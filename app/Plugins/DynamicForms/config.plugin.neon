@@ -1,0 +1,15 @@
+extensions:
+	contactForm: App\Plugins\DynamicForms\DI\Extension()
+
+services:
+	#Front
+	- App\Plugins\DynamicForms\Forms\ContactFormFactory
+	#contactFormControl: App\Components\ContactForm\ContactForm
+	- App\Plugins\DynamicForms\Components\ContactFormControl
+	- App\Plugins\DynamicForms\Model\DynamicForms
+	- App\Plugins\DynamicForms\Forms\DynamicFormFormFactory
+	- App\Plugins\DynamicForms\Forms\DynamicFormItemFormFactory
+
+	-
+		factory: App\Plugins\DynamicForms\Components\ContactFormComponentFactory
+		tags: [presenter.component: contactFormControl]

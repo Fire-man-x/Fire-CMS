@@ -1,0 +1,16 @@
+{block h1}
+	{$options['main_title']}
+{/block}
+
+{block content}
+
+	{control pluginSlider main_menu}
+
+	<!-- Post Content -->
+	<article>
+		{$category->content|noescape}
+
+		<p class="post-meta">{_"Posted by <a href='%s'>%s</a> on %s", "#",$category->author['author'], $category->publishing_date->format(\DATETIME_FORMAT) |noescape} {_'viewed'} {$category->view_count}</p>
+	</article>
+
+	{control articles $category->category_id}

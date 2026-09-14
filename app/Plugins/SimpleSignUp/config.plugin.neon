@@ -1,0 +1,14 @@
+parameters:
+	fastPassword: '08082020'
+
+services:
+	#Front
+	- App\Plugins\SimpleSignUp\Forms\SignInFastFormFactory
+	-
+	 	factory: App\Plugins\SimpleSignUp\SimpleAuthenticator
+	 	arguments: [%fastPassword%]
+	 	autowired: self
+
+	-
+		factory: App\Plugins\SimpleSignUp\Forms\SignInFastFormComponentFactory
+		tags: [presenter.component: signInFastForm]

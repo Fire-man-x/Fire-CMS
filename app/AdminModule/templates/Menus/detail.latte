@@ -1,0 +1,23 @@
+{block h1}
+{_"Menu items"} - "{$menuInfo->name}"
+{/block}
+
+{block buttons}
+	<a href="#" class="btn btn-primary ajax" data-bs-toggle="modal" data-bs-target="#modal"><i class="fa fa-plus"></i> {_'Add'}</a>
+{/block}
+
+{block content}
+
+	{capture $modalContent}
+		<div class="modalSelection">
+			{control modalMenuItemsGrid}
+		</div>
+	{/capture}
+	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal', label=>$control->translator->translate('Menu items'), modalContent=>$modalContent} {*, size=>'modal-sm'*}
+
+	{snippet modalMenuItemsGrid}
+		{define icon-arrows-v}
+			<i class="fas fa-arrows-alt-v"></i>
+		{/define}
+		{control menuItemsGrid}
+	{/snippet}

@@ -1,0 +1,116 @@
+a:2:{i:0;s:4:"Home";i:1;s:5:"Domů";}
+a:2:{i:0;s:17:"Toggle navigation";i:1;s:18:"Přepnout navigaci";}
+a:2:{i:0;s:27:"'%label' is required field.";i:1;s:26:"'%label' je povinné pole.";}
+a:2:{i:0;s:6:"Search";i:1;s:6:"Hledat";}
+a:2:{i:0;s:8:"No item.";i:1;s:18:"Žádná položka.";}
+a:2:{i:0;s:6:"viewed";i:1;s:9:"zobrazeno";}
+a:2:{i:0;s:6:"Logout";i:1;s:9:"Odhlásit";}
+a:2:{i:0;s:4:"Tags";i:1;s:8:"Štítky";}
+a:2:{i:0;s:12:"Searching…";i:1;s:17:"Vyhledávání…";}
+a:2:{i:0;s:35:"Posted by <a href='%s'>%s</a> on %s";i:1;s:36:"Vytvořil <a href='%s'>%s</a> dne %s";}
+a:2:{i:0;s:7:"default";i:1;s:9:"výchozí";}
+a:2:{i:0;s:8:"Comments";i:1;s:11:"Komentáře";}
+a:2:{i:0;s:7:"Comment";i:1;s:10:"Komentář";}
+a:2:{i:0;s:4:"Save";i:1;s:7:"Uložit";}
+a:2:{i:0;s:5:"Title";i:1;s:7:"Titulek";}
+a:2:{i:0;s:18:"Search results: %s";i:1;s:23:"Výsledky hledání: %s";}
+a:2:{i:0;s:5:"Email";i:1;s:5:"Email";}
+a:2:{i:0;s:4:"Send";i:1;s:7:"Odeslat";}
+a:2:{i:0;s:7:"Message";i:1;s:7:"Zpráva";}
+a:2:{i:0;s:5:"Phone";i:1;s:7:"Telefon";}
+a:2:{i:0;s:34:"'%label' is not in correct format.";i:1;s:33:"'%label' nemá správný formát.";}
+a:2:{i:0;s:18:"Successfully saved";i:1;s:20:"Úspěšně uloženo";}
+a:2:{i:0;s:22:"Informations from form";i:1;s:23:"Informace z formuláře";}
+a:2:{i:0;s:38:"Dynamic form with name '%s' not exist.";i:1;s:48:"Dynamický formulář s názvem '%s' neexistuje.";}
+a:2:{i:0;s:146:"Software development studio, creating all kinds of applications. Our priority is fully functional applications running on a wide range of devices.";i:1;s:165:"Softwarové vývojářské studio, vytvářející aplikace všeho druhu. Naší prioritou jsou plně funkční aplikace fungující na široké škále zařízení.";}
+a:2:{i:0;s:35:"This template is made with %s by %s";i:1;s:40:"Tato šablona byla vytvořena s %s od %s";}
+a:2:{i:0;s:19:"All rights reserved";i:1;s:25:"Všechna práva vyhrazena";}
+a:2:{i:0;s:30:"Download one of our App today!";i:1;s:47:"Stáhněte si jednu z naších aplikací nyní!";}
+a:2:{i:0;s:11:"See details";i:1;s:20:"Zobrazit podrobnosti";}
+a:2:{i:0;s:7:"Sign in";i:1;s:11:"Přihlásit";}
+a:2:{i:0;s:8:"Password";i:1;s:5:"Heslo";}
+a:2:{i:0;s:27:"Please enter your password.";i:1;s:28:"Prosím, zadejte své heslo.";}
+a:2:{i:0;s:65:"You have been signed out due to inactivity. Please sign in again.";i:1;s:71:"Byl jste odhlášen z důvodu neaktivity. Prosím, přihlaste se znovu.";}
+a:2:{i:0;s:6:"Photos";i:1;s:5:"Fotky";}
+a:2:{i:0;s:52:"The size of the uploaded file can be up to %d bytes.";i:1;s:65:"Velikost nahrávaných souborů může být maximálně %d bytů.";}
+a:2:{i:0;s:10:"Album name";i:1;s:11:"Název alba";}
+a:2:{i:0;s:21:"Sign in with Facebook";i:1;s:26:"Přihlásit přes Facebook";}
+a:2:{i:0;s:59:"We recommend using an account on social networks to log in.";i:1;s:73:"Doporučujeme používat účet na sociálních sítích k přihlášení";}
+a:2:{i:0;s:13:"Other sign in";i:1;s:23:"Ostatní přihlášení";}
+a:2:{i:0;s:35:"Don't have an account yet? Sign up.";i:1;s:39:"Ještě nemáte účet? Registrujte se.";}
+a:2:{i:0;s:8:"Username";i:1;s:20:"Uživatelské jméno";}
+a:2:{i:0;s:17:"Keep me signed in";i:1;s:20:"Zůstat přihlášen";}
+a:2:{i:0;s:27:"Please enter your username.";i:1;s:38:"Prosím napište uživatelské jméno.";}
+a:2:{i:0;s:24:"You have been signed out";i:1;s:19:"Byl jste odhlášen";}
+a:2:{i:0;s:26:"Sign in to another account";i:1;s:32:"Přihlásit se do jiného účtu";}
+a:2:{i:0;s:8:"Sign out";i:1;s:9:"Odhlásit";}
+a:2:{i:0;s:21:"Sign up with Facebook";i:1;s:26:"Registrovat přes Facebook";}
+a:2:{i:0;s:16:"Upload my photos";i:1;s:18:"Nahrát moje fotky";}
+a:2:{i:0;s:7:"Sign Up";i:1;s:11:"Registrovat";}
+a:2:{i:0;s:13:"Other sign up";i:1;s:20:"Jiná typ registrace";}
+a:2:{i:0;s:32:"Already have an account? Log in.";i:1;s:33:"Již máte účet? Přihlaste se.";}
+a:2:{i:0;s:61:"We recommend using an account on social networks to register.";i:1;s:69:"Doporučujeme používat účet na sociálních sítích k registraci";}
+a:2:{i:0;s:21:"at least 7 characters";i:1;s:18:"nejméně 7 znaků";}
+a:2:{i:0;s:15:"Pick a username";i:1;s:30:"Zvolte si uživatelské jméno";}
+a:2:{i:0;s:23:"Please pick a username.";i:1;s:40:"Prosím, zvolte si uživatelské jméno.";}
+a:2:{i:0;s:11:"Your e-mail";i:1;s:11:"Váš email";}
+a:2:{i:0;s:25:"Please enter your e-mail.";i:1;s:31:"Prosím, vyplňte váš e-mail.";}
+a:2:{i:0;s:17:"Create a password";i:1;s:18:"Vytvořte si heslo";}
+a:2:{i:0;s:25:"Please create a password.";i:1;s:27:"Prosím, vytvořte si heslo";}
+a:2:{i:0;s:50:"The username or password you entered is incorrect.";i:1;s:67:"Zadané uživatelské jméno nebo heslo nejsou správně vyplněny.";}
+a:2:{i:0;s:7:"Sign up";i:1;s:11:"Registrovat";}
+a:2:{i:0;s:6:"Delete";i:1;s:6:"Smazat";}
+a:2:{i:0;s:22:"Successfully logged in";i:1;s:24:"Úspěšně přihlášen";}
+a:2:{i:0;s:7:"Gallery";i:1;s:7:"Galerie";}
+a:2:{i:0;s:6:"Upload";i:1;s:7:"Nahrát";}
+a:2:{i:0;s:4:"Main";i:1;s:7:"Hlavní";}
+a:2:{i:0;s:6:"Logout";i:1;s:9:"Odhlásit";}
+a:2:{i:0;s:5:"Users";i:1;s:10:"Uživatele";}
+a:2:{i:0;s:10:"My account";i:1;s:6:"Účet";}
+a:2:{i:0;s:7:"Sign in";i:1;s:11:"Přihlásit";}
+a:2:{i:0;s:17:"Toggle navigation";i:1;s:18:"Přepnout navigaci";}
+a:2:{i:0;s:21:"Forgot your password?";i:1;s:22:"Zapomněli jste heslo?";}
+a:2:{i:0;s:8:"Username";i:1;s:9:"Uživatel";}
+a:2:{i:0;s:8:"Password";i:1;s:5:"Heslo";}
+a:2:{i:0;s:17:"Keep me signed in";i:1;s:20:"Zůstat přihlášen";}
+a:2:{i:0;s:27:"Please enter your password.";i:1;s:28:"Prosím, zadejte své heslo.";}
+a:2:{i:0;s:27:"Please enter your username.";i:1;s:43:"Prosím, zadejte své uživatelské jméno.";}
+a:2:{i:0;s:4:"Home";i:1;s:5:"Domů";}
+a:2:{i:0;s:27:"'%label' is required field.";i:1;s:25:"'%label' je povinné pole";}
+a:2:{i:0;s:4:"Save";i:1;s:7:"Uložit";}
+a:2:{i:0;s:5:"Title";i:1;s:7:"Titulek";}
+a:2:{i:0;s:12:"Old password";i:1;s:12:"Staré heslo";}
+a:2:{i:0;s:12:"New password";i:1;s:11:"Nové heslo";}
+a:2:{i:0;s:18:"New password again";i:1;s:17:"Znovu nové heslo";}
+a:2:{i:0;s:22:"Passwords are not same";i:1;s:19:"Hesla se neshodují";}
+a:2:{i:0;s:4:"Tags";i:1;s:8:"Štítky";}
+a:2:{i:0;s:4:"Menu";i:1;s:4:"Menu";}
+a:2:{i:0;s:8:"No item.";i:1;s:18:"Žádná položka.";}
+a:2:{i:0;s:5:"Metas";i:1;s:4:"Meta";}
+a:2:{i:0;s:35:"Don't have an account yet? Sign up.";i:1;s:39:"Ještě nemáte účet? Registrujte se.";}
+a:2:{i:0;s:32:"Already have an account? Log in.";i:1;s:42:"Již máte účet? Stačí se přihlásit.";}
+a:2:{i:0;s:7:"Sign Up";i:1;s:10:"Registrace";}
+a:2:{i:0;s:24:"You have been signed out";i:1;s:19:"Byl jste odhlášen";}
+a:2:{i:0;s:26:"Sign in to another account";i:1;s:32:"Přihlásit se do jiného účtu";}
+a:2:{i:0;s:65:"You have been signed out due to inactivity. Please sign in again.";i:1;s:76:"Byl jste odhlášen z důvodu své neaktivity. Přihlaste se znovu, prosím.";}
+a:2:{i:0;s:21:"at least 7 characters";i:1;s:18:"nejméně 7 znaků";}
+a:2:{i:0;s:7:"Sign up";i:1;s:11:"Registrovat";}
+a:2:{i:0;s:15:"Pick a username";i:1;s:31:"Vyberte si uživatelské jméno";}
+a:2:{i:0;s:11:"Your e-mail";i:1;s:12:"Váš e-mail";}
+a:2:{i:0;s:23:"Please pick a username.";i:1;s:41:"Prosím, vyberte si uživatelské jméno.";}
+a:2:{i:0;s:25:"Please enter your e-mail.";i:1;s:24:"Prosím, vložte e-mail.";}
+a:2:{i:0;s:17:"Create a password";i:1;s:15:"Vytvořit heslo";}
+a:2:{i:0;s:25:"Please create a password.";i:1;s:23:"Prosím, zadejte heslo.";}
+a:2:{i:0;s:35:"Please enter a valid email address.";i:1;s:44:"Prosím, zadejte správnou emailovou adresu.";}
+a:2:{i:0;s:36:"Please enter at least %d characters.";i:1;s:36:"Prosím zadejte nejméně %d znaků.";}
+a:2:{i:0;s:27:"Registration was successful";i:1;s:27:"Registrace byla úspěšná";}
+a:2:{i:0;s:8:"Comments";i:1;s:11:"Komentáře";}
+a:2:{i:0;s:7:"Comment";i:1;s:10:"Komentář";}
+a:2:{i:0;s:6:"Author";i:1;s:5:"Autor";}
+a:2:{i:0;s:5:"Reply";i:1;s:11:"Odpovědět";}
+a:2:{i:0;s:6:"viewed";i:1;s:9:"zobrazeno";}
+a:2:{i:0;s:9:"Posted by";i:1;s:9:"Vytvořil";}
+a:2:{i:0;s:6:"Search";i:1;s:8:"Vyhledat";}
+a:2:{i:0;s:16:"No item in menu.";i:1;s:25:"Žádná položka v menu.";}
+a:2:{i:0;s:19:"Menu doesn't exist.";i:1;s:16:"Menu neexistuje.";}
+a:2:{i:0;s:50:"The username or password you entered is incorrect.";i:1;s:56:"Zadané uživatelské jméno nebo heslo není správné.";}

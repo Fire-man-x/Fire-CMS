@@ -1,0 +1,237 @@
+{**
+ * @param string   $basePath web base path
+ * @param array	$flashes  flash messages
+ *}
+{var $basePath = $basePath.'/..'}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+
+	<title>{ifset title}{include title|stripHtml} | {/ifset}Fire CMS / Admin</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="icon" href="{$basePath}/administration/favicon.png" type="image/png">
+
+	{block head}{/block}
+
+	{var $themeColor = '#343a40'}
+	{ifset $themeColor}
+		<meta name="theme-color" content="{$themeColor}">{* Chrome, Firefox OS and Opera *}
+		<meta name="msapplication-navbutton-color" content="{$themeColor}">{* Windows Phone *}
+		<meta name="apple-mobile-web-app-capable" content="yes">{* iOS Safari -*}
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	{/ifset}
+
+	{block scripts}
+	<script type="text/javascript" src="{$basePath}/vendors/jquery/jquery-3.1.1.min.js"></script>
+	<script type="text/javascript" src="{$basePath}/vendors/jquery-ui/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="{$basePath}/vendors/jquery-ui/jquery-ui.min.css">
+	<script type="text/javascript" src="{$basePath}/vendors/netteForms.min.js"></script>
+	<script type="text/javascript" src="{$basePath}/vendors/nette.ajax.js"></script>
+	<script type="text/javascript" src="{$basePath}/administration/js/jquery.mjs.nestedSortable.js"></script>
+	<script type="text/javascript" src="{$basePath}/administration/js/main.js"></script>
+	{/block}
+
+	<!-- Bootstrap with Pooper without jQuery -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+
+
+	<!--link href="{$basePath}/administration/cssistration/theme.litera.css" rel="stylesheet" /-->
+	<link rel="stylesheet" href="{$basePath}/administration/css/style.css">
+
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="{$basePath}/vendors/fontawesome-free-5.9.0-web/css/all.min.css">
+
+	<!-- MesourGrid -- >
+	<link rel="stylesheet" href="{$basePath}/administration/css/mesourGrid.css">
+	<script src="{$basePath}/administration/js/mesourGrid.js"></script>
+
+	<!-- Datagrid -->
+	<link rel="stylesheet" href="{$basePath}/administration/css/datagrid.css">
+	<script src="{$basePath}/administration/js/datagrid.js"></script>
+
+	<!-- CK Editor -- >
+	<script src="//cdn.ckeditor.com/4.6.1/standard/ckeditor.js"></script-->
+	<script>
+		var linkToFileManagerUrl = {link :Admin:FilesManager:default isWindowMode=>true};
+		var nameFileManager = {_"Files manager"};
+	</script>
+
+	<!-- Summernote -->
+	<link rel="stylesheet" href="{$basePath}/vendors/summernote-0.8.12/summernote-bs4.css">
+	<script src="{$basePath}/vendors/summernote-0.8.12/summernote-bs4.js"></script>
+	<script src="{$basePath}/vendors/summernote-0.8.12/lang/summernote-cs-CZ.js"></script>
+
+
+	<!-- Files upload -->
+	{\Zet\FileUpload\FileUploadControl::getHead($basePath.'/vendors')}
+	{\Zet\FileUpload\FileUploadControl::getScripts($basePath.'/vendors')}
+
+	<!-- Typeahead -->
+	<link rel="stylesheet" href="{$basePath}/administration/css/typeaheadjs.css">
+	<script src="{$basePath}/administration/js/typeahead.bundle.min.js"></script>
+
+	<!-- TokenField -->
+	<link rel="stylesheet" href="{$basePath}/administration/css/bootstrap-tokenfield.min.css">
+	<script src="{$basePath}/administration/js/bootstrap-tokenfield.js"></script>
+
+</head>
+
+<body {if $isWindowMode}style="padding-top: 0.5rem;"{/if}>
+	<nav n:if="!$isWindowMode" class="navbar navbar-expand-md navbar-dark bg-dark navbar-inverse bg-primary" role="toolbar">
+		<div class="container-fluid">
+			<a class="navbar-brand" n:href=":Admin:Default:default">Fire CMS / Admin</a>
+			<button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="{_"Toggle navigation"}">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div n:if="$user->isLoggedIn() && $user->isAllowed('Admin')" class="collapse navbar-collapse" id="navbarResponsive">
+			<ul class="nav navbar-nav me-auto ">
+				<li n:if="$user->isAllowed('Categories', 'view') || /*$user->isAllowed('Articles', 'view') ||*/ $user->isAllowed('FilesManager', 'view') || $user->isAllowed('Menus', 'view')" class="nav-item dropdown {if
+						$presenter->isLinkCurrent(':Admin:Categories:*') ||
+						$presenter->isLinkCurrent(':Admin:Articles:*') ||
+						$presenter->isLinkCurrent(':Admin:FilesManager:*') ||
+						$presenter->isLinkCurrent(':Admin:Menus:*') ||
+						$presenter->isLinkCurrent(':Admin:Plugin:Sliders:*')}active{/if}">
+					<a href="" class="nav-link dropdown-toggle" id="responsiveNavbarDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{_"Content"}</a>
+					<div class="dropdown-menu" aria-labelledby="responsiveNavbarDropdown">
+						<a n:if="$user->isAllowed('Categories', 'view')" n:href=":Admin:Categories:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Categories:default') ? 'active', dropdown-item">{_"Categories"}</a>
+						<a n:if="$user->isAllowed('Articles', 'view')" n:href=":Admin:Articles:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Articles:default') ? 'active', dropdown-item">{_"Articles"}</a>
+						<a n:if="$user->isAllowed('Comments', 'view')" n:href=":Admin:Comments:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Comments:default') ? 'active', dropdown-item">{_"Comments"}</a>
+						<a n:if="$user->isAllowed('FilesManager', 'view')" n:href=":Admin:FilesManager:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:FilesManager:default') ? 'active', dropdown-item">{_"Files manager"}</a>
+						<a n:if="$user->isAllowed('Menus', 'view')" n:href=":Admin:Menus:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Menus:default') ? 'active', dropdown-item">{_"Menu"}</a>
+						<a n:if="true || $user->isAllowed('Sliders', 'view')" n:href=":Admin:Sliders:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Sliders:default') ? 'active', dropdown-item">{_"Sliders"}</a>
+					</div>
+				</li>
+				<li class="nav-item dropdown {if $presenter->isLinkCurrent(':Admin:Categories:*')}active{/if}">
+					<a href="" class="nav-link dropdown-toggle" id="responsiveNavbarDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{_"Other"}</a>
+					<div class="dropdown-menu" aria-labelledby="responsiveNavbarDropdown">
+						<a n:if="$user->isAllowed('DynamicForms', 'view')" n:href=":Admin:DynamicForms:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:DynamicForms:default') ? 'active', dropdown-item">{_"Dynamic forms"}</a>
+						<a n:if="true || $user->isAllowed('Towns', 'view')" n:href=":Admin:Towns:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Towns:default') ? 'active', dropdown-item">{_"Towns"}</a>
+						<a n:if="true || $user->isAllowed('Events', 'view')" n:href=":Admin:Events:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Events:default') ? 'active', dropdown-item">{_"Events"}</a>
+						<a n:if="true || $user->isAllowed('Tests', 'view')" n:href=":Admin:Tests:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Tests:default') ? 'active', dropdown-item">{_"Tests"}</a>
+						<a n:if="true || $user->isAllowed('Calendar', 'view')" n:href=":Admin:Calendar:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Calendar:default') ? 'active', dropdown-item">{_"Calendar"}</a>
+						<a n:if="true || $user->isAllowed('Calendar', 'view')" n:href=":Admin:Calendar:League:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Calendar:League:default') ? 'active', dropdown-item">{_"Calendar"} - {_"League"}</a>
+						<a n:if="true || $user->isAllowed('Attendace', 'view')" n:href=":Admin:Attendance:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Attendance:default') ? 'active', dropdown-item">{_"Attendance"}</a>
+						<a n:if="true || $user->isAllowed('Members', 'view')" n:href=":Admin:Members:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Members:default') ? 'active', dropdown-item">{_"Members"}</a>
+						<!-- Example split danger button -->
+						{*<div class="btn-group">
+							<a type="button" class="dropdown-item">Action</a>
+							<button type="button" class="btn dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<span class="sr-only">Toggle Dropdown</span>
+							</button>
+							<div class="dropdown-menu">
+								<a class="dropdown-item" href="#">Action</a>
+								<a class="dropdown-item" href="#">Another action</a>
+								<a class="dropdown-item" href="#">Something else here</a>
+							</div>
+						</div>*}
+					</div>
+				</li>
+				<li n:if="$user->isAllowed('Settings', 'view')" class="nav-item dropdown {if
+						$presenter->isLinkCurrent(':Admin:Settings:Default:*') ||
+						$presenter->isLinkCurrent(':Admin:Settings:Languages:*') ||
+						$presenter->isLinkCurrent(':Admin:Settings:Users:*') ||
+						$presenter->isLinkCurrent(':Admin:Settings:Roles:*') ||
+						$presenter->isLinkCurrent(':Admin:Settings:Tags:*') ||
+						$presenter->isLinkCurrent(':Admin:Settings:Urls:*')}active{/if}">
+					<a href=""  class="nav-link dropdown-toggle" id="responsiveNavbarDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{_"Settings"}</a>
+					<div class="dropdown-menu" aria-labelledby="responsiveNavbarDropdown">
+						<a n:href=":Admin:Settings:Default:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Settings:Default:default') ? 'active', dropdown-item">{_"Main"}</a>
+						<a n:href=":Admin:Settings:Languages:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Settings:Languages:default') ? 'active', dropdown-item">{_"Languages"}</a>
+						{*<a n:href=":Admin:Settings:Metas:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Settings:Metas:default') ? 'active', dropdown-item">{_"Metas"}</a>*}
+						<a n:href=":Admin:Settings:Users:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Settings:Users:default') ? 'active', dropdown-item">{_"Users"}</a>
+						<a n:href=":Admin:Settings:Roles:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Settings:Roles:default') ? 'active', dropdown-item">{_"Roles"}</a>
+						<a n:href=":Admin:Settings:Tags:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Settings:Tags:default') ? 'active', dropdown-item">{_"Tags"}</a>
+						<a n:href=":Admin:Settings:Urls:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Settings:Urls:default') ? 'active', dropdown-item">{_"Urls"}</a>
+					</div>
+				</li>
+			</ul>
+
+			<ul class="nav navbar-nav {*float-md-right*}" >
+				<li><a n:href=":Front:Default:default id=>null" class="nav-link d-block" title="{_'Show web'}" target="blank" data-bs-toggle="tooltip" data-bs-placement="left"><i class="fa fa-globe"></i></a></li>
+				<li class="nav-item dropdown">
+					<a href="#" class="nav-link dropdown-toggle" id="userNavbarDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<span class="fa fa-user"></span>
+						{$user->getIdentity()->makedName} ({$user->getIdentity()->username})
+					</a>
+
+					<div class="dropdown-menu dropdown-menu-right" aria-labelledby="responsiveNavbarDropdown">
+						<a href="./" class="dropdown-item"><i class="fa fa-user fa-fw" aria-hidden="true"></i> {_"My account"}</a>
+						{if $user->isInRole('admin')}
+							<div class="dropdown-divider"></div>
+							<a class="dropdown-header"><i class=" fa fa-lock fa-fw" aria-hidden="true"></i> {_"Admin Panel"}</a>
+							<a n:href=":Admin:Settings:Users:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Settings:Users:default') ? 'active', dropdown-item"><i class="fa fa-users fa-fw " aria-hidden="true"></i> {_"Users"}</a>
+						{/if}
+						<div class="dropdown-divider"></div>
+						<a n:href=":Admin:Sign:out id=>null" class="dropdown-item" tabindex="-1"><i class="fa fa-sign-out fa-fw" aria-hidden="true"></i> {_"Logout"}</a>
+					</div>
+				</li>
+			</ul>
+		</div>
+		</div>
+	</nav>
+
+	<div class="container-fluid" id="main">
+		<div n:tag-ifset="sidebar" class="row row-offcanvas row-offcanvas-left">
+
+
+			<div n:if="$user->isLoggedIn() /*&& !$isWindowMode*/" n:ifset="sidebar" id="sidebar" class="col-md-3 col-lg-2 mt-1 sidebar-offcanvas" role="navigation">
+				{include sidebar}
+			</div>
+
+			<div n:tag-if="$user->isLoggedIn() /*&& !$isWindowMode*/" id="content" {ifset sidebar}class="col-md-9 col-lg-10 main"{/ifset}>
+
+				<!--toggle sidebar button-->
+				{*<p n:if="$user->isLoggedIn() /*&& !$isWindowMode*/" n:ifset="sidebar" class="hidden-md-up">
+					<button type="button" class="btn btn-primary-outline btn-sm" data-bs-toggle="offcanvas"><i class="fa fa-chevron-left"></i> {_"Menu"}</button>
+				</p>*}
+
+				{snippet flashes}
+					<div n:ifset="$flashes" class="message" >
+						<div n:foreach="$flashes as $flash" n:class="alert-dismissible, fade, show, flash, $flash->type, alert, 'alert-'.$flash->type" role="alert" data-bs-dismiss="alert">
+							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{_"Close"}" title="{_"Close"}">
+								<span aria-hidden="true" class="visually-hidden">&times;</span>
+							</button>
+							{$flash->message}
+						</div>
+					</div>
+				{/snippet}
+
+				<div n:if="$user->isLoggedIn() && !$isWindowMode" class="header mt-2">
+					{*<div n:ifset="stats" class="stats">
+						{include stats}
+					</div>*}
+
+					<h1 n:block=title class="page-title">{ifset h1}{include h1}{/ifset}</h1>
+
+					{control breadCrumb}
+				</div>
+
+				<div n:ifset="buttons" class="btn-toolbar mb-3" role="toolbar" aria-label="{_"Toolbar with action buttons"}">
+					<div class="btn-group mr-2" role="group">
+						{include buttons}
+					</div>
+				</div>
+
+				{include content}
+			</div>
+		</div>
+	</div>
+
+	<footer n:if="!$isWindowMode" class="footer">
+		<div class="container-fluid">
+			<span class="text-muted text-right small float-right">© 2019-{date('Y')} <a href="https://www.koterec.cz/" target="_blank">Fire CMS</a></span>
+		</div>
+	</footer>
+
+	{* confirm dialog *}
+	{capture $modalFooter}
+		<button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" aria-hidden="true">{_'Cancel'}</button>
+		<a href="#" id="confirm-button" class="btn btn-danger">{_'Ok'}</a>
+	{/capture}
+	{include '../../Presenters/templates/Components/modalForm.latte' id=>'confirm-modal', label=>null, modalFooter=>$modalFooter} {*, size=>'modal-sm'*}
+</body>
+</html>

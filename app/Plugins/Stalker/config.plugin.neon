@@ -1,0 +1,6 @@
+services:
+	#Admin
+	- App\Plugins\Stalker\Model\Stalkers
+	stalker:
+		factory: App\Plugins\Stalker\Stalker
+		tags: [presenter.plugin: stalker]

@@ -1,0 +1,17 @@
+{block content}
+
+<div class="container">
+	<div class="col-xs-8 offset-xs-2 col-lg-4 offset-lg-4">
+		<h1 n:block=title>{_"Sign in"}</h1>
+		{* OR
+		{import '../Components/form.latte'}
+		{include form signInForm}
+		*}
+		{control signInForm}
+
+		<div class="clearfix"></div>
+		<p><a n:href="up">{_"Don't have an account yet? Sign up."}</a></p>
+	</div>
+</div>
+
+

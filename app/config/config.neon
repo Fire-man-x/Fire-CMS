@@ -1,0 +1,229 @@
+#
+# WARNING: it is CRITICAL that this file & directory are NOT accessible directly via a web browser!
+# https://nette.org/security-warning
+#
+parameters:
+	themePath: "%wwwDir%/theme"
+
+application:
+	errorPresenter: Error
+	mapping:
+		*: App\*Module\Presenters\*Presenter
+	debugger: true
+
+session:
+	expiration: 14 days
+	savePath: "%tempDir%/sessions"
+
+tracy:
+	bar:
+		- LiveTranslator\Panel
+
+search:
+	# Routery
+	router:
+		in: %appDir%/Router
+		implements: App\Router\RouterProvider
+
+
+extensions:
+	router: App\Router\DI\RouterProviderExtension
+	#uploadManager: ondrs\UploadManager\DI\Extension
+	fileUpload: Zet\FileUpload\FileUploadExtension
+	#imageStore: Rostenkowski\ImageStore\Extension
+	fileManager: App\Components\FileManager\DI\Extension
+
+	#Input
+	tagInput: Achse\TagInput\Extension
+	dateInput: Vodacek\Forms\Controls\Extension
+	visualpaginator: AlesWita\Components\VisualPaginatorExtension
+	antispam: Zet\AntiSpam\AntiSpamExtension
+
+	#replicator
+	replicator: Kdyby\Replicator\DI\ReplicatorExtension
+
+# Pořadí načítání rout (vyšší priorita = dřív = vyšší přednost).
+# Routery pluginů mají bez nastavení prioritu 0, ostatní -100.
+router:
+	priorities:
+		App\Router\AdminRouter: 100
+		App\Router\FileRouter: -50
+		App\Router\FrontRouter: -100
+
+fileUpload:
+	maxFiles: 100
+	maxFileSize: 20M
+	fileFilter: '' #Zet\FileUpload\Filter\ImageFilter
+	uploadModel: App\Model\MultiFileUploadModel #Zet\FileUpload\Model\BaseUploadModel
+	renderer: Zet\FileUpload\Template\Renderer\Bootstrap4Renderer
+
+fileManager:
+	storageDir: %wwwDir%/files
+	cacheDir:   %wwwDir%/files/cache
+	basePath:   /files/cache/
+
+visualpaginator:
+	session: @Nette\Http\Session
+	translator: @Nette\Localization\Translator
+	template: AlesWita\Components\VisualPaginator::TEMPLATE_BOOTSTRAP_V4 # without '@' !!!
+	#itemsPerPageList: [1: 1, 2: 2, 3: 3]
+	messages:
+		"send": "paginator.send"
+		"itemsPerPage": "paginator.itemsPerPage"
+
+#imageStore:
+#	storageDir: %appDir%/../data/images
+#	cacheDir:   %wwwDir%/cached-images
+#	basePath:   /images/
+
+services:
+	pluginServiceLocator:
+		implement: App\DI\IPluginServiceLocator
+		tagged: presenter.plugin
+
+	pluginComponentLocator:
+		implement: App\DI\IPluginComponentLocator
+		tagged: presenter.component
+
+	nette.latteFactory:
+		setup:
+			- addFilter('shortcodes', [@shortcodes, transform]) #[App\Components\Shortcodes, transform])
+
+	# Custom presenter factory: falls back to presenters living in plugin/module
+	# trees under their own PSR-4 namespace (App\Plugins\*, App\Modules\*).
+	# The PresenterFactoryCallback (DI-aware presenter instantiation) must be
+	# re-declared because redefining `factory` drops the inherited arguments;
+	# the setMapping() setup added by nette/application is kept automatically.
+	application.presenterFactory:
+		factory: App\Application\PresenterFactory(
+			Nette\Bridges\ApplicationDI\PresenterFactoryCallback(_, null)
+		)
+		setup:
+			- setScanDirs([%appDir%/Plugins, %appDir%/Modules, %appDir%/../theme/Plugins])
+
+	- App\Model\Users
+	- App\Model\UserManager
+	roles: App\Model\Roles
+	formFactory: App\Forms\FormFactory
+	- App\Forms\SignInFormFactory
+	- App\Forms\SignUpFormFactory
+	- App\Modules\UrlModule\Model
+	- App\Modules\UrlModule\RedirectionsModel
+	urlManager: App\Modules\UrlModule\UrlManager
+
+	galleryImageStorage:
+		factory: App\Plugins\SDHGallery\Components\GalleryImageStorage
+		autowired: false
+		arguments:
+			directory: %wwwDir%/foto/public
+			cacheDirectory: %wwwDir%/foto/public
+			baseUrl: /foto/
+
+	userGalleryImageStorage:
+		factory: App\Plugins\SDHGallery\Components\UserGalleryImageStorage
+		autowired: false
+		arguments:
+			directory: %wwwDir%/foto/nopublic/upload
+			cacheDirectory: %wwwDir%/foto/nopublic/upload/cache
+			baseUrl: /foto/nopublic/upload/cache
+
+	- App\Plugins\SDHGallery\Components\UserGalleryImageLoader(@userGalleryImageStorage)
+	- App\Plugins\SDHGallery\Presenters\GalleryPresenter(@galleryImageStorage)
+
+	- App\Model\Categories
+	- App\Service\Category
+	- App\Forms\CategoryFormFactory
+	- App\Forms\CategorySubtype\DefaultFormPart
+	- App\Forms\CategorySubtype\HomepageFormPart
+	- App\Forms\CategorySubtype\CategoryLinkFormPart
+	- App\Forms\CategorySubtype\UrlFormPart
+	- App\Forms\CategorySubtype\GalleryFormPart
+	- App\Modules\UrlModule\Forms\UrlFormFactory
+	- App\Modules\UrlModule\Forms\RedirectionFormFactory
+
+
+	- App\Model\Articles
+	- App\Service\Article
+	- App\Forms\ArticleFormFactory
+
+	- App\Modules\CommentsModule\Model\Comments
+	- App\Modules\CommentsModule\Comment
+	- App\Forms\CommentFormFactory
+
+	- App\Model\Files
+	- App\Model\FileFolders
+	- App\Forms\FilesManagerUploadFormFactory
+	- App\Forms\FilesManagerFolderFormFactory
+	- App\Forms\FilesManagerFileNameFormFactory
+	- App\Model\MultiFileUploadModel
+	- App\Plugins\SDHGallery\Components\MultiFileUploadModel
+
+	- App\Components\Menu\Model\Menus
+	- App\Forms\MenuFormFactory
+
+	#Admin\Settings
+	- App\Model\Options
+	- App\Forms\SettingFormFactory
+	- App\Model\Languages
+	- App\Forms\LanguageFormFactory
+	languages: App\Service\LanguageService
+	- App\Forms\RoleFormFactory
+	- App\Forms\TagFormFactory
+	modules: App\Model\Modules
+	- App\Forms\UserFormFactory
+	- App\Model\Tags
+
+	- App\Model\Metas
+	- App\Model\ArticleMetas
+	- App\Model\CategoryMetas
+	- App\Forms\MetaFormFactory
+	- App\Forms\MetaValueFormFactory
+
+
+	#Admin Menu
+	- App\Components\CategoriesMenu\CategoriesMenu
+	- App\Components\FilesManagerMenu\FilesManagerMenu
+
+	#- ondrs\UploadManager\Managers\FileManager
+	- Zet\FileUpload\Model\BaseUploadModel
+
+	#Frontend
+	- App\Components\Menu\Menu
+	- App\Components\LanguageChanger\LanguageChanger
+	- App\FrontModule\Components\Articles\Articles
+	- App\FrontModule\Components\Categories\Categories
+	- App\FrontModule\Components\SearchControl\SearchFormFactory
+	- App\FrontModule\Components\SearchControl\SearchControl
+	- App\FrontModule\Components\LoginLinkControl\LoginLinkControl
+	- App\Modules\CommentsModule\Components\Comments\Comments
+	- App\Components\ViewCounter
+	- App\Components\ThemePath(%themePath%)
+	shortcodes: App\Components\Shortcodes
+
+	#Services
+	- App\Service\Meta
+	- App\Service\Tag
+
+	translator:
+		factory: LiveTranslator\Translator("en") #default lang "en" is overrided in BaseFrontPresenter
+		#setup:
+			#- setAvailableLanguages([en, cs])
+			#- setAvailableLanguages([
+			#	en: "nplurals=2; plural=(n==1) ? 0 : 1;",
+			#	cs: "nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4 ? 1 : 2));",
+			#])
+			##- setPresenterLanguageParam(lang)
+	translatorStorage: LiveTranslator\Storage\File(%appDir%/../data/localization/)
+
+	user: App\Security\User
+	authorizator: App\Security\AuthorizatorFactory::create(@modules, @roles)
+
+	- Contributte\OAuth2Client\Flow\Facebook\FacebookProvider([
+		clientId: 278805626686671
+		clientSecret: 672440917df9593167bd325fde14f1cb
+		graphApiVersion: v15.0
+	])
+	- Contributte\OAuth2Client\Flow\Facebook\FacebookAuthCodeFlow
+	- App\Security\FacebookLogin
+
+	# imageStorage: Rostenkowski\ImageStore\ImageStorage("%appDir%/../data/images", "%wwwDir%/images", "/images/")

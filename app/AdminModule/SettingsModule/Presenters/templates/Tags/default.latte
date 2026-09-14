@@ -1,0 +1,29 @@
+{block h1}
+	{_"Tags"}
+{/block}
+
+{block buttons}
+	<a n:href="add!" class="btn btn-primary ajax" data-bs-toggle="modal" data-bs-target="#modal"><i class="fa fa-plus"></i> {_'Add'}</a>
+{/block}
+
+{block content}
+	{if count($languages)>1}
+		<ul id="tabsJustified" class="nav nav-tabs">
+			<li class="nav-item">
+				<a class="nav-link {if $actualLanguage==null}active{/if}" href="{link this language=>null}" aria-expanded="false">{_'All'}</a>
+			</li>
+			<li n:foreach="$languages as $language => $languageName" class="nav-item">
+				<a class="nav-link {if $language==$actualLanguage}active{/if}" href="{link this language=>$language}" aria-expanded="false">{$languageName}</a>
+			</li>
+		</ul>
+		<br>
+	{/if}
+
+	{capture $modalContent}
+		{snippet tagForm}
+			{control tagForm}
+		{/snippet}
+	{/capture}
+	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal', label=>$control->translator->translate('Tag'), modalContent=>$modalContent, size=>'modal-sm'}
+
+	{control tagsGrid}

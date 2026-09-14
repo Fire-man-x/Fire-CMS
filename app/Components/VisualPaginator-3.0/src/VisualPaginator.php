@@ -1,0 +1,344 @@
+<?php
+
+/**
+ * This file is part of the AlesWita\Components\VisualPaginator
+ * Copyright (c) 2015 Ales Wita (aleswita+github@gmail.com)
+ */
+
+declare(strict_types=1);
+
+namespace AlesWita\Components;
+
+use Nette;
+use Nette\Application;
+use Nette\Application\Attributes\Persistent;
+use Nette\Utils;
+
+
+/**
+ * @author Ales Wita
+ * @author David Grudl
+ * @license MIT
+ */
+class VisualPaginator extends Application\UI\Control
+{
+	/** default session section constant */
+	const SESSION_SECTION = "Visual-Paginator";
+
+	/** arrays with predefined templates */
+	const TEMPLATE_NORMAL = [
+		"main" => __DIR__ . "/templates/normal/main.latte",
+		"paginator" => __DIR__ . "/templates/normal/paginator.latte",
+		"itemsPerPage" => __DIR__ . "/templates/normal/items-per-page.latte",
+	];
+	const TEMPLATE_BOOTSTRAP_V3 = [
+		"main" => __DIR__ . "/templates/bootstrap-v3/main.latte",
+		"paginator" => __DIR__ . "/templates/bootstrap-v3/paginator.latte",
+		"itemsPerPage" => __DIR__ . "/templates/bootstrap-v3/items-per-page.latte",
+	];
+	const TEMPLATE_BOOTSTRAP_V4 = [
+		"main" => __DIR__ . "/templates/bootstrap-v4/main.latte",
+		"paginator" => __DIR__ . "/templates/bootstrap-v4/paginator.latte",
+		"itemsPerPage" => __DIR__ . "/templates/bootstrap-v4/items-per-page.latte",
+	];
+
+	/** ******************** */
+
+	#[Persistent]
+	public $page;
+
+	#[Persistent]
+	public $itemsPerPage;
+
+	public array $onPaginate;
+
+	/** ******************** */
+
+	private Nette\Utils\Paginator $paginator;
+
+	private Nette\Http\Session $session;
+
+	private Nette\Localization\Translator $translator;
+
+	private Nette\Http\SessionSection $sessionSection;
+
+	private string $itemsPerPageReposity;
+
+	private bool $canSetItemsPerPage = false;
+
+	public static array $itemsPerPageList = [
+		10 => "10",
+		20 => "20",
+		30 => "30",
+		40 => "40",
+		50 => "50",
+		100 => "100",
+	];
+
+	public static array $paginatorTemplate = self::TEMPLATE_NORMAL;
+
+	public static array $messages = [
+		"send" => "Send",
+		"itemsPerPage" => "Items per page",
+	];
+
+	private bool $ajax = false;
+
+	/** ********** getters - start ********** */
+
+	public function getPaginator(): Nette\Utils\Paginator {
+		if ($this->paginator === null) {
+			$this->paginator = new Utils\Paginator;
+		}
+		$this->paginator->page = ($this->page === null ? 1 : (int) $this->page);
+		$this->paginator->itemsPerPage = (int) ($this->itemsPerPage === null ? array_values(self::$itemsPerPageList)[0] : $this->itemsPerPage);
+		return $this->paginator;
+	}
+
+	public function getOffset(): int {
+		return $this->getPaginator()->offset;
+	}
+
+	public function getItemsPerPage(): int {
+		return $this->getPaginator()->itemsPerPage;
+	}
+
+	private function getSessionReposity(): string {
+		if ($this->itemsPerPageReposity !== null) {
+			return $this->itemsPerPageReposity;
+		} else {
+			$name = $this->presenter->getRequest()->getPresenterName();
+			$params = $this->presenter->getRequest()->getParameters();
+			$match = Utils\Strings::match($name, '~^((\w+):(\w+))|(\w+)$~');
+
+			if (isset($match[2]) && isset($match[3]) && $match[2] !== "" && $match[3] !== "") {// module:presenter
+				return Utils\Strings::lower("{$match[2]}-{$match[3]}-{$params["action"]}");
+			} elseif (isset($match[4]) && $match[4] !== "") {// presenter
+				return Utils\Strings::lower("{$match[4]}-{$params["action"]}");
+			} else {
+				return "default";
+			}
+		}
+	}
+
+	/** ********** getters - end ********** */
+
+	/** ********** setters - start ********** */
+
+	/**
+	 * @param int
+	 * @throws Nette\InvalidArgumentException
+	 */
+	public function setItemsPerPage(int $num): self {
+		if ($this->canSetItemsPerPage && !in_array($num, array_keys(self::$itemsPerPageList), true)) {
+			throw new Nette\InvalidArgumentException("AlesWita\\Components\\VisualPaginator::\$itemsPerPageList[{$num}] does not exist.");
+		}
+		if ($this->session !== null) {
+			$this->sessionSection->{$this->getSessionReposity()} = $num;
+		}
+		$this->itemsPerPage = $num;
+		return $this;
+	}
+
+	/**
+	 * @param Nette\Http\Session
+	 * @param string|null
+	 * @param string
+	 */
+	public function setSession(Nette\Http\Session $session, ?string $itemsPerPageReposity = null, string $section = self::SESSION_SECTION): self {
+		$this->session = $session;
+		$this->sessionSection = $session->getSection($section);
+		if ($itemsPerPageReposity !== null) {
+			$this->itemsPerPageReposity = Utils\Strings::lower($itemsPerPageReposity);
+		}
+		return $this;
+	}
+
+	/**
+	 * @param Nette\Localization\Translator
+	 */
+	public function setTranslator(Nette\Localization\Translator $translator): self {
+		$this->translator = $translator;
+		return $this;
+	}
+
+	/**
+	 * @param bool
+	 */
+	public function setCanSetItemsPerfd(bool $bool): self {
+		$this->canSetItemsPerPage = $bool;
+		return $this;
+	}
+
+	/**
+	 * @deprecated
+	 * @param array
+	 * @throws Nette\InvalidArgumentException
+	 */
+	public function setItemsPerPageList(array $arr): self {
+		trigger_error(__METHOD__ . " is deprecated.", E_USER_DEPRECATED);
+		if ($arr !== array_filter($arr, function ($s): bool {return is_numeric($s);})) {
+			throw new Nette\InvalidArgumentException('Keys in $itemsPerPageList array must be numeric.');
+		}
+		self::$itemsPerPageList = $arr;
+		return $this;
+	}
+
+	/**
+	 * @deprecated
+	 * @param array
+	 * @throws Nette\InvalidArgumentException
+	 */
+	public function setPaginatorTemplate(array $template): self {
+		trigger_error(__METHOD__ . " is deprecated.", E_USER_DEPRECATED);
+		if (array_keys($template) !== array_keys(self::TEMPLATE_NORMAL)) {
+			throw new Nette\InvalidArgumentException("Template array must have these keys: main, paginator and itemsPerPage.");
+		}
+		self::$paginatorTemplate = $template;
+		return $this;
+	}
+
+	/**
+	 * @deprecated
+	 * @param string
+	 */
+	public function setText(string ... $s): self {
+		trigger_error(__METHOD__ . " is deprecated.", E_USER_DEPRECATED);
+		self::$messages[$s[0]] = $s[1];
+		return $this;
+	}
+
+	/**
+	 * @param bool
+	 */
+	public function setAjax(bool $bool): self {
+		$this->ajax = $bool;
+		return $this;
+	}
+
+	/**
+	 * @param int
+	 * @param self
+	 */
+	public function setItemCount(int $count): self {
+		$this->getPaginator()->itemCount = $count;
+		return $this;
+	}
+
+	/** ********** setters - end ********** */
+
+	/**
+	 * @param array
+	 */
+	public function loadState(array $params): void {
+		parent::loadState($params);
+
+		// get items per page from session
+		if ($this->session !== null && $this->canSetItemsPerPage) {
+			if (isset($this->sessionSection->{$this->getSessionReposity()}) && in_array($this->sessionSection->{$this->getSessionReposity()}, array_keys(self::$itemsPerPageList), true)) {
+				$this->setItemsPerPage($this->sessionSection->{$this->getSessionReposity()});
+			} else {
+				unset($this->sessionSection->{$this->getSessionReposity()});
+			}
+		}
+
+		bdump($this->page);
+		$this->getPaginator()->page = (int) $this->page ?: 1;
+		$this->getPaginator()->itemsPerPage = (int) $this->itemsPerPage;
+		$this->page = $this->getPaginator()->page;
+		$this->itemsPerPage = $this->getPaginator()->itemsPerPage;
+
+		$this["itemsPerPage"]->setDefaults([
+			"itemsPerPage" => $this->itemsPerPage,
+		]);
+	}
+
+	public function render(): void {
+		$paginator = $this->getPaginator();
+
+		if ($paginator->pageCount < 2) {
+			$foo = [$paginator->page];
+		} else {
+			$foo = range(max($paginator->firstPage, $paginator->page - 3), min($paginator->lastPage, $paginator->page + 3));
+			$count = 4;
+			$quotient = ($paginator->pageCount - 1) / $count;
+
+			for ($i = 0; $i <= $count; $i++) {
+				$foo[] = round($quotient * $i) + $paginator->firstPage;
+			}
+			sort($foo);
+		}
+
+		$this->template->steps = array_values(array_unique($foo));
+		$this->template->itemsPerPage = $this->canSetItemsPerPage;
+		$this->template->paginator = $paginator;
+		$this->template->ajax = $this->ajax;
+
+		$this->template->setFile(self::$paginatorTemplate["main"]);
+		$this->template->render();
+	}
+
+	public function renderPaginator(): void {
+		$paginator = $this->getPaginator();
+
+		if ($paginator->pageCount < 2) {
+			$foo = [$paginator->page];
+		} else {
+			$foo = range(max($paginator->firstPage, $paginator->page - 3), min($paginator->lastPage, $paginator->page + 3));
+			$count = 4;
+			$quotient = ($paginator->pageCount - 1) / $count;
+
+			for ($i = 0; $i <= $count; $i++) {
+				$foo[] = round($quotient * $i) + $paginator->firstPage;
+			}
+			sort($foo);
+		}
+
+		$this->template->steps = array_values(array_unique($foo));
+		$this->template->paginator = $paginator;
+		$this->template->ajax = $this->ajax;
+
+		$this->template->setFile(self::$paginatorTemplate["paginator"]);
+		$this->template->render();
+	}
+
+	public function renderItemsPerPage(): void {
+		$this->template->itemsPerPage = $this->canSetItemsPerPage;
+		$this->template->ajax = $this->ajax;
+
+		$this->template->setFile(self::$paginatorTemplate["itemsPerPage"]);
+		$this->template->render();
+	}
+
+	/** ******************** */
+
+	protected function createComponentItemsPerPage(): Nette\Application\UI\Form {
+		$form = new Application\UI\Form;
+		$form->setTranslator($this->translator);
+
+		$form->addSelect("itemsPerPage", self::$messages["itemsPerPage"], self::$itemsPerPageList)
+			//->setAttribute("onchange", "this.form.submit()")
+			->setRequired();
+
+		$form->addSubmit("send", self::$messages["send"]);
+
+		$form->onSuccess[] = function (Application\UI\Form $form, array $values): void {
+			$this->setItemsPerPage($values["itemsPerPage"]);
+			$this->handlePaginate();
+
+			if (!$this->presenter->isAjax()) {
+				$this->redirect('this');
+			}
+		};
+
+		return $form;
+	}
+
+	public function handlePaginate(): void {
+		if ($this->onPaginate !== null) {
+			foreach ($this->onPaginate as $event) {
+				Utils\Callback::invoke($event);
+			}
+		}
+	}
+}

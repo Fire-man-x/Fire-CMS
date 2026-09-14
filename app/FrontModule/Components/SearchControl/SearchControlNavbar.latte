@@ -1,0 +1,14 @@
+{capture $popoverSearchForm}
+	{form searchForm, class=>'form-inline my-2 my-lg-0'}
+		<div class="input-group" role="search">
+			{input query class=>'form-control mr-sm-2'}
+			<span class="input-group-btn">
+				 {input send class=>'btn btn-outline-secondary my-2 my-sm-0'}
+			</span>
+		</div>
+	{/form}
+{/capture}
+
+<button type="button" class="btn btn-secondary" data-container="html" data-bs-toggle="popover" data-bs-placement="bottom" data-content="{$popoverSearchForm}">
+	<i class="fa fa-search"></i>
+</button>

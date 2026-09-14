@@ -1,0 +1,18 @@
+<div class="modal fade" id="{$id}" {* nejde zavrit esc - data-bs-backdrop="static" data-bs-keyboard="false"*} tabindex="-1" role="dialog" aria-labelledby="{$id}Label" aria-hidden="true">
+	<div class="modal-dialog {ifset $size}{$size}{/ifset}" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="{$id}Label">{$label}</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-hidden="true" aria-label="{_'Close'}"></button>
+			</div>
+			<div n:ifset="$modalContent" class="modal-body">
+				{$modalContent|noescape}
+			</div>
+			<div n:ifset="$modalFooter" class="modal-footer">
+				{$modalFooter|noescape}
+				{*<button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" aria-hidden="true">Cancel</button>
+				<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>*}
+			</div>
+		</div>
+	</div>
+</div>

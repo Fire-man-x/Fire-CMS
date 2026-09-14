@@ -1,0 +1,7 @@
+!.gitignore
+.idea
+www/files/*
+!www/files/.htaccess
+www/theme/*/.sass-cache
+vendor/*
+!vendor/.htaccess

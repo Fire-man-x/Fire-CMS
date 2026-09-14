@@ -1,0 +1,6 @@
+services:
+	#Front
+	- App\Plugins\Statistics\Model\Statistics
+	statistics:
+		factory: App\Plugins\Statistics\Statistics
+		tags: [presenter.plugin: statistics]

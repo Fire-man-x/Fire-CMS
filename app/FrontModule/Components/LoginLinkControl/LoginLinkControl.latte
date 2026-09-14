@@ -1,0 +1,22 @@
+{*
+ * LoginLinkControl Template
+ *}
+
+ <div>
+	{if $user->isLoggedIn()}
+		<div n:if="!$user->isInRole('subscriber')">
+			<i class="fa fa-lock fa-fw" aria-hidden="true"></i> <a tabindex="-1" href="{plink :Admin:Default:}"> Admin</a>
+		</div>
+		<div>
+			<i class="fa fa-user fa-fw" aria-hidden="true"></i> {$user->getIdentity()->makedName} ({$user->getIdentity()->username})
+		</div>
+		<div>
+			<i class="fa fa-sign-out fa-fw" aria-hidden="true"></i> <a tabindex="-1" href="{plink :Front:Sign:out id=>null}">{_"Logout"}</a>
+		</div>
+	{else}
+		<div>
+
+			<i class="fa fa-sign-in fa-fw" aria-hidden="true"></i>  <a tabindex="-1" href="{plink :Front:Sign:in id=>null}">{_"Sign in"}</a>
+		</div>
+	{/if}
+ </div>

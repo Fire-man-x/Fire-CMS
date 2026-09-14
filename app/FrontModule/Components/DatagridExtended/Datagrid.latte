@@ -1,0 +1,69 @@
+{**
+ * This file is part of the Nextras community extensions of Nette Framework
+ *
+ * @license    MIT
+ * @link       https://github.com/nextras
+ *}
+<div class="grid" data-grid-name="{$control->getUniqueId()}">
+{snippet rows}
+
+{*
+	$hasActionsColumn se u této komponenty vykresluje vždy (natvrdo true),
+	$hasGlobalActionsColumn závisí na tom, zda má formulář kontejner 'actions'.
+	Obě hodnoty se předávají do cells šablon jako argumenty tagu {import},
+	aby k nim měly přístup bloky definované v Datagrid.blocks.latte.
+*}
+{var $hasActionsColumn = true}
+{var $hasGlobalActionsColumn = isset($form['actions'])}
+
+{foreach $cellsTemplates as $cellsTemplate}
+	{import $cellsTemplate, hasActionsColumn => $hasActionsColumn, hasGlobalActionsColumn => $hasGlobalActionsColumn}
+{/foreach}
+
+{form form, class => 'ajax'}
+
+
+{define caption-tag}
+	<caption n:ifset="$caption">{$caption}</caption>
+{/define}
+
+{include #table-open-tag}
+{include #caption-tag}
+	<thead>
+		{include #row-head-columns}
+		{ifset $form['filter']}
+			{include #row-head-filter}
+		{/ifset}
+	</thead>
+	<tbody>
+		{if count($data)}
+			{foreach $data as $row}
+				{var $primary = $control->getter($row, $rowPrimaryKey)}
+				{var $rowId = $control->getSnippetId("rows-$primary")}
+				{include #row row => $row, rowId => $rowId, iterator => $iterator}
+			{/foreach}
+		{else}
+			{ifset #empty-result}{include #empty-result}{/ifset}
+		{/if}
+	</tbody>
+	{*<tfoot n:ifset="#table-tfoot">
+		{include #table-tfoot}
+	</tfoot>*}
+	<tfoot n:if="isset($paginator) || $hasGlobalActionsColumn">
+		<tr>
+			<th colspan="{=count($columns) + $hasGlobalActionsColumn + $hasActionsColumn}">
+				{if $hasGlobalActionsColumn}
+					{include #global-actions}
+				{/if}
+				{ifset $paginator}
+					{include #pagination}
+				{/ifset}
+			</th>
+		</tr>
+	</tfoot>
+{include #table-close-tag}
+
+{/form}
+
+{/snippet}
+</div>

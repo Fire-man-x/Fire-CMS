@@ -1,0 +1,25 @@
+{block h1}
+	{_"Roles"}
+{/block}
+
+{block buttons}
+	<a n:href="add!" class="btn btn-primary ajax" data-bs-toggle="modal" data-bs-target="#modal"><i class="fa fa-plus"></i> {_'Add'}</a>
+{/block}
+
+{block content}
+
+	{capture $modalContent}
+		{snippet roleForm}
+			{control roleForm}
+		{/snippet}
+	{/capture}
+	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal', label=>$control->translator->translate('Role'), modalContent=>$modalContent, size=>'modal-sm'}
+
+	{capture $modalContent}
+		{snippet roleModulesForm}
+			{control roleModulesForm}
+		{/snippet}
+	{/capture}
+	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal-role-permission', label=>$control->translator->translate('Role permission'), modalContent=>$modalContent, size=>'modal-lg'}
+
+	{control rolesGrid}

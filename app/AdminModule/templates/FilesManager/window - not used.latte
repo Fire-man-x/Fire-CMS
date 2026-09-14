@@ -1,0 +1,70 @@
+{block h1}
+{_"Files manager"}
+{/block}
+
+{block buttons}
+	<a href="#" nx:href="add!" class="btn btn-primary ajax" data-bs-toggle="modal" data-bs-target="#modal"><i class="fa fa-upload"></i> {_'Add'}</a>
+{/block}
+
+{block sidebar}
+	{control filesManagerMenu}
+{/block}
+
+{block content}
+
+	{capture $modalContent}
+		{form uploadForm}
+			{input files}
+			{$form->getRenderer()->renderPair($form['send']) |noescape}
+		{/form}
+	{/capture}
+	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal', label=>$control->translator->translate('Upload'), modalContent=>$modalContent} {*, size=>'modal-sm'*}
+
+	<div id="content-inside" class="col-lg-9 col-xl-8">
+
+		<fieldset>
+			<legend>{_'Images'}</legend>
+			{snippet files}
+				{foreach $files as $file}
+					<a n:href="fileInfo! hash=>$file->getHash()" class="ajax"><img n:src="$file, '100x100'" alt="{$file->getName()}" class="img-thumbnail" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{$file->getName()}"></a>
+				{/foreach}
+
+				<div n:if="$showPaginator">
+					{control paginator}
+				</div>
+			{/snippet}
+			{*<img src="/images/thumb.svg" alt="Thumbnail" class="img-thumbnail" style="width: 100px;">*}
+		</fieldset>
+	</div>
+
+	<div id="sidebar-inside" class="col-lg-3 col-xl-4" role="navigation">
+		<fieldset>
+			<legend>{_'File info'}</legend>
+
+			{snippet fileInfo}
+				{ifset $fileInfo}
+					<div class="form-group row required">
+						<div class="col-sm-3 control-label">{_"Name"}</div>
+
+						<div class="col-sm-9">{$fileInfo->name}</div>
+					</div>
+					<div class="form-group row required">
+						<div class="col-sm-3 control-label">{_"Date"}</div>
+
+						<div class="col-sm-9">{$fileInfo->create_date|date:\DATETIME_FORMAT}</div>
+					</div>
+					<div class="form-group row required">
+						<div class="col-sm-3"></div>
+
+						<div class="col-sm-9"><a n:href="delete! hash=>$fileInfo->disk_name" class="ajax btn btn-danger"><i class="fa fa-trash"></i> {_"Delete"}</a></div>
+					</div>
+				{else}
+					<div>
+						{_'No file selected'}
+					</div>
+				{/ifset}
+			{/snippet}
+
+		</fieldset>
+
+	</div>

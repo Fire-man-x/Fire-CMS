@@ -1,0 +1,11 @@
+<div n:ifset="$metas" n:if="count($metas)">
+	{_'Metas'}:
+	{if isset($metas['divny']) && !empty($metas['divny']->value)}
+		Divny - {$metas['divny']->value}
+	{/if}
+	{ifset $metas['file']}
+		{_'File'} - {$metas['file']->value}
+	{/ifset}
+
+	{*foreach $metas as $meta}{if !$iterator->isFirst()}, {/if}<a n:href="Categories:detail url=>$meta->name"><span class="meta meta-default label label-default">{$meta->name}</span></a>{/foreach*}
+</div>

@@ -1,0 +1,136 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Model;
+
+use Nette\Database\Explorer;
+use Nette\SmartObject;
+use Nette\Utils\ArrayHash;
+
+/**
+ * Base Model
+ */
+abstract class BaseModel
+{
+	use SmartObject;
+
+	/**
+	 * Table name
+	 */
+	private string $tableName;
+
+	/**
+	 * Primary key column_id
+	 */
+	private string $columnId;
+
+	protected Explorer $database;
+
+
+	public function __construct(Explorer $database)
+	{
+		$this->database = $database;
+	}
+
+
+	/**
+	 * Get table name
+	 * @return string
+	 */
+	public function getTableName(): string
+	{
+		if(isset($this->tableName)){
+			return $this->tableName;
+		} else {
+			throw new \InvalidArgumentException("Table name is not defined.");
+		}
+	}
+
+	/**
+	 * Set table name
+	 */
+	protected function setTableName(string $tableName): void
+	{
+		$this->tableName = $tableName;
+	}
+
+
+	/**
+	 * Get primary key column name
+	 */
+	public function getColumnId(): string
+	{
+		if(isset($this->columnId)){
+			return $this->columnId;
+		} else {
+			throw new \InvalidArgumentException("Column ID is not defined.");
+		}
+	}
+
+	/**
+	 * Set primary key column name
+	 */
+	protected function setColumnId(string $columnId): void
+	{
+		$this->columnId = $columnId;
+	}
+
+
+
+	/**
+	 * Get table
+	 */
+	protected function getTable(): \Nette\Database\Table\Selection
+	{
+		return $this->database->table($this->getTableName());
+	}
+
+
+	/**
+	 * Get all rows
+	 */
+	public function getAll(): \Nette\Database\Table\Selection
+	{
+		return $this->getTable();
+	}
+
+
+	/**
+	 * Inserts new
+	 */
+	public function insert(ArrayHash $data): int
+	{
+		$this->getTable()->insert($data);
+		return $this->database->query("SELECT LAST_INSERT_ID()")->fetchField();
+	}
+
+
+	/**
+	 * Find by id
+	 */
+	public function findById(int $id): \Nette\Database\Table\Selection
+	{
+		return $this->getTable()->where($this->getColumnId(), $id);
+	}
+
+
+	/**
+	 * Update
+	 */
+	public function update(int $id, array $data): void
+	{
+		$this->findById($id)
+			->update($data);
+	}
+
+
+	/**
+	 * Delete
+	 */
+	public function delete(int $id): void
+	{
+		$this->findById($id)
+			->delete();
+	}
+
+}

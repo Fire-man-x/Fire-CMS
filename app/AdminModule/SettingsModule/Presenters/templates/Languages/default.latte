@@ -1,0 +1,18 @@
+{block h1}
+	{_"Languages"}
+{/block}
+
+{block buttons}
+	<a href="#" nx:href="add!" class="btn btn-primary ajax" data-bs-toggle="modal" data-bs-target="#modal"><i class="fa fa-plus"></i> {_'Add'}</a>
+{/block}
+
+{block content}
+
+	{capture $modalContent}
+		{snippet languageForm}
+			{control languageForm}
+		{/snippet}
+	{/capture}
+	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal', label=>$control->translator->translate('Language'), modalContent=>$modalContent} {*, size=>'modal-sm'*}
+
+	{control languagesGrid}

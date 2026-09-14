@@ -1,0 +1,39 @@
+.grid td,
+.grid th {
+  border-color: #CACACA;
+}
+.grid .grid-col-actions {
+  text-align: center;
+}
+.grid .btn {
+  margin-right: 3px;
+}
+.grid thead .grid-columns,
+.grid thead .grid-filters {
+  background: #EEE;
+}
+.grid thead .grid-columns th,
+.grid thead .grid-filters th {
+  border-bottom-width: 1px;
+}
+.grid thead tr:last-child th {
+  border-bottom-width: 2px;
+}
+.grid tbody > tr > td {
+  vertical-align: middle;
+}
+.grid tfoot {
+  background: #EEE;
+}
+.grid tfoot th {
+  text-align: center;
+}
+.grid tfoot .pagination, .grid tfoot .grid-global-actions {
+  margin: 5px;
+}
+.grid tfoot .grid-global-actions {
+  margin-right: -100%;
+}
+.grid .grid-col-global-actions {
+  width: 16px;
+}

@@ -1,0 +1,36 @@
+{block h1}
+{_"Articles"}
+{/block}
+
+{block buttons}
+	{if $user->isAllowed('Articles', 'add')}
+		<a n:if="$user->isAllowed('Articles', 'add')" n:href="detail id=>null" class="btn btn-primary"><i class="fa fa-plus"></i> {_'Add'}</a>
+	{*workaround*}
+	</div>
+	<div class="btn-group" role="group" aria-label="{_"Fast filtration"}">
+	{/if}
+		<a n:if="$counts['all']" n:href="this, show=>null" class="btn btn-secondary {if $show == null}active{/if}" >
+			<i class="fa fa-globe"></i>
+			{_"All"}
+			<span class="badge badge-default badge-pill">{$counts['all']}</span>
+		</a>
+		<a n:if="$counts['personal']" n:href="this, show=>'personal'" class="btn btn-secondary {if $show == "personal"}active{/if}">
+			<i class="fas fa-user-tag"></i>
+			{_"Own"}
+			<span class="badge badge-default badge-pill">{$counts['personal']}</span>
+		</a>
+		<a n:if="$counts['pending']" n:href="this, show=>'pending'" class="btn btn-secondary {if $show == "pending"}active{/if}">
+			<i class="fas fa-user-clock"></i>
+			{_"Waiting for approve"}
+			<span class="badge badge-default badge-pill">{$counts['pending']}</span>
+		</a>
+		<a n:if="$counts['trash']" n:href="this, show=>'trash'" class="btn btn-secondary {if $show == "trash"}active{/if}">
+			<i class="fa fa-trash"></i>
+			{_"Trash"}
+			<span class="badge badge-default badge-pill">{$counts['trash']}</span>
+		</a>
+{/block}
+
+{block content}
+
+	{control articlesGrid}

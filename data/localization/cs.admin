@@ -1,0 +1,299 @@
+a:2:{i:0;s:4:"Main";i:1;s:7:"Hlavní";}
+a:2:{i:0;s:6:"Logout";i:1;s:9:"Odhlásit";}
+a:2:{i:0;s:5:"Users";i:1;s:11:"Uživatelé";}
+a:2:{i:0;s:10:"My account";i:1;s:6:"Účet";}
+a:2:{i:0;s:7:"Sign in";i:1;s:11:"Přihlásit";}
+a:2:{i:0;s:17:"Toggle navigation";i:1;s:18:"Přepnout navigaci";}
+a:2:{i:0;s:21:"Forgot your password?";i:1;s:22:"Zapomněli jste heslo?";}
+a:2:{i:0;s:8:"Username";i:1;s:9:"Uživatel";}
+a:2:{i:0;s:8:"Password";i:1;s:5:"Heslo";}
+a:2:{i:0;s:17:"Keep me signed in";i:1;s:20:"Zůstat přihlášen";}
+a:2:{i:0;s:27:"Please enter your password.";i:1;s:28:"Prosím, zadejte své heslo.";}
+a:2:{i:0;s:27:"Please enter your username.";i:1;s:43:"Prosím, zadejte své uživatelské jméno.";}
+a:2:{i:0;s:4:"Home";i:1;s:5:"Domů";}
+a:2:{i:0;s:4:"Edit";i:1;s:7:"Upravit";}
+a:2:{i:0;s:7:"Actions";i:1;s:4:"Akce";}
+a:2:{i:0;s:4:"Name";i:1;s:6:"Název";}
+a:2:{i:0;s:9:"Edit town";i:1;s:14:"Upravit město";}
+a:2:{i:0;s:19:"Nothing to display.";i:1;s:17:"Nic k zobrazení.";}
+a:2:{i:0;s:4:"Town";i:1;s:6:"Město";}
+a:2:{i:0;s:3:"Add";i:1;s:7:"Přidat";}
+a:2:{i:0;s:27:"'%label' is required field.";i:1;s:26:"'%label' je povinné pole.";}
+a:2:{i:0;s:4:"Save";i:1;s:7:"Uložit";}
+a:2:{i:0;s:6:"Street";i:1;s:5:"Ulice";}
+a:2:{i:0;s:6:"Delete";i:1;s:6:"Smazat";}
+a:2:{i:0;s:18:"Successfully saved";i:1;s:20:"Úspěšně uloženo";}
+a:2:{i:0;s:20:"Successfully deleted";i:1;s:20:"Úspěšně smazáno";}
+a:2:{i:0;s:4:"User";i:1;s:9:"Uživatel";}
+a:2:{i:0;s:6:"Active";i:1;s:8:"Aktivní";}
+a:2:{i:0;s:10:"First name";i:1;s:6:"Jméno";}
+a:2:{i:0;s:7:"Surname";i:1;s:11:"Příjmení";}
+a:2:{i:0;s:5:"Title";i:1;s:7:"Titulek";}
+a:2:{i:0;s:7:"Profile";i:1;s:6:"Profil";}
+a:2:{i:0;s:6:"Gender";i:1;s:8:"Pohlaví";}
+a:2:{i:0;s:12:"Birth number";i:1;s:14:"Rodné číslo";}
+a:2:{i:0;s:5:"Phone";i:1;s:12:"Tel. číslo";}
+a:2:{i:0;s:8:"Zip code";i:1;s:4:"PSČ";}
+a:2:{i:0;s:3:"man";i:1;s:4:"muž";}
+a:2:{i:0;s:5:"woman";i:1;s:5:"žena";}
+a:2:{i:0;s:12:"Informations";i:1;s:9:"Informace";}
+a:2:{i:0;s:12:"Old password";i:1;s:12:"Staré heslo";}
+a:2:{i:0;s:12:"New password";i:1;s:11:"Nové heslo";}
+a:2:{i:0;s:18:"New password again";i:1;s:17:"Znovu nové heslo";}
+a:2:{i:0;s:22:"Passwords are not same";i:1;s:19:"Hesla se neshodují";}
+a:2:{i:0;s:9:"Date from";i:1;s:8:"Datum od";}
+a:2:{i:0;s:7:"Date to";i:1;s:8:"Datum do";}
+a:2:{i:0;s:4:"days";i:1;s:3:"dny";}
+a:2:{i:0;s:4:"Type";i:1;s:3:"Typ";}
+a:2:{i:0;s:13:"Validity from";i:1;s:11:"Platnost od";}
+a:2:{i:0;s:11:"Validity to";i:1;s:11:"Platnost do";}
+a:2:{i:0;s:4:"Note";i:1;s:9:"Poznámka";}
+a:2:{i:0;s:9:"Test time";i:1;s:15:"Zkušební doba";}
+a:2:{i:0;s:16:"Roles and groups";i:1;s:14:"Role a skupiny";}
+a:2:{i:0;s:8:"Contract";i:1;s:7:"Smlouva";}
+a:2:{i:0;s:11:"Examination";i:1;s:8:"Zkouška";}
+a:2:{i:0;s:24:"Set as unactive (active)";i:1;s:35:"Nastavit jako neaktivní (aktivní)";}
+a:2:{i:0;s:24:"Set as active (unactive)";i:1;s:35:"Nastavit jako aktivní (neaktivní)";}
+a:2:{i:0;s:34:"'%label' is not in correct format.";i:1;s:33:"'%label' nemá správný formát.";}
+a:2:{i:0;s:5:"Roles";i:1;s:4:"Role";}
+a:2:{i:0;s:8:"Settings";i:1;s:10:"Nastavení";}
+a:2:{i:0;s:4:"Role";i:1;s:4:"Role";}
+a:2:{i:0;s:6:"Groups";i:1;s:7:"Skupiny";}
+a:2:{i:0;s:5:"Group";i:1;s:7:"Skupina";}
+a:2:{i:0;s:14:"Role in system";i:1;s:15:"Role v systému";}
+a:2:{i:0;s:4:"Date";i:1;s:5:"Datum";}
+a:2:{i:0;s:3:"GPS";i:1;s:3:"GPS";}
+a:2:{i:0;s:4:"Text";i:1;s:4:"Text";}
+a:2:{i:0;s:13:"Date and time";i:1;s:12:"Datum a čas";}
+a:2:{i:0;s:13:"Select groups";i:1;s:15:"Vyberte skupinu";}
+a:2:{i:0;s:12:"Select users";i:1;s:18:"Vyberte uživatele";}
+a:2:{i:0;s:6:"Degree";i:1;s:5:"Titul";}
+a:2:{i:0;s:9:"Dashboard";i:1;s:13:"Hlavní panel";}
+a:2:{i:0;s:6:"Solved";i:1;s:10:"Vyřešeno";}
+a:2:{i:0;s:18:"There are no item.";i:1;s:18:"Žádná položka.";}
+a:2:{i:0;s:8:"Shortcut";i:1;s:7:"Zkratka";}
+a:2:{i:0;s:24:"Set as solved (unsolved)";i:1;s:39:"Nastavit jako vyřešeno (nevyřešeno)";}
+a:2:{i:0;s:24:"Set as unsolved (solved)";i:1;s:39:"Nastavit jako nevyřešeno (vyřešeno)";}
+a:2:{i:0;s:2:"S.";i:1;s:2:"V.";}
+a:2:{i:0;s:13:"Creation time";i:1;s:16:"Čas vytvoření";}
+a:2:{i:0;s:10:"Statistics";i:1;s:10:"Statistiky";}
+a:2:{i:0;s:4:"view";i:1;s:8:"zobrazit";}
+a:2:{i:0;s:3:"add";i:1;s:7:"přidat";}
+a:2:{i:0;s:4:"edit";i:1;s:7:"upravit";}
+a:2:{i:0;s:6:"delete";i:1;s:6:"smazat";}
+a:2:{i:0;s:15:"Role permission";i:1;s:17:"Oprávnění role";}
+a:2:{i:0;s:3:"any";i:1;s:8:"žádné";}
+a:2:{i:0;s:6:"Detail";i:1;s:6:"Detail";}
+a:2:{i:0;s:9:"Templates";i:1;s:8:"Šablony";}
+a:2:{i:0;s:8:"Template";i:1;s:8:"Šablona";}
+a:2:{i:0;s:2:"A.";i:1;s:2:"A.";}
+a:2:{i:0;s:31:"An error occurred when deleting";i:1;s:27:"Nastala chyba při mazání";}
+a:2:{i:0;s:5:"Print";i:1;s:8:"Tisknout";}
+a:2:{i:0;s:13:"Template name";i:1;s:15:"Název šablony";}
+a:2:{i:0;s:4:"Next";i:1;s:7:"Další";}
+a:2:{i:0;s:8:"Previous";i:1;s:11:"Předchozí";}
+a:2:{i:0;s:9:"Duplicate";i:1;s:10:"Duplikovat";}
+a:2:{i:0;s:6:"Search";i:1;s:8:"Vyhledat";}
+a:2:{i:0;s:6:"Images";i:1;s:8:"Obrázky";}
+a:2:{i:0;s:26:"You can select only images";i:1;s:30:"Můžete vybrat pouze obrázky";}
+a:2:{i:0;s:17:"Image attachments";i:1;s:21:"Obrázkové přílohy";}
+a:2:{i:0;s:6:"Remove";i:1;s:9:"Odstranit";}
+a:2:{i:0;s:5:"Count";i:1;s:6:"Počet";}
+a:2:{i:0;s:7:"History";i:1;s:8:"Historie";}
+a:2:{i:0;s:7:"Changes";i:1;s:6:"Změny";}
+a:2:{i:0;s:6:"Before";i:1;s:5:"Před";}
+a:2:{i:0;s:5:"After";i:1;s:2:"Po";}
+a:2:{i:0;s:20:"Is not completed yet";i:1;s:23:"Stále není dokončeno";}
+a:2:{i:0;s:6:"Status";i:1;s:4:"Stav";}
+a:2:{i:0;s:11:"Admin Panel";i:1;s:21:"Panel administrátora";}
+a:2:{i:0;s:5:"Close";i:1;s:8:"Zavřít";}
+a:2:{i:0;s:7:"Content";i:1;s:5:"Obsah";}
+a:2:{i:0;s:10:"Categories";i:1;s:9:"Kategorie";}
+a:2:{i:0;s:3:"URL";i:1;s:3:"URL";}
+a:2:{i:0;s:3:"SEO";i:1;s:3:"SEO";}
+a:2:{i:0;s:7:"Excerpt";i:1;s:10:"Předmluva";}
+a:2:{i:0;s:7:"Article";i:1;s:8:"Článek";}
+a:2:{i:0;s:9:"Languages";i:1;s:6:"Jazyky";}
+a:2:{i:0;s:4:"Tags";i:1;s:8:"Štítky";}
+a:2:{i:0;s:6:"Public";i:1;s:9:"Veřejné";}
+a:2:{i:0;s:8:"Articles";i:1;s:8:"Články";}
+a:2:{i:0;s:13:"Files manager";i:1;s:17:"Správce souborů";}
+a:2:{i:0;s:12:"Show in menu";i:1;s:15:"Zobrazit v menu";}
+a:2:{i:0;s:4:"Move";i:1;s:10:"Přesunout";}
+a:2:{i:0;s:8:"Category";i:1;s:9:"Kategorie";}
+a:2:{i:0;s:14:"Set as default";i:1;s:23:"Nastavit jako výchozí";}
+a:2:{i:0;s:2:"D.";i:1;s:2:"V.";}
+a:2:{i:0;s:7:"Default";i:1;s:9:"Výchozí";}
+a:2:{i:0;s:2:"Id";i:1;s:2:"Id";}
+a:2:{i:0;s:9:"SEO title";i:1;s:11:"SEO titulek";}
+a:2:{i:0;s:15:"SEO description";i:1;s:9:"SEO popis";}
+a:2:{i:0;s:12:"SEO keywords";i:1;s:20:"SEO klíčová slova";}
+a:2:{i:0;s:6:"Upload";i:1;s:7:"Nahrát";}
+a:2:{i:0;s:14:"Items per page";i:1;s:27:"Počet položek na stránku";}
+a:2:{i:0;s:23:"This field is required.";i:1;s:22:"Toto pole je povinné.";}
+a:2:{i:0;s:11:"Create date";i:1;s:17:"Datum vytvoření";}
+a:2:{i:0;s:11:"Set as main";i:1;s:21:"Nastavit jako hlavní";}
+a:2:{i:0;s:2:"M.";i:1;s:2:"H.";}
+a:2:{i:0;s:6:"Select";i:1;s:6:"Vybrat";}
+a:2:{i:0;s:4:"Send";i:1;s:7:"Odeslat";}
+a:2:{i:0;s:11:"Show on web";i:1;s:16:"Zobrazit na webu";}
+a:2:{i:0;s:4:"Menu";i:1;s:4:"Menu";}
+a:2:{i:0;s:5:"Menus";i:1;s:4:"Menu";}
+a:2:{i:0;s:17:"Template location";i:1;s:23:"Umístění v šabloně";}
+a:2:{i:0;s:10:"Menu items";i:1;s:13:"Položky menu";}
+a:2:{i:0;s:5:"Items";i:1;s:8:"Položky";}
+a:2:{i:0;s:8:"Nickname";i:1;s:11:"Přezdívka";}
+a:2:{i:0;s:5:"Email";i:1;s:5:"Email";}
+a:2:{i:0;s:4:"Site";i:1;s:8:"Stránka";}
+a:2:{i:0;s:8:"Homepage";i:1;s:16:"Hlavní stránka";}
+a:2:{i:0;s:16:"Link to category";i:1;s:18:"Odkaz na kategorii";}
+a:2:{i:0;s:16:"No file selected";i:1;s:30:"Není vybrán žádný soubor.";}
+a:2:{i:0;s:9:"File info";i:1;s:19:"Informace o souboru";}
+a:2:{i:0;s:8:"No item.";i:1;s:18:"Žádná položka.";}
+a:2:{i:0;s:15:"Web description";i:1;s:10:"Popis webu";}
+a:2:{i:0;s:9:"Web title";i:1;s:11:"Název webu";}
+a:2:{i:0;s:11:"Default SEO";i:1;s:13:"Výchozí SEO";}
+a:2:{i:0;s:11:"Folder name";i:1;s:14:"Název složky";}
+a:2:{i:0;s:5:"Files";i:1;s:7:"Soubory";}
+a:2:{i:0;s:15:"Publishing date";i:1;s:15:"Datum publikace";}
+a:2:{i:0;s:5:"Never";i:1;s:5:"Nikdy";}
+a:2:{i:0;s:15:"Expiration date";i:1;s:14:"Datum expirace";}
+a:2:{i:0;s:4:"Size";i:1;s:8:"Velikost";}
+a:2:{i:0;s:3:"Key";i:1;s:6:"Klíč";}
+a:2:{i:0;s:5:"Value";i:1;s:7:"Hodnota";}
+a:2:{i:0;s:5:"Metas";i:1;s:4:"Meta";}
+a:2:{i:0;s:4:"File";i:1;s:6:"Soubor";}
+a:2:{i:0;s:13:"Default value";i:1;s:17:"Výchozí hodnota";}
+a:2:{i:0;s:8:"Language";i:1;s:5:"Jazyk";}
+a:2:{i:0;s:13:"All languages";i:1;s:15:"Všechny jazyky";}
+a:2:{i:0;s:28:"Resize image after upload to";i:1;s:39:"Změnit velikost obrázku po uploadu na";}
+a:2:{i:0;s:7:"Sliders";i:1;s:7:"Slidery";}
+a:2:{i:0;s:6:"Slider";i:1;s:6:"Slider";}
+a:2:{i:0;s:16:"Display duration";i:1;s:15:"Doba zobrazení";}
+a:2:{i:0;s:15:"Animation speed";i:1;s:16:"Rychlost animace";}
+a:2:{i:0;s:6:"Manual";i:1;s:7:"Ruční";}
+a:2:{i:0;s:15:"Show navigation";i:1;s:17:"Zobrazit navigaci";}
+a:2:{i:0;s:12:"Slider items";i:1;s:16:"Položky slideru";}
+a:2:{i:0;s:11:"Add to post";i:1;s:23:"Vložit do příspěvku";}
+a:2:{i:0;s:12:"Bulk editing";i:1;s:17:"Hromadné úpravy";}
+a:2:{i:0;s:7:"Gallery";i:1;s:7:"Galerie";}
+a:2:{i:0;s:10:"Select all";i:1;s:11:"Vybrat vše";}
+a:2:{i:0;s:12:"Deselect all";i:1;s:15:"Zrušit výběr";}
+a:2:{i:0;s:7:"Publish";i:1;s:12:"Publikováno";}
+a:2:{i:0;s:7:"Pending";i:1;s:21:"Čeká na schválení";}
+a:2:{i:0;s:5:"Draft";i:1;s:7:"Koncept";}
+a:2:{i:0;s:14:"Older versions";i:1;s:14:"Starší verze";}
+a:2:{i:0;s:4:"View";i:1;s:8:"Zobrazit";}
+a:2:{i:0;s:7:"Restore";i:1;s:7:"Obnovit";}
+a:2:{i:0;s:3:"Tag";i:1;s:8:"Štítek";}
+a:2:{i:0;s:18:"Tag already exist.";i:1;s:23:"Štítek již existuje.";}
+a:2:{i:0;s:3:"All";i:1;s:4:"Vše";}
+a:2:{i:0;s:31:"Not translated in all languages";i:1;s:35:"Není přeloženo do všech jazyků";}
+a:2:{i:0;s:7:"default";i:1;s:9:"výchozí";}
+a:2:{i:0;s:15:"Approve article";i:1;s:18:"Schválit článek";}
+a:2:{i:0;s:4:"deny";i:1;s:8:"zakázat";}
+a:2:{i:0;s:5:"allow";i:1;s:7:"povolit";}
+a:2:{i:0;s:19:"Waiting for approve";i:1;s:21:"Čeká na schválení";}
+a:2:{i:0;s:5:"Trash";i:1;s:4:"Koš";}
+a:2:{i:0;s:7:"Approve";i:1;s:9:"Schválit";}
+a:2:{i:0;s:8:"Text box";i:1;s:12:"Textový box";}
+a:2:{i:0;s:12:"Site traffic";i:1;s:23:"Návštěvnost stránek";}
+a:2:{i:0;s:5:"Posts";i:1;s:12:"Příspěvky";}
+a:2:{i:0;s:35:"Don't have an account yet? Sign up.";i:1;s:39:"Ještě nemáte účet? Registrujte se.";}
+a:2:{i:0;s:32:"Already have an account? Log in.";i:1;s:42:"Již máte účet? Stačí se přihlásit.";}
+a:2:{i:0;s:7:"Sign Up";i:1;s:10:"Registrace";}
+a:2:{i:0;s:24:"You have been signed out";i:1;s:19:"Byl jste odhlášen";}
+a:2:{i:0;s:26:"Sign in to another account";i:1;s:32:"Přihlásit se do jiného účtu";}
+a:2:{i:0;s:65:"You have been signed out due to inactivity. Please sign in again.";i:1;s:76:"Byl jste odhlášen z důvodu své neaktivity. Přihlaste se znovu, prosím.";}
+a:2:{i:0;s:21:"at least 7 characters";i:1;s:18:"nejméně 7 znaků";}
+a:2:{i:0;s:7:"Sign up";i:1;s:11:"Registrovat";}
+a:2:{i:0;s:15:"Pick a username";i:1;s:31:"Vyberte si uživatelské jméno";}
+a:2:{i:0;s:11:"Your e-mail";i:1;s:12:"Váš e-mail";}
+a:2:{i:0;s:23:"Please pick a username.";i:1;s:41:"Prosím, vyberte si uživatelské jméno.";}
+a:2:{i:0;s:25:"Please enter your e-mail.";i:1;s:24:"Prosím, vložte e-mail.";}
+a:2:{i:0;s:17:"Create a password";i:1;s:15:"Vytvořit heslo";}
+a:2:{i:0;s:25:"Please create a password.";i:1;s:23:"Prosím, zadejte heslo.";}
+a:2:{i:0;s:35:"Please enter a valid email address.";i:1;s:44:"Prosím, zadejte správnou emailovou adresu.";}
+a:2:{i:0;s:36:"Please enter at least %d characters.";i:1;s:36:"Prosím zadejte nejméně %d znaků.";}
+a:2:{i:0;s:27:"Registration was successful";i:1;s:27:"Registrace byla úspěšná";}
+a:2:{i:0;s:8:"Show web";i:1;s:12:"Zobrazit web";}
+a:2:{i:0;s:8:"Comments";i:1;s:11:"Komentáře";}
+a:2:{i:0;s:7:"Comment";i:1;s:10:"Komentář";}
+a:2:{i:0;s:6:"Author";i:1;s:5:"Autor";}
+a:2:{i:0;s:5:"Reply";i:1;s:11:"Odpovědět";}
+a:2:{i:0;s:10:"Reply from";i:1;s:12:"Odpověď od";}
+a:2:{i:0;s:15:"From comment...";i:1;s:16:"Z komentáře...";}
+a:2:{i:0;s:18:"Translation status";i:1;s:14:"Stav překladu";}
+a:2:{i:0;s:10:"Welcome in";i:1;s:10:"Vítejte v";}
+a:2:{i:0;s:3:"Own";i:1;s:4:"Moje";}
+a:2:{i:0;s:8:"Unactive";i:1;s:10:"Neaktivní";}
+a:2:{i:0;s:20:"ublaboo_datagrid.all";i:1;s:4:"Vše";}
+a:2:{i:0;s:29:"ublaboo_datagrid.reset_filter";i:1;s:15:"Resetovat filtr";}
+a:2:{i:0;s:23:"ublaboo_datagrid.action";i:1;s:4:"Akce";}
+a:2:{i:0;s:22:"ublaboo_datagrid.items";i:1;s:8:"Položky";}
+a:2:{i:0;s:21:"ublaboo_datagrid.from";i:1;s:1:"z";}
+a:2:{i:0;s:32:"ublaboo_datagrid.per_page_submit";i:1;s:7:"Odeslat";}
+a:2:{i:0;s:25:"ublaboo_datagrid.previous";i:1;s:11:"Předchozí";}
+a:2:{i:0;s:21:"ublaboo_datagrid.next";i:1;s:7:"Další";}
+a:2:{i:0;s:2:"Ok";i:1;s:2:"Ok";}
+a:2:{i:0;s:30:"ublaboo_datagrid.no_item_found";i:1;s:17:"Žádná položka";}
+a:2:{i:0;s:21:"Personal informations";i:1;s:17:"Osobní informace";}
+a:2:{i:0;s:3:"New";i:1;s:5:"Nový";}
+a:2:{i:0;s:27:"Toolbar with action buttons";i:1;s:39:"Panel nástrojů s akčními tlačítky";}
+a:2:{i:0;s:15:"New translation";i:1;s:14:"Nový překlad";}
+a:2:{i:0;s:15:"Fast filtration";i:1;s:16:"Rychlá filtrace";}
+a:2:{i:0;s:32:"Here are some simple statistics.";i:1;s:45:"Zde najdete několik jednoduchých statistik.";}
+a:2:{i:0;s:4:"Urls";i:1;s:10:"Url adresy";}
+a:2:{i:0;s:3:"Url";i:1;s:3:"Url";}
+a:2:{i:0;s:12:"Redirections";i:1;s:16:"Přesměrování";}
+a:2:{i:0;s:7:"Old url";i:1;s:10:"Stará url";}
+a:2:{i:0;s:7:"New url";i:1;s:9:"Nová url";}
+a:2:{i:0;s:15:"Last usage date";i:1;s:27:"Datum posledního použití";}
+a:2:{i:0;s:22:"paginator.itemsPerPage";i:1;s:20:"Položek na stránku";}
+a:2:{i:0;s:14:"paginator.send";i:1;s:7:"Odeslat";}
+a:2:{i:0;s:36:"ublaboo_datagrid.no_item_found_reset";i:1;s:39:"Žádná položka nenalezena, resetujte";}
+a:2:{i:0;s:21:"ublaboo_datagrid.here";i:1;s:3:"zde";}
+a:2:{i:0;s:4:"Sort";i:1;s:8:"Řazení";}
+a:2:{i:0;s:5:"Other";i:1;s:8:"Ostatní";}
+a:2:{i:0;s:13:"Dynamic forms";i:1;s:11:"Formuláře";}
+a:2:{i:0;s:16:"Name in template";i:1;s:18:"Název v šabloně";}
+a:2:{i:0;s:29:"An error occurred when saving";i:1;s:30:"Nastala chyba při ukládání";}
+a:2:{i:0;s:58:"Record for value '%value' in field '%label' already exist.";i:1;s:64:"Záznam pro hodnotu '%value' v políčku '%label' již existuje.";}
+a:2:{i:0;s:18:"Dynamic form items";i:1;s:20:"Položky formuláře";}
+a:2:{i:0;s:5:"Label";i:1;s:7:"Popisek";}
+a:2:{i:0;s:10:"Input name";i:1;s:16:"Název políčka";}
+a:2:{i:0;s:51:"'%label' can contains only this chars "a-z" or "_".";i:1;s:58:"'%label' může obsahovat pouze tyto znaky "a-z" nebo "_".";}
+a:2:{i:0;s:8:"Required";i:1;s:8:"Povinný";}
+a:2:{i:0;s:39:"Cannot insert duplicate input name '%s'";i:1;s:47:"Nelze vložit duplicitní název políčka '%s'";}
+a:2:{i:0;s:13:"Where to send";i:1;s:11:"Kam odeslat";}
+a:2:{i:0;s:19:"Form submit message";i:1;s:33:"Zpráva po odeslání formuláře";}
+a:2:{i:0;s:7:"Integer";i:1;s:18:"Číselná hodnota";}
+a:2:{i:0;s:8:"Textarea";i:1;s:13:"Textové pole";}
+a:2:{i:0;s:6:"Cancel";i:1;s:7:"Zrušit";}
+a:2:{i:0;s:7:"Delete?";i:1;s:7:"Smazat?";}
+a:2:{i:0;s:15:"Repair rotation";i:1;s:14:"Opravit rotaci";}
+a:2:{i:0;s:5:"Towns";i:1;s:4:"Obce";}
+a:2:{i:0;s:6:"Events";i:1;s:9:"Události";}
+a:2:{i:0;s:5:"Tests";i:1;s:5:"Testy";}
+a:2:{i:0;s:13:"Images select";i:1;s:17:"Výběr obrázků";}
+a:2:{i:0;s:12:"Select image";i:1;s:15:"Vybrat obrázek";}
+a:2:{i:0;s:8:"Calendar";i:1;s:10:"Kalendář";}
+a:2:{i:0;s:6:"League";i:1;s:4:"Liga";}
+a:2:{i:0;s:7:"Leagues";i:1;s:4:"Ligy";}
+a:2:{i:0;s:17:"League years list";i:1;s:22:"Seznam ročníků ligy";}
+a:2:{i:0;s:11:"League year";i:1;s:13:"Ročník ligy";}
+a:2:{i:0;s:18:"League year points";i:1;s:14:"Body ročníku";}
+a:2:{i:0;s:10:"Attendance";i:1;s:9:"Docházka";}
+a:2:{i:0;s:15:"Edit attendance";i:1;s:17:"Upravit docházku";}
+a:2:{i:0;s:3:"Who";i:1;s:3:"Kdo";}
+a:2:{i:0;s:7:"Members";i:1;s:9:"Členové";}
+a:2:{i:0;s:15:"Attendance list";i:1;s:16:"Seznam docházky";}
+a:2:{i:0;s:14:"Add attendance";i:1;s:17:"Přidat docházku";}
+a:2:{i:0;s:6:"Member";i:1;s:5:"Člen";}
+a:2:{i:0;s:12:"Members list";i:1;s:14:"Seznam členů";}
+a:2:{i:0;s:13:"Other sign in";i:1;s:20:"Jiná přihlášení";}
+a:2:{i:0;s:21:"Sign in with Facebook";i:1;s:26:"Přihlásit přes Facebook";}
+a:2:{i:0;s:18:"Members - inactive";i:1;s:23:"Členové  - neaktivní";}
+a:2:{i:0;s:22:"Successfully logged in";i:1;s:24:"Úspěšně přihlášen";}
+a:2:{i:0;s:56:"You have not access to resouce '%s' with privilege '%s'.";i:1;s:62:"Nemáte přístup do sekce '%s' s přístupovými právy '%s'.";}
+a:2:{i:0;s:38:"You have not access to administration.";i:1;s:34:"Nemáte přístup do administrace.";}

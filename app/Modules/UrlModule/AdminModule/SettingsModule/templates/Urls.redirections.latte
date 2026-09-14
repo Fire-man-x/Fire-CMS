@@ -1,0 +1,31 @@
+{layout \APP_DIR.'/AdminModule/templates/@layout.latte'}
+
+{block h1}
+	{_"Redirections"}
+{/block}
+
+{block buttons}
+	<a href="#" nx:href="add!" class="btn btn-primary ajax" data-bs-toggle="modal" data-bs-target="#modal"><i class="fa fa-plus"></i> {_'Add'}</a>
+	{*workaround*}
+	</div>
+	<div class="btn-group" role="group" aria-label="{_"Fast filtration"}">
+		<a n:href="default" class="btn btn-secondary {if $presenter->isLinkCurrent('default')}active{/if}" >
+			<i class="fa fa-globe"></i>
+			{_"Urls"}
+		</a>
+		<a n:href="redirections" class="btn btn-secondary {if $presenter->isLinkCurrent('redirections')}active{/if}">
+			<i class="fas fa-share"></i>
+			{_"Redirections"}
+		</a>
+{/block}
+
+{block content}
+
+	{capture $modalContent}
+		{snippet urlRedirectionForm}
+			{control urlRedirectionForm}
+		{/snippet}
+	{/capture}
+	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal', label=>$control->translator->translate('Redirections'), modalContent=>$modalContent} {*, size=>'modal-sm'*}
+
+	{control redirectionsGrid}

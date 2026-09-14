@@ -1,0 +1,15 @@
+<ul n:if="count($languageLinks) >1" class="nav navbar-nav navbar-right {$menuClass}" >
+	<li class="nav-item dropdown">
+		<a href="#" class="nav-link dropdown-toggle" id="languageNavbarDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<span class="fa fa-flag"></span>
+			{$language}
+		</a>
+
+		<div n:if="$languageLinks" class="dropdown-menu" aria-labelledby="languageNavbarDropdown">
+			<a n:foreach="$languages->getActiveLanguages() as $languageId => $languageInfo" n:ifset="$languageLinks[$languageId]"
+					href="{$languageLinks[$languageId]}"
+					lang="{$languageId}"
+					class="dropdown-item">{$languageInfo["shortcut"]}</a>
+		</div>
+	</li>
+</ul>

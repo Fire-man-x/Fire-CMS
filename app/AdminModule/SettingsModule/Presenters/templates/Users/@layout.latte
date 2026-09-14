@@ -1,0 +1,13 @@
+{layout '../../../../templates/@layout.latte'}
+
+{block h1}
+	{_"User"} {if $userInfo}"{if $userInfo->first_name || $userInfo->surname}{$userInfo->first_name} {$userInfo->surname}{else}{$userInfo->username}{/if}"{/if}
+{/block}
+
+{block menu}
+	<ul class="nav nav-tabs">
+		<li n:class="$presenter->isLinkCurrent('detail') ? active, nav-item"><a n:class="$presenter->isLinkCurrent('detail') ? active, nav-link" n:href="detail">{_"Profile"}</a></li>
+		<li n:class="$presenter->isLinkCurrent('password') ? active, !$userInfo ? disabled, nav-item"><a n:class="$presenter->isLinkCurrent('password') ? active, nav-link" {if $userInfo}href="{link password}"{/if}>{_"Password"}</a></li>
+	</ul>
+	<br>
+{/block}

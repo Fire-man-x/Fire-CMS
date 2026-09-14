@@ -1,0 +1,51 @@
+{
+	"name": "fire/cms",
+	"description": "Fire CMS system",
+	"type": "project",
+    "not used": "jzechy/jquery-fileupload\": \"*\",\"jzechy/nette-antispam\": \"*\", \"phpstan/phpstan\": \"^1.2\"",
+	"require": {
+		"php": "~8.3",
+		"nette/nette": "^3.2",
+        "ublaboo/datagrid": "7.2.*",
+        "kdyby/forms-replicator": "*",
+
+        "guzzlehttp/guzzle": "*",
+
+        "contributte/oauth2-client": "*",
+        "league/oauth2-facebook": "^2.0",
+        "jwage/easy-csv": "*"
+    },
+	"require-dev": {
+		"nette/tester": "*",
+        "phpstan/phpstan-nette": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\Plugins\\": ["app/Plugins", "theme/Plugins"],
+            "App\\": "app",
+            "Theme\\": "theme",
+			"Nextras\\Datagrid\\": "./libs/nextras/datagrid/src"
+		},
+        "classmap": [
+        ],
+        "files": [
+        ]
+    },
+	"scripts": {
+		"stan": "@php \"vendor/bin/phpstan\" analyse --configuration \"app/config/phpstan.neon\" -vvv --ansi",
+		"stan-generate-baseline": "@php \"vendor/bin/phpstan\" analyse --configuration \"app/config/phpstan.neon\" --generate-baseline \"app/config/phpstan-baseline.neon\" -vvv --ansi",
+		"stan-report": "@php \"vendor/bin/phpstan\" analyse --configuration \"app/config/phpstan.neon\" --error-format=table > \"log/phpstan-report.txt\" 2>&1",
+		"stan-report-json": "@php \"vendor/bin/phpstan\" analyse --configuration \"app/config/phpstan.neon\" --error-format=json --no-progress > \"log/phpstan-report.json\"",
+		"stan9": "@composer stan -- --level 9",
+		"stan10": "@composer stan -- --level 10"
+    },
+	"scripts-descriptions": {
+		"console": "Runs a PHP application console command. Usage: \"composer console -- --help\"",
+		"stan": "Runs PHPStan for static code analysis. Usage: \"composer stan {path to file or folder}\"",
+		"stan-generate-baseline": "Runs PHPStan and generate baseline.",
+		"stan-report": "Runs PHPStan and saves table output to log/phpstan-report.txt.",
+		"stan-report-json": "Runs PHPStan and saves JSON output to log/phpstan-report.json.",
+		"stan9": "Runs PHPStan at level 9. Usage: \"composer stan9 {path to file or folder}\"",
+		"stan10": "Runs PHPStan at level 10. Usage: \"composer stan10 {path to file or folder}\""
+    }
+}

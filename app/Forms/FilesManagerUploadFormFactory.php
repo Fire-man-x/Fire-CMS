@@ -1,0 +1,78 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Forms;
+
+use App\Components\FileManager\Files\HashImageEntity;
+use App\Components\FileManager\Files\IFile;
+use App\Model;
+use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
+
+class FilesManagerUploadFormFactory extends BaseFormFactory
+{
+
+	private Model\Files $filesModel;
+
+	private Model\MultiFileUploadModel $multiFileUploadModel;
+
+
+	public function __construct(FormFactory $factory, Model\Files $filesModel, Model\MultiFileUploadModel $multiFileUploadModel)
+	{
+		parent::__construct($factory);
+		$this->filesModel = $filesModel;
+		$this->multiFileUploadModel = $multiFileUploadModel;
+	}
+
+
+	public function create(int|string $editId = null): Form
+	{
+		$form = parent::create($editId);
+
+		 /*$form->addMultiUpload('files', 'Files');;
+		 /* ->setRequired(false)
+		  ->addRule(Form::IMAGE);
+		 */
+		$form->addFileUpload('files');
+		/* ->setRequired(true)
+		  ->addRule(Form::IMAGE); */
+
+		$form->addSubmit('send', 'Save');
+
+		$form->onSuccess[] = array($this, 'formSucceeded');
+
+		//defaults
+		if ($this->isEditMode()) {
+			//$form->setDefaults($values);
+		}
+
+		return $form;
+	}
+
+
+	public function formSucceeded(Form $form, $values)
+	{
+		if ($values->files) {
+			\Tracy\Debugger::timer("p");
+			/** @var IFile $file */
+			foreach ($values->files as $file) {
+				/*if($file->isOk()) {
+					$file = $this->multiFileUploadModel->save($file, array());
+				}*/
+
+				$this->filesModel->insert(ArrayHash::from(array(
+						"original_name" => $file->getName(),
+						"file_folder_id" => $form->getPresenter()->id,
+						"disk_name" => $file->getHash(),
+						"extension" => $file->getExtension(),
+						"mime_type" => $file->getMimeType(),
+						"size" => $file->getSize(),
+						"is_image" => $file instanceof HashImageEntity,
+				)));
+			}
+			\Tracy\Debugger::log("cas:".\Tracy\Debugger::timer("p"));
+		}
+		$form->getPresenter()->redirect('this');
+	}
+
+}

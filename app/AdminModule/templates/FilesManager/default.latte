@@ -1,0 +1,162 @@
+{block h1}
+{_"Files manager"}
+{/block}
+
+{block buttons}
+	<a href="#" class="btn btn-primary ajax" data-bs-toggle="modal" data-bs-target="#modal"><i class="fa fa-upload"></i> {_'Add'}</a>
+{/block}
+
+{block sidebar}
+	{snippet filesManagerMenuFolders}
+		{control filesManagerMenu}
+	{/snippet}
+{/block}
+
+{block content}
+	<script type="text/javascript">
+		var changeFolderOfFilesUrl = {link changeFolderOfFiles!}
+	</script>
+
+	{capture $modalContent}
+		{form uploadForm}
+			{input files}
+			{$form->getRenderer()->renderPair($form['send']) |noescape}
+		{/form}
+	{/capture}
+	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal', label=>$control->translator->translate('Upload'), modalContent=>$modalContent} {*, size=>'modal-sm'*}
+
+	<div nx:tag-if="!$isWindowMode" id="content-inside" class="col-lg-9 col-xl-8">
+
+		<fieldset n:class="$isWindowMode ? images-selection">
+			<legend nx:if="!$isWindowMode">{_'Files'} - {$folderInfo->name}</legend>
+
+			<div class="btn-toolbar mb-3 justify-content-between" role="toolbar" aria-label="{_"Toolbar with action buttons"}">
+				<div class="input-group">
+					<div class="input-group-prepend">
+						<span class="input-group-text">{_"Bulk editing"}:</span>
+					</div>
+					<select name="files-manager_bulk-edit" class="form-control custom-select">
+						{var $prompt = PROMPT_VALUE}
+						<option value="" selected="">{$prompt}</option>
+						<option value="selectAll">{_"Select all"}</option>
+						<option value="deselectAll">{_"Deselect all"}</option>
+						<option data-link="{link bulkEditingDelete!}" value="delete">{_"Delete"}</option>
+					</select>
+				</div>
+				<div class="input-group">
+					<div class="input-group-prepend">
+						<span class="input-group-text">{_"Sort"}:</span>
+					</div>
+					<select id="files-manager_order-by" name="orderBy" class="form-control custom-select" required="">
+						<option value="" selected="" data-link="{link setOrderBy!, orderBy=>''}">Nejnovějšího</option>
+						<option value="dateDesc" data-link="{link setOrderBy!, orderBy=>'dateDesc'}">Nejstaršího</option>
+						<option value="nameAsc" data-link="{link setOrderBy!, orderBy=>'nameAsc'}">Název A-Z</option>
+						<option value="nameDesc" data-link="{link setOrderBy!, orderBy=>'nameDesc'}">Název Z-A</option>
+						<option value="sizeDesc" data-link="{link setOrderBy!, orderBy=>'sizeDesc'}">Největší</option>
+						<option value="sizeAsc" data-link="{link setOrderBy!, orderBy=>'sizeAsc'}">Nejmenší</option>
+					</select>
+				</div>
+			</div>
+
+
+
+			<div class="clearfix"></div>
+			<div class="images-selection mt-3">
+				{snippet files}
+					{if $files}
+						{foreach $files as $file}
+							{var $is_image = $file instanceof App\Components\FileManager\Files\HashImageEntity}
+							{var $fileId = $file->getId()}
+							<div n:snippet="file-{$fileId}" class="img-thumbnail galery-thumbnail d-inline-block float-left" data-file-id="{$file->getId()}" data-is-image="{if $is_image}1{else}0{/if}">
+								<input type="checkbox" id="checkbox{$file->getId()}"  class="btn-primary"/>
+								<label for="checkbox{$file->getId()}">
+									<a {*nx:tag-if="!$isWindowMode"*} n:href="fileInfo! hash=>$file->getHash()" class="ajax" {*data-ajax-pass=""*}>
+										<div class="galery-thumbnail-centered">
+											{if $is_image}
+												<img n:src="$file, '130x130'" alt="{$file->getName()}">
+											{else}
+												<span class="btn fa fa-file-{$presenter->getIconOfFile($file->getExtension())}-o d-block"></span>
+											{/if}
+										</div>
+										<small class="galery-thumbnail-description">{$file->getName()}</small>
+									</a>
+								</label>
+							</div>
+						{/foreach}
+					{else}
+						<div class="jumbotron">
+							<span class="h1" >{_"No item."}</span>
+						</div>
+					{/if}
+
+					<div class="clearfix"></div>
+					<div n:if="$showPaginator" class="container-fluid">
+						<hr>
+						{control paginator}
+					</div>
+				{/snippet}
+			</div>
+		</fieldset>
+	</div>
+
+	<div nx:if="!$isWindowMode" id="sidebar-inside" class="col-lg-3 col-xl-4" role="navigation">
+		<fieldset>
+			<legend>{_'File info'}</legend>
+
+			{snippet fileInfo}
+				{ifset $fileInfo}
+					{form fileNameForm}
+					<div class="form-group row required">
+						<div class="col-sm-3 control-label">{label new_name /} {*_"Name"*}</div>
+
+						<div class="col-sm-9">
+							<div class="input-group">
+								{input new_name class=>'form-control'}
+								<span class="input-group-btn">
+									{input send class=>'btn btn-primary button'}
+								</span>
+							</div>
+						</div>
+
+						<div class="col-sm-12">({$fileInfo->disk_name})</div>
+					</div>
+					{input editId}
+					{/form}
+					<div class="form-group row required">
+						<div class="col-sm-3 control-label">{_"Date"}</div>
+						<div class="col-sm-9">{$fileInfo->create_date|date:\DATETIME_FORMAT}</div>
+					</div>
+					<div class="form-group row required">
+						<div class="col-sm-3 control-label">{_"Size"}</div>
+						<div class="col-sm-9">{$fileInfo->size|bytes}</div>
+					</div>
+					<div class="form-group row required">
+						<div class="col-sm-3 control-label">{_"Repair rotation"}</div>
+						<div class="col-sm-9">
+							<a href="{link repairImageOrientation! fileId => $fileInfo->file_id}" class="ajax btn btn-sm btn-outline-dark"><i class="fa fa-hammer"></i></a>
+							<a href="{link rotateImage! fileId => $fileInfo->file_id, rotateDirection => 'left'}" class="ajax btn btn-sm btn-outline-dark"><i class="fa fa-undo"></i></a>
+							<a href="{link rotateImage! fileId => $fileInfo->file_id, rotateDirection => 'right'}" class="ajax btn btn-sm btn-outline-dark"><i class="fa fa-redo"></i></a>
+						</div>
+					</div>
+					<div class="form-group row required">
+						<div class="col-sm-3"></div>
+
+						<div class="col-sm-9"><a n:href="delete! hash=>$fileInfo->disk_name" class="btn btn-danger"><i class="fa fa-trash"></i> {_"Delete"}</a></div>
+					</div>
+				{else}
+					<div>
+						<p>{_'No file selected'}</p>
+					</div>
+				{/ifset}
+			{/snippet}
+
+		</fieldset>
+	</div>
+
+	<div class="clearfix"></div>
+
+	<footer>
+		<div class="container-fluid">
+			<button n:if="$isWindowMode" id="use-selected-files" class="btn btn-primary float-right"><i class="fa fa-save"></i> {_"Add to post"}</button>
+		</div>
+	</footer>

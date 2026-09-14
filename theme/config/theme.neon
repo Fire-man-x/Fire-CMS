@@ -1,0 +1,18 @@
+#v případě potřeby úpravy DI kontejneru, pište sem
+tracy:
+#	bar:
+#		- Theme\Component\Nextras\src\MailPanel(%tempDir%/mail-panel-latte)
+
+#search:
+#	themePlugins:
+#		in: %rootDir%/theme/Plugins
+#		extends: App\Model\Plugin\Plugin
+#		classes:
+#		 	- *Plugin
+#		files:
+#			- *Plugin.php
+
+#services:
+	#nette.mailer:
+	#	class: Nette\Mail\IMailer
+	#	factory: Theme\Component\Nextras\src\FileMailer(%tempDir%/mail-panel-mails)

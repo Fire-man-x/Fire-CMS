@@ -1,0 +1,26 @@
+<style type="text/css">
+#TranslationPanel-availableLangs {
+	font-weight: bold;
+	font-size: 1.1em;
+	text-align: center;
+}
+</style>
+
+<script type="text/javascript">
+/* <![CDATA[ */
+	var translationPanel = {
+		init: function() {}
+	};
+/* > */
+</script>
+
+<div id="TranslationPanel">
+	<h1>Translations ({$lang|upper})</h1>
+
+	<div class="nette-inner">
+		<p>You have activated default language. Switch language to start translating.</p>
+		<p id="TranslationPanel-availableLangs" n:if="$availableLangs" n:inner-foreach="$availableLangs as $i => $availableLang">
+			<a href="{$panel->getLink($availableLang)}">{$availableLang|upper}</a>{sep} | {/sep}
+		</p>
+	</div>
+</div>

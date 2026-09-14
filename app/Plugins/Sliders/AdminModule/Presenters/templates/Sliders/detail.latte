@@ -1,0 +1,78 @@
+{block h1}
+{_"Slider items"} - "{$sliderInfo->name}"
+{/block}
+
+{block content}
+
+	<div class="container-fluid">
+		{snippet items}
+			{foreach $languages as $language => $languageName}
+				<h3 n:if="count($languages) != 1">{$languageName}</h3>
+				<div class="slider-inside images-sortable mb-2" data-language="{$language}">
+					{ifset $items[$language]}
+						<div n:foreach="$items[$language] as $item" class="img-thumbnail d-inline-block" data-file-id="{$item['file']->getId()}" data-position="{$item['position']}">
+							<img n:src="$item['file'], '100x100'" alt="{$item['file']->getName()}" class="">
+							{var $prompt = PROMPT_VALUE}
+							<small class="d-block text-xs-center">{$item['file']->getName()}<br>URL: {if $item['url']}{$item['url']}{else}{$prompt}{/if}<br>Text: {if $item['text']}{$item['text']}{else}{$prompt}{/if}</small>
+							<div class="text-xs-center">
+							<a href='{link editItem! language=>$language, position=>$item['position']}' class='ajax'><i class='fas fa-pencil-alt'></i></a>
+							<a href='{link removeItem! language=>$language, position=>$item['position']}' class='ajax'><i class='fa fa-times'></i></a>
+							</div>
+						</div>
+					{/ifset}
+				</div>
+
+				<a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal" data-src="{link :Admin:FilesManager:default, isWindowMode=>true, toLanguage=>$language}" data-language="" title="{_'Add'}" ><i class="fa fa-plus"></i> {_'Add'}</a>
+				<hr n:if="!$iterator->isLast()">
+			{/foreach}
+		{/snippet}
+
+		<script type="text/javascript">
+			var selectedFilesFromIframeUrl = {link addItemImage!};
+			//sortable menu
+			var sortableFunc = function(){
+				$('.slider-inside.images-sortable').sortable({
+					forcePlaceholderSize: true,
+					helper:	'clone',
+					opacity: .6,
+					//placeholder: 'placeholder',
+					items: '.img-thumbnail',
+					tolerance: 'pointer',
+					//toleranceElement: '> div',
+					//tabSize: 15,
+					revert: true,
+					update: function() {
+						console.log("update");
+						var serialized = $(this).sortable( "toArray", {
+							attribute: "data-position"
+						});
+
+						$.nette.ajax({
+							url: {link sortItems!},
+							data: {
+								items: serialized,
+								language: $(this).data("language")
+							},
+							complete: function(){
+								sortableFunc();
+							}
+						});
+					}
+				});
+			};
+			sortableFunc();
+		</script>
+
+		{capture $modalContent}
+			<iframe />
+		{/capture}
+		{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal', label=>$control->translator->translate('Images'), modalContent=>$modalContent, size=>'modal-lg modal-fs'}
+
+		{capture $modalContent}
+			{snippet sliderItemForm}
+				{control sliderItemForm}
+			{/snippet}
+		{/capture}
+		{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal-slider-items', label=>$control->translator->translate('Slider items'), modalContent=>$modalContent}
+
+	</div>

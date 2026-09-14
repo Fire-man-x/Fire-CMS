@@ -1,0 +1,65 @@
+{snippet folders}
+	{var $level = 0}
+	<ol class="{if $level==0}nav flex-column nav-pills nav-stacked menu-sortable{else}nav-sublevel{/if}" n:block="fileFolders-menu">
+		<li n:foreach="$fileFolders as $fileFolder" class="nav-item {if $fileFolder->file_folder_id==1}mjs-nestedSortable-no-nesting{/if} file-item-droppable" data-id="cat_{$fileFolder->file_folder_id}">
+			<span class="nav-link {if $fileFolder->file_folder_id == $activeItem}active{/if}">
+				<a class="inverse" href="{plink this id=>$fileFolder->file_folder_id, parentFolder=>null}">{if $fileFolder->default==true}<i class="far fa-times-circle"></i> {/if}{$fileFolder->name} <small>({$fileFolder->itemCount})</small></a>
+				<span class="buttons float-right text-right fade">
+					<span n:if="$fileFolder->default == false" class="handler" title="{_'Move'}"><i class="fa fa-arrows-alt"></i></span>
+					<a href="{link addFolder! folder_id=>null, parentFolder=>$fileFolder->file_folder_id}" class="ajax" title="{_'Add'}"><i class="fa fa-plus"></i></a>
+					<a n:if="$fileFolder->default == false" href="{link editFolder! folder_id=>$fileFolder->file_folder_id, parentFolder=>null}" class="ajax" title="{_'Edit'}"><i class="fas fa-pencil-alt"></i></a>
+					<a n:if="$fileFolder->default == false" href="{link removeFolder folder_id=>$fileFolder->file_folder_id}" class="small" title="{_'Delete'}"><i class="fa fa-trash"></i></a>
+				</span>
+			</span>
+
+				{*<div class="placeholder"></div>*}
+			{if !empty($fileFolder->childs)}{include fileFolders-menu 'fileFolders'=>$fileFolder->childs, 'level'=>$level+1}{/if}
+		</li>
+	</ol>
+{/snippet}
+
+<a n:href="addFolder! folder_id=>null, parentFolder=>null" class="btn btn-outline-dark ajax" data-bs-toggle="modal" data-bs-target="#folderNameModal" title="{_'Add'}" ><i class="fa fa-plus"></i></a>
+
+{capture $modalContent}
+	{snippet folderNameForm}
+		{control folderNameForm}
+	{/snippet}
+{/capture}
+{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'folderNameModal', label=>$control->translator->translate('Folder name'), modalContent=>$modalContent, size=>'modal-sm'}
+
+<script type="text/javascript">
+	var sortMenuUrl = {link sortMenu!}
+
+	//sortable menu
+	$('#sidebar .menu-sortable').nestedSortable({
+		forcePlaceholderSize: true,
+		handle: '.handler',
+		helper:	'clone',
+		opacity: .6,
+		placeholder: 'placeholder nav-item',
+		items: 'li',
+		tolerance: 'pointer',
+		//toleranceElement: '> div',
+		tabSize: 15,
+		revert: true,
+
+		isTree: true,
+		expandOnHover: 700,
+		startCollapsed: true,
+		start: function( event, ui ) {
+			//console.log("start");
+			/*$("#sidebar li:not(:has(ul))").append(
+				$("<ul class='sortable fake'>").append(
+					$("<li class='nav-link'>")//.append("<div class='placeholder'>")
+				)
+			);*/
+		},
+		stop: function( event, ui ) {
+			var serialized = $(this).nestedSortable('toHierarchy', {"attribute":"data-id"});
+			$.ajax({
+				url: sortMenuUrl,
+				data: { 'filesManagerMenu-items': serialized }
+			});
+		}
+	});
+</script>

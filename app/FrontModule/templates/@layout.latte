@@ -1,0 +1,184 @@
+{**
+ * @param string   $basePath web base path
+ * @param array	$flashes  flash messages
+ *}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+
+	<title>{ifset $seo['title']}{$seo['title']} | {else}{ifset title}{include title|stripHtml} | {/ifset}{/ifset}{$options['main_title']}</title>
+	<meta n:ifset="$seo['description']" name="description" content="{$seo['description']}">
+	<meta n:ifset="$seo['keywords']" name="keywords" content="{$seo['keywords']}">
+	<meta n:ifset="author" name="author" content="{include author}">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="icon" href="{$basePath}/theme/{$options['themePath']}/favicon.png" type="image/png">
+
+	{block head}{/block}
+
+	{ifset $themeColor}
+		<meta name="theme-color" content="{$themeColor}">{* Chrome, Firefox OS and Opera *}
+		<meta name="msapplication-navbutton-color" content="{$themeColor}">{* Windows Phone *}
+		<meta name="apple-mobile-web-app-capable" content="yes">{* iOS Safari -*}
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	{/ifset}
+
+	{control languageChanger:head}
+
+	{block scripts}
+	<script type="text/javascript" src="{$basePath}/vendors/jquery/jquery-3.4.1.min.js"></script>
+
+	<script type="text/javascript" src="{$basePath}/vendors/jquery-ui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="{$basePath}/vendors/netteForms.min.js"></script>
+	<script type="text/javascript" src="{$basePath}/vendors/nette.ajax.js"></script>
+	{/block}
+
+	<!-- Bootstrap with Pooper without jQuery -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
+
+	<!-- Theme -->
+	<link href="{$basePath}/theme/{$options['themePath']}/css/clean-blog.min.css" rel="stylesheet" />
+	<script src="{$basePath}/theme/{$options['themePath']}/js/clean-blog.min.js"></script>
+	<script src="{$basePath}/theme/{$options['themePath']}/main.js"></script>
+	<link href="{$basePath}/theme/{$options['themePath']}/style.css" rel="stylesheet" />
+
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="{$basePath}/vendors/fontawesome-free-5.9.0-web/css/all.min.css">
+
+	<!-- OwlCarousel2 -->
+	<link href="{$basePath}/vendors/OwlCarousel2-2.2.0/owl.carousel.min.css" rel="stylesheet" />
+	<link href="{$basePath}/vendors/OwlCarousel2-2.2.0/owl.theme.default.min.css" rel="stylesheet" />
+	<script src="{$basePath}/vendors/OwlCarousel2-2.2.0/owl.carousel.min.js"></script>
+
+	<!-- lightGallery -->
+	<link href="{$basePath}/vendors/baguetteBox/baguetteBox.min.css" rel="stylesheet" />
+	<script src="{$basePath}/vendors/baguetteBox/baguetteBox.min.js"></script>
+</head>
+
+<body>
+	<!-- Navigation -->
+	<nav class="navbar navbar-expand-lg navbar-default navbar-custom navbar-fixed-top" role="toolbar">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="{_"Toggle navigation"}">{_"Menu"} ☰</button>
+		<a class="navbar-brand" n:href=":Front:Default:default">{$options['main_title']}</a>
+
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse" id="navbarResponsive">
+
+			{control languageChanger}
+
+			{control menu top-menu, 0, 'navbar-nav navbar-right'}{*, 'btn btn-outline-dark'*}
+
+			<div class="nav-right">
+				{control search}
+			</div>
+		</div>
+		<!-- /.navbar-collapse -->
+	</nav>
+
+	<!-- Page Header -->
+	<header class="intro-header" style="background-image: url('/theme/default/img/home-bg.jpg')">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+					<div class="site-heading">
+						<h1 n:block=title class="page-title">{ifset h1}{include h1}{/ifset}</h1>
+						<hr class="small">
+						<span class="subheading">{$options['main_description']}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+
+
+	<!-- Main Content -->
+	<div class="container" id="main">
+		<div class="row">
+
+			<div nx:ifset="sidebar" id="sidebar" class="col-md-3 col-lg-2 sidebar-offcanvas" role="navigation">
+				{block sidebar}
+					{control menu left-menu, null, "nav-pills nav-stacked"}
+					{control menu text-box, null, "nav-pills nav-stacked"}
+				{/block}
+
+				{control loginLink}
+			</div>
+
+			<div id="content" {*ifset sidebar*}class="col-md-9 col-lg-10 main"{*/ifset*}>
+
+				<!--toggle sidebar button-->
+				<p n:if="false && $user->isLoggedIn()" nx:ifset="sidebar" class="hidden-md-up">
+					<button type="button" class="btn btn-primary-outline btn-sm" data-bs-toggle="offcanvas"><i class="fa fa-chevron-left"></i> Menu</button>
+				</p>
+
+				<div n:ifset="$flashes" class="container-fluid" id="message">
+					<div n:foreach="$flashes as $flash" n:class="'alert-dismissible', 'fade', 'in', 'flash', $flash->type, 'alert', 'alert-'.$flash->type" role="alert">
+						<button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true" class="visually-hidden">&times;</span>
+						</button>
+						{$flash->message}
+					</div>
+				</div>
+
+				<div class="header">
+					{control breadCrumb}
+				</div>
+
+				<div class="main-content">
+					<div n:ifset="buttons" class="container-fluid btn-toolbar" role="toolbar">
+						<p class="btn-group" role="group"> {*Should be div*}
+							{include buttons}
+						</p>
+					</div>
+				</div>
+
+				{include content}
+			</div>
+
+		</div>
+	</div>
+
+	<footer>
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+					<ul class="list-inline text-center">
+						<li>
+							<a href="#">
+								<span class="fa-stack fa-lg">
+									<i class="fa fa-circle fa-stack-2x"></i>
+									<i class="fab fa-twitter fa-stack-1x fa-inverse"></i>
+								</span>
+							</a>
+						</li>
+						<li>
+							<a href="#">
+								<span class="fa-stack fa-lg">
+									<i class="fa fa-circle fa-stack-2x"></i>
+									<i class="fab fa-facebook fa-stack-1x fa-inverse"></i>
+								</span>
+							</a>
+						</li>
+						<li>
+							<a href="#">
+								<span class="fa-stack fa-lg">
+									<i class="fa fa-circle fa-stack-2x"></i>
+									<i class="fab fa-github fa-stack-1x fa-inverse"></i>
+								</span>
+							</a>
+						</li>
+					</ul>
+
+					{control menu left-menu, 0, "justify-content-center list-inline"}
+
+					<p class="copyright text-muted">Copyright &copy; Fire CMS 2019</p>
+				</div>
+			</div>
+		</div>
+	</footer>
+
+</body>
+</html>

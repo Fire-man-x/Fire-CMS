@@ -1,0 +1,14 @@
+#application:
+#	mapping:
+#		Admin:Comments: App\Modules\CommentsModule\AdminModule\*Presenter
+#		*: App\*Module\Presenters\*Presenter
+
+services:
+	#Admin
+	- App\Plugins\Sliders\Model\Sliders
+	- App\Plugins\Sliders\Model\SliderItems
+	- App\Plugins\Sliders\Forms\SliderFormFactory
+	- App\Plugins\Sliders\Forms\SliderItemFormFactory
+
+	#Front
+	pluginSlider: App\Plugins\Sliders\Components\Slider

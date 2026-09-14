@@ -1,0 +1,181 @@
+{block h1}
+{_"Article"}
+{/block}
+
+{block content}
+	{form articleForm}
+		<div id="content-inside" class="col-lg-9 col-xl-8">
+			{if count($languages)>1}
+				<ul id="tabsJustified" class="nav nav-tabs">
+					<li n:foreach="$languages as $language => $languageName" class="nav-item">
+						<a class="nav-link {if $language==$actualLanguage}active{/if}" href="{link this language=>$language}" aria-expanded="false">{$languageName}</a>
+					</li>
+				</ul>
+				<br>
+			{/if}
+
+			{$form->getRenderer()->renderPair($form['translation']['title']) |noescape}
+
+			{$form->getRenderer()->renderPair($form['translation']['url']) |noescape}
+
+			{$form->getRenderer()->renderPair($form['translation']['excerpt']) |noescape}
+
+			{$form->getRenderer()->renderPair($form['translation']['content']) |noescape}
+
+			<fieldset>
+				<legend>{_"SEO"}</legend>
+				{$form->getRenderer()->renderPair($form['translation']['seo_title']) |noescape}
+				{$form->getRenderer()->renderPair($form['translation']['seo_description']) |noescape}
+				{$form->getRenderer()->renderPair($form['translation']['seo_keywords']) |noescape}
+			</fieldset>
+		</div>
+
+		<div id="sidebar-inside" class="col-lg-3 col-xl-4" role="navigation">
+			<fieldset>
+				<legend>{_'Actions'}</legend>
+				<div class="form-group row">
+					<div class="col-sm-3 col-lg-12x control-label">
+						{label active: /}
+					</div>
+
+					<div class="col-sm-9 col-lg-12x">
+						<div class="form-check checkbox">{input active:}</div>
+					</div>
+				</div>
+
+				{$form->getRenderer()->renderPair($form['status']) |noescape}
+
+				<div n:if="$revisionCount" class="form-group row">
+					<div class="col-sm-3 col-lg-12x control-label">
+						<i class="fa fa-history"></i> {_'Older versions'}
+					</div>
+
+					<div class="col-sm-9 col-lg-12x">
+						{var $revisionParamName = \App\AdminModule\Presenters\ArticlesPresenter::$revisionParameter}
+						{capture $revisionsContainer}
+							<ul class="list-unstyled">
+								<li n:foreach="$revisionsList as $revision"><strong n:tag-if="$revision->article_id == $presenter->getParameter($revisionParamName)"><a n:href="this $revisionParamName=>$revision->article_id" title="{_'View'}">{$revision->create_date|date:\DATETIME_FORMAT}</a></strong></li>
+							</ul>
+						{/capture}
+						<a tabindex="0" class="btn btn-outline-dark" role="button" data-bs-toggle="popover" data-bs-placement="bottom" title="&lt;i class=&quot;fa fa-history&quot;&gt;&lt;/i&gt; {_'Older versions'}" data-content="{$revisionsContainer}">
+							{$revisionCount}
+						</a>
+						<a n:if="$presenter->getParameter($revisionParamName)" n:href="this $revisionParamName=>null" class="btn btn-secondary" role="button" title="{_'Restore'}">
+							<i class="fa fa-undo"></i>
+						</a>
+					</div>
+				</div>
+
+				{$form->getRenderer()->renderPair($form['publishing_date']) |noescape}
+
+				{$form->getRenderer()->renderPair($form['expiring_date']) |noescape}
+
+				<div class="form-group row">
+					<div class="col-sm-3 col-lg-12x control-label">
+						{label public: /}
+					</div>
+
+					<div class="col-sm-9 col-lg-12x">
+						<div class="form-check checkbox">{input public:}</div>
+					</div>
+				</div>
+
+				<div class="form-group row">
+					<div class="col-sm-12 control-label"></div>
+
+					<div class="col-sm-12">
+						{input send class=>'btn btn-primary button'}
+						<a n:if="isset($id) && $form['translation']['title']->getValue()" n:href=":Front:Articles:detail id=>$id, locale=>$actualLanguage" class="btn btn-secondary" title="{_'Show on web'}" target="blank"><i class="fa fa-eye"></i></a>
+					</div>
+				</div>
+			</fieldset>
+
+			<fieldset>
+				<legend>{_'Tags'}</legend>
+				{input tags class=>'form-control text'}
+			</fieldset>
+
+			<fieldset class="images-sortable">
+				<legend>{_'Images'} <a href="#" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#modal" data-src="{link :Admin:FilesManager:default isWindowMode=>true}" title="{_'Add'}" ><i class="fa fa-plus"></i></a></legend>
+				{input images}
+				{snippet files}
+					{ifset $files}
+						<div n:foreach="$files as $file" class="img-thumbnail d-inline-block" data-file-id="{$file->getId()}">
+							<a n:tag-if="!$isWindowMode" nx:href="fileInfo! hash=>$file->getHash()" data-bs-toggle="popover" titlex="{_'Actions'}" data-content="<a href='{link removeImage! file_id=>$file->getId()}' class='ajax'><i class='fa fa-times'></i></a>" data-bs-placement="bottom" titlex="{$file->getName()}">
+								<img n:src="$file, '100x100'" alt="{$file->getName()}" class="">
+								<small class="d-block text-xs-center">{$file->getName()}</small>
+							</a>
+						</div>
+					{/ifset}
+				{/snippet}
+			</fieldset>
+
+			<fieldset>
+				<legend>{_'Categories'} <a href="#" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#categoriesSelectionModal" title="{_'Add'}" ><i class="fa fa-plus"></i></a></legend>
+				{snippet categories}
+					{*control categoriesGrid*}
+				{/snippet}
+			</fieldset>
+		</div>
+	{/form}
+
+	<div class="clearfix"></div>
+
+	{*<div class="" role="navigation">
+		<fieldset>
+			<legend>{_'Metas'}</legend>
+			{snippet metas}
+				{control metaValueForm}
+			{/snippet}
+		</fieldset>
+	</div>*}
+
+	<div class="clearfix"></div>
+
+	<script type="text/javascript">
+		var selectedFilesFromIframeUrl = {link addImage!};
+
+		//sortable menu
+		$('#sidebar-inside .images-sortable').sortable({
+			forcePlaceholderSize: true,
+			helper:	'clone',
+			opacity: .6,
+			//placeholder: 'placeholder',
+			items: '.img-thumbnail',
+			tolerance: 'pointer',
+			//toleranceElement: '> div',
+			//tabSize: 15,
+			revert: true,
+
+			//isTree: true,
+			//expandOnHover: 700,
+			//startCollapsed: true,
+			start: function( event, ui ) {
+				//console.log("start");
+				/*$("#sidebar li:not(:has(ul))").append(
+					$("<ul class='sortable fake'>").append(
+						$("<li class='nav-link'>")//.append("<div class='placeholder'>")
+					)
+				);*/
+			},
+			stop: function( event, ui ) {
+				//var serialized = $(this).nestedSortable('toHierarchy', {"attribute":"data-id"});
+				//$('#serializeOutput').text(serialized+'\n\n');
+				//console.log(serialized);
+				/*$.ajax({
+					url: sortMenuUrl,
+					data: { 'articlesMenu-items': serialized }
+				});*/
+			}
+		});
+	</script>
+
+	{capture $modalContent}
+		<iframe />
+	{/capture}
+	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal', label=>$control->translator->translate('Images'), modalContent=>$modalContent, size=>'modal-lg modal-fs'}
+
+	{capture $categoriesSelectionModalContent}
+		{control categorySelectionGrid}
+	{/capture}
+	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'categoriesSelectionModal', label=>$control->translator->translate('Categories'), modalContent=>$categoriesSelectionModalContent, size=>'modal-lg'}

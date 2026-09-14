@@ -1,0 +1,4 @@
+<div n:ifset="$tags" n:if="count($tags)">
+	{_'Tags'}:
+	{foreach $tags as $tag}{if !$iterator->isFirst()}, {/if}<a n:href="Tags:default url=>$tag->name"><span class="tag tag-default label label-default">{$tag->name}</span></a>{/foreach}
+</div>

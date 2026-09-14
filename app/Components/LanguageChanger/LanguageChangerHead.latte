@@ -1,0 +1,3 @@
+{if $languageLinks}
+<link n:foreach="$languages->getActiveLanguages() as $lang => $lang_name" n:ifset="$languageLinks[$lang]" n:if="$language != $lang" rel="alternate" href="{$languageLinks[$lang]}" hreflang="{$lang}" />
+{/if}

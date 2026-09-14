@@ -1,0 +1,22 @@
+includes:
+	- %currentWorkingDirectory%/vendor/phpstan/phpstan-nette/extension.neon
+	- %currentWorkingDirectory%/vendor/phpstan/phpstan-nette/rules.neon
+	- phpstan-baseline.neon
+
+parameters:
+	scanDirectories:
+		- %currentWorkingDirectory%/app
+		- %currentWorkingDirectory%/vendor
+		- %currentWorkingDirectory%/theme
+
+	paths:
+		- %currentWorkingDirectory%/app
+
+	tmpDir:
+		%currentWorkingDirectory%/temp/phpstan
+
+	level: 5
+
+	treatPhpDocTypesAsCertain: false
+
+	editorUrlTitle: '%%relFile%%:%%line%%'

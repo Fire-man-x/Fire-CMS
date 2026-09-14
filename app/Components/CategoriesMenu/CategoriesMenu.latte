@@ -1,0 +1,59 @@
+{var $level = 0}
+<ol class="{if $level==0}nav flex-column nav-pills nav-stacked menu-sortable{else}nav-sublevel{/if}" n:block="categories-menu">
+	<li n:foreach="$categories as $category" class="nav-item {if $category->category_id==1}mjs-nestedSortable-no-nesting{/if}" data-id="cat_{$category->category_id}">
+		<span class="nav-link {if $category->category_id == $activeCategory}active{/if} {if !$category->active}font-italic{/if}">
+			<a class="{*inverse*}" href="{plink this id=>$category->category_id, parent=>null}">{if $category->category_id==1}<i class="fas fa-chalkboard"></i> {/if}{$category->grid_name} {* [{$category->category_left}-{$category->category_right}]*}</a>
+			<span class="buttons float-right text-right">
+				<span n:if="$category->type != 'homepage'" class="handler" title="{_'Move'}"><i class="fas fa-arrows-alt"></i></span>
+				<a href="{plink this id=>null, parent=>$category->category_id}" title="{_'Add'}"><i class="fa fa-plus"></i></a>
+				<a n:if="$category->type != 'homepage'" href="{link removeCategory category_id=>$category->category_id, parent=>null}" class="small" title="{_'Delete'}" data-confirm="modal" data-confirm-text="{_"Delete"}?"><i class="fa fa-trash"></i></a>
+			</span>
+			<div class="clearfix"></div>
+		</span>
+
+			{*<div class="placeholder"></div>*}
+		{if !empty($category->childs)}{include categories-menu 'categories'=>$category->childs, 'level'=>$level+1}{/if}
+	</li>
+</ol>
+
+
+<a href="{plink :Admin:Categories:default id=>null}" class="btn btn-outline-dark" title="{_'Add'}" ><i class="fa fa-plus"></i></a>
+
+<script type="text/javascript">
+	var sortMenuUrl = {link sortMenu!}
+
+	//sortable menu
+	$('#sidebar .menu-sortable').nestedSortable({
+		forcePlaceholderSize: true,
+		handle: '.handler',
+		helper:	'clone',
+		opacity: .6,
+		placeholder: 'placeholder nav-item',
+		items: 'li',
+		tolerance: 'pointer',
+		//toleranceElement: '> div',
+		tabSize: 15,
+		revert: true,
+
+		isTree: true,
+		expandOnHover: 700,
+		startCollapsed: true,
+		start: function( event, ui ) {
+			//console.log("start");
+			/*$("#sidebar li:not(:has(ul))").append(
+				$("<ul class='sortable fake'>").append(
+					$("<li class='nav-link'>")//.append("<div class='placeholder'>")
+				)
+			);*/
+		},
+		stop: function( event, ui ) {
+			var serialized = $(this).nestedSortable('toHierarchy', {"attribute":"data-id"});
+			//$('#serializeOutput').text(serialized+'\n\n');
+			console.log(serialized);
+			$.ajax({
+				url: sortMenuUrl,
+				data: { 'categoriesMenu-items': serialized }
+			});
+		}
+	});
+</script>

@@ -1,0 +1,31 @@
+{extends \APP_DIR.'AdminModule/templates/@layout.latte'}
+
+{block h1}
+{_"Comments"}
+{/block}
+
+{*block buttons}
+	<a n:if="$user->isAllowed('Comments', 'add')" n:href="add! id=>null" class="btn btn-primary ajax" data-bs-toggle="modal" data-bs-target="#modal"><i class="fa fa-plus"></i> {_'Add'}</a>
+{/block*}
+
+{block content}
+
+	{capture $modalContent}
+		{snippet commentReplyForm}
+			<div n:ifset="$commentInfo">
+				<div class="row">
+					<div class="col-sm-3"><strong>{$commentInfo->author}</strong><br><a href="mailto:{$commentInfo->author_email}">{$commentInfo->author_email}</a></div>
+					<div class="col-sm-9 text-right">{$commentInfo->create_date|date:\DATETIME_FORMAT}</div>
+				</div>
+				<div class="">
+					<div class=""><strong>{$commentInfo->title}</strong></div>
+					<div class="text-justify">{$commentInfo->text}</div>
+				</div>
+			</div>
+			<hr>
+			{control commentReplyForm}
+		{/snippet}
+	{/capture}
+	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal', label=>$control->translator->translate('Comment'), modalContent=>$modalContent} {*, size=>'modal-sm'*}
+
+	{control commentsGrid}

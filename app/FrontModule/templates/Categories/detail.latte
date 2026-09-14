@@ -1,0 +1,21 @@
+{block h1}
+{$category->title|noescape}
+{/block}
+
+{block content}
+	 <!-- Post Content -->
+	<article>
+		{$category->content|shortcodes|noescape}
+
+		{* Metas *}
+		{include '../../Components/Metas.latte' metas=>$category->metas}
+
+		{* Tags *}
+		{include '../../Components/Tags.latte' tags=>$category->tags}
+
+		<p class="post-meta">{_"Posted by <a href='%s'>%s</a> on %s", "#",$category->author['author'], $category->publishing_date->format(\DATETIME_FORMAT) |noescape} {_'viewed'} {$category->view_count}</p>
+	</article>
+
+	{control categories $category->category_id}
+
+	{control articles $category->category_id}

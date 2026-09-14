@@ -1,0 +1,40 @@
+<div class="owl-carousel owl-theme" id="slider_{$slider->slider_id}">
+	<div n:foreach="$sliderItems as $item" title="{if $item->text}{$item->text}{else}{$item->file->getName()}{/if}">
+		<a href="{if $item->url}{$item->url}{else}{image $item->file}{/if}" {*title=""*}>
+			<img n:src="$item->file, '945x'" alt="{$item->file->getName()}" class="">
+		</a>
+	</div>
+</div>
+
+{var $autoplay = $slider->manual == 0}
+{var $showNav = $slider->navigation == 1}
+{var $timeout = $slider->duration + $slider->speed}
+<script type="text/javascript">
+
+	$('.owl-carousel#slider_{$slider->slider_id}').owlCarousel({
+		loop: true,
+		margin: 10,
+		/*responsiveClass:true,*/
+		nav: false,
+		dots: {$showNav},
+		//navText: ['předchozí', 'další'],
+		autoplay: {$autoplay},
+		autoplayHoverPause: true,
+		autoplayTimeout: {$timeout},
+		autoplaySpeed: {$slider->speed},
+		responsiveRefreshRate : 1000,
+		//autoWidth:true,
+		//autoHeight:true,
+		responsive: {
+			0: {
+				items: 1,
+			},
+			600: {
+				items: 1,
+			},
+			1000: {
+				items: 1,
+			}
+		}
+	});
+</script>

@@ -1,0 +1,51 @@
+<hr>
+
+<section class="comments" id="replies">
+<h4>{_"Comments"}</h4>
+
+	{if count($comments)}
+		{var $commentCount = $control['paginator']->getPaginator()->getItemCount()}
+		<h6 class="comments_header">{$commentCount} Replies</h6>
+
+		{var $level = 0}
+		<section n:block="comments" class="{if $level==0}comments_list{else}subcomments_list{/if}" {if $level>0}style="margin-left: 20px; padding-left: 10px; border-left: 1px solid black;"{/if}>
+			<article n:foreach="$comments as $comment" class="comment media " >
+				{var $showChilds = !empty($comment->childs)}
+				<header class="comment_header container-fluid">
+					<div class="row">
+						<div class="col-xs-7">
+							<strong class="post-title">{$comment->title}</strong>
+							{*[{$comment->left} - {$comment->right}]*}
+						</div>
+						<div class=" col-xs-5 post-meta text-right small">{$comment->author} on {$comment->create_date|date:\DATETIME_FORMAT}</div>
+					</div>
+				</header>
+				<div class="post-subtitle media-body text-justify">{$comment->text}</div>
+				{*<footer class="comment_footer">
+					<nav class="content--tertiary nav-pills">
+						<ul class="list-inline nav nav-pills">
+							<li class="list-inline-item"><a data-action="comment-new" data-action-path="/replies/366067/replies" data-login-required="true" href="#">Reply</a></li>
+							<li class="list-inline-item"><a data-action="comment-quote" data-login-required="true" href="#">Quote</a></li>
+							<li class="list-inline-item"><a data-remote="true" data-method="put" data-action="flag" class="flag" href="/replies/366067/flag">Flag</a></li>
+							<li class="list-inline-item"><a id="helpful-366067" data-login-required="true" data-remote="true" rel="nofollow" data-method="post" href="/replies/366067/helpfuls">Mark as Helpful (0)</a></li>
+							<li class="list-inline-item"><a data-remote="true" data-method="post" data-login-required="true" data-bookmark="reply-366067" href="/replies/366067/favorites" class=""><span class="media__body" data-bookmark="copy">Bookmark</span></a></li>
+						</ul>
+					</nav>
+				</footer>*}
+
+				{if $showChilds}{include comments 'comments'=>$comment->childs, 'level'=>$level+1}{/if}
+
+			</article>
+		</section>
+
+		{if $showPaginator}
+			{control paginator}
+		{/if}
+	{else}
+		<div class="jumbotron-hr">
+			<span class="" >{_"No item."}</span>
+		</div>
+	{/if}
+
+	{control commentForm}
+</section>

@@ -1,0 +1,25 @@
+{if $categories->count()}
+	<div class="card card-default">
+		{*<div class="panel-heading">Panel heading without title</div>*}
+		<div class="card-body">
+			<div class="list-group">
+				{foreach $categories as $category}
+					<a href="{plink :Front:Categories:detail id=>$category->category_id}" class="list-group-item">
+						<div class="btn btn-outline-dark">
+							<span class="fa fa-chevron-circle-right"></span> {$category->title}
+						</div>
+					</a>
+				{/foreach}
+			</div>
+		</div>
+	</div>
+
+	{if $showPaginator}
+		{control paginator}
+	{/if}
+{else}
+	{*<hr />
+	<div class="jumbotron">
+		<span class="h1" >{_"No item."}</span>
+	</div>*}
+{/if}

@@ -1,0 +1,18 @@
+{block h1}
+{_'Tag'}: {$tag->name|noescape}
+{/block}
+
+{block content}
+	<article>
+		<section>
+			<h3><span class="badge">Kategorie:</span> Zde jsou všechny kategorie se štítkem "{$tag->name}"</h3>
+
+			{control categories}
+		</section>
+
+		<section>
+			<h3><span class="badge">Články:</span> Zde jsou všechny články se štítkem "{$tag->name}"</h3>
+
+			{control articles}
+		</section>
+	</article>

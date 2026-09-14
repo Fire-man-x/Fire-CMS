@@ -1,0 +1,27 @@
+{block h1}
+{_"Category"}
+{/block}
+
+{block content}
+
+	{*foreach $articles as $article}
+		<div class="post-preview">
+			<a n:href="Articles:detail url=>$article->url">
+				<h2 class="post-title">
+					{$article->title}
+				</h2>
+			</a>
+			<p class="post-subtitle">
+				{$article->excerpt|noescape}
+			</p>
+			<p class="post-meta">{_"Posted by <a href='%s'>%s</a> on %s", "#",$article->author['author'], $article->publishing_date->format(\DATETIME_FORMAT) |noescape}</p>
+		</div>
+		<hr>
+	{/foreach}
+
+	<!-- Pager -->
+	<ul class="pager">
+		<li class="next">
+			<a href="#">Older Posts &rarr;</a>
+		</li>
+	</ul>*}

@@ -1,0 +1,69 @@
+.list_carousel {
+	padding: 15px 40px 15px 40px;
+	position: relative;
+    background-color: #CCCCCC;
+    margin-bottom: 60px;
+	
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    border-radius:10px;
+}
+
+.list_carousel.responsive {
+	width: auto;
+}
+
+.list_carousel img {
+	border: 1px solid #ccc;
+	background-color: white;
+	padding: 9px;
+	margin: 7px;
+	/*display: block;
+	float: left;*/
+}
+.clearfix {
+	float: none;
+	clear: both;
+}
+.prev {
+	float: left;
+	margin-left: 10px;
+}
+.next {
+	float: right;
+	margin-right: 10px;
+}
+.pager {
+	float: left;
+	width: 300px;
+	text-align: center;
+}
+.pager a {
+	margin: 0 5px;
+	text-decoration: none;
+}
+.pager a.selected {
+	text-decoration: underline;
+}
+.timer {
+	background-color: #999;
+	height: 6px;
+	width: 0px;
+}
+.pagination {
+	text-align: center;
+}
+.pagination a {
+	background: url(./images/pagination.png) 0 0 no-repeat transparent;
+	width: 12px;
+	height: 12px;
+	margin: 0 5px 0 0;
+	display: inline-block;
+}
+.pagination a.selected {
+	background-position: 0 -12px;
+	cursor: default;
+}
+.pagination a span {
+	display: none;
+}

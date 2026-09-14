@@ -1,0 +1,27 @@
+{block content}
+
+<div class="container">
+	<div class="mt-5 col-xs-8 offset-xs-2 col-lg-4 offset-lg-4">
+		<h1 n:block=title>{_"Sign in"}</h1>
+		{* OR
+		{import '../Components/form.latte'}
+		{include form signInForm}
+		*}
+		{control signInForm}
+
+		{*<div class="clearfix"></div>
+		<p><a n:href="up">{_"Don't have an account yet? Sign up."}</a></p>
+		*}
+
+		<div id="other-login" class="login">
+			<h2>{_"Other sign in"}</h2>
+			<a href="{plink :Admin:Sign:facebook}" class="btn btn-primary mb-5"><span class="fa fa-facebook-official"></span> {_'Sign in with Facebook'}</a><br><br>
+
+			{*<div id="fb-root"></div>
+			<script async defer crossorigin="anonymous" src="https://connect.facebook.net/cs_CZ/sdk.js#xfbml=1&version=v7.0&appId=278805626686671&autoLogAppEvents=1" nonce="IHzPqdDI"></script>
+			<div class="fb-login-button" data-size="large" data-button-type="login_with" data-layout="rounded" data-auto-logout-link="false" data-use-continue-as="true" data-width=""></div>*}
+		</div>
+	</div>
+</div>
+
+
