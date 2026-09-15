@@ -100,7 +100,7 @@ class FilesManagerPresenter extends BasePresenter
 		$this->addBreadCrumbLink("Files manager", $this->link(":Admin:FilesManager:default", array("id" => null)) );
 
 		//set default id
-		$folderInfo = $this->fileFoldersModel->findById($this->id)->fetch();
+		$folderInfo = $this->fileFoldersModel->getById($this->id);
 		if(!$folderInfo){
 			throw new \Nette\Application\BadRequestException("Item with id '$this->id' doesn't exist.");
 		}
@@ -111,7 +111,7 @@ class FilesManagerPresenter extends BasePresenter
 	public function actionDefault(): void
 	{
 		//datasource for images
-		$source = $this->filesModel->getAll()->where("file_folder_id", $this->id);
+		$source = $this->filesModel->findAll()->where("file_folder_id", $this->id);
 		switch($this->orderBy)
 		{
 			case 'nameAsc':
@@ -217,7 +217,7 @@ class FilesManagerPresenter extends BasePresenter
 	 */
 	public function handleFileInfo($hash): void
 	{
-		$fileInfo = $this->filesModel->getAll()->where("disk_name", $hash)->fetch();
+		$fileInfo = $this->filesModel->findAll()->where("disk_name", $hash)->fetch();
 		if ($fileInfo) {
 			$this->template->fileInfo = $fileInfo;
 			$this->filesManagerFileNameFormFactory->setEditId($fileInfo->file_id);
@@ -268,7 +268,7 @@ class FilesManagerPresenter extends BasePresenter
 	 */
 	public function handleBulkEditingDelete(array $files): void
 	{
-		$filesInfo = $this->filesModel->findById($files)->fetchAll();
+		$filesInfo = $this->filesModel->getById($files);
 		if (!$filesInfo) {
 			throw new \InvalidArgumentException("File with id not found.");
 		}
@@ -304,8 +304,8 @@ class FilesManagerPresenter extends BasePresenter
 		{
 			return;
 		}
-		$filesInfo = $this->filesModel->findById($files)->fetchAll();
-		if (!$filesInfo) {
+		$filesInfo = $this->filesModel->findByIds($files);
+		if (!$filesInfo->count()) {
 			throw new \InvalidArgumentException("File with id not found.");
 		}
 
@@ -329,7 +329,7 @@ class FilesManagerPresenter extends BasePresenter
 	 */
 	public function handleRepairImageOrientation(int $fileId): void
 	{
-		$fileRow = $this->filesModel->findById($fileId)->select('*')->fetch();
+		$fileRow = $this->filesModel->getById($fileId);
 		if(!$fileRow)
 		{
 			throw new Nette\InvalidArgumentException("File with file id '$fileId' not exist.");
@@ -396,7 +396,7 @@ class FilesManagerPresenter extends BasePresenter
 	 */
 	public function handleRotateImage(int $fileId, string $rotateDirection): void
 	{
-		$fileRow = $this->filesModel->findById($fileId)->fetch();
+		$fileRow = $this->filesModel->getById($fileId);
 		if(!$fileRow)
 		{
 			throw new Nette\InvalidArgumentException("File with file id '$fileId' not exist.");

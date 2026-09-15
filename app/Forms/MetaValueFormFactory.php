@@ -44,7 +44,7 @@ class MetaValueFormFactory extends BaseFormFactory
 	{
 		$form = parent::create($editId);
 
-		$items = $this->metasModel->getAll()
+		$items = $this->metasModel->findAll()
 			->where("type", $this->type)
 			->where("language_id = ? OR language_id IS NULL", $language)
 			->fetchAll();
@@ -103,7 +103,7 @@ class MetaValueFormFactory extends BaseFormFactory
 	{
 		parent::setDefaultValues($form, $editId);
 
-		$defaults = $this->metasModel->findById($editId)->fetch();
+		$defaults = $this->metasModel->getById($editId);
 
 		$form->setDefaults($defaults);
 	}

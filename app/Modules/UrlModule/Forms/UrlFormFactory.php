@@ -70,7 +70,7 @@ class UrlFormFactory extends BaseFormFactory
 	{
 		parent::setDefaultValues($form, $editId);
 
-		$defaults = $this->model->findById($editId)->fetch();
+		$defaults = $this->model->getById($editId);
 
 		$form->setDefaults($defaults);
 	}

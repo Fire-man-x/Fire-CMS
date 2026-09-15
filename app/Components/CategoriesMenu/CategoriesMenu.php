@@ -125,7 +125,7 @@ class CategoriesMenu extends Control
 	 */
 	public function recalculateLeftRight(): void
 	{
-		$items = $this->createTree($this->categoriesModel->getAll()->fetchAll());
+		$items = $this->createTree($this->categoriesModel->findAll()->fetchAll());
 
 		$updateItems = array();
 		$this->treeToArray($updateItems, $items);

@@ -49,7 +49,7 @@ class Menus extends BaseModel
 		$index = 0;
 		while ($exist){
 			$location = \Nette\Utils\Strings::webalize($text . ($index == 0 ? "" : " " . $index));
-			$sql = $this->getAll()
+			$sql = $this->findAll()
 				->where("location", $location);
 			if($ignoreMenuId){
 				$sql->where($this->getColumnId()." != ?", $ignoreMenuId);

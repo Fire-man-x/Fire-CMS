@@ -39,7 +39,7 @@ class MetasPresenter extends BasePresenter
 	 */
 	protected function createComponentMetasGrid(string $name): Datagrid
 	{
-		$source = $this->model->getAll()->order("language_id ASC")->order("key ASC")->order($this->model->getColumnId());
+		$source = $this->model->findAll()->order("language_id ASC")->order("key ASC")->order($this->model->getColumnId());
 		$primaryKey = $this->model->getColumnId();
 
 		$grid = new Datagrid($this, $name);

@@ -23,7 +23,7 @@ class Model extends BaseModel
 
 	public function getAllForGrid(): \Nette\Database\Table\Selection
 	{
-		return $this->getAll()->order("url ASC")->order($this->getColumnId());
+		return $this->findAll()->order("url ASC")->order($this->getColumnId());
 	}
 
 

@@ -57,10 +57,11 @@ class Files extends BaseModel implements IViewCounter
 
 	/**
 	 * Move files to other folder
+	 * @param array<int,int> $files
 	 */
 	public function changeFilesFolder(int $toFolder, array $files): void
 	{
-		$this->findById($files)->update(array("file_folder_id"=>$toFolder));
+		$this->findByIds($files)->update(array("file_folder_id"=>$toFolder));
 	}
 
 

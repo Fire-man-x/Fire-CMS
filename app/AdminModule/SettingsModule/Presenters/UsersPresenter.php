@@ -37,13 +37,13 @@ class UsersPresenter extends BasePresenter
 
 		$this->addBreadCrumbLink("Users", $this->link(":Admin:Settings:Users:default", array("id"=>null)));
 
-		$this->template->userInfo = $this->users->findById($this->id)->fetch();
+		$this->template->userInfo = $this->users->getById($this->id);
 	}
 
 
 	public function actionDetail(): void
 	{
-		$this->template->userInfo = $this->users->findById($this->id)->fetch();
+		$this->template->userInfo = $this->users->getById($this->id);
 	}
 
 
@@ -55,7 +55,7 @@ class UsersPresenter extends BasePresenter
 	 */
 	protected function createComponentUsersGrid(string $name): Datagrid
 	{
-		$source = $this->users->getAll()
+		$source = $this->users->findAll()
 			//->select(':roles.title AS role_title')
 			->select('users.*')
 			->select('"" AS role_title')

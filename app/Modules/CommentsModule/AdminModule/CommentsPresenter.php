@@ -102,17 +102,17 @@ class CommentsPresenter extends BasePresenter
 		$this->template->show = $this->show;
 
 		$counts = array(
-			"all"=>$this->commentsModel->getAll()
+			"all"=>$this->commentsModel->findAll()
 				->select("COUNT(*) AS count")
 				->where("comments.status != ?","trash")
 				//->where("comments.history_id", null)
 				->fetchField(),
-			"pending"=>$this->commentsModel->getAll()
+			"pending"=>$this->commentsModel->findAll()
 				->select("COUNT(*) AS count")
 				->where("comments.status = ?","pending")
 				//->where("comments.history_id", null)
 				->fetchField(),
-			"trash"=>$this->commentsModel->getAll()
+			"trash"=>$this->commentsModel->findAll()
 				->select("COUNT(*) AS count")
 				->where("comments.status = ?","trash")
 				//->where("comments.history_id", null)
@@ -140,7 +140,7 @@ class CommentsPresenter extends BasePresenter
 		$this->template->comments = $this->commentsModel;
 
 		//edit own
-		$createdBy = $this->commentsModel->findById($this->id)->fetchField("created_by");
+		$createdBy = $this->commentsModel->getById($this->id)?->created_by;
 		if(!$this->user->isAllowed(new \App\Security\Resource("Comments", $createdBy),"edit")){
 			throw new \Nette\Application\ForbiddenRequestException("You have not access to 'Comments' with priviledge 'edit'.");
 		}
@@ -155,7 +155,7 @@ class CommentsPresenter extends BasePresenter
 	 */
 	protected function createComponentCommentsGrid(string $name): Datagrid
 	{
-		$source = $this->commentsModel->getAll()
+		$source = $this->commentsModel->findAll()
 			->select("comments.*")
 			->select(":category_comment.category.grid_name AS category_grid_name")
 			//->where("comments.history_id", null)
@@ -182,7 +182,7 @@ class CommentsPresenter extends BasePresenter
 		$grid->setDataSource($source);
 		$grid->setTranslator($this->translator);
 
-		$usersList = $this->userModel->getAll()->fetchAssoc($this->userModel->getColumnId());
+		$usersList = $this->userModel->findAll()->fetchAssoc($this->userModel->getColumnId());
 		$userManager = $this->userManager;
 		$grid->addColumnText("author", "Author")
 			->setRenderer(function ($row) use ($usersList, $userManager) {
@@ -283,7 +283,7 @@ class CommentsPresenter extends BasePresenter
 	public function handleActivate($comment_id, $status = 0)
 	{
 		//edit own
-		$createdBy = $this->commentsModel->findById($comment_id)->fetchField("created_by");
+		$createdBy = $this->commentsModel->getById($comment_id)?->created_by;
 		if(!$this->user->isAllowed(new \App\Security\Resource("Comments", $createdBy),"edit")){
 			throw new \Nette\Application\ForbiddenRequestException("You have not access to 'Comments' with priviledge 'edit'.");
 		}
@@ -319,8 +319,7 @@ class CommentsPresenter extends BasePresenter
 	#[Privilege('edit')]
 	public function handleReply($comment_id)
 	{
-		$defaults = $this->commentsModel->findById($comment_id)->fetch();
-		$this->template->commentInfo = $defaults;
+		$this->template->commentInfo = $this->commentsModel->getById($comment_id);;
 
 		//$this->commentFactory->setEditId($comment_id);
 		$this->commentFactory->setDefaultValuesReply($this["commentReplyForm"], $comment_id);

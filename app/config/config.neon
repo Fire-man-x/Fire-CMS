@@ -77,9 +77,7 @@ visualpaginator:
 #	basePath:   /images/
 
 services:
-	pluginServiceLocator:
-		implement: App\DI\IPluginServiceLocator
-		tagged: presenter.plugin
+	pluginServiceLocator: App\DI\PluginServiceLocator
 
 	pluginComponentLocator:
 		implement: App\DI\IPluginComponentLocator
@@ -111,24 +109,24 @@ services:
 	- App\Modules\UrlModule\RedirectionsModel
 	urlManager: App\Modules\UrlModule\UrlManager
 
-	galleryImageStorage:
-		factory: App\Plugins\SDHGallery\Components\GalleryImageStorage
-		autowired: false
-		arguments:
-			directory: %wwwDir%/foto/public
-			cacheDirectory: %wwwDir%/foto/public
-			baseUrl: /foto/
+	#galleryImageStorage:
+	#	factory: App\Plugins\SDHGallery\Components\GalleryImageStorage
+	#	autowired: false
+	#	arguments:
+	#		directory: %wwwDir%/foto/public
+	#		cacheDirectory: %wwwDir%/foto/public
+	#		baseUrl: /foto/
 
-	userGalleryImageStorage:
-		factory: App\Plugins\SDHGallery\Components\UserGalleryImageStorage
-		autowired: false
-		arguments:
-			directory: %wwwDir%/foto/nopublic/upload
-			cacheDirectory: %wwwDir%/foto/nopublic/upload/cache
-			baseUrl: /foto/nopublic/upload/cache
+	#userGalleryImageStorage:
+	#	factory: App\Plugins\SDHGallery\Components\UserGalleryImageStorage
+	#	autowired: false
+	#	arguments:
+	#		directory: %wwwDir%/foto/nopublic/upload
+	#		cacheDirectory: %wwwDir%/foto/nopublic/upload/cache
+	#		baseUrl: /foto/nopublic/upload/cache
 
-	- App\Plugins\SDHGallery\Components\UserGalleryImageLoader(@userGalleryImageStorage)
-	- App\Plugins\SDHGallery\Presenters\GalleryPresenter(@galleryImageStorage)
+	#- App\Plugins\SDHGallery\Components\UserGalleryImageLoader(@userGalleryImageStorage)
+	#- App\Plugins\SDHGallery\Presenters\GalleryPresenter(@galleryImageStorage)
 
 	- App\Model\Categories
 	- App\Service\Category
@@ -156,7 +154,7 @@ services:
 	- App\Forms\FilesManagerFolderFormFactory
 	- App\Forms\FilesManagerFileNameFormFactory
 	- App\Model\MultiFileUploadModel
-	- App\Plugins\SDHGallery\Components\MultiFileUploadModel
+	#- App\Plugins\SDHGallery\Components\MultiFileUploadModel
 
 	- App\Components\Menu\Model\Menus
 	- App\Forms\MenuFormFactory

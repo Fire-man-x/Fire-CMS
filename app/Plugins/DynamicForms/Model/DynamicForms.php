@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace App\Plugins\DynamicForms\Model;
 
 use App\Model\BaseModel;
+use App\Model\RecordNotFoundException;
 use App\Service\LanguageService;
 use Nette\Database\Explorer;
+use Nette\Database\LockTimeoutException;
 use Nette\InvalidArgumentException;
 use Nette\Utils\ArrayHash;
 
@@ -49,11 +51,13 @@ class DynamicForms extends BaseModel
 
 	/**
 	 * Get all items
-	 * @param int $dynamicFormId
 	 */
-	public function getItems($dynamicFormId): array
+	public function getItems(int $dynamicFormId): array
 	{
-		$dynamicForm = $this->findById($dynamicFormId)->fetch();
+		$dynamicForm = $this->getById($dynamicFormId);
+		if(!$dynamicForm){
+			throw new RecordNotFoundException();
+		}
 		$items = @unserialize($dynamicForm->items_specifications);
 		return $items !== false ? $items : array();
 	}
@@ -61,9 +65,8 @@ class DynamicForms extends BaseModel
 
 	/**
 	 * Save all items
-	 * @param int $dynamicFormId
 	 */
-	private function saveItems($dynamicFormId, array $items): void
+	private function saveItems(int $dynamicFormId, array $items): void
 	{
 		$this->update($dynamicFormId, array(
 			"items_specifications" => serialize($items),
@@ -73,10 +76,8 @@ class DynamicForms extends BaseModel
 
 	/**
 	 * Test if item exist
-	 * @param int $dynamicFormId
-	 * @param string $itemName
 	 */
-	public function testIfItemNameExist($dynamicFormId, $itemName, $notIn): bool
+	public function testIfItemNameExist(int $dynamicFormId, string $itemName, string $notIn): bool
 	{
 		$items = $this->getItems($dynamicFormId);
 
@@ -182,7 +183,7 @@ class DynamicForms extends BaseModel
 	 */
 	public function findByTemplateName($templateName, $notInId = null): \Nette\Database\Table\Selection
 	{
-		$query = $this->getAll()->where("template_name", $templateName);
+		$query = $this->findAll()->where("template_name", $templateName);
 		if(isset($notInId))
 		{
 			$query->where($this->getColumnId()." != ?", $notInId);
@@ -200,7 +201,7 @@ class DynamicForms extends BaseModel
 	public function updateGridName($articleId, $language, $name): void
 	{
 		if($language == $this->languages->getDefaultLanguage() ||
-			($language != $this->languages->getDefaultLanguage() && $this->findById($articleId)->select("grid_name")->fetchField() == null)){
+			($language != $this->languages->getDefaultLanguage() && $this->getById($articleId)?->grid_name == null)){
 			$this->update($articleId, array("grid_name"=>$name));
 		}
 	}

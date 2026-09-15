@@ -70,9 +70,7 @@ class UserFormFactory extends BaseFormFactory
 		$form->addSubmit('save', 'Save');
 
 		if($this->isEditMode()){
-			/* @var $values \Nette\Database\Table\Selection */
-			$valuesRow = $this->users->findById($this->getEditId())->fetch();
-			$values = $valuesRow->toArray();
+			$values = $this->users->getById($this->getEditId())?->toArray();
 			$form->setDefaults($values);
 		}
 
@@ -125,7 +123,7 @@ class UserFormFactory extends BaseFormFactory
 	public function formNewPasswordSucceeded($form, $values)
 	{
 		try {
-			$this->users->getAll()
+			$this->users->findAll()
 				->where("user_id",  $this->user_id)
 				->update(array(
 						Users::COLUMN_PASSWORD_HASH => $this->passwords->hash($values->new_password)
@@ -157,7 +155,7 @@ class UserFormFactory extends BaseFormFactory
 
 	public function formRecoveryPasswordSucceeded(Form $form, $values)
 	{
-		$findedUser = $this->users->getAll()->where("username", $values->username);
+		$findedUser = $this->users->findAll()->where("username", $values->username);
 
 		if ($findedUser) {
 			$email = $findedUser->email;

@@ -34,7 +34,7 @@ class RolesPresenter extends BasePresenter
 	 */
 	protected function createComponentRolesGrid(string $name): Datagrid
 	{
-		$source = $this->model->getAll()->order("position");
+		$source = $this->model->findAll()->order("position");
 		$primaryKey = $this->model->getColumnId();
 
 		$grid = new Datagrid($this, $name);
@@ -162,10 +162,12 @@ class RolesPresenter extends BasePresenter
 	/**
 	 * Edit handler
 	 */
-	public function handleEdit(int $id): void
+	public function handleEdit(int $role_id): void
 	{
-		$this->factory->setEditId($id);
-		$this->factory->setDefaultValues($this["roleForm"], $id);
+		$this->factory->setEditId($role_id);
+		/** @var Nette\Application\UI\Form $form */
+		$form = $this["roleForm"];
+		$this->factory->setDefaultValues($form, $role_id);
 		$this->redrawControl("roleForm");
 	}
 
@@ -173,10 +175,10 @@ class RolesPresenter extends BasePresenter
 	/**
 	 * Delete handler
 	 */
-	public function handleDelete(int $id): void
+	public function handleDelete(int $role_id): void
 	{
-		if(!$this->model->findById($id)->fetch()->default){
-			$this->model->delete($id);
+		if(!$this->model->getById($role_id)?->default){
+			$this->model->delete($role_id);
 			$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
 		}  else {
 			$this->flashMessage(FAIL_DELETE, FLASH_FAILED);
@@ -188,10 +190,12 @@ class RolesPresenter extends BasePresenter
 	/**
 	 * Edit handler
 	 */
-	public function handleEditRolePermission(int $id): void
+	public function handleEditRolePermission(int $role_id): void
 	{
-		$this->factory->setEditId($id);
-		$this->factory->setModuleFormDefaultValues($this["roleModulesForm"], $id);
+		$this->factory->setEditId($role_id);
+		/** @var Nette\Application\UI\Form $form */
+		$form = $this["roleForm"];
+		$this->factory->setModuleFormDefaultValues($form, $role_id);
 		$this->redrawControl("roleModulesForm");
 	}
 

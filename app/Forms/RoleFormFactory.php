@@ -45,7 +45,7 @@ class RoleFormFactory extends BaseFormFactory
 	{
 		$values->name = str_replace("-", "_", \Nette\Utils\Strings::webalize($values->name));
 
-		$query = $this->model->getAll()->where("name", $values->name);
+		$query = $this->model->findAll()->where("name", $values->name);
 		if ($this->isEditMode()) {
 			$query->where($this->model->getColumnId() . " != ?", $this->getEditId());
 		}
@@ -65,7 +65,7 @@ class RoleFormFactory extends BaseFormFactory
 
 		if ($this->isEditMode()) {
 			//if default - dont update name
-			$isDefault = $this->model->getAll()
+			$isDefault = $this->model->findAll()
 				->where($this->model->getColumnId(), $this->getEditId())
 				->fetchField("default");
 			if($isDefault){
@@ -84,8 +84,8 @@ class RoleFormFactory extends BaseFormFactory
 	 */
 	public function setDefaultValues(Form $form, int $editId)
 	{
-		$defaults = $this->model->findById($editId)->fetch();
-		if ($defaults->default) {
+		$defaults = $this->model->getById($editId);
+		if ($defaults?->default) {
 			$form["name"]->getControlPrototype()->readonly(true);
 		}
 

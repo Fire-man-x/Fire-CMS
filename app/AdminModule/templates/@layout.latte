@@ -108,14 +108,8 @@
 				<li class="nav-item dropdown {if $presenter->isLinkCurrent(':Admin:Categories:*')}active{/if}">
 					<a href="" class="nav-link dropdown-toggle" id="responsiveNavbarDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{_"Other"}</a>
 					<div class="dropdown-menu" aria-labelledby="responsiveNavbarDropdown">
-						<a n:if="$user->isAllowed('DynamicForms', 'view')" n:href=":Admin:DynamicForms:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:DynamicForms:default') ? 'active', dropdown-item">{_"Dynamic forms"}</a>
-						<a n:if="true || $user->isAllowed('Towns', 'view')" n:href=":Admin:Towns:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Towns:default') ? 'active', dropdown-item">{_"Towns"}</a>
-						<a n:if="true || $user->isAllowed('Events', 'view')" n:href=":Admin:Events:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Events:default') ? 'active', dropdown-item">{_"Events"}</a>
-						<a n:if="true || $user->isAllowed('Tests', 'view')" n:href=":Admin:Tests:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Tests:default') ? 'active', dropdown-item">{_"Tests"}</a>
-						<a n:if="true || $user->isAllowed('Calendar', 'view')" n:href=":Admin:Calendar:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Calendar:default') ? 'active', dropdown-item">{_"Calendar"}</a>
-						<a n:if="true || $user->isAllowed('Calendar', 'view')" n:href=":Admin:Calendar:League:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Calendar:League:default') ? 'active', dropdown-item">{_"Calendar"} - {_"League"}</a>
-						<a n:if="true || $user->isAllowed('Attendace', 'view')" n:href=":Admin:Attendance:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Attendance:default') ? 'active', dropdown-item">{_"Attendance"}</a>
-						<a n:if="true || $user->isAllowed('Members', 'view')" n:href=":Admin:Members:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Members:default') ? 'active', dropdown-item">{_"Members"}</a>
+						{* Populated dynamically from plugins active in theme/config/plugins.neon - see App\DI\PluginServiceLocator::getList(). *}
+						<a n:foreach="$presenter->pluginServices->getList() as $pluginMenuItem" n:if="!$pluginMenuItem->resource || $user->isAllowed($pluginMenuItem->resource, 'view')" n:href="$pluginMenuItem->link id=>null" n:class="$presenter->isLinkCurrent($pluginMenuItem->link) ? 'active', dropdown-item">{_$pluginMenuItem->title}</a>
 						<!-- Example split danger button -->
 						{*<div class="btn-group">
 							<a type="button" class="dropdown-item">Action</a>

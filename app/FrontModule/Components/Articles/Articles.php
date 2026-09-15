@@ -137,7 +137,7 @@ class Articles extends Control
 			}
 
 			//author
-			$user = $this->usersModel->findById($article->created_by)->fetch()->toArray();
+			$user = $this->usersModel->getById($article->created_by)?->toArray();
 			$user['author'] = $this->userManager->makeName($user);
 			$article->author = $user;
 		}

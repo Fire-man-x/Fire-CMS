@@ -10,6 +10,7 @@ use App\Modules\UrlModule\UrlManager;
 use App\Model;
 use App\Service\Tag;
 use Nette\Application\UI\Form;
+use Nette\Database\Table\ActiveRow;
 use Nette\InvalidArgumentException;
 use Nette\Security\User;
 
@@ -115,7 +116,7 @@ class ArticleFormFactory extends BaseFormFactory
 				$data = $this->model->findById($revision)->where("history_id", $this->getEditId())->fetch();
 				$dataTranslation = $this->model->findTranslationBy($revision, $this->language)->fetch();
 			}else{ //normal category
-				$data = $this->model->findById($this->getEditId())->fetch();
+				$data = $this->model->getById($this->getEditId());
 				$dataTranslation = $this->model->findTranslationBy($this->getEditId(), $this->language)->fetch();
 			}
 

@@ -47,7 +47,7 @@ class UrlManager
 	public function getUrl($urlId): array
 	{
 		if (!isset($this->url)) {
-			$this->url = $this->model->findById($urlId);
+			$this->url = $this->model->getById($urlId)?->toArray();
 		}
 
 		return $this->url;
@@ -66,7 +66,7 @@ class UrlManager
 			$languageId = $this->languages->getDefaultLanguage();
 		}
 
-		$urlInfo = $this->model->getAll()
+		$urlInfo = $this->model->findAll()
 			->where('language_id', $languageId)
 			->where('type', $type)
 			->where('key', $key)
@@ -111,7 +111,7 @@ class UrlManager
 			$languageId = $this->languages->getDefaultLanguage();
 		}
 
-		$urlInfo = $this->model->getAll()
+		$urlInfo = $this->model->findAll()
 			->where('language_id', $languageId)
 			->where('url', $url)
 			->fetch();
@@ -152,13 +152,13 @@ class UrlManager
 			//redirection
 			if($oldUrl != $webalizedUrl) {
 				//update old redirection if exist
-				$this->redirectionsModel->getAll()
+				$this->redirectionsModel->findAll()
 					->where("language_id", $language)
 					->where("old_url", $oldUrl)
 					->update(array("new_url" => $webalizedUrl));
 
 				//update all old to new
-				$this->redirectionsModel->getAll()
+				$this->redirectionsModel->findAll()
 					->where("language_id", $language)
 					->where("new_url", $oldUrl)
 					->update(array("new_url" => $webalizedUrl));
@@ -171,7 +171,7 @@ class UrlManager
 				));
 
 				//remove recursive
-				$this->redirectionsModel->getAll()
+				$this->redirectionsModel->findAll()
 					->where("language_id", $language)
 					->where("old_url", $webalizedUrl)
 					->delete();
@@ -202,7 +202,7 @@ class UrlManager
 		$index = 0;
 		while ($exist){
 			$webalizedUrl = \Nette\Utils\Strings::webalize($url . ($index == 0 ? "" : " " . $index));
-			$sql = $this->model->getAll()
+			$sql = $this->model->findAll()
 				->where("url", $webalizedUrl);
 			if($notInKey){
 				$sql->where("key != ?", $notInKey);
@@ -227,7 +227,7 @@ class UrlManager
 			$languageId = $this->languages->getDefaultLanguage();
 		}
 
-		$urlInfo = $this->redirectionsModel->getAll()
+		$urlInfo = $this->redirectionsModel->findAll()
 			->where('language_id', $languageId)
 			->where('old_url', $url)
 			->fetch();

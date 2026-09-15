@@ -50,7 +50,7 @@ class Comments extends BaseModel
 	 */
 	public function getAllInLanguage($language)
 	{
-		return $this->getAll()->where("language_id", $language);
+		return $this->findAll()->where("language_id", $language);
 	}
 
 }

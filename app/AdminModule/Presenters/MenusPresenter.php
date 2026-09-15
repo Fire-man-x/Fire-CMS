@@ -41,7 +41,7 @@ class MenusPresenter extends BasePresenter
 	/**
 	 * Menu parent
 	 */
-	private int $parent;
+	private ?int $parent = null;
 
 	/**
 	 * Actual language
@@ -80,14 +80,13 @@ class MenusPresenter extends BasePresenter
 
 
 	/**
-	 * @param $parent
 	 * @return void
 	 * @throws Nette\Application\UI\InvalidLinkException
 	 */
 	#[Secured]
 	#[Resource('Menus')]
 	#[Privilege('edit')]
-	public function actionDetail($parent = null): void
+	public function actionDetail(?int $parent = null): void
 	{
 		$this->parent = $parent;
 
@@ -97,7 +96,7 @@ class MenusPresenter extends BasePresenter
 			$this->actualLanguage = $this->languages->getDefaultLanguage();
 		}
 
-		$this->template->menuInfo = $this->menusModel->findById($this->id)->fetch();
+		$this->template->menuInfo = $this->menusModel->getById($this->id);
 
 		//breadcrumb
 		$this->addBreadCrumbLink($this->template->menuInfo['name'], $this->link(":Admin:Menus:detail", array("id" => $this->id)), null, false);
@@ -119,7 +118,7 @@ class MenusPresenter extends BasePresenter
 	 */
 	protected function createComponentMenusGrid(string $name): Datagrid
 	{
-		$source = $this->menusModel->getAll()
+		$source = $this->menusModel->findAll()
 			->order("name")
 			->order("location");
 		$primaryKey = $this->menusModel->getColumnId();
@@ -141,7 +140,7 @@ class MenusPresenter extends BasePresenter
 			->setIcon('check-circle')
 			->setTitle('Set as unactive');
 		$activeColumn->onChange[] = function($id, $value) {
-			$this->handleActivate($id, $value);
+			$this->handleActivate((int) $id, (bool) $value);
 		};
 
 		$grid->addColumnText("name", "Name");
@@ -270,7 +269,7 @@ class MenusPresenter extends BasePresenter
 
 	public function getMenuItemChildrens(?int $parentId): Nette\Database\Table\Selection {
 		$this->payload->parr = $parentId;
-		$query = $this->categoriesModel->getAll()
+		$query = $this->categoriesModel->findAll()
 			->select("*")
 			->select("IFNULL(parent_id,0) AS parent_id")
 			->where("history_id", null)
@@ -290,8 +289,11 @@ class MenusPresenter extends BasePresenter
 	#[Secured]
 	#[Resource('Menus')]
 	#[Privilege('edit')]
-	public function handleSort(int $item_id, ?int $prev_id, ?int $next_id): void
+	public function handleSort(?int $item_id, ?int $prev_id, ?int $next_id): void
 	{
+		if(!$item_id){
+			throw new Nette\InvalidArgumentException("Missing argumet item_id");
+		}
 		$this->menusModel->updatePositionOfMenuItem($this->id, $item_id, $prev_id, $next_id);
 
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
@@ -312,7 +314,7 @@ class MenusPresenter extends BasePresenter
 	#[Secured]
 	#[Resource('Menus')]
 	#[Privilege('edit')]
-	public function handleActivate(int $menu_id, $status = 0): void
+	public function handleActivate(int $menu_id, bool $status): void
 	{
 		$this->menusModel->update($menu_id, array("active" => (boolean) $status));
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);

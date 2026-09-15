@@ -34,7 +34,7 @@ class Modules extends BaseModel implements IList
 	/**
 	 * Update
 	 */
-	public function update(int $id, array $data): void
+	public function update(int $id, array $data): ?bool
 	{
 		throw new \Nette\InvalidStateException("Not implemented yet.");
 	}
@@ -43,7 +43,7 @@ class Modules extends BaseModel implements IList
 	/**
 	 * Delete
 	 */
-	public function delete(int $id): void
+	public function delete(int $id): ?int
 	{
 		throw new \Nette\InvalidStateException("Not implemented yet.");
 	}
@@ -54,7 +54,7 @@ class Modules extends BaseModel implements IList
 	 */
 	public function getAllModules(): \Nette\Database\Table\Selection
 	{
-		return $this->getAll()
+		return $this->findAll()
 				->where("name IS NOT NULL")
 				->where("privilege IS NULL")
 				->order("title");
@@ -81,7 +81,7 @@ class Modules extends BaseModel implements IList
 	 */
 	public function getAllOtherPrivileges(): \Nette\Database\Table\Selection
 	{
-		return $this->getAll()
+		return $this->findAll()
 				->where("privilege IS NOT NULL")
 				->where("name IS NULL")
 				->order("title");

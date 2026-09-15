@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace App\Plugins\Sliders\Model;
 
 use App\Model\BaseModel;
-use App\Service\LanguageService;
 use Nette\Database\Explorer;
 use Nette\Utils\ArrayHash;
 
@@ -34,15 +33,13 @@ class SliderItems extends BaseModel
 
 	/**
 	 * Delete
-	 * @param array $id
 	 */
-	public function delete($id): void
+	public function delete(int|array $id): ?int
 	{
 		if(!is_array($id)){
 			throw new \Nette\InvalidArgumentException("For delete you must specify more parameters");
 		}
-		$this->getAll()
-			->where($id)
+		return $this->findByIds($id)
 			->delete();
 	}
 
@@ -52,21 +49,19 @@ class SliderItems extends BaseModel
 	 */
 	protected function getNextPosition(string $language): int
 	{
-		return $this->getAll()->select("IFNULL(MAX(position),0)+1 AS position")->where("language_id", $language)->fetchField();
+		return $this->findAll()->select("IFNULL(MAX(position),0)+1 AS position")->where("language_id", $language)->fetchField();
 	}
 
 
 	/**
 	 * Change positions of items
-	 * @param int $slider_id Id of slider
-	 * @param string $language Id of language
-	 * @param array $positions Array with sorted old positions
+	 * @param array<int|int> $positions Array with sorted old positions
 	 */
-	public function changePositions($slider_id, $language, $positions): void
+	public function changePositions(int $slider_id, string $language, array $positions): void
 	{
 		$maxPos = $this->getNextPosition($language);
 		foreach ($positions as $newPosition => $oldPosition){
-			$this->getAll()
+			$this->findAll()
 				->where("slider_id", $slider_id)
 				->where("language_id", $language)
 				->where("position", $oldPosition)
@@ -76,7 +71,7 @@ class SliderItems extends BaseModel
 		}
 
 		//return to base position
-		$this->getAll()
+		$this->findAll()
 				->where("slider_id", $slider_id)
 				->where("language_id", $language)
 				->update(array(

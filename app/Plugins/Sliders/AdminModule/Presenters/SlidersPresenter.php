@@ -62,8 +62,8 @@ class SlidersPresenter extends BasePresenter
 	public function renderDetail(): void
 	{
 		$this->template->languages = $this->languages->getLanguages();
-		$this->template->sliderInfo = $this->modelSliders->findById($this->id)->fetch();
-		$this->template->items = $this->modelSliderItems->getAll()
+		$this->template->sliderInfo = $this->modelSliders->getById($this->id);
+		$this->template->items = $this->modelSliderItems->findAll()
 			->select("slider_items.*")
 			->select("file.*")
 			->where("slider_id", $this->id)
@@ -83,7 +83,7 @@ class SlidersPresenter extends BasePresenter
 	 */
 	protected function createComponentSlidersGrid(string $name): Datagrid
 	{
-		$source = $this->modelSliders->getAll()->order("name");
+		$source = $this->modelSliders->findAll()->order("name");
 		$primaryKey = $this->modelSliders->getColumnId();
 
 		$grid = new Datagrid($this, $name);
@@ -197,7 +197,7 @@ class SlidersPresenter extends BasePresenter
 	 */
 	public function handleDelete(int $slider_id): void
 	{
-		if (!$this->modelSliders->findById($slider_id)->fetch()->default) {
+		if (!$this->modelSliders->getById($slider_id)?->default) {
 			$this->modelSliders->delete($slider_id);
 			$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
 		} else {

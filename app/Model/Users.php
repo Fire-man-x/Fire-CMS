@@ -34,19 +34,19 @@ class Users extends BaseModel
 
 	public function findByName(string $username): \Nette\Database\Table\Selection
 	{
-		return $this->getAll()->where(self::COLUMN_NAME, $username);
+		return $this->findAll()->where(self::COLUMN_NAME, $username);
 	}
 
 
 	public function findByEmail(string $email): \Nette\Database\Table\Selection
 	{
-		return $this->getAll()->where(self::COLUMN_EMAIL, $email);
+		return $this->findAll()->where(self::COLUMN_EMAIL, $email);
 	}
 
 
 	public function findByOAuthId(string $oauthService, int $oauthId): \Nette\Database\Table\Selection
 	{
-		return $this->getAll()
+		return $this->findAll()
 			->where(self::COLUMN_OAUTH_SERVICE, $oauthService)
 			->where(self::COLUMN_OAUTH_ID, $oauthId);
 	}

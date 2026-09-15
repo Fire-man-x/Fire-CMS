@@ -72,7 +72,10 @@ class UserManager implements Authenticator
 		$arr = $row->toArray();
 		$arr["makedName"] = $this->makeName($arr);
 		unset($arr[Users::COLUMN_PASSWORD_HASH]);
-		$role = $this->rolesModel->findById($row[Users::COLUMN_ROLE])->fetch();
+		$role = $this->rolesModel->getById($row[Users::COLUMN_ROLE]);
+		if(!$role){
+			throw new RecordNotFoundException();
+		}
 		return new SimpleIdentity($arr[Users::COLUMN_ID], array(new Role($role["name"], $arr[Users::COLUMN_ID])), $arr);
 	}
 
@@ -98,8 +101,10 @@ class UserManager implements Authenticator
 		$arr = $user->toArray();
 		$arr["makedName"] = $this->makeName($arr);
 		unset($arr[Users::COLUMN_PASSWORD_HASH]);
-		$role = $this->rolesModel->findById($user[Users::COLUMN_ROLE])->fetch();
-
+		$role = $this->rolesModel->getById($user[Users::COLUMN_ROLE]);
+		if(!$role){
+			throw new RecordNotFoundException();
+		}
 		return new SimpleIdentity($arr[Users::COLUMN_ID], array(new Role($role["name"], $arr[Users::COLUMN_ID])), $arr);
 	}
 

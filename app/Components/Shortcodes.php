@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Components;
 
+use App\Components\FileManager\Macro\ImageRequest;
 use App\Model\Files;
 use BadFunctionCallException;
 use Nette\Application\LinkGenerator;
@@ -110,10 +111,10 @@ class Shortcodes
 	private function shortcodeImage($params)
 	{
 		$file_id = $params[0];
-		$file = $this->filesModel->findById($file_id)->fetch();
+		$file = $this->filesModel->getById($file_id);
 
 		$fileEntity = $this->filesModel->toFileEntity($file);
-		$imageRequest = FileManager\Requests\ImageRequest::fromMacro($fileEntity, array($params[1]));
+		$imageRequest = ImageRequest::fromMacro($fileEntity, array($params[1]));
 
 		return '<img src="' . $this->fileManager->link($imageRequest) . '">';
 	}
@@ -137,7 +138,7 @@ class Shortcodes
 			}
 		}
 
-		$file = $this->filesModel->findById($file_id)->fetch();
+		$file = $this->filesModel->getById($file_id);
 		if($file){
 
 			$name = $file["new_name"] ? $file["new_name"] : $file["original_name"];

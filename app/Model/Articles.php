@@ -56,9 +56,9 @@ class Articles extends BaseModel implements IViewCounter, ISubTags, ISubComments
 	/**
 	 * Delete
 	 */
-	public function delete(int $id): void
+	public function delete(int $id): ?int
 	{
-		$this->changeStatus($id, 'trash');
+		return (int) $this->changeStatus($id, 'trash');
 	}
 
 
@@ -68,7 +68,7 @@ class Articles extends BaseModel implements IViewCounter, ISubTags, ISubComments
 	public function updateGridName(int $articleId, string $language, string $name): void
 	{
 		if($language == $this->languages->getDefaultLanguage() ||
-			($language != $this->languages->getDefaultLanguage() && $this->findById($articleId)->select("grid_name")->fetchField() == null)){
+			($language != $this->languages->getDefaultLanguage() && $this->getById($articleId)?->grid_name == null)){
 			$this->update($articleId, array("grid_name"=>$name));
 		}
 	}
@@ -77,12 +77,12 @@ class Articles extends BaseModel implements IViewCounter, ISubTags, ISubComments
 	/**
 	 * Update grid name
 	 */
-	private function changeStatus(int $id, string $status): void
+	private function changeStatus(int $id, string $status): bool
 	{
 		if(!in_array($status, self::$statuses)){
 			throw new \InvalidArgumentException("Status '$status' is not permitted.");
 		}
-		$this->findById($id)
+		return $this->getById($id)
 			->update(array("status" => $status));
 	}
 
@@ -90,9 +90,9 @@ class Articles extends BaseModel implements IViewCounter, ISubTags, ISubComments
 	/**
 	 * Change status publish
 	 */
-	public function statusPublish(int $id): void
+	public function statusPublish(int $id): bool
 	{
-		$this->changeStatus($id, "publish");
+		return $this->changeStatus($id, "publish");
 	}
 
 

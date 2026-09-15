@@ -75,7 +75,7 @@ class FilesManagerFileNameFormFactory extends BaseFormFactory
 	{
 		parent::setDefaultValues($form, $editId);
 
-		$defaults = $this->model->findById($editId)->fetch();
+		$defaults = $this->model->getById($editId);
 		if ($defaults) {
 			$defaults = $defaults->toArray();
 			/*if(!$defaults["new_name"]){

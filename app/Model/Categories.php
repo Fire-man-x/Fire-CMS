@@ -81,7 +81,7 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 	public function updateGridName($categoryId, $language, $name)
 	{
 		if($language == $this->languages->getDefaultLanguage() ||
-			($language != $this->languages->getDefaultLanguage() && $this->findById($categoryId)->select("grid_name")->fetchField() == null)){
+			($language != $this->languages->getDefaultLanguage() && $this->getById($categoryId)?->grid_name == null)){
 			$this->update($categoryId, array("grid_name"=>$name));
 		}
 	}
@@ -93,10 +93,10 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 	 * @param string $language
 	 * @param string $name
 	 */
-	private function recalculateLeftRightPositions($categoryId)
+	private function recalculateLeftRightPositions(int $categoryId)
 	{
 		if($language == $this->languages->getDefaultLanguage() ||
-			($language != $this->languages->getDefaultLanguage() && $this->findById($categoryId)->select("grid_name")->fetchField() == null)){
+			($language != $this->languages->getDefaultLanguage() && $this->getById($categoryId)?->grid_name == null)){
 			$this->update($categoryId, array("grid_name"=>$name));
 		}
 	}
@@ -138,7 +138,7 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 	 */
 	public function getAllForMenu()
 	{
-		$query = $this->getAll()
+		$query = $this->findAll()
 			->where("history_id", null)
 			->where("status NOT IN ?", array("auto-draft", "trash"))
 			->order("category_left");
@@ -217,7 +217,7 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 	 */
 	protected function getNextPosition()
 	{
-		return $this->getAll()->select("IFNULL(MAX(position),0)+1 AS position")->fetchField();
+		return $this->findAll()->select("IFNULL(MAX(position),0)+1 AS position")->fetchField();
 	}
 
 

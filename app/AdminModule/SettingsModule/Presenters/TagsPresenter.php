@@ -72,7 +72,7 @@ class TagsPresenter extends BasePresenter
 	 */
 	protected function createComponentTagsGrid(string $name): Datagrid
 	{
-		$source = $this->model->getAll()
+		$source = $this->model->findAll()
 			->select("tags.*")
 			->order("title");
 		if ($this->actualLanguage != null) {

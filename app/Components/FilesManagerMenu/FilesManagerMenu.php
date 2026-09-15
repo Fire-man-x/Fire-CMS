@@ -108,7 +108,7 @@ class FilesManagerMenu extends Control
 			$this->parentFolder = null;
 		}*/
 
-		$this->fileFolders = $this->createTree($this->fileFoldersModel->getAll()->order("position")->fetchAll());
+		$this->fileFolders = $this->createTree($this->fileFoldersModel->findAll()->order("position")->fetchAll());
 		$this->template->fileFolders = $this->fileFolders;
 		$this->template->activeItem = $this->activeItem;
 
@@ -129,7 +129,7 @@ class FilesManagerMenu extends Control
 				unset($items[$itemId]);
 				$fileFolder['childs'] = $this->createTree($items, $fileFolder['file_folder_id'], $level+1);
 				//@todo: moznost zrychlit jednim dotazem
-				$fileFolder['itemCount'] = $this->filesModel->getAll()->where("file_folder_id", $fileFolder['file_folder_id'])->count();
+				$fileFolder['itemCount'] = $this->filesModel->findAll()->where("file_folder_id", $fileFolder['file_folder_id'])->count();
 				$tree[] = ArrayHash::from($fileFolder, false);
 			}
 		}
@@ -209,7 +209,7 @@ class FilesManagerMenu extends Control
 	#[Privilege('delete')]
 	public function handleRemoveFolder($folder_id)
 	{
-		$folderInfo = $this->fileFoldersModel->findById($folder_id)->fetch();
+		$folderInfo = $this->fileFoldersModel->getById($folder_id);
 		if($folderInfo && $folderInfo->default){
 			throw new ForbiddenRequestException("You have not permissions to remove folder.");
 		}
@@ -219,7 +219,7 @@ class FilesManagerMenu extends Control
 			$redirectToId = $folderInfo->parent_id != null ? $folderInfo->parent_id : $defaultId;
 		}
 
-		$this->filesModel->getAll()
+		$this->filesModel->findAll()
 			->where("file_folder_id", $folder_id)
 			->update(array(
 			"file_folder_id" => $folderInfo->parent_id != null ? $folderInfo->parent_id : $defaultId

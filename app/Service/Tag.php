@@ -171,7 +171,7 @@ class Tag
 	 */
 	public function findByName(string $language, string $name): array
 	{
-		$items = $this->tagsModel->getAll()
+		$items = $this->tagsModel->findAll()
 			->select("tags.grid_name")
 			->select("tags.tag_id")
 			->select(":" . Model\Tags::TRANSLATION_TABLE_NAME . ".language_id")

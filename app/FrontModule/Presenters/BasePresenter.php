@@ -168,7 +168,7 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 		$this->addBreadCrumbLink('Home', '/'/*$this->link('//:Front:Default:', array("id"=>null))*/, 'fa fa-home');
 
 		//options
-		$options = $this->options->getAll()->fetchPairs("key", "value");
+		$options = $this->options->findAll()->fetchPairs("key", "value");
 		$this->template->options = $options;
 
 		//register shortcode to template

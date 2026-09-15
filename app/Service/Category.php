@@ -89,7 +89,7 @@ class Category
 	 */
 	public function delete(int $categoryId): int
 	{
-		$categoryInfo = $this->categoriesModel->findById($categoryId)->fetch();
+		$categoryInfo = $this->categoriesModel->getById($categoryId);
 		if($categoryInfo && $categoryInfo->type == "homepage"){
 			throw new ForbiddenRequestException("You can not delete homepage category.");
 		}
@@ -107,11 +107,11 @@ class Category
 		$right = $categoryInfo->category_right;
 		$width = $right - $left + 1;
 
-		$this->categoriesModel->getAll()
+		$this->categoriesModel->findAll()
 			->where("category_right >= ?", $right)
 			->update(array("category_right"=> new \Nette\Database\SqlLiteral("`category_right` - ".$width)));
 
-		$this->categoriesModel->getAll()
+		$this->categoriesModel->findAll()
 			->where("category_left >= ?", $left)
 			->update(array("category_left"=> new \Nette\Database\SqlLiteral("`category_left` - ".$width)));
 
@@ -139,7 +139,7 @@ class Category
 		if ($id == null) {
 			return 0;
 		}
-		return $this->categoriesModel->getAll()->where("history_id", $id)->count();
+		return $this->categoriesModel->findAll()->where("history_id", $id)->count();
 	}
 
 
@@ -149,7 +149,7 @@ class Category
 	public function makeBackup(int $id): void
 	{
 		//$this->categorysModel->getDatabase()->query("INSERT INTO ".$this->categorysModel->getTableName()." SELECT *, null AS category_id FROM ".$this->categorysModel->getTableName()." WHERE category_id = 10");
-		$categoryToDuplicate = ArrayHash::from($this->categoriesModel->findById($id)->fetch()->toArray());
+		$categoryToDuplicate = ArrayHash::from($this->categoriesModel->getById($id)?->toArray());
 		$categoryToDuplicate->history_id = $categoryToDuplicate->category_id;
 		$categoryToDuplicate->category_id = null;
 
@@ -222,7 +222,7 @@ class Category
 		if($id == null){
 			return null;
 		}
-		return $this->categoriesModel->getAll()->where("history_id", $id)->order("create_date")->fetchAll();
+		return $this->categoriesModel->findAll()->where("history_id", $id)->order("create_date")->fetchAll();
 	}
 
 
@@ -267,7 +267,7 @@ class Category
 		$node['right'] = $left++;
 
 		//save to DB
-		$this->categoriesModel->getAll()
+		$this->categoriesModel->findAll()
 			->where("category_id", $node['category_id'])
 			->update(array(
 				"category_left"=> $node['left'],

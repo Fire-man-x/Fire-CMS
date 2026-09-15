@@ -69,7 +69,7 @@ class Tags extends BaseModel
 	public function updateGridName(int $tagId, string $language, string $name)
 	{
 		if($language == $this->languages->getDefaultLanguage() ||
-			($language != $this->languages->getDefaultLanguage() && $this->findById($tagId)->select("grid_name")->fetchField() == null)){
+			($language != $this->languages->getDefaultLanguage() && $this->getById($tagId)?->grid_name == null)){
 			$this->update($tagId, array("grid_name"=>$name));
 		}
 	}

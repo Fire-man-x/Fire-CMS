@@ -193,7 +193,7 @@ class ContactFormFactory extends BaseFormFactory
 
 		parent::setDefaultValues($form, $editId);
 
-		$defaults = $this->model->findById($editId)->fetch();
+		$defaults = $this->model->getById($editId)->fetch();
 
 		$form->setDefaults($defaults);
 	}

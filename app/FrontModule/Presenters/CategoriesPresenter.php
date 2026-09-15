@@ -89,16 +89,16 @@ class CategoriesPresenter extends BasePresenter
 		}*/
 
 		//author
-		$user = $this->usersModel->findById($categoryInfo->created_by)->fetch()->toArray();
+		$user = $this->usersModel->getById($categoryInfo->created_by)?->toArray();
 		$user['author'] = $this->userManager->makeName($user);
 		$categoryInfo->author = $user;
 
 		//meta
-		$meta = $this->metaService->getStructureByColumnId(CommentsModule\Meta::TYPE_CATEGORY, $this->language, $category->category_id);
+		$meta = $this->metaService->getStructureByColumnId(Meta::TYPE_CATEGORY, $this->language, $category->category_id);
 		$categoryInfo->metas = $meta;
 
 		//tags
-		$tags = $this->tagService->getRelationTags(CommentsModule\Tag::TYPE_CATEGORY, $this->language, $category->category_id);
+		$tags = $this->tagService->getRelationTags(Tag::TYPE_CATEGORY, $this->language, $category->category_id);
 		$categoryInfo->tags = $tags;
 
 		$this->template->category = $categoryInfo;

@@ -64,7 +64,7 @@ abstract class BaseSubMetas extends BaseModel
 	public function findByColumnId(int $id): \Nette\Database\Table\Selection
 	{
 
-		return $this->getAll()->where($this->getReferenceColumn(), $id);
+		return $this->findAll()->where($this->getReferenceColumn(), $id);
 	}
 
 
@@ -109,7 +109,7 @@ abstract class BaseSubMetas extends BaseModel
 	/**
 	 * Update
 	 */
-	public function update(int $id, array $data): void
+	public function update(int $id, array $data): ?bool
 	{
 		throw new \BadMethodCallException("You cannot use this method");
 	}

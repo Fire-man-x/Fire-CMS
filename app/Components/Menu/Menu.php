@@ -71,7 +71,7 @@ class Menu extends Control
 
 		$this->template->setFile($this->templateFile);
 
-		$menuExist = $this->menusModel->getAll()
+		$menuExist = $this->menusModel->findAll()
 			->where("location", $location)
 			->where("active", true)->fetch();
 		if(!$menuExist){

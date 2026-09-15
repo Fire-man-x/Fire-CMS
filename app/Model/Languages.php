@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace App\Model;
 
 use Nette\Database\Explorer;
+use Nette\Database\Table\ActiveRow;
+use Nette\Database\Table\Selection;
 use Nette\Utils\ArrayHash;
 
 /**
@@ -31,13 +33,39 @@ class Languages extends BaseModel
 		return (int) $this->database->getInsertId();
 	}
 
+	/**
+	 * Find row by id
+	 */
+	public function findById(int|string  $id): Selection
+	{
+		return $this->getTable()->where($this->getColumnId(), $id);
+	}
+
+
+	/**
+	 * Find by id
+	 */
+	public function getById(int|string $id): ?ActiveRow
+	{
+		return $this->findById($id)->fetch();
+	}
+
+
+	/**
+	 * Update
+	 */
+	public function update(int|string $id, array $data): ?bool
+	{
+		return $this->getById($id)?->update($data);
+	}
+
 
 	/**
 	 * Delete
 	 */
-	public function delete(int $id): void
+	public function delete(int|string $id): ?int
 	{
-		$this->findById($id)
+		return $this->findById($id)
 			->where("default", 0)
 			->delete();
 	}
@@ -48,7 +76,7 @@ class Languages extends BaseModel
 	 */
 	protected function getNextPosition(): int
 	{
-		return $this->getAll()->select("IFNULL(MAX(position),0)+1 AS position")->fetchField();
+		return $this->findAll()->select("IFNULL(MAX(position),0)+1 AS position")->fetchField();
 	}
 
 }

@@ -23,8 +23,8 @@ class DefaultPresenter extends BasePresenter
 	public function renderDefault(): void
 	{
 		$this->template->counts = array(
-			"users" => $this->usersModel->getAll()->select("COUNT(*) AS count")->fetch()['count'],
-			"articles" => $this->articlesModel->getAll()->select("COUNT(*) AS count")->where("history_id", null)->fetch()['count'],
+			"users" => $this->usersModel->findAll()->select("COUNT(*) AS count")->fetch()['count'],
+			"articles" => $this->articlesModel->findAll()->select("COUNT(*) AS count")->where("history_id", null)->fetch()['count'],
 			"statistics" => 0, //$this->statisticsModel->getAvgPerDay()
 		);
 	}

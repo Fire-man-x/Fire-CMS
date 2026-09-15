@@ -23,6 +23,6 @@ class RedirectionsModel extends BaseModel
 
 	public function getAllForGrid(): \Nette\Database\Table\Selection
 	{
-		return $this->getAll()->order("old_url ASC")->order($this->getColumnId());
+		return $this->findAll()->order("old_url ASC")->order($this->getColumnId());
 	}
 }

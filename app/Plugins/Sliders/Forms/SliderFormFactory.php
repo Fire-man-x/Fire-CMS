@@ -64,7 +64,7 @@ class SliderFormFactory extends BaseFormFactory
 	 */
 	public function setDefaultValues(Form $form, int $editId): void
 	{
-		$defaults = $this->model->findById($editId)->fetch();
+		$defaults = $this->model->getById($editId);
 
 		$form->setDefaults($defaults);
 	}

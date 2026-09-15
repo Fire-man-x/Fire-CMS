@@ -108,7 +108,7 @@ class CommentFormFactory extends BaseFormFactory
 	{
 		$this->setType($this->service->getTypeByStoredItem($editId));
 
-		$defaults = $this->model->findById($editId)->fetch();
+		$defaults = $this->model->getById($editId);
 
 		$form->setDefaults($defaults);
 	}

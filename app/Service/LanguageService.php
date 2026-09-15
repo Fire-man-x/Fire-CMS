@@ -49,7 +49,7 @@ class LanguageService
 	public function getLanguages(): array
 	{
 		if (!isset($this->languages)) {
-			$this->languages = $this->model->getAll()
+			$this->languages = $this->model->findAll()
 				->select($this->model->getColumnId())
 				->select("shortcut")
 				->order("default DESC")
@@ -83,7 +83,7 @@ class LanguageService
 	public function getDefaultLanguage(): string
 	{
 		if (!isset($this->defaultLanguage)) {
-			$this->defaultLanguage = $this->model->getAll()
+			$this->defaultLanguage = $this->model->findAll()
 				->select($this->model->getColumnId())
 				->where("active", true)
 				->where("default", true)
@@ -100,7 +100,7 @@ class LanguageService
 	public function getActiveLanguages(): array
 	{
 		if (!isset($this->activelanguages)) {
-			$this->activelanguages = $this->model->getAll()
+			$this->activelanguages = $this->model->findAll()
 				->where("active", true)
 				->order("default DESC")
 				->order($this->model->getColumnId())

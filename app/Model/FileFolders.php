@@ -36,17 +36,18 @@ class FileFolders extends BaseModel
 	/**
 	 * Delete
 	 */
-	public function delete(int $id): void{
+	public function delete(int $id): ?int
+	{
 		//update all childs
-		$info = $this->findById($id)->fetch();
-		$this->getAll()
-			->where("parent_id", $id)
-			->update(array(
-			"parent_id" => $info->parent_id
-		));
+		$info = $this->getById($id);
+		if($info) {
+			$this->findAll()
+				->where("parent_id", $id)
+				->update(["parent_id" => $info->parent_id]);
+		}
 
 		//finally delete
-		parent::delete($id);
+		return parent::delete($id);
 	}
 
 
@@ -56,7 +57,7 @@ class FileFolders extends BaseModel
 	 */
 	protected function getNextPosition(): int
 	{
-		return $this->getAll()->select("IFNULL(MAX(position),0)+1 AS position")->fetchField();
+		return $this->findAll()->select("IFNULL(MAX(position),0)+1 AS position")->fetchField();
 	}
 
 

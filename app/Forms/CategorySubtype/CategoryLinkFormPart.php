@@ -14,7 +14,7 @@ class CategoryLinkFormPart implements ICategoryFormType
 
 	private Translator $translator;
 
-	private string $categoriesList;
+	private array $categoriesList;
 
 
 	public function __construct(Model\Categories $categoryModel, Translator $translator)
@@ -38,7 +38,7 @@ class CategoryLinkFormPart implements ICategoryFormType
 			->setRequired(VALIDATE_REQUIRED);
 
 		//link to category
-		$this->categoriesList = $this->categoryModel->getAll()
+		$this->categoriesList = $this->categoryModel->findAll()
 			->order("IF(type=?,0,1)", "homepage")
 			->order("grid_name")
 			->fetchAll(); //("category_id", "grid_name");

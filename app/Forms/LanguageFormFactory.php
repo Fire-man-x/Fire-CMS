@@ -77,11 +77,11 @@ class LanguageFormFactory extends BaseFormFactory
 	{
 		parent::setDefaultValues($form, $editId);
 
-		$defaults = $this->model->findById($editId)->fetch();
+		$defaults = $this->model->getById($editId);
 
-		if ($defaults->default) {
+		/*if ($defaults?->default) {
 			//$form["type"]->setDisabled(true);
-		}
+		}*/
 
 		$form->setDefaults($defaults);
 	}

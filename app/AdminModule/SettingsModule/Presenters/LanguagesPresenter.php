@@ -7,6 +7,7 @@ use App\Model\Languages;
 use App\Forms\LanguageFormFactory;
 use Contributte\Datagrid\Column\ColumnLink;
 use Contributte\Datagrid\Datagrid;
+use JetBrains\PhpStorm\NoReturn;
 use Nette;
 
 /**
@@ -38,7 +39,7 @@ class LanguagesPresenter extends BasePresenter
 	 */
 	protected function createComponentLanguagesGrid(): Datagrid
 	{
-		$source = $this->model->getAll()->order("default DESC")->order($this->model->getColumnId());
+		$source = $this->model->findAll()->order("default DESC")->order($this->model->getColumnId());
 		$primaryKey = $this->model->getColumnId();
 
 		$grid = new Datagrid();
@@ -147,10 +148,12 @@ class LanguagesPresenter extends BasePresenter
 	/**
 	 * Edit handler
 	 */
-	public function handleEdit(int $language_id): void
+	public function handleEdit(int|string $language_id): void
 	{
 		$this->factory->setEditId($language_id);
-		$this->factory->setDefaultValues($this["languageForm"], $language_id);
+		/** @var Nette\Application\UI\Form $form */
+		$form = $this["languageForm"];
+		$this->factory->setDefaultValues($form, $language_id);
 		$this->redrawControl("languageForm");
 	}
 
@@ -158,9 +161,9 @@ class LanguagesPresenter extends BasePresenter
 	/**
 	 * Delete handler
 	 */
-	public function handleDelete(int $language_id): void
+	public function handleDelete(int|string $language_id): void
 	{
-		if(!$this->model->findById($language_id)->fetch()->default){
+		if(!$this->model->getById($language_id)?->default){
 			$this->model->delete($language_id);
 			$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
 		}  else {
@@ -172,12 +175,10 @@ class LanguagesPresenter extends BasePresenter
 
 	/**
 	 * Activate
-	 * @param int $language_id
-	 * @param boolean $status
 	 */
-	public function handleActivate($language_id, $status = 0): void
+	public function handleActivate(int $language_id, bool $status = false): void
 	{
-		$this->model->update($language_id, array("active" => (boolean) $status));
+		$this->model->update($language_id, array("active" => $status));
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 
 		if ($this->isAjax()) {
@@ -195,7 +196,7 @@ class LanguagesPresenter extends BasePresenter
 	 */
 	public function handleSetDefault(int $language_id): void
 	{
-		$this->model->getAll()->update(array("default" => false));
+		$this->model->findAll()->update(array("default" => false));
 		$this->model->update($language_id, array("default" => true));
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 		$this->redirect('this');

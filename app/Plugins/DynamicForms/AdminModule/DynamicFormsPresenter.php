@@ -123,7 +123,7 @@ class DynamicFormsPresenter extends BasePresenter
 		$this->template->dynamicForms = $this->dynamicFormsModel;
 
 		//edit own
-		$dynamicFormInfo = $this->dynamicFormsModel->findById($this->id)->fetch();
+		$dynamicFormInfo = $this->dynamicFormsModel->getById($this->id);
 		if(!$this->user->isAllowed(new \App\Security\Resource("DynamicForms", $dynamicFormInfo ? $dynamicFormInfo->created_by : $this->getUser()->getId()),"edit")){
 			throw new \Nette\Application\ForbiddenRequestException("You have not access to 'DynamicForms' with priviledge 'edit'.");
 		}
@@ -158,7 +158,7 @@ class DynamicFormsPresenter extends BasePresenter
 	 */
 	protected function createComponentDynamicFormsGrid(string $name): Datagrid
 	{
-		$source = $this->dynamicFormsModel->getAll()
+		$source = $this->dynamicFormsModel->findAll()
 			->select("dynamic_forms.*")
 			->order("dynamic_forms.grid_name DESC")
 			->order("dynamic_forms.".$this->dynamicFormsModel->getColumnId());

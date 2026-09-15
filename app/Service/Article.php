@@ -30,7 +30,7 @@ class Article
 		if($id == null){
 			return 0;
 		}
-		return $this->articlesModel->getAll()->where("history_id", $id)->count();
+		return $this->articlesModel->findAll()->where("history_id", $id)->count();
 	}
 
 
@@ -40,7 +40,7 @@ class Article
 	public function makeBackup(int $id): void
 	{
 		//$this->db->query("INSERT INTO ".$this->articlesModel->getTableName()." SELECT *, null AS article_id FROM ".$this->articlesModel->getTableName()." WHERE article_id = 10");
-		$articleToDuplicate = ArrayHash::from($this->articlesModel->findById($id)->fetch()->toArray());
+		$articleToDuplicate = ArrayHash::from($this->articlesModel->getById($id)?->toArray());
 		$articleToDuplicate->history_id = $articleToDuplicate->article_id;
 		$articleToDuplicate->article_id = null;
 
@@ -114,7 +114,7 @@ class Article
 		if($id == null){
 			return null;
 		}
-		return $this->articlesModel->getAll()->where("history_id", $id)->order("create_date")->fetchAll();
+		return $this->articlesModel->findAll()->where("history_id", $id)->order("create_date")->fetchAll();
 	}
 
 }

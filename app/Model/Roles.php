@@ -34,7 +34,7 @@ class Roles extends BaseModel implements IList
 	 */
 	public function insert(ArrayHash $data): int
 	{
-		$maxPosition = $this->getAll()->select("MAX(position) AS position")->fetch();
+		$maxPosition = $this->findAll()->select("MAX(position) AS position")->fetch();
 		$data->position = $maxPosition->position + 1;
 
 		return parent::insert($data);
@@ -44,9 +44,9 @@ class Roles extends BaseModel implements IList
 	/**
 	 * Delete
 	 */
-	public function delete(int $id): void
+	public function delete(int $id): ?int
 	{
-		$this->findById($id)
+		return $this->findById($id)
 			->where("default", 0)
 			->delete();
 	}
@@ -149,7 +149,7 @@ class Roles extends BaseModel implements IList
 	 */
 	public function getList()
 	{
-		return $this->getAll()->order("position")->fetchPairs($this->getColumnId(), "title");
+		return $this->findAll()->order("position")->fetchPairs($this->getColumnId(), "title");
 	}
 
 
@@ -158,6 +158,6 @@ class Roles extends BaseModel implements IList
 	 */
 	public function getListWithName(): array|\Nette\Database\Table\Selection
 	{
-		return $this->getAll()->order("position")->fetchPairs($this->getColumnId(), "name");
+		return $this->findAll()->order("position")->fetchPairs($this->getColumnId(), "name");
 	}
 }

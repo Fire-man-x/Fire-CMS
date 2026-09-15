@@ -79,7 +79,7 @@ class SettingFormFactory extends BaseFormFactory
 		$form->addSubmit('send', 'Save');
 
 		//default values
-		$values = $this->model->getAll()->fetchPairs("key", "value");
+		$values = $this->model->findAll()->fetchPairs("key", "value");
 		$form->setDefaults($values);
 
 		$form->onSuccess[] = array($this, 'formSucceeded');

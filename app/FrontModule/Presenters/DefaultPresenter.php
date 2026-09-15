@@ -58,7 +58,7 @@ class DefaultPresenter extends BasePresenter
 		$category = Nette\Utils\ArrayHash::from($category->toArray());
 
 		//author
-		$user = $this->usersModel->findById($category->created_by)->fetch()->toArray();
+		$user = $this->usersModel->getById($category->created_by)?->toArray();
 		$user['author'] = $this->userManager->makeName($user);
 		$category->author = $user;
 

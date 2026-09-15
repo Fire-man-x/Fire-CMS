@@ -101,7 +101,7 @@ class CategoriesPresenter extends BasePresenter
 		$this->type = $this->getParameter("type");
 		$itemExist = null;
 		if($this->id){
-			$itemExist = $this->categoriesModel->findById($this->id)->fetch();
+			$itemExist = $this->categoriesModel->getById($this->id);
 			if(!$itemExist){
 				throw new \Nette\Application\BadRequestException("Item with id '$this->id' doesn't exist.");
 			}

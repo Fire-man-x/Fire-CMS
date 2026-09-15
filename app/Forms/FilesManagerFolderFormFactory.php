@@ -78,7 +78,7 @@ class FilesManagerFolderFormFactory extends BaseFormFactory
 
 		$defaults = array();
 		if($editId){
-			$defaults = $this->model->findById($editId)->fetch();
+			$defaults = $this->model->getById($editId);
 
 			if ($defaults->default) {
 				//$form["type"]->setDisabled(true);

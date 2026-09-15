@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace App\Model;
 
 use Nette\Database\Explorer;
+use Nette\Database\Table\ActiveRow;
+use Nette\Database\Table\Selection;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
 
@@ -80,7 +82,7 @@ abstract class BaseModel
 	/**
 	 * Get table
 	 */
-	protected function getTable(): \Nette\Database\Table\Selection
+	protected function getTable(): Selection
 	{
 		return $this->database->table($this->getTableName());
 	}
@@ -89,9 +91,28 @@ abstract class BaseModel
 	/**
 	 * Get all rows
 	 */
-	public function getAll(): \Nette\Database\Table\Selection
+	public function findAll(): Selection
 	{
 		return $this->getTable();
+	}
+
+
+	/**
+	 * Find row by id
+	 */
+	public function findById(int $id): Selection
+	{
+		return $this->getTable()->where($this->getColumnId(), $id);
+	}
+
+
+	/**
+	 * Find all rows by ids
+	 * @param array<int,int|string> $ids
+	 */
+	public function findByIds(array $ids): Selection
+	{
+		return $this->getTable()->where($this->getColumnId(), $ids);
 	}
 
 
@@ -106,31 +127,29 @@ abstract class BaseModel
 
 
 	/**
-	 * Find by id
+	 * Get by id
 	 */
-	public function findById(int $id): \Nette\Database\Table\Selection
+	public function getById(int $id): ?ActiveRow
 	{
-		return $this->getTable()->where($this->getColumnId(), $id);
+		return $this->findById($id)->fetch();
 	}
 
 
 	/**
 	 * Update
 	 */
-	public function update(int $id, array $data): void
+	public function update(int $id, array $data): ?bool
 	{
-		$this->findById($id)
-			->update($data);
+		return $this->getById($id)?->update($data);
 	}
 
 
 	/**
 	 * Delete
 	 */
-	public function delete(int $id): void
+	public function delete(int $id): ?int
 	{
-		$this->findById($id)
-			->delete();
+		return $this->getById($id)?->delete();
 	}
 
 }

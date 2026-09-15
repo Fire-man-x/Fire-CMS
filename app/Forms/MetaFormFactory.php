@@ -65,7 +65,7 @@ class MetaFormFactory extends BaseFormFactory
 
 	public function formValidate(Form $form, array $values)
 	{
-		$query = $this->model->getAll()
+		$query = $this->model->findAll()
 			->where("type", $values->type)
 			->where("key", $values->key);
 
@@ -121,7 +121,7 @@ class MetaFormFactory extends BaseFormFactory
 	{
 		parent::setDefaultValues($form, $editId);
 
-		$defaults = $this->model->findById($editId)->fetch();
+		$defaults = $this->model->getById($editId);
 
 		$form->setDefaults($defaults);
 	}

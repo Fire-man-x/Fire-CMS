@@ -75,7 +75,7 @@ class Meta
 			->where("language_id = ? OR language_id IS NULL", $language);*/
 
 		$metaTable = "metas";
-		$items = $this->metasModel->getAll()
+		$items = $this->metasModel->findAll()
 			->select($metaTable . ".language_id")
 			->select($metaTable . ".key")
 			->select($metaTable . ".value AS default_value")

@@ -61,7 +61,7 @@ class Slider extends BaseControl
 
 		$this->template->setFile($this->templateFile);
 
-		$slider = $this->modelSliders->getAll()->where("location", $location)->fetch();
+		$slider = $this->modelSliders->findAll()->where("location", $location)->fetch();
 		if(!$slider){
 			throw new \Nette\InvalidArgumentException("Slider with location '$location' doesn't exist.");
 		}

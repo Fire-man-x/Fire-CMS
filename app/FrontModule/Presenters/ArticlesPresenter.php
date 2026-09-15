@@ -129,16 +129,16 @@ class ArticlesPresenter extends BasePresenter
 			}
 
 			//author
-			$user = $this->usersModel->findById($articleInfo->created_by)->fetch()->toArray();
+			$user = $this->usersModel->getById($articleInfo->created_by)?->toArray();
 			$user['author'] = $this->userManager->makeName($user);
 			$articleInfo->author = $user;
 
 			//meta
-			$metas = $this->metaService->getStructureByColumnId(CommentsModule\Meta::TYPE_ARTICLE, $this->language, $article->article_id);
+			$metas = $this->metaService->getStructureByColumnId(Meta::TYPE_ARTICLE, $this->language, $article->article_id);
 			$articleInfo->metas = $metas;
 
 			//tags
-			$tags = $this->tagService->getRelationTags(CommentsModule\Tag::TYPE_ARTICLE, $this->language, $article->article_id);
+			$tags = $this->tagService->getRelationTags(Tag::TYPE_ARTICLE, $this->language, $article->article_id);
 			$articleInfo->tags = $tags;
 
 			$this->template->article = $articleInfo;

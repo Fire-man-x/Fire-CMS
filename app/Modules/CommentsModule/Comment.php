@@ -147,12 +147,12 @@ class Comment
 		$allComments = $model->getRelationComments($articleId)->fetchPairs("comment_id", "article_id");
 		$allCommentsIds = array_keys($allComments);
 
-		$this->commentsModel->getAll()
+		$this->commentsModel->findAll()
 			->where("comment_id", $allCommentsIds)
 			->where("right >= ?", $right)
 			->update(array("right"=> new \Nette\Database\SqlLiteral("`right` + 2")));
 
-		$this->commentsModel->getAll()
+		$this->commentsModel->findAll()
 			->where("comment_id", $allCommentsIds)
 			->where("left >= ?", $right)
 			->update(array("left"=> new \Nette\Database\SqlLiteral("`left` + 2")));
@@ -194,22 +194,22 @@ class Comment
 		$allComments = $model->getRelationComments($articleId)->fetchPairs("comment_id", "article_id");
 		$allCommentsIds = array_keys($allComments);
 
-		$comment = $this->commentsModel->findById($commentId)->fetch();
+		$comment = $this->commentsModel->getById($commentId);
 
-		$left = $comment["left"];
-		$right = $comment["right"];
+		$left = $comment?->left;
+		$right = $comment?->right;
 		$width = $right - $left + 1;
 
-		$this->commentsModel->getAll()
+		$this->commentsModel->findAll()
 			->where("left BETWEEN ? AND ?", $left, $right)
 			->delete();
 
-		$this->commentsModel->getAll()
+		$this->commentsModel->findAll()
 			->where("comment_id", $allCommentsIds)
 			->where("right >= ?", $right)
 			->update(array("right"=> new \Nette\Database\SqlLiteral("`right` - ".$width)));
 
-		$this->commentsModel->getAll()
+		$this->commentsModel->findAll()
 			->where("comment_id", $allCommentsIds)
 			->where("left >= ?", $left)
 			->update(array("left"=> new \Nette\Database\SqlLiteral("`left` - ".$width)));
@@ -261,7 +261,7 @@ class Comment
 		$node->right = $left++;
 
 		//save to DB
-		$this->commentsModel->getAll()
+		$this->commentsModel->findAll()
 			->where("comment_id", $node->comment_id)
 			->update(array(
 				"left"=> $node->left,

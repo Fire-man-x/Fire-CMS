@@ -107,22 +107,22 @@ class ArticlesPresenter extends BasePresenter
 		$this->template->show = $this->show;
 
 		$counts = array(
-			"all"=>$this->articlesModel->getAll()
+			"all"=>$this->articlesModel->findAll()
 				->select("COUNT(*) AS count")
 				->where("articles.status != ?","trash")
-				->where("articles.history_id", null)->fetchField(),
-			"personal"=>$this->articlesModel->getAll()
+				->where("articles.history_id", null)->fetch()?->count,
+			"personal"=>$this->articlesModel->findAll()
 				->select("COUNT(*) AS count")
 				->where("articles.created_by = ?", $this->user->getId())
-				->where("articles.history_id", null)->fetchField(),
-			"pending"=>$this->articlesModel->getAll()
+				->where("articles.history_id", null)->fetch()?->count,
+			"pending"=>$this->articlesModel->findAll()
 				->select("COUNT(*) AS count")
 				->where("articles.status = ?","pending")
-				->where("articles.history_id", null)->fetchField(),
-			"trash"=>$this->articlesModel->getAll()
+				->where("articles.history_id", null)->fetch()?->count,
+			"trash"=>$this->articlesModel->findAll()
 				->select("COUNT(*) AS count")
 				->where("articles.status = ?","trash")
-				->where("articles.history_id", null)->fetchField()
+				->where("articles.history_id", null)->fetch()?->count
 			);
 		$this->template->counts = $counts;
 	}
@@ -144,7 +144,7 @@ class ArticlesPresenter extends BasePresenter
 		$this->template->articles = $this->articlesModel;
 
 		//edit own
-		$articleInfo = $this->articlesModel->findById($this->id)->fetch();
+		$articleInfo = $this->articlesModel->getById($this->id);
 		if(!$this->user->isAllowed(new \App\Security\Resource("Articles", $articleInfo ? $articleInfo->created_by : $this->getUser()->getId()),"edit")){
 			throw new \Nette\Application\ForbiddenRequestException("You have not access to 'Articles' with priviledge 'edit'.");
 		}
@@ -194,7 +194,7 @@ class ArticlesPresenter extends BasePresenter
 	 */
 	protected function createComponentArticlesGrid($name): Datagrid
 	{
-		$source = $this->articlesModel->getAll()
+		$source = $this->articlesModel->findAll()
 			->select("articles.*")
 			->select(":category_article.category.grid_name AS category_grid_name")
 			->where("articles.history_id", null)
@@ -453,7 +453,7 @@ class ArticlesPresenter extends BasePresenter
 	public function handleActivate($article_id, $status = 0): void
 	{
 		//edit own
-		$createdBy = $this->articlesModel->findById($article_id)->fetchField("created_by");
+		$createdBy = $this->articlesModel->getById($article_id)?->created_by;
 		if(!$this->user->isAllowed(new \App\Security\Resource("Articles", $createdBy),"edit")){
 			throw new \Nette\Application\ForbiddenRequestException("You have not access to 'Articles' with priviledge 'edit'.");
 		}

@@ -13,3 +13,8 @@ services:
 	-
 		factory: App\Plugins\DynamicForms\Components\ContactFormComponentFactory
 		tags: [presenter.component: contactFormControl]
+
+	#Admin menu
+	-
+		factory: App\DI\PluginMenuItem('Dynamic forms', ':Admin:DynamicForms:default', 'DynamicForms')
+		tags: [presenter.menu]

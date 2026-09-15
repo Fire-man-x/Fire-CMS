@@ -210,7 +210,7 @@ class UrlsPresenter extends BasePresenter
 	 */
 	public function handleDelete(int $url_id)
 	{
-		if(!$this->model->findById($url_id)->fetch()->default){
+		if(!$this->model->getById($url_id)?->default){
 			$this->model->delete($url_id);
 			$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
 		}  else {

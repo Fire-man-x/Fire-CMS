@@ -175,7 +175,7 @@ class DynamicFormFormFactory extends BaseFormFactory
 	{
 		parent::setDefaultValues($form, $editId);
 
-		$defaults = $this->model->findById($editId)->fetch();
+		$defaults = $this->model->getById($editId);
 		$translations = $this->model->getAllWithTranslation()->where('dynamic_form_id', $editId);
 
 		if($defaults)

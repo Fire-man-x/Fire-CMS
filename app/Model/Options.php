@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use Nette\Database\Table\ActiveRow;
 use Nette\Utils\ArrayHash;
 
 /**
@@ -24,7 +25,7 @@ class Options extends BaseModel
 	/**
 	 * Find by id
 	 */
-	public function findById(int $id): \Nette\Database\Table\Selection
+	public function getById(int $id): ?ActiveRow
 	{
 		throw new \LogicException("Not implemented yet");
 	}
@@ -50,7 +51,8 @@ class Options extends BaseModel
 	}
 
 
-	public function update(int $id, array $data): void{
+	public function update(int $id, array $data): ?bool
+	{
 		throw new \InvalidArgumentException("Cannot use method update in Options model. Use 'useOption' method instead.");
 	}
 
