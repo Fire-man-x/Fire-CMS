@@ -16,6 +16,25 @@ zlehka tak, jak byste to dělali v běžné jednoúčelové aplikaci — změny 
 do všech navazujících klientských projektů. Klientsky specifické chování patří do balíčku pod
 `app/Plugins/` (viz Konvence níže).
 
+## Jazyk
+Komentáře, dokumentace, vysvětlení → **česky**.
+
+## Tvrdá pravidla
+- `declare(strict_types=1);` v každém PHP souboru
+- PHP 8.3 features (constructor promotion, readonly, enums, match)
+- PHPStan: **level 5 přes `app/config/phpstan.neon` je aktuálně vynucovaná brána** (viz Příkazy níže) —
+  baseline (`app/config/phpstan-baseline.neon`) má ale skoro 2000 řádků nasbíraného dluhu, takže level 5
+  fakticky neznamená "bez chyb", jen "bez NOVÝCH chyb nad rámec baseline". `composer stan9` / `composer
+  stan10` existují jako přísnější kontrola nad konkrétním souborem/adresářem, kterou spouštějte na nový kód
+  (viz Příkazy) — nejde o vynucenou CI bránu, level 10 je dlouhodobý cíl, ne aktuální stav repozitáře.
+- Explicitní typy, žádný `mixed` bez důvodu — nový kód piš tak, aby procházel `composer stan9`/`stan10`
+- Nový kód: constructor injection (promoted properties) místo `/** @inject */` veřejných vlastností.
+  Výjimka: staré presentery (napsané před timto pravidlem — Sliders, Menus, Articles apod.) `/** @inject */`
+  pořád používají a nepřepisujeme je zpětně jen kvůli stylu; nový presenter pište pomocí constructor
+  injection, i když sourozenecké presentery v okolí vypadají jinak.
+- Latte šablony: `{varType Type $var}` na začátku pro každou proměnnou, kterou presenter do šablony posílá
+  (existující šablony to typicky nemají — dopisujte to jen do nových/měněných šablon)
+
 ## Příkazy
 
 ```
@@ -137,3 +156,15 @@ přesměrování, se kterými pracuje `CustomRouter`), `CommentsModule` (koment�
 
 ## Formátování
 Odsazení je tabulátory, ne mezery (`.editorconfig`); kódování UTF-8, konce řádků LF.
+
+## Po dokončení změny (dokumentace)
+Znalostní báze pro vývojáře i AI je v `docs/` (viz `docs/README.md` pro navigaci). Po významnější změně:
+1. Changelog entry: `docs/Changelog/YYYY-MM-DD-popis.md` podle `docs/Changelog/_template.md`
+2. Update `docs/Changelog/_index.md`
+3. Pokud změna architektury → update příslušný soubor v `docs/Architecture/`
+4. Pokud nový pattern/gotcha, na který by AI mělo v budoucnu narazit → update `docs/AI-Context/gotchas.md`
+   nebo `docs/AI-Context/patterns.md`
+
+`docs/` je oddělené od `doc/` (bez "s") zmíněného výše v tomto souboru — `doc/` obsahuje provozní
+návody (merge/rebase jádra, GitLab CI/CD nasazení, konvence balíčků), `docs/` je znalostní báze
+architektury pro AI asistenty a nové vývojáře.
