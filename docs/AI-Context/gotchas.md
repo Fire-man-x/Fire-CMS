@@ -102,6 +102,17 @@ ACL (`#[Secured]`/`#[Resource]`/`#[Privilege]`) potřebuje odpovídající řád
 nový `#[Secured]` presenter je syntakticky správně, ale bez seed dat se chová podle výchozího chování ACL
 (ověřte konkrétně v `Acl`/`AuthorizatorFactory`, nespoléhejte na to naslepo v testu/demu).
 
+## DI tagované služby se sbírají napříč VŠEMI config soubory, ne jen z "vlastního"
+
+`nextras/migrations`'s `MigrationsExtension` sbírá migrační skupiny přes `$builder->findByTag('nextras.
+migrations.group')` — to najde OTAGOVANOU službu bez ohledu na to, ve kterém NEON souboru/extension byla
+zaregistrovaná. Díky tomu si každý plugin může zaregistrovat vlastní `Nextras\Migrations\Entities\Group`
+službu přímo ve svém `config.plugin.neon` (viz `Architecture/plugins.md`) a nemusí se vůbec zasahovat do
+core `app/config/config.neon` — funguje to stejně, jako by ta služba byla deklarovaná přímo v hlavním
+configu. Neplatí to univerzálně pro všechny extensions (některé čtou svoji vlastní config sekci, ne tagy),
+ale kdykoliv extension dokumentuje "discovery via tag", je bezpečné tag zaregistrovat z libovolného configu
+včetně pluginového.
+
 ## Testování přes `curl` na sdíleném/multi-tenant boxu
 
 Tenhle vývojový box hostuje víc projektů (fire-cms, pet-hotel, další klientské projekty) přes stejný

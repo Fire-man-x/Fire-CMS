@@ -4,4 +4,5 @@ includes:
 	- %rootDir%/app/Plugins/Stalker/config.plugin.neon
 	- %rootDir%/app/Plugins/Statistics/config.plugin.neon
 	- %rootDir%/app/Plugins/Sliders/config.plugin.neon
+	- %rootDir%/app/Plugins/Hotel/config.plugin.neon
 

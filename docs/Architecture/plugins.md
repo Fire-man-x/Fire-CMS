@@ -13,8 +13,15 @@ Dva mechanismy rozšíření jádra:
   časem mění, ověřte `ls app/Plugins`, nespoléhejte na tento výčet natvrdo).
 
 Konvence pro psaní pluginu je v `doc/conventions.md` — nikdy neupravovat soubory jádra přímo (např.
-`HomepagePresenter.php`, `default.latte`), chování se má přepsat z pluginu; ukázková DB data patří do
-`data/migrations/<název-balíčku>/`; frontend assety balíčku do `www/frontend/<název-balíčku>/`.
+`HomepagePresenter.php`, `default.latte`), chování se má přepsat z pluginu; frontend assety balíčku do
+`www/frontend/<název-balíčku>/`.
+
+**Migrace patří do vlastního stromu balíčku**, `app/Plugins/<Name>/data/migrations/*.sql` (ne do
+`data/migrations/` — to je jen pro jádro, skupiny `structures`/`basic-data`/`dummy-data`). Balíček si
+svoji migrační skupinu zaregistruje sám ve vlastním `config.plugin.neon` jako otagovanou službu
+(`Nextras\Migrations\Entities\Group`, tag `nextras.migrations.group: {for: [migrations]}`) — přidání
+balíčku tak nikdy nevyžaduje editovat core `app/config/config.neon`. Migrace se pouští přes `bin/console
+migrations:continue` (`nextras/migrations` + `contributte/console`, viz `Architecture/configuration.md`).
 
 ## Jak `PresenterFactory` najde presenter uvnitř Modules/Plugins
 

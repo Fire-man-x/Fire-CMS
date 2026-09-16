@@ -42,6 +42,9 @@ extensions:
 	#replicator
 	replicator: Kdyby\Replicator\DI\ReplicatorExtension
 
+	console: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
+	migrations: Nextras\Migrations\Bridges\NetteDI\MigrationsExtension
+
 # Pořadí načítání rout (vyšší priorita = dřív = vyšší přednost).
 # Routery pluginů mají bez nastavení prioritu 0, ostatní -100.
 router:
@@ -49,6 +52,25 @@ router:
 		App\Router\AdminRouter: 100
 		App\Router\FileRouter: -50
 		App\Router\FrontRouter: -100
+
+# Core schema migrations only (data/migrations/<group>/). Each PLUGIN owns its own migrations
+# under its own tree instead (app/Plugins/<Name>/data/migrations/*.sql) and registers its own
+# group as a tagged service from its config.plugin.neon - see App\Plugins\Hotel\'s example - so
+# adding a plugin's migrations never requires touching this core file.
+migrations:
+	dir: %appDir%/../data/migrations
+	driver: mysql
+	dbal: nette
+	groups:
+		structures:
+			directory: %appDir%/../data/migrations/structures
+		basic-data:
+			directory: %appDir%/../data/migrations/basic-data
+			dependencies: [structures]
+		dummy-data:
+			enabled: %debugMode%
+			directory: %appDir%/../data/migrations/dummy-data
+			dependencies: [structures, basic-data]
 
 fileUpload:
 	maxFiles: 100

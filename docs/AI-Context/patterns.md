@@ -158,6 +158,17 @@ services:
     -
         factory: App\DI\PluginMenuItem('Titulek', ':Admin:X:default', 'X')
         tags: [presenter.menu]
+
+    # Vlastní migrace (schéma/seed data) - viz Architecture/plugins.md, "Migrace patří do vlastního
+    # stromu balíčku". Adresář je uvnitř balíčku, ne v core data/migrations/.
+    -
+        factory: Nextras\Migrations\Entities\Group
+        setup:
+            - $name('x-structures')
+            - $enabled(true)
+            - $directory(%rootDir%/app/Plugins/X/data/migrations)
+            - $dependencies([structures])
+        tags: [nextras.migrations.group: {for: [migrations]}]
 ```
 
 Viz `Architecture/plugins.md` pro `presenter.plugin` vs. `presenter.component` vs. `presenter.menu`.

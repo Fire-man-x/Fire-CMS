@@ -13,7 +13,9 @@
 
         "contributte/oauth2-client": "*",
         "league/oauth2-facebook": "^2.0",
-        "jwage/easy-csv": "*"
+        "jwage/easy-csv": "*",
+		"nextras/migrations": "^3.5",
+		"contributte/console": "^0.11.0"
     },
 	"require-dev": {
 		"nette/tester": "*",
@@ -32,6 +34,7 @@
         ]
     },
 	"scripts": {
+		"console": "@php bin/console",
 		"stan": "@php \"vendor/bin/phpstan\" analyse --configuration \"app/config/phpstan.neon\" -vvv --ansi",
 		"stan-generate-baseline": "@php \"vendor/bin/phpstan\" analyse --configuration \"app/config/phpstan.neon\" --generate-baseline \"app/config/phpstan-baseline.neon\" -vvv --ansi",
 		"stan-report": "@php \"vendor/bin/phpstan\" analyse --configuration \"app/config/phpstan.neon\" --error-format=table > \"log/phpstan-report.txt\" 2>&1",

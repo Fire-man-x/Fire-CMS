@@ -1,5 +1,6 @@
 !.gitignore
 .idea
+app/config/config.local.neon
 www/files/*
 !www/files/.htaccess
 www/theme/*/.sass-cache

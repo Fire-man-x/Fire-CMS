@@ -4,6 +4,19 @@ Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na det
 
 ## 2026-09-16
 
+- **`Hotel` plugin (`app/Plugins/Hotel/`): marketplace pro ubytování zvířat, postavený na frontendovém
+  self-service místo admin-spravovaného CRUD.** Nahrazuje předchozí verzi (viz záznam níže "Port
+  funkcionality Pets/Owners/..." — ten kód byl smazán, ne přesunut, protože vlastnický model byl jinak).
+  Majitelé nemovitostí a zákazníci se registrují a přihlašují na frontendu (`App\Model\UserManager` +
+  dvě nové role `property_owner`/`customer`, žádný nový auth systém), spravují svá vlastní data
+  (`Property`/`Customer`/`Pet`/`Facility`), zákazník vytváří `Reservation` s validací kapacity
+  (`Reservations::countOverlapping()`). Hlavní administrátor má nad vším plný CRUD přes nové resources
+  `HotelProperties`/`HotelCustomers`/`HotelPets`/`HotelFacilities`/`HotelReservations` (přiřadit ručně
+  přes Settings → Roles, stejně jako u všech ostatních resources v repu). `ContractTemplates`, skutečné
+  vyhledávání a platby zůstávají mimo rozsah. Migrace `app/Plugins/Hotel/data/migrations/20260916140000.sql`
+  (obsahuje i seed pro obě nové role), registrovaná jako vlastní `nextras/migrations` skupina přímo v
+  `config.plugin.neon` (žádný zásah do core `config.neon`) — **není ještě aplikovaná** na žádnou DB, admin
+  ACL grant taky ne. Viz `docs/Architecture/plugins.md` a `docs/AI-Context/gotchas.md` pro detaily.
 - **Znalostní báze `docs/` opravena, aby odpovídala tomuto projektu.** Adresář `docs/` byl omylem zkopírován
   z jiného projektu (jiné ORM — Record/Repository/Collection místo `BaseModel`, jiný počet pluginů, jiná
   moduly). Přepsán tak, aby popisoval skutečnou architekturu Fire CMS. `CLAUDE.md` "Tvrdá pravidla" opravena

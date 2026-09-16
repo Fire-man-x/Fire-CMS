@@ -15,14 +15,24 @@
 ## Balíčky
 1. Balíček vždy vychází z `Fire CMS`.
 1. Balíček nikdy neupravuje zdrojové soubory `Fire CMS`, například `.../HomepagePresenter.php` nebo `.../Homepage/default.latte`.
-1. Výchozí/vzorová data databáze jsou uloženy ve složce `./data/migrations/název balíčku`, například `./data/migrations/dummy-data`.
-    - Příklad konfiguračního souboru `package.theme.neon.dist`
-		```shell
-			migrations:
-				groups:
-					dummy-data:
-						directory: %rootDir%/data/migrations/dummy-data
+1. Migrace balíčku (schéma i vzorová data) jsou uloženy v jeho vlastním stromu, `./app/Plugins/název
+   balíčku/data/migrations/`, ne v `./data/migrations/` (ta patří jen jádru — core `structures`/
+   `basic-data`/`dummy-data` skupinám). Balíček si svoji skupinu zaregistruje sám ve vlastním
+   `config.plugin.neon`, takže přidání/odebrání balíčku nikdy nevyžaduje zásah do `app/config/config.neon`:
+    - Příklad `config.plugin.neon`
+		```neon
+			services:
+				-
+					factory: Nextras\Migrations\Entities\Group
+					setup:
+						- $name('název-balíčku-structures')
+						- $enabled(true)
+						- $directory(%rootDir%/app/Plugins/název balíčku/data/migrations)
+						- $dependencies([structures])
+					tags: [nextras.migrations.group: {for: [migrations]}]
 		```
+    - Migrace se spouští přes `bin/console migrations:continue` (`nextras/migrations` +
+      `contributte/console`, viz `composer console -- migrations:continue`).
 1. Zdroje `[CSS, LESS, images, ...]` jsou uloženy ve složce `./www/frontend/název balíčku`, například `./www/frontned/package/`.
 1. Výchozí šablony jsou uloženy v `./App/`, pokud se nejedná o společnou šablonu.
 1. Výchozí společné šablony jsou uloženy v `./theme/`. Příklad `./theme/FrontendModule/templates/Homepage/default.latte`

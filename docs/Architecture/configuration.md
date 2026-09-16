@@ -56,6 +56,33 @@ Viz [plugins.md](plugins.md) pro co přesně dělá a proč. Přepisuje **stejno
 zaregistrovala vestavěná `Nette\Bridges\ApplicationDI\ApplicationExtension` — proto se `factory:` musí
 zadat kompletně znovu (přepsáním `factory` se ztratí args, které by extension jinak doplnila).
 
+## Migrace — `nextras/migrations` + `contributte/console`
+
+```neon
+extensions:
+	console: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
+	migrations: Nextras\Migrations\Bridges\NetteDI\MigrationsExtension
+
+migrations:
+	dir: %appDir%/../data/migrations
+	driver: mysql
+	dbal: nette
+	groups:
+		structures: {directory: %appDir%/../data/migrations/structures}
+		basic-data: {directory: %appDir%/../data/migrations/basic-data, dependencies: [structures]}
+		dummy-data: {enabled: %debugMode%, directory: %appDir%/../data/migrations/dummy-data, dependencies: [structures, basic-data]}
+```
+
+`%consoleMode%` je vestavěný Nette parametr (`PHP_SAPI === 'cli'`) — `ConsoleExtension` proto v běžném
+webovém requestu neregistruje vůbec nic (žádné riziko pro produkční web). Spouští se přes `bin/console`
+(malý ručně psaný bootstrap skript, stejný vzor jako `www/index.php` — Composer ho negeneruje sám), nebo
+`composer console -- <příkaz>`. `bin/console list` ukáže dostupné příkazy, hlavní jsou `migrations:continue`
+(pustí čekající migrace), `migrations:create` (založí nový migrační soubor), `migrations:reset`.
+
+**`data/migrations/` je jen pro jádro** (skupiny výše). Migrace balíčku patří do jeho vlastního stromu a
+balíček si svoji skupinu registruje sám — viz `plugins.md`, sekce "Migrace patří do vlastního stromu
+balíčku" — takže tahle core konfigurace se při přidávání/odebírání balíčků nemění.
+
 ## `Nette\Bridges\ApplicationDI\ApplicationExtension` — kompilační kontrola presenterů
 
 Nette při KOMPILACI DI kontejneru (ne za běhu) najde — přes RobotLoader, `%appDir%` jako výchozí scanDirs —
