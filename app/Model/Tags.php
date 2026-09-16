@@ -86,32 +86,3 @@ class Tags extends BaseModel
 	}
 
 }
-
-interface ISubTags
-{
-
-
-	/**
-	 * Relation tags table
-	 */
-	public function getRelationTagsTable(): \Nette\Database\Table\Selection;
-
-
-	/**
-	 * Inserts relation with tag
-	 */
-	public function insertRelationTags(int $id, int $tagId): void;
-
-
-	/**
-	 * Delete all relation with tags
-	 */
-	public function deleteAllRelationTags(int $id);
-
-
-	/**
-	 * Delete relation with tags
-	 */
-	public function deleteRelationTag(int $id, int $tagId);
-
-}

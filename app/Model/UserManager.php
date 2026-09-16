@@ -143,8 +143,3 @@ class UserManager implements Authenticator
 	}
 
 }
-
-
-
-class DuplicateNameException extends \Exception
-{}

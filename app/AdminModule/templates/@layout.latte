@@ -130,7 +130,8 @@
 						$presenter->isLinkCurrent(':Admin:Settings:Users:*') ||
 						$presenter->isLinkCurrent(':Admin:Settings:Roles:*') ||
 						$presenter->isLinkCurrent(':Admin:Settings:Tags:*') ||
-						$presenter->isLinkCurrent(':Admin:Settings:Urls:*')}active{/if}">
+						$presenter->isLinkCurrent(':Admin:Settings:Urls:*') ||
+						$presenter->isLinkCurrent(':Admin:Plugins:*')}active{/if}">
 					<a href=""  class="nav-link dropdown-toggle" id="responsiveNavbarDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{_"Settings"}</a>
 					<div class="dropdown-menu" aria-labelledby="responsiveNavbarDropdown">
 						<a n:href=":Admin:Settings:Default:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Settings:Default:default') ? 'active', dropdown-item">{_"Main"}</a>
@@ -140,6 +141,7 @@
 						<a n:href=":Admin:Settings:Roles:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Settings:Roles:default') ? 'active', dropdown-item">{_"Roles"}</a>
 						<a n:href=":Admin:Settings:Tags:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Settings:Tags:default') ? 'active', dropdown-item">{_"Tags"}</a>
 						<a n:href=":Admin:Settings:Urls:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Settings:Urls:default') ? 'active', dropdown-item">{_"Urls"}</a>
+						<a n:href=":Admin:Plugins:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Plugins:default') ? 'active', dropdown-item">{_"Plugins"}</a>
 					</div>
 				</li>
 			</ul>

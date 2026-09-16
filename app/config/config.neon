@@ -99,6 +99,7 @@ services:
 		setup:
 			- setScanDirs([%appDir%/Plugins, %appDir%/Modules, %appDir%/../theme/Plugins])
 
+	- App\Model\Plugin\PluginRepository(%rootDir%)
 	- App\Model\Users
 	- App\Model\UserManager
 	roles: App\Model\Roles
