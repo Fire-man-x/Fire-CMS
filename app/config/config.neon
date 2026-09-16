@@ -28,6 +28,7 @@ search:
 
 extensions:
 	router: App\Router\DI\RouterProviderExtension
+	pluginPresenterGate: App\DI\PluginPresenterGateExtension(%rootDir%)
 	#uploadManager: ondrs\UploadManager\DI\Extension
 	fileUpload: Zet\FileUpload\FileUploadExtension
 	#imageStore: Rostenkowski\ImageStore\Extension

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Application;
 
+use App\Model\Plugin\PluginRepository;
 use Nette\Application\PresenterFactory as NettePresenterFactory;
 use Nette\Utils\Finder;
 
@@ -19,6 +20,13 @@ use Nette\Utils\Finder;
  * This factory first asks Nette's standard mapping. When the resulting class
  * does not exist, it looks the presenter up in an index built by scanning the
  * configured plugin/module directories for *Presenter.php files.
+ *
+ * A presenter living under a "Plugins" tree is only returned while its plugin
+ * is enabled in theme/config/plugins.neon (see PluginRepository). RobotLoader
+ * indexes the class regardless of that config, so without this check a
+ * disabled plugin's presenter would still be routable and the DI container
+ * would fail with an autowiring error (its services aren't registered
+ * anymore) instead of a clean 404.
  */
 final class PresenterFactory extends NettePresenterFactory
 {
@@ -31,12 +39,14 @@ final class PresenterFactory extends NettePresenterFactory
 	/**
 	 * Lazy index: presenter short class name => list of candidates.
 	 *
-	 * list<array{class: string, realm: string, stem: string}>>|null
+	 * list<array{class: string, realm: string, stem: string, pluginName: ?string}>>|null
 	 */
 	private ?array $index = null;
 
-	public function __construct(?callable $factory = null)
-	{
+	public function __construct(
+		?callable $factory = null,
+		private readonly ?PluginRepository $pluginRepository = null,
+	) {
 		parent::__construct($factory);
 	}
 
@@ -93,6 +103,15 @@ final class PresenterFactory extends NettePresenterFactory
 			return null;
 		}
 
+		// drop candidates belonging to a plugin that is currently disabled
+		$candidates = array_values(array_filter(
+			$candidates,
+			fn(array $c): bool => $c['pluginName'] === null || $this->isPluginActive($c['pluginName']),
+		));
+		if (!$candidates) {
+			return null;
+		}
+
 		// 1) keep candidates from the same realm (Admin/Front); '' matches any realm
 		$pool = array_values(array_filter(
 			$candidates,
@@ -144,12 +163,24 @@ final class PresenterFactory extends NettePresenterFactory
 					? 'Admin'
 					: (str_contains($class, '\\FrontModule\\') ? 'Front' : '');
 				$stem = preg_match('~\\\\(?:Plugins|Modules)\\\\([^\\\\]+)~', $class, $m) ? $m[1] : '';
+				$pluginName = preg_match('~\\\\Plugins\\\\([^\\\\]+)~', $class, $pm) ? $pm[1] : null;
 
-				$this->index[$short][] = ['class' => $class, 'realm' => $realm, 'stem' => $stem];
+				$this->index[$short][] = ['class' => $class, 'realm' => $realm, 'stem' => $stem, 'pluginName' => $pluginName];
 			}
 		}
 
 		return $this->index;
+	}
+
+
+	/**
+	 * Whether a "Plugins" candidate's owning plugin is enabled. When no
+	 * PluginRepository was injected, gating is skipped (fail open) rather
+	 * than blocking every plugin presenter.
+	 */
+	private function isPluginActive(string $pluginName): bool
+	{
+		return $this->pluginRepository === null || $this->pluginRepository->isActive($pluginName);
 	}
 
 
