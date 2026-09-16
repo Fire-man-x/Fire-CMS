@@ -1135,26 +1135,8 @@ parameters:
 			path: ../Forms/CategoryFormFactory.php
 
 		-
-			message: '#^Call to function array_key_exists\(\) with mixed and string will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: ../Forms/CategorySubtype/CategoryLinkFormPart.php
-
-		-
 			message: '#^Method App\\Forms\\CategorySubtype\\CategoryLinkFormPart\:\:onSuccessFormPart\(\) has invalid return type App\\Forms\\CategorySubtype\\ArrayHash\.$#'
 			identifier: class.notFound
-			count: 1
-			path: ../Forms/CategorySubtype/CategoryLinkFormPart.php
-
-		-
-			message: '#^Parameter \#2 \$array of function array_key_exists expects array, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Forms/CategorySubtype/CategoryLinkFormPart.php
-
-		-
-			message: '#^Property App\\Forms\\CategorySubtype\\CategoryLinkFormPart\:\:\$categoriesList \(string\) does not accept array\<Nette\\Database\\Table\\ActiveRow\>\.$#'
-			identifier: assign.propertyType
 			count: 1
 			path: ../Forms/CategorySubtype/CategoryLinkFormPart.php
 
