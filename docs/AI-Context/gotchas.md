@@ -11,19 +11,39 @@ presenter `Sliders` reálně existuje a je aktivní. Při ručním testování p
 (případně s pomlčkami), ne název třídy 1:1. Tohle se dá snadno splést s daleko vážnějším problémem (viz
 další bod) — než začnete hledat bug v kódu, ověřte URL casing.
 
-## Vypnutý plugin a kompilace kontejneru
+## Vypnutý plugin a kompilace kontejneru — POUZE `app/Plugins/*` a `app/Modules/*`
 
 Když je plugin vypnutý v `theme/config/plugins.neon`, jeho třída presenteru pořád fyzicky existuje na
 disku. `Nette\Bridges\ApplicationDI\ApplicationExtension` při KOMPILACI kontejneru (ne za běhu) skenuje
-`app/` a ověřuje, že `@inject` vlastnosti všech nalezených presenterů jdou naautowirovat — o
-`theme/config/plugins.neon` nic neví. Výsledek: `Nette\DI\MissingServiceException` na presenteru
-vypnutého pluginu **shodí kompilaci CELÉHO kontejneru**, ne jen stránku toho pluginu — jakákoliv jiná
-stránka administrace i frontendu přestane fungovat.
+presentery a ověřuje, že jejich `@inject`/konstruktor jdou naautowirovat — o `theme/config/plugins.neon`
+nic neví. Výsledek: `Nette\DI\MissingServiceException` na presenteru vypnutého pluginu **shodí kompilaci
+CELÉHO kontejneru**, ne jen stránku toho pluginu — jakákoliv jiná stránka administrace i frontendu
+přestane fungovat.
 
-`App\Application\PresenterFactory` (routing-time gating, viz `Architecture/plugins.md`) tohle NEŘEŠÍ —
-ten běží až PO úspěšné kompilaci kontejneru.
+**Týká se to ale JEN `app/Plugins/*` (a `app/Modules/*`), NE `theme/Plugins/*`.** Ověřeno přímo v
+`vendor/nette/bootstrap/src/Bootstrap/Configurator.php`: výchozí registrace `ApplicationExtension` je
+`['%debugMode%', ['%appDir%'], '%tempDir%/cache/nette.application']` — druhý argument (`scanDirs`) je
+PEVNĚ `%appDir%`, nekonfigurovatelné z `config.neon` a nezávislé na `App\Application\PresenterFactory`'s
+vlastním `setScanDirs()` (to je JINÁ, samostatná RobotLoader instance s vlastní cache v `temp/cache/
+nette.application`, viz `findPresenters()` v `ApplicationExtension`). Presentery pod `theme/Plugins/<Name>/`
+(viz `Architecture/plugins.md`, "product packages" jako `PetHotel`/`SDH*`) proto tahle eager validace
+NIKDY nenajde — celá tahle třída bugů se `theme/Plugins/*` balíčků strukturálně netýká. Praktický důsledek:
+klientsky/projektově specifickou funkcionalitu, kterou chcete bezpečně zapínat/vypínat, umisťujte do
+`theme/Plugins/`, ne do `app/Plugins/`.
 
-**Zkoušené a zavržené opravy** (viz `Changelog/_index.md`, "Plugins Gate" + revert):
+**Routing-time gating v `App\Application\PresenterFactory` aktuálně NEEXISTUJE.** Dřív (kvůli původnímu
+Sliders bugu) tahle třída měla `PluginRepository`/`isPluginActive()` kontrolu, co aspoň vypnutému pluginu
+zajišťovala čisté 404 misto pádu PO úspěšné kompilaci — ověřeno 2026-09-16 čtením aktuálního zdroje, tahle
+kontrola tam už není (pravděpodobně vedlejší efekt `git revert` "Plugins Gate" commitu, který ji možná
+obsahoval spolu s hlubší opravou, nebo uživatelova vlastního branch resetu — přesná příčina nezjištěna).
+Riziko: vypnutý `app/Plugins/*` plugin (např. `Sliders`) může znovu spadnout na `MissingServiceException`
+misto čistého 404, pokud RobotLoaderova cache (`temp/cache/nette.application`) jeho presenter najde. Pokud
+na tohle narazíte, `isPluginActive()` gating (filtrování `resolveFallback()` kandidátů podle `PluginRepository
+::isActive()`) je snadné znovu přidat — jde o samostatnou, lehkou opravu NEZÁVISLOU na těžší
+`PluginPresenterGateExtension` níže.
+
+**Zkoušené a zavržené opravy** (viz `Changelog/_index.md`, "Plugins Gate" + revert) — pro `app/Plugins/*`/
+`app/Modules/*`, kde se `theme/Plugins/*` obchvat výše nepoužije:
 - Omezení `application.scanDirs` na core adresáře / `scanDirs: false` v `config.neon`.
 - Vyloučení neaktivních pluginů z hlavního RobotLoaderu (`$robotLoader->excludeDirectory(...)` v
   `bootstrap.php`).
@@ -39,6 +59,35 @@ ukázalo nečekaně křehké/rizikové v kombinaci s dalšími extensions), oper
 přesune `InjectExtension` na konec pořadí (`$this->extensions = array_merge(array_diff_key($this->extensions,
 $last), $last);`), takže libovolná normálně zaregistrovaná extension (přes `extensions:` v `config.neon`)
 proběhne dřív než `InjectExtension` — netřeba řešit pořadí ručně.
+
+## `DynamicForms` eagerně stavěl ACL při KAŽDÉM bootu kontejneru — spadlo to na prázdné DB
+
+`App\Plugins\DynamicForms\DI\Extension::afterCompile()` vkládal do generovaného `initialize()` metody
+kontejneru (běží NEPODMÍNĚNĚ při každém bootu — web i CLI, viz `Architecture/configuration.md`) volání
+`setContactFormControl($this->getByType(ContactFormControl::class), $this->getService('application.
+application'))`. To eagerly staví celý řetězec: `ContactFormControl` → `ContactFormFactory` →
+`App\Modules\CommentsModule\Comment` (constructor arg `security.user`) → `App\Security\User`
+(constructor arg `authorizator`) → `App\Security\AuthorizatorFactory::create()`, jejíž tělo OKAMŽITĚ
+(ne líně) volá `Roles::getListWithName()` — tj. SELECTuje tabulku `roles`. Na čerstvé/prázdné DB (před
+prvním `bin/console migrations:continue`/`migrations:reset`) tohle spadne na `SQLSTATE[42S02]: Base
+table or view not found: 1146 Table 'roles' doesn't exist` — a to DŘÍV, než konzolový příkaz (nebo
+jakýkoliv web request) vůbec dostane šanci cokoliv udělat. Chicken-and-egg past: nejde namigrovat
+prázdnou DB, protože bootstrap kontejneru se sám o sobě pokusí přečíst ACL tabulky, o kterých vůbec
+neví, že ještě neexistují.
+
+Zjištěno čtením VYGENEROVANÉHO kontejneru (`temp/cache/nette.configurator/Container_*.php`), ne jen
+zdrojového kódu — teprve tam je vidět skutečný řetězec `getService()`/`getByType()` napříč
+`createService*()` metodami; ze zdrojových tříd samotných to není zjevné (`Nette\Application\Application`
+ani `ContactFormControl` samy o sobě `security.user` nepotřebují — schová se to o dvě úrovně hlouběji,
+v `CommentsModule\Comment`).
+
+Opraveno guardem na `%consoleMode%` v `Extension::afterCompile()` — v CLI (`$builder->parameters
+['consoleMode']`) se tělo do `initialize()` vůbec nepřidá (konzolový skript stejně nikdy nevykresluje
+Latte shortcode "contactForm", o nic tak nepřichází). **Po týhle opravě je nutné invalidovat zkompilovaný
+kontejner** (smazat `temp/cache/nette.configurator/Container_*.php*`) — v produkčním módu Nette
+nekontroluje mtime configu/kódu při každém requestu (viz níže "Testování přes `curl`..."), takže stará
+zkompilovaná verze by se použila dál beze změny. Na tomhle sandboxu jsou ty soubory vlastněné `www-data`
+a nejde je smazat jako běžný uživatel z tohoto shellu — případně smazat mimo něj.
 
 ## RobotLoader vs. PSR-4 — necesta souboru z namespace
 

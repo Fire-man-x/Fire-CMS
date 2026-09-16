@@ -36,14 +36,14 @@ class UsersPresenter extends BasePresenter
 		parent::startup();
 
 		$this->addBreadCrumbLink("Users", $this->link(":Admin:Settings:Users:default", array("id"=>null)));
-
-		$this->template->userInfo = $this->users->getById($this->id);
 	}
 
 
 	public function actionDetail(): void
 	{
-		$this->template->userInfo = $this->users->getById($this->id);
+		if($this->id) {
+			$this->template->userInfo = $this->users->getById($this->id);
+		}
 	}
 
 
@@ -98,7 +98,7 @@ class UsersPresenter extends BasePresenter
 		});
 
 
-		$grid->addAction('delete', 'Delete', 'delete!', array($primaryKey => $primaryKey))
+		$grid->addAction('delete', 'Delete', 'delete!', array('id' => $primaryKey))
 			->setClass(function($item) {
 				return 'btn btn-danger btn-sm ajax'.($item['id'] === 1 ? ' disabled' : '');
 			})

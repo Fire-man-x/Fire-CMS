@@ -40,6 +40,19 @@ class Extension extends CompilerExtension
 	public function afterCompile(\Nette\PhpGenerator\ClassType $class): void
 	{
 		parent::afterCompile($class);
+
+		// Skip in CLI (bin/console): this wiring eagerly builds ContactFormControl, which cascades
+		// through ContactFormFactory -> CommentsModule\Comment -> security.user -> authorizator ->
+		// Roles::getListWithName() - i.e. it queries the `roles` table as a side effect of container
+		// initialize(), unconditionally, on EVERY boot. On a fresh/empty database (e.g. before the
+		// first `bin/console migrations:continue`/`migrations:reset` has run) this crashes with
+		// "Table 'roles' doesn't exist" before the console command itself ever gets a chance to run -
+		// and a console script never renders the "contactForm" Latte shortcode anyway, so it's safe
+		// to skip entirely here.
+		if ($this->getContainerBuilder()->parameters['consoleMode']) {
+			return;
+		}
+
 		$initialize = $class->getMethod('initialize');
 		$initialize->addBody(self::class.'::setContactFormControl($this->getByType(?), $this->getService(?));',
 			array(ContactFormControl::class, 'application.application')

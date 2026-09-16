@@ -1,16 +1,38 @@
-# Modules vs. Plugins
+# Modules vs. Plugins vs. Theme Product Packages
 
-Dva mechanismy rozšíření jádra:
+Tři mechanismy rozšíření jádra:
 
 - **`app/Modules/<Name>Module/`** — funkční oblasti dodávané jako součást jádra samotného. Aktuálně:
   `CommentsModule`, `UrlModule` (obě mají obsah), `CoreModule` (prázdný adresář, zatím bez obsahu — rezerva
   do budoucna, ne fungující modul). Modul obvykle má vlastní `Model/`, `Forms/`, `Components/` a podstrom
   `AdminModule/` (občas i `FrontModule/`) s presentery/šablonami. Modul se nedá "vypnout" — je to napořád
   součást jádra.
-- **`app/Plugins/<Name>/`** — volitelná/klientsky specifická funkcionalita, zapojovaná přes vlastní
-  `config.plugin.neon`, který `theme/config/plugins.neon` includuje jen pro AKTIVNÍ pluginy. Aktuální
-  pluginy v jádru: `DynamicForms`, `SimpleSignUp`, `Sliders`, `Stalker`, `Statistics` (počet i seznam se
-  časem mění, ověřte `ls app/Plugins`, nespoléhejte na tento výčet natvrdo).
+- **`app/Plugins/<Name>/`** — SYSTÉMOVÝ plugin: volitelná funkcionalita, ale obecná/znovupoužitelná napříč
+  VŠEMI klientskými projekty postavenými na Fire CMS (ne šitá na míru jednomu klientovi). Zapojuje se přes
+  vlastní `config.plugin.neon`, který `theme/config/plugins.neon` includuje jen pro AKTIVNÍ pluginy.
+  Aktuální pluginy v jádru: `DynamicForms`, `SimpleSignUp`, `Sliders`, `Stalker`, `Statistics` (počet i
+  seznam se časem mění, ověřte `ls app/Plugins`, nespoléhejte na tento výčet natvrdo).
+- **`theme/Plugins/<Name>/`** — "product package": funkcionalita šitá na míru KONKRÉTNÍMU klientskému
+  projektu (např. `PetHotel` pro projekt Pet Hotel, `SDHCalendar`/`SDHEvents`/`SDHAttendance`/`SDHTests`/
+  `SDHTowns`/`SDHGallery` pro SDH), ne obecně použitelná napříč všemi klienty — proto patří do `theme/`
+  (téma/web-specifická vrstva), ne do `app/Plugins/`. Stejná konvence jako u `app/Plugins/` — vlastní
+  `config.plugin.neon`, `Model/`/`Forms/`/`AdminModule/`/`FrontModule/`, aktivace přes `theme/config/
+  plugins.neon` (viz `doc/product-packages.md` pro historicky zmiňovanou alternativní cestu přes
+  `*.theme.neon.dist` → `theme/config/theme.neon` — v praxi ale i tyhle balíčky používají stejný
+  `config.plugin.neon` + `plugins.neon` mechanismus jako `app/Plugins/`). Namespace je `Theme\Plugins\
+  <Name>\...` (ne `App\Plugins\...`).
+
+**Důležitý důsledek pro "vypnutý plugin a kompilaci kontejneru" (viz `gotchas.md`):** `Nette\Bridges\
+ApplicationDI\ApplicationExtension` (co eagerly validuje `@inject`/autowiring VŠECH nalezených presenterů
+při kompilaci DI kontejneru) skenuje jen `%appDir%` — pevně dané v `Nette\Bootstrap\Configurator`'s
+výchozí registraci té extension, ne konfigurovatelné z `config.neon`. Presentery pod `theme/Plugins/*`
+proto tahle eager validace **nikdy** nenajde a nikdy nevalidiuje, ať je balíček aktivní nebo ne — celá
+třída bugů, co potkala `Sliders`/`DynamicForms` (viz `gotchas.md`), se `theme/Plugins/*` balíčků strukturálně
+netýká. Z toho plyne praktické doporučení: klientsky/projektově specifickou funkcionalitu, kterou budete
+chtít bezpečně zapínat/vypínat bez rizika shození kompilace, umisťujte do `theme/Plugins/`, ne do
+`app/Plugins/` — `app/Plugins/*` zůstává vyhrazené pro OBECNÉ, systémové pluginy, u kterých se
+"vypnuto = 404" řeší jinak (viz routing gating níže) a případný fix kompilace by musel řešit tenhle
+zbylý průnik.
 
 Konvence pro psaní pluginu je v `doc/conventions.md` — nikdy neupravovat soubory jádra přímo (např.
 `HomepagePresenter.php`, `default.latte`), chování se má přepsat z pluginu; frontend assety balíčku do

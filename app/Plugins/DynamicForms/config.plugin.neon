@@ -1,6 +1,14 @@
 extensions:
 	contactForm: App\Plugins\DynamicForms\DI\Extension()
 
+migrations:
+	groups:
+		dynamicForms:
+			enabled: true
+			directory: %appDir%/Plugins/DynamicForms/data/migrations
+			dependencies: [structures]
+			generator: null
+
 services:
 	#Front
 	- App\Plugins\DynamicForms\Forms\ContactFormFactory

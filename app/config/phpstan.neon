@@ -11,6 +11,7 @@ parameters:
 
 	paths:
 		- %currentWorkingDirectory%/app
+		- %currentWorkingDirectory%/theme
 
 	tmpDir:
 		%currentWorkingDirectory%/temp/phpstan

@@ -4,6 +4,13 @@ Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na det
 
 ## 2026-09-16
 
+- **`DynamicForms` blokoval `bin/console` na prázdné DB — eager ACL build v `initialize()`.** Viz
+  [2026-09-16-dynamicforms-eager-acl-cli-fix.md](2026-09-16-dynamicforms-eager-acl-cli-fix.md).
+  `migrations:reset` na čerstvé DB padal na "Table 'roles' doesn't exist", protože
+  `App\Plugins\DynamicForms\DI\Extension::afterCompile()` eagerly stavěl `ContactFormControl` →
+  ... → `security.user` → `authorizator` → `Roles::getListWithName()` v KAŽDÉM bootu kontejneru (web i
+  CLI), ještě před tím, než migrace stihly `roles` tabulku vytvořit. Opraveno guardem na `%consoleMode%`
+  (plugin, ne jádro). Vyžaduje smazat `temp/cache/nette.configurator/Container_*.php*`, aby se projevilo.
 - **`Hotel` plugin (`app/Plugins/Hotel/`): marketplace pro ubytování zvířat, postavený na frontendovém
   self-service místo admin-spravovaného CRUD.** Nahrazuje předchozí verzi (viz záznam níže "Port
   funkcionality Pets/Owners/..." — ten kód byl smazán, ne přesunut, protože vlastnický model byl jinak).
