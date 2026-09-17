@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Forms\CategorySubtype;
 
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 
 /**
  * Interface for form part
@@ -30,10 +31,6 @@ interface ICategoryFormType //extends compone
 	public function setDefaultValuesToFormPart(Form $form, array $values);
 
 
-	/**
-	 *
-	 * @return ArrayHash
-	 */
-	public function onSuccessFormPart(Form $form, array $values, $editId);
+	public function onSuccessFormPart(Form $form, ArrayHash $values, int $editId): ArrayHash;
 
 }

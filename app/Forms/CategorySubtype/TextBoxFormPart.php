@@ -5,6 +5,7 @@ namespace App\Forms\CategorySubtype;
 
 use App\Model;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 
 class TextBoxFormPart implements ICategoryFormType
 {
@@ -43,7 +44,7 @@ class TextBoxFormPart implements ICategoryFormType
 	}
 
 
-	public function onSuccessFormPart(Form $form, $values, $editId)
+	public function onSuccessFormPart(Form $form, ArrayHash $values, int $editId): ArrayHash
 	{
 		$translationContainer = $values->translation;
 

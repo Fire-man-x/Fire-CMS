@@ -114,7 +114,7 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	public function formatLayoutTemplateFiles(): array
 	{
 		list($module, $presenter) = Helpers::splitName($this->getName());
-		$layout = $this->layout ?: 'layout';
+		$layout = $this->getLayout() ?: 'layout';
 		$dir = dirname($this->getReflection()->getFileName());
 		$dir = is_dir($this->getThemePath()) ? $dir : dirname($dir);
 		$list = [

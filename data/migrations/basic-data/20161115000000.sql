@@ -21,7 +21,9 @@ INSERT INTO `firecms_options` (`key`, `value`) VALUES
 	('main_title',	'FIre CMS / FrontEnd - Testovací stránka'),
 	('seo_description',	'Seo popis'),
 	('seo_keywords',	'Seo klíčová slova'),
-	('seo_title',	'');
+	('seo_title',	''),
+	('main_email',	'info@example.com'),
+	('themePath',	'sdh');
 
 INSERT INTO `firecms_roles` (`role_id`, `parent_id`, `default`, `position`, `name`, `title`) VALUES
 	(1,	NULL,	1,	1,	'admin',	'Administrátor'),

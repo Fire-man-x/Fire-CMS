@@ -6,6 +6,7 @@ namespace App\Forms\CategorySubtype;
 use App\Model;
 use Nette\Application\UI\Form;
 use Nette\Localization\Translator;
+use Nette\Utils\ArrayHash;
 
 class CategoryLinkFormPart implements ICategoryFormType
 {
@@ -63,7 +64,7 @@ class CategoryLinkFormPart implements ICategoryFormType
 	}
 
 
-	public function onSuccessFormPart(Form $form, $values, $editId)
+	public function onSuccessFormPart(Form $form, ArrayHash $values, int $editId): ArrayHash
 	{
 		$values->translation->url = $values->translation->link_to_category_id;
 		unset($values->translation->link_to_category_id);

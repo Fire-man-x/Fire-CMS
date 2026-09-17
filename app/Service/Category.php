@@ -38,10 +38,10 @@ class Category
 		//last right
 		$rightQuery = $this->categoriesModel->getAllForMenu();
 		if($hasParent){
-			$rightQuery->select("categories.category_right AS max_right");
+			$rightQuery->select($this->categoriesModel->getTableName().".category_right AS max_right");
 			$rightQuery->where("category_id", $values["parent_id"]);
 		}else{
-			$rightQuery->select("IFNULL(MAX(categories.category_right), 0) AS max_right");
+			$rightQuery->select("IFNULL(MAX(".$this->categoriesModel->getTableName().".category_right), 0) AS max_right");
 		}
 		$right = $rightQuery->fetchField();
 		if ($hasParent) {
@@ -159,7 +159,7 @@ class Category
 		//description
 		$allWithTranslations = $this->categoriesModel->getTranslationTable()
 			->select(Model\Categories::TRANSLATION_TABLE_NAME.".*")
-			->where("category_descriptions.category_id", $id)
+			->where(Model\Categories::TRANSLATION_TABLE_NAME.".category_id", $id)
 			->fetchAll();
 		foreach ($allWithTranslations as $allWithTranslation){
 			$translation = ArrayHash::from($allWithTranslation->toArray());

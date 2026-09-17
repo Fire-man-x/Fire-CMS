@@ -260,7 +260,7 @@ class CategoryFormFactory extends BaseFormFactory
 		//updating
 		if ($this->isEditMode()) {
 			//make backup and update
-			$this->categoryService->update($this->getEditId(), $values, $this->language, $translationContainer);
+			$this->categoryService->update($this->getEditId(), (array) $values, $this->language, $translationContainer);
 
 			//url
 			if($url)

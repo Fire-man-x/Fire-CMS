@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Forms\CategorySubtype;
 
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 
 class UrlFormPart implements ICategoryFormType
 {
@@ -33,7 +34,7 @@ class UrlFormPart implements ICategoryFormType
 	}
 
 
-	public function onSuccessFormPart(Form $form, $values, $editId)
+	public function onSuccessFormPart(Form $form, ArrayHash $values, int $editId): ArrayHash
 	{
 		return $values;
 	}

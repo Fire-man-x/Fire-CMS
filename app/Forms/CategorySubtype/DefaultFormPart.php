@@ -5,6 +5,7 @@ namespace App\Forms\CategorySubtype;
 
 use App\Modules\UrlModule\UrlManager;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 
 class DefaultFormPart implements ICategoryFormType
 {
@@ -60,7 +61,7 @@ class DefaultFormPart implements ICategoryFormType
 	}
 
 
-	public function onSuccessFormPart(Form $form, $values, $editId)
+	public function onSuccessFormPart(Form $form, ArrayHash $values, int $editId): ArrayHash
 	{
 		$translationContainer = $values->translation;
 
