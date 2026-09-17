@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace App\Components\FileManager\Storages;
 
-use App\Components\FileManager\Files\IFile;
-use App\Components\FileManager\Macro\IRequest;
+use App\Components\FileManager\Files\File;
+use App\Components\FileManager\Request\Request;
+use Nette\Application\Responses\FileResponse;
 use Nette\Http\FileUpload;
-use Nette\Http\Response;
 use Nette\Utils\Image;
 
 /**
@@ -18,56 +18,38 @@ interface IStorage
 
 	/**
 	 * Returns true if the storage contains the given image.
-	 *
-	 * @param IFile $file
-	 * @return boolean
 	 */
-	public function exist(IFile $file);
+	public function exist(File $file): bool;
 
 
 	/**
 	 * Returns the requested image encapsulated in a HTTP response object.
-	 *
-	 * @param  IRequest $request
-	 * @return Response
 	 */
-	public function download(IRequest $request);
+	public function download(Request $request): FileResponse;
 
 
 	/**
 	 * Creates the URL of the requested image thumbnail.
-	 *
-	 * @param  IRequest $request
-	 * @return string
 	 */
-	public function link(IRequest $request);
+	public function link(Request $request): string;
 
 
 	/**
 	 * Fetches the original stored image.
-	 *
-	 * @param IFile $file
-	 * @return Image
 	 */
-	public function original(IFile $file);
+	public function original(File $file): Image;
 
 
 	/**
 	 * Removes the requested image from the storage.
-	 *
-	 * @param IFile $file
-	 * @return void
 	 */
-	public function remove(IFile $file);
+	public function remove(File $file): void;
 
 
 	/**
 	 * Uploads an image to the storage and store it's meta information in the given image entity.
-	 *
-	 * @param FileUpload $upload
-	 * @return IFile
 	 */
-	public function upload(FileUpload $upload, array $settings = array());
+	public function upload(FileUpload $upload, array $settings = array()): File;
 
 
 }

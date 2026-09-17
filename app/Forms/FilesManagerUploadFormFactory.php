@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Forms;
 
+use App\Components\FileManager\Files\HashFile;
 use App\Components\FileManager\Files\HashImageEntity;
-use App\Components\FileManager\Files\IFile;
 use App\Model;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
@@ -50,11 +50,11 @@ class FilesManagerUploadFormFactory extends BaseFormFactory
 	}
 
 
-	public function formSucceeded(Form $form, $values)
+	public function formSucceeded(Form $form, ArrayHash $values)
 	{
 		if ($values->files) {
 			\Tracy\Debugger::timer("p");
-			/** @var IFile $file */
+			/** @var HashFile $file */
 			foreach ($values->files as $file) {
 				/*if($file->isOk()) {
 					$file = $this->multiFileUploadModel->save($file, array());

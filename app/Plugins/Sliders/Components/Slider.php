@@ -74,7 +74,6 @@ class Slider extends BaseControl
 			->order("position")
 			->fetchAll();
 		foreach ($sliderItems as &$item){
-			$item = \Nette\Utils\ArrayHash::from($item->toArray());
 			$item->file = $this->modelFiles->toFileEntity($item);
 		}
 

@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace App\Components;
 
-use App\Components\FileManager\Macro\ImageRequest;
+use App\Components\FileManager\Files\HashImageEntity;
+use App\Components\FileManager\Request\ImageRequest;
 use App\Model\Files;
+use App\Model\RecordNotFoundException;
 use BadFunctionCallException;
 use Nette\Application\LinkGenerator;
 use Nette\Application\UI\ITemplate;
@@ -108,12 +110,18 @@ class Shortcodes
 	/**
 	 * Image shortcode
 	 */
-	private function shortcodeImage($params)
+	private function shortcodeImage(array $params): string
 	{
 		$file_id = $params[0];
 		$file = $this->filesModel->getById($file_id);
+		if(!$file){
+			throw new RecordNotFoundException();
+		}
 
 		$fileEntity = $this->filesModel->toFileEntity($file);
+		if(!$fileEntity instanceof HashImageEntity){
+			throw new \LogicException("File is not HashImageEntity");
+		}
 		$imageRequest = ImageRequest::fromMacro($fileEntity, array($params[1]));
 
 		return '<img src="' . $this->fileManager->link($imageRequest) . '">';

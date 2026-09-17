@@ -6,7 +6,7 @@ namespace App\AdminModule\Presenters;
 use AlesWita\Components\VisualPaginator;
 use App\Components\FileManager\Files\HashFileEntity;
 use App\Components\FileManager\Files\HashImageEntity;
-use App\Components\FileManager\Macro\ImageRequest;
+use App\Components\FileManager\Request\ImageRequest;
 use App\Components\FileManager\Storages\HashFileStorage;
 use App\Forms\CategoryFormFactory;
 use App\Forms\FilesManagerFileNameFormFactory;

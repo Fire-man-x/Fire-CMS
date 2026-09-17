@@ -6,12 +6,16 @@ namespace App\Components\FileManager\Files;
 
 use App\Components\FileManager\Exceptions\ImageTypeException;
 use Nette\Utils\Image;
+use Nette\Utils\ImageType;
 
 /**
  * Basic implementation of the image meta information as Doctrine entity.
  */
-class ImageEntity extends FileEntity
+class ImageEntity implements File
 {
+	use BaseEntityTrait {
+		setMimeType as traitSetMimeType;
+	}
 
 	private int $width;
 
@@ -19,20 +23,18 @@ class ImageEntity extends FileEntity
 
 	/**
 	 * The image type -> MIME type map
-	 *
+	 * @var array<int,string>
 	 */
 	protected array $mimeTypes = array(Image::JPEG => 'image/jpeg', Image::PNG => 'image/png', Image::GIF => 'image/gif');
 
+
 	/**
-	 * The image type -> file extension map
-	 *
+	 * @throws ImageTypeException
 	 */
-	private array $mimeTypesTranslator = array('image/jpeg' => Image::JPEG, 'image/png' => Image::PNG, 'image/gif' => Image::GIF);
-
-
 	public function setMimeType(string $mimeType): void
 	{
-		parent::setMimeType($this->checkMimeType($mimeType));
+		$this->checkMimeType($mimeType);
+		$this->traitSetMimeType($mimeType);
 	}
 
 
@@ -41,19 +43,22 @@ class ImageEntity extends FileEntity
 	 *
 	 * @throws ImageTypeException
 	 */
-	protected function checkMimeType(string $mimeType): string
+	protected function checkMimeType(string $mimeType): void
 	{
-		if (!in_array($mimeType, $this->mimeTypes, true)) {
+		$mimeType = str_replace("image/", "", $mimeType);
+		$type = Image::extensionToType($mimeType);
+		if(!Image::isTypeSupported($type)){
 			throw new ImageTypeException((int) $mimeType);
 		}
-
-		return $mimeType;
 	}
 
-
+	/**
+	 * @return ImageType::*
+	 */
 	public function getTranslatedMimeType(): int
 	{
-		return $this->mimeTypesTranslator[parent::getMimeType()];
+		$mimeType = str_replace("image/", "", $this->getMimeType());
+		return Image::extensionToType($mimeType);
 	}
 
 

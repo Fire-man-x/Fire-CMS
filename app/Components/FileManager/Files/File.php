@@ -7,7 +7,7 @@ namespace App\Components\FileManager\Files;
 /**
  * File meta information interface
  */
-interface IFile
+interface File
 {
 	/**
 	 * Returns the file name.

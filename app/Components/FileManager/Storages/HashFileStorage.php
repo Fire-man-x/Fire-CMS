@@ -8,15 +8,16 @@ use App\Components\FileManager\Exceptions\UploaderException;
 use App\Components\FileManager\Files\Directory;
 use App\Components\FileManager\Files\HashFileEntity;
 use App\Components\FileManager\Files\HashImageEntity;
-use App\Components\FileManager\Files\IFile;
-use App\Components\FileManager\Files\IHashFile;
-use App\Components\FileManager\Macro\ImageRequest;
-use App\Components\FileManager\Macro\IRequest;
+use App\Components\FileManager\Files\File;
+use App\Components\FileManager\Files\HashFile;
+use App\Components\FileManager\Request\FileRequest;
+use App\Components\FileManager\Request\ImageRequest;
+use App\Components\FileManager\Request\Request;
 use Nette\Http\FileUpload;
-use Nette\Http\Request;
 use Nette\SmartObject;
 use Nette\Utils\Finder;
 use Nette\Utils\Image;
+use Nette\Utils\ImageException;
 
 /**
  * Image file storage
@@ -34,67 +35,63 @@ class HashFileStorage extends FileStorage
 {
 	use SmartObject;
 
-	private Request $httpRequest;
-
 
 	/**
 	 * Constructs the image file storage from the given arguments.
-	 *
-	 * @param string $directory The directory to store the images in
-	 * @param string $cacheDirectory
-	 * @param string $baseUrl
-	 * @param boolean $tryCreateDirectories
-	 * @param Request $request
 	 */
-	public function __construct($directory = "", $cacheDirectory = '', $baseUrl = '/cache/', $tryCreateDirectories = true, Request $request = null){
+	public function __construct(string $directory = "", string $cacheDirectory = '', string $baseUrl = '/cache/', bool $tryCreateDirectories = true, private ?\Nette\Http\Request $httpRequest = null){
 		parent::__construct($directory, $cacheDirectory, $baseUrl, $tryCreateDirectories);
-
-		$this->httpRequest = $request;
 	}
 
 
 	/**
 	 * Returns the URL of the cached version of the image.
-	 *
-	 * @param IRequest $request The image request
-	 * @return string  The URL of the image
+	 * @throws ImageException
 	 */
-	public function link(IRequest $request){
-		$this->createCacheImage($request);
-		$hash = $request->getFile()->getHash();
-		$fileName = $this->getCacheFileName($request);
+	public function link(Request $request): string
+	{
+		if($request instanceof ImageRequest) {
+			$this->createCacheImage($request);
+			$fileName = $this->getCacheFileName($request);
+			$hash = $request->getFile()->getHash();
 
-		$append = '';
-		if($this->httpRequest->isAjax()) {
-			$append = '?v=' . date('Gis');
+			$append = '';
+			if($this->httpRequest->isAjax()) {
+				$append = '?v=' . date('Gis');
+			}
+
+			return $this->getBaseUrl() . "$hash[0]/$hash[1]/" . $fileName . $append;
+		} elseif($request instanceof FileRequest) {
+			return parent::link($request);
+		} else {
+			throw new \InvalidArgumentException("Request is not correct instance of IRequest");
 		}
-
-		return $this->getBaseUrl() . "$hash[0]/$hash[1]/" . $fileName . $append;
 	}
 
 
 	/**
 	 * Removes the image from the storage by the given image file information.
-	 *
-	 * @param IFile $file The image information
-	 * @return HashFileStorage Fluent interface
 	 */
-	public function remove(IFile $file){
+	public function remove(File|HashFile $file): void
+	{
+		if(!$file instanceof HashFile){
+			throw new \LogicException('File is not instance of IHashFile');
+		}
+
 		$this->removeCache($file);
 
 		@unlink($this->getOriginalFilePathWithFileName($file));
-
-		return $this;
 	}
 
 
 	/**
 	 * Removes the image from the storage by the given image file information.
-	 *
-	 * @param IFile $file The image information
-	 * @return HashFileStorage Fluent interface
 	 */
-	public function removeCache(IFile $file){
+	public function removeCache(File|HashFile $file): void
+	{
+		if(!$file instanceof HashFile){
+			throw new \LogicException('File is not instance of IHashFile');
+		}
 		$directory = str_replace($file->getHash(), "", $this->getCacheFilePath($file->getHash()));
 		$findedFiles = Finder::findFiles($file->getHash() . "*")->in($this->cacheDirectory . "/" . $directory);
 		try{
@@ -106,25 +103,19 @@ class HashFileStorage extends FileStorage
 		catch(\Exception $e){
 
 		}
-
-		return $this;
 	}
 
 
 	/**
 	 * Stores the given uploaded file.
-	 *
-	 * @param FileUpload $upload
-	 * @return IFile File
-	 * @throws UploaderException
 	 */
-	public function upload(FileUpload $upload, array $settings = array()){
+	public function upload(FileUpload $upload, array $settings = array()): HashImageEntity
+	{
 		if($upload->getError()) {
 			throw new UploaderException($upload->getError());
 		}
 		$source = $upload->getTemporaryFile();
 
-		$file = null;
 		if($upload->isImage()) {
 			$file = new HashImageEntity();
 
@@ -179,11 +170,12 @@ class HashFileStorage extends FileStorage
 	 * Some special images like the "Image Not Available" image are stored
 	 * in directories prefixed with an underscore. Those directories are not
 	 * fragmented to hash based structure.
-	 *
-	 * @param IFile|IHashFile $file The image file information
-	 * @return string
 	 */
-	protected function getOriginalFilePath(IFile $file){
+	protected function getOriginalFilePath(File|HashFile $file): string
+	{
+		if(!$file instanceof HashFile){
+			throw new \LogicException('File is not instance of IHashFile');
+		}
 		$hash = $file->getHash();
 		$path = $this->directory . '/' . "$hash[0]/$hash[1]";
 		new Directory($path);
@@ -194,12 +186,10 @@ class HashFileStorage extends FileStorage
 
 	/**
 	 * Returns the part of the image filename relative to the cache directory.
-	 *
-	 * @param ImageRequest $imageRequest The image request
-	 * @return string
 	 */
-	protected function getCacheFilePathWithFileName(ImageRequest $imageRequest){
-		return $this->getCacheFilePath($imageRequest->getFile()->getHash()) . "/" . $this->getCacheFileName($imageRequest);
+	protected function getCacheFilePathWithFileName(ImageRequest $imageRequest): string
+	{
+		return $this->getCacheFilePath($imageRequest) . "/" . $this->getCacheFileName($imageRequest);
 	}
 
 
@@ -209,22 +199,19 @@ class HashFileStorage extends FileStorage
 	 * Some special images like the "Image Not Available" image are stored
 	 * in directories prefixed with an underscore. Those directories are not
 	 * fragmented to hash based structure.
-	 *
-	 * @param string $hash Tha SHA1 hash
-	 * @return string
 	 */
-	protected function getCacheFilePath($hash){
+	protected function getCacheFilePath(ImageRequest $imageRequest): string{
+		$hash = $imageRequest->getFile()->getHash();
 		return "$this->cacheDirectory/$hash[0]/$hash[1]";
 	}
 
 
 	/**
 	 * Returns the file name of the cached version of the image.
-	 *
-	 * @param ImageRequest $imageRequest
 	 * @return string The file name of the cached version of the image
 	 */
-	protected function getCacheFileName(ImageRequest $imageRequest){
+	protected function getCacheFileName(ImageRequest $imageRequest): string
+	{
 		$dimensions = $imageRequest->getDimensions();
 		$flags = $imageRequest->getFlags();
 		$crop = (int)$imageRequest->getCrop();
@@ -242,7 +229,8 @@ class HashFileStorage extends FileStorage
 	 * @param string $filename The file to compute the hash from
 	 * @return string The SHA1 hash of a file
 	 */
-	private function hash($filename){
+	private function hash(string $filename): string
+	{
 		return sha1_file($filename);
 	}
 

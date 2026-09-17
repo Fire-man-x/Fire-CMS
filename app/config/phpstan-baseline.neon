@@ -79,8 +79,8 @@ parameters:
 			path: ../AdminModule/Presenters/FilesManagerPresenter.php
 
 		-
-			message: '#^Property App\\AdminModule\\Presenters\\FilesManagerPresenter\:\:\$parent is never written, only read\.$#'
-			identifier: property.onlyRead
+			message: '#^Property App\\AdminModule\\Presenters\\FilesManagerPresenter\:\:\$parent \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
 			count: 1
 			path: ../AdminModule/Presenters/FilesManagerPresenter.php
 
@@ -181,78 +181,6 @@ parameters:
 			path: ../Components/FileManager/DI/Extension.php
 
 		-
-			message: '#^Parameter \#2 \$code of method Exception\:\:__construct\(\) expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Components/FileManager/Exceptions/UploaderException.php
-
-		-
-			message: '#^Call to an undefined method App\\Components\\FileManager\\Storages\\IStorage\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../Components/FileManager/FileManager.php
-
-		-
-			message: '#^Method App\\Components\\FileManager\\Files\\EmptyHashImage\:\:getMimeType\(\) should return string but returns int\.$#'
-			identifier: return.type
-			count: 1
-			path: ../Components/FileManager/Files/EmptyHashImage.php
-
-		-
-			message: '#^Parameter \#1 \$mimeType \(int\) of method App\\Components\\FileManager\\Files\\FileEntity\:\:setMimeType\(\) should be compatible with parameter \$mimeType \(string\) of method App\\Components\\FileManager\\Files\\IFile\:\:setMimeType\(\)$#'
-			identifier: method.childParameterType
-			count: 1
-			path: ../Components/FileManager/Files/FileEntity.php
-
-		-
-			message: '#^Property App\\Components\\FileManager\\Files\\FileEntity\:\:\$mimeType \(string\) does not accept int\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../Components/FileManager/Files/FileEntity.php
-
-		-
-			message: '#^Parameter \#1 \$id \(int\) of method App\\Components\\FileManager\\Files\\HashFileEntity\:\:setId\(\) should be compatible with parameter \$id \(string\) of method App\\Components\\FileManager\\Files\\IHashFile\:\:setId\(\)$#'
-			identifier: method.childParameterType
-			count: 1
-			path: ../Components/FileManager/Files/HashFileEntity.php
-
-		-
-			message: '#^Parameter \#1 \$id \(int\) of method App\\Components\\FileManager\\Files\\HashImageEntity\:\:setId\(\) should be compatible with parameter \$id \(string\) of method App\\Components\\FileManager\\Files\\IHashFile\:\:setId\(\)$#'
-			identifier: method.childParameterType
-			count: 1
-			path: ../Components/FileManager/Files/HashImageEntity.php
-
-		-
-			message: '#^Parameter \#1 \$mimeType \(string\) of method App\\Components\\FileManager\\Files\\ImageEntity\:\:setMimeType\(\) should be compatible with parameter \$mimeType \(int\) of method App\\Components\\FileManager\\Files\\FileEntity\:\:setMimeType\(\)$#'
-			identifier: method.childParameterType
-			count: 1
-			path: ../Components/FileManager/Files/ImageEntity.php
-
-		-
-			message: '#^Parameter \#1 \$mimeType of method App\\Components\\FileManager\\Files\\FileEntity\:\:setMimeType\(\) expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Components/FileManager/Files/ImageEntity.php
-
-		-
-			message: '#^Parameter \#1 \$type of class App\\Components\\FileManager\\Exceptions\\ImageTypeException constructor expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Components/FileManager/Files/ImageEntity.php
-
-		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$args$#'
-			identifier: parameter.notFound
-			count: 1
-			path: ../Components/FileManager/Macro/FileRequest.php
-
-		-
-			message: '#^Property App\\Components\\FileManager\\Macro\\ImageRequest\:\:\$dimensions \(string\) does not accept int\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../Components/FileManager/Macro/ImageRequest.php
-
-		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 1
@@ -277,42 +205,6 @@ parameters:
 			path: ../Components/FileManager/Macro/Nodes/SrcNode.php
 
 		-
-			message: '#^Access to an undefined property App\\Components\\FileManager\\Macro\\ImageRequest\:\:\$getfile\.$#'
-			identifier: property.notFound
-			count: 1
-			path: ../Components/FileManager/Storages/FileStorage.php
-
-		-
-			message: '#^Call to an undefined method App\\Components\\FileManager\\Files\\IFile\:\:getHash\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: ../Components/FileManager/Storages/FileStorage.php
-
-		-
-			message: '#^Call to an undefined method App\\Components\\FileManager\\Files\\IFile\:\:getHeight\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../Components/FileManager/Storages/FileStorage.php
-
-		-
-			message: '#^Call to an undefined method App\\Components\\FileManager\\Files\\IFile\:\:getTranslatedMimeType\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../Components/FileManager/Storages/FileStorage.php
-
-		-
-			message: '#^Call to an undefined method App\\Components\\FileManager\\Files\\IFile\:\:getWidth\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../Components/FileManager/Storages/FileStorage.php
-
-		-
-			message: '#^Call to an undefined method App\\Components\\FileManager\\Macro\\ImageRequest\:\:getName\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../Components/FileManager/Storages/FileStorage.php
-
-		-
 			message: '#^Call to an undefined method App\\Components\\FileManager\\Storages\\FileStorage\:\:createCacheDirectoryPath\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -331,38 +223,8 @@ parameters:
 			path: ../Components/FileManager/Storages/FileStorage.php
 
 		-
-			message: '#^Return type \(Nette\\Application\\Responses\\FileResponse\) of method App\\Components\\FileManager\\Storages\\FileStorage\:\:download\(\) should be compatible with return type \(Nette\\Http\\Response\) of method App\\Components\\FileManager\\Storages\\IStorage\:\:download\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: ../Components/FileManager/Storages/FileStorage.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between string and 0 will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 3
-			path: ../Components/FileManager/Storages/FileStorage.php
-
-		-
-			message: '#^Undefined variable\: \$image$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../Components/FileManager/Storages/FileStorage.php
-
-		-
-			message: '#^Call to an undefined method App\\Components\\FileManager\\Files\\IFile\:\:getHash\(\)\.$#'
-			identifier: method.notFound
-			count: 7
-			path: ../Components/FileManager/Storages/HashFileStorage.php
-
-		-
 			message: '#^PHPDoc tag @var above a class has no effect\.$#'
 			identifier: varTag.misplaced
-			count: 1
-			path: ../Components/FileManager/Storages/HashFileStorage.php
-
-		-
-			message: '#^Parameter \#1 \$code of class App\\Components\\FileManager\\Exceptions\\UploaderException constructor expects string, int\<min, \-1\>\|int\<1, max\> given\.$#'
-			identifier: argument.type
 			count: 1
 			path: ../Components/FileManager/Storages/HashFileStorage.php
 
@@ -373,19 +235,7 @@ parameters:
 			path: ../Components/FileManager/Storages/HashFileStorage.php
 
 		-
-			message: '#^Parameter \#1 \$hash \(string\) of method App\\Components\\FileManager\\Storages\\HashFileStorage\:\:getCacheFilePath\(\) should be compatible with parameter \$imageRequest \(App\\Components\\FileManager\\Macro\\ImageRequest\) of method App\\Components\\FileManager\\Storages\\FileStorage\:\:getCacheFilePath\(\)$#'
-			identifier: method.childParameterType
-			count: 1
-			path: ../Components/FileManager/Storages/HashFileStorage.php
-
-		-
-			message: '#^Parameter \#1 \$imageRequest of method App\\Components\\FileManager\\Storages\\HashFileStorage\:\:getCacheFileName\(\) expects App\\Components\\FileManager\\Macro\\ImageRequest, App\\Components\\FileManager\\Macro\\IRequest given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Components/FileManager/Storages/HashFileStorage.php
-
-		-
-			message: '#^Parameter \#1 \$request of method App\\Components\\FileManager\\Storages\\FileStorage\:\:createCacheImage\(\) expects App\\Components\\FileManager\\Macro\\ImageRequest, App\\Components\\FileManager\\Macro\\IRequest given\.$#'
+			message: '#^Parameter \#1 \$imageRequest of method App\\Components\\FileManager\\Storages\\HashFileStorage\:\:getCacheFilePath\(\) expects App\\Components\\FileManager\\Request\\ImageRequest, string given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../Components/FileManager/Storages/HashFileStorage.php
@@ -817,12 +667,6 @@ parameters:
 			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
 
 		-
-			message: '#^Strict comparison using \!\=\= between Nette\\Http\\Session and null will always evaluate to true\.$#'
-			identifier: notIdentical.alwaysTrue
-			count: 2
-			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
-
-		-
 			message: '#^Strict comparison using \!\=\= between array and null will always evaluate to true\.$#'
 			identifier: notIdentical.alwaysTrue
 			count: 1
@@ -831,12 +675,6 @@ parameters:
 		-
 			message: '#^Strict comparison using \!\=\= between string and null will always evaluate to true\.$#'
 			identifier: notIdentical.alwaysTrue
-			count: 1
-			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between Nette\\Utils\\Paginator and null will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
 			count: 1
 			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
 
@@ -1005,12 +843,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method Nette\\Application\\UI\\Form\:\:addTagInput\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: ../Forms/ArticleFormFactory.php
-
-		-
-			message: '#^Property App\\Forms\\ArticleFormFactory\:\:\$languages is never read, only written\.$#'
-			identifier: property.onlyWritten
 			count: 1
 			path: ../Forms/ArticleFormFactory.php
 
@@ -1213,38 +1045,14 @@ parameters:
 			path: ../Forms/FilesManagerFileNameFormFactory.php
 
 		-
-			message: '#^Property App\\Forms\\FilesManagerFileNameFormFactory\:\:\$languages is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../Forms/FilesManagerFileNameFormFactory.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: ../Forms/FilesManagerFileNameFormFactory.php
-
-		-
 			message: '#^Access to an undefined property Nette\\Application\\UI\\Presenter\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1
 			path: ../Forms/FilesManagerFolderFormFactory.php
 
 		-
-			message: '#^Property App\\Forms\\FilesManagerFolderFormFactory\:\:\$fileManager has unknown class ondrs\\UploadManager\\Managers\\ImageManager as its type\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Forms/FilesManagerFolderFormFactory.php
-
-		-
 			message: '#^Access to an undefined property Nette\\Application\\UI\\Presenter\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 1
-			path: ../Forms/FilesManagerUploadFormFactory.php
-
-		-
-			message: '#^Call to an undefined method App\\Components\\FileManager\\Files\\IFile\:\:getHash\(\)\.$#'
-			identifier: method.notFound
 			count: 1
 			path: ../Forms/FilesManagerUploadFormFactory.php
 
@@ -1399,12 +1207,6 @@ parameters:
 			path: ../Forms/UserFormFactory.php
 
 		-
-			message: '#^Parameter \#2 \$data of method App\\Model\\BaseModel\:\:update\(\) expects array, Nette\\Utils\\ArrayHash given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Forms/UserFormFactory.php
-
-		-
 			message: '#^Property App\\FrontModule\\Components\\Articles\\Articles\:\:\$articles is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
@@ -1461,18 +1263,6 @@ parameters:
 		-
 			message: '#^Call to static method fromFile\(\) on an unknown class App\\Components\\FileManager\\Requests\\FileRequest\.$#'
 			identifier: class.notFound
-			count: 1
-			path: ../FrontModule/Presenters/FilesPresenter.php
-
-		-
-			message: '#^Instantiated class App\\Components\\FileManager\\Requests\\ImageRequest not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../FrontModule/Presenters/FilesPresenter.php
-
-		-
-			message: '#^Parameter \#1 \$request of method App\\Components\\FileManager\\FileManager\:\:fetch\(\) expects App\\Components\\FileManager\\Macro\\IRequest, App\\Components\\FileManager\\Requests\\ImageRequest given\.$#'
-			identifier: argument.type
 			count: 1
 			path: ../FrontModule/Presenters/FilesPresenter.php
 
@@ -1607,24 +1397,6 @@ parameters:
 			identifier: variable.undefined
 			count: 1
 			path: ../Model/Categories.php
-
-		-
-			message: '#^Class App\\Components\\FileManager\\Files\\HashFileEntity referenced with incorrect case\: App\\Components\\Filemanager\\Files\\HashFileEntity\.$#'
-			identifier: class.nameCase
-			count: 2
-			path: ../Model/Files.php
-
-		-
-			message: '#^Class App\\Components\\FileManager\\Files\\HashImageEntity referenced with incorrect case\: App\\Components\\Filemanager\\Files\\HashImageEntity\.$#'
-			identifier: class.nameCase
-			count: 2
-			path: ../Model/Files.php
-
-		-
-			message: '#^Interface App\\Components\\FileManager\\Files\\IFile referenced with incorrect case\: App\\Components\\Filemanager\\Files\\IFile\.$#'
-			identifier: interface.nameCase
-			count: 2
-			path: ../Model/Files.php
 
 		-
 			message: '#^Parameter \#1 \$hash of method App\\Model\\Files\:\:findByHash\(\) expects string, int given\.$#'
@@ -1901,12 +1673,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: ../Plugins/DynamicForms/Forms/DynamicFormFormFactory.php
-
-		-
-			message: '#^Parameter \#1 \$file of method App\\Model\\Files\:\:toFileEntity\(\) expects array\|Nette\\Database\\Table\\ActiveRow, Nette\\Utils\\ArrayHash given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Plugins/Sliders/Components/Slider.php
 
 		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'

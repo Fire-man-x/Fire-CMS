@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace App\Components\FileManager;
 
 use App\Components\FileManager\Exceptions\UploaderException;
-use App\Components\FileManager\Files\IFile;
-use App\Components\FileManager\Macro\IRequest;
+use App\Components\FileManager\Files\File;
+use App\Components\FileManager\Request\Request;
 use App\Components\FileManager\Storages\IStorage;
 use Nette\Application\Responses\FileResponse;
 use Nette\Http\FileUpload;
@@ -29,14 +29,12 @@ class FileManager
 
 	/**
 	 * The public accessible URL of the cache directory
-	 *
 	 */
 	private IStorage $storage;
 
 
 	/**
 	 * Constructs the file manager from the given arguments.
-	 *
 	 */
 	public function __construct(IStorage $storage)
 	{
@@ -56,7 +54,7 @@ class FileManager
 	/**
 	 * File storage setter
 	 */
-	public function setStorage(IStorage $storage)
+	public function setStorage(IStorage $storage): void
 	{
 		$this->storage = $storage;
 	}
@@ -64,9 +62,8 @@ class FileManager
 
 	/**
 	 * Fetches the original image by the given image meta information.
-	 *
 	 */
-	public function original(IFile $file): Image
+	public function original(File $file): Image
 	{
 		return $this->storage->original($file);
 	}
@@ -74,9 +71,8 @@ class FileManager
 
 	/**
 	 * Removes the image from the storage by the given image meta information.
-	 *
 	 */
-	public function remove(IFile $file): FileManager
+	public function remove(File $file): FileManager
 	{
 		$this->storage->remove($file);
 
@@ -86,9 +82,8 @@ class FileManager
 
 	/**
 	 * Checks if an image of the given meta information is stored in the storage.
-	 *
 	 */
-	public function exist(IFile $file): bool
+	public function exist(File $file): bool
 	{
 		return $this->storage->exist($file);
 	}
@@ -99,7 +94,7 @@ class FileManager
 	 *
 	 * @throws UploaderException
 	 */
-	public function upload(FileUpload $upload, array $settings = array()): IFile
+	public function upload(FileUpload $upload, array $settings = array()): File
 	{
 		return $this->storage->upload($upload, $settings);
 	}
@@ -107,9 +102,8 @@ class FileManager
 
 	/**
 	 * Returns the URL of the cached version of the image.
-	 *
 	 */
-	public function link(IRequest $request): string
+	public function link(Request $request): string
 	{
 		return $this->storage->link($request);
 	}
@@ -117,9 +111,8 @@ class FileManager
 
 	/**
 	 * Creates the file download HTTP response which can be easily sent using the `send()` method.
-	 *
 	 */
-	public function download(IRequest $request): Response|FileResponse
+	public function download(Request $request): Response|FileResponse
 	{
 		return $this->storage->download($request);
 	}
@@ -127,11 +120,11 @@ class FileManager
 
 	/**
 	 * Creates the file download HTTP response which can be easily sent using the `send()` method.
-	 *
 	 */
-	public function fetch(IRequest $request): Image
+	public function fetch(Request $request): Image
 	{
-		return $this->storage->fetch($request);
+		throw new \LogicException('Unimplemented yet');
+		//return $this->storage->original($request);
 	}
 
 }

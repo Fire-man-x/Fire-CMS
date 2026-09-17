@@ -1,18 +1,18 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Components\FileManager\Macro;
+namespace App\Components\FileManager\Request;
 
 
-use App\Components\FileManager\Files\IFile;
-use App\Components\FileManager\Files\ImageEntity;
+use App\Components\FileManager\Files\File;
+use App\Components\FileManager\Files\HashImageEntity;
 use Nette\SmartObject;
 use Nette\Utils\Image;
 
 /**
  * Image request encapsulation
  */
-class ImageRequest implements IRequest
+class ImageRequest implements Request
 {
 	use SmartObject;
 
@@ -20,7 +20,7 @@ class ImageRequest implements IRequest
 	 * The requested image file information.
 	 *
 	 */
-	private ImageEntity $file;
+	private HashImageEntity $file;
 
 	/**
 	 * The requested image thumbnail dimensions
@@ -43,17 +43,13 @@ class ImageRequest implements IRequest
 
 	/**
 	 * Constructs the image request from the given file information, requested dimensions and flags.
-	 *
-	 * @param integer $dimensions
-	 * @param integer $flags
-	 * @param boolean $crop
 	 */
-	public function __construct(ImageEntity $file, $dimensions = IRequest::ORIGINAL, $flags = IRequest::ORIGINAL, $crop = false)
+	public function __construct(HashImageEntity $file, string $dimensions = Request::ORIGINAL, int $flags = 0, bool $crop = false)
 	{
-		if((string)intval($dimensions) == $dimensions && intval($dimensions) === IRequest::ORIGINAL)
+		/*if((string)intval($dimensions) == $dimensions && intval($dimensions) === IRequest::ORIGINAL)
 		{
 			$dimensions = IRequest::ORIGINAL;
-		}
+		}*/
 
 		$this->file = $file;
 		$this->dimensions = $dimensions;
@@ -67,10 +63,10 @@ class ImageRequest implements IRequest
 	 *
 	 * @return ImageRequest
 	 */
-	public static function crop(ImageEntity $image = null, array $args = array())
+	public static function crop(HashImageEntity $image = null, array $args = array())
 	{
-		$dimensions = isset($args[0]) ? $args[0] : IRequest::ORIGINAL;
-		$flags = Image::FIT;
+		$dimensions = $args[0] ?? Request::ORIGINAL;
+		$flags = Image::OrSmaller;
 
 		$request = new ImageRequest($image, $dimensions, $flags, true);
 
@@ -80,12 +76,10 @@ class ImageRequest implements IRequest
 
 	/**
 	 * Creates the image request from the image macro arguments.
-	 *
-	 * @return ImageRequest
 	 */
-	public static function fromMacro(ImageEntity $image = null, array $args = array())
+	public static function fromMacro(HashImageEntity $image = null, array $args = array()): ImageRequest
 	{
-		return new ImageRequest($image, isset($args[0]) ? $args[0] : IRequest::ORIGINAL, isset($args[1]) ? $args[1] : IRequest::ORIGINAL);
+		return new ImageRequest($image, $args[0] ?? Request::ORIGINAL, $args[1] ?? 0);
 	}
 
 
@@ -95,16 +89,16 @@ class ImageRequest implements IRequest
 	}
 
 
-	public function getFile(): ImageEntity
+	public function getFile(): HashImageEntity
 	{
 		return $this->file;
 	}
 
 
-	public function setFile(IFile|ImageEntity $file): void
+	public function setFile(File|HashImageEntity $file): void
 	{
-		if(!$file instanceof ImageEntity){
-			throw new \LogicException('File is not instance of ImageEntity.');
+		if(!$file instanceof HashImageEntity){
+			throw new \LogicException('File is not instance of HashImageEntity.');
 		}
 
 		$this->file = $file;

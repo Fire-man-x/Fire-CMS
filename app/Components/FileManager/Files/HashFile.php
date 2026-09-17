@@ -7,7 +7,7 @@ namespace App\Components\FileManager\Files;
 /**
  * File special meta information interface
  */
-interface IHashFile extends IFile
+interface HashFile extends File
 {
 
 	/**

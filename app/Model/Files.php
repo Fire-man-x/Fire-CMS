@@ -5,10 +5,10 @@ namespace App\Model;
 
 use App\Components\FileManager\Files\HashFileEntity;
 use App\Components\FileManager\Files\HashImageEntity;
-use App\Components\FileManager\Files\IFile;
 use App\Components\IViewCounter;
 use Nette\Database\Explorer;
 use Nette\Database\SqlLiteral;
+use Nette\Database\Table\ActiveRow;
 use Nette\Utils\ArrayHash;
 
 /**
@@ -67,10 +67,8 @@ class Files extends BaseModel implements IViewCounter
 
 	/**
 	 * Convert to FileEntity
-	 * @param \Nette\Database\Table\ActiveRow|array $file
-	 * @return IFile|HashFileEntity|HashImageEntity
 	 */
-	public function toFileEntity($file)
+	public function toFileEntity(ActiveRow $file): HashFileEntity|HashImageEntity
 	{
 		if($file["is_image"]){
 			$fileEntity = new HashImageEntity();
@@ -91,7 +89,7 @@ class Files extends BaseModel implements IViewCounter
 	/**
 	 * Add view count to counter
 	 */
-	public function addViewCount(int $fileHash, string $language): void
+	public function addViewCount(int|string $fileHash, string $language): void
 	{
 		$data = array(
 			"view_count" => new SqlLiteral("view_count+1")

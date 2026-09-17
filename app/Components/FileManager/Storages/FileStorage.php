@@ -8,18 +8,16 @@ use App\Components\FileManager\Exceptions\InvalidCacheDirectoryException;
 use App\Components\FileManager\Exceptions\UploaderException;
 use App\Components\FileManager\Files\Directory;
 use App\Components\FileManager\Files\FileEntity;
-use App\Components\FileManager\Files\IFile;
+use App\Components\FileManager\Files\File;
 use App\Components\FileManager\Files\ImageEntity;
-use App\Components\FileManager\Macro\FileRequest;
-use App\Components\FileManager\Macro\ImageRequest;
-use App\Components\FileManager\Macro\IRequest;
+use App\Components\FileManager\Request\FileRequest;
+use App\Components\FileManager\Request\ImageRequest;
+use App\Components\FileManager\Request\Request;
 use Nette\Application\Responses\FileResponse;
 use Nette\Http\FileUpload;
-use Nette\Http\Request;
 use Nette\SmartObject;
 use Nette\Utils\Finder;
 use Nette\Utils\Image;
-use Nette\Utils\Strings;
 
 /**
  * Image file storage
@@ -80,12 +78,10 @@ class FileStorage implements IStorage
 
 	/**
 	 * Sets the public accessible cache directory URL.
-	 *
-	 * @param string $baseUrl
-	 * @return $this
 	 */
-	protected function setBaseUrl($baseUrl){
-		if(!Strings::endsWith($baseUrl, '/')) {
+	protected function setBaseUrl(string $baseUrl): static
+	{
+		if(!str_ends_with($baseUrl, '/')) {
 			$baseUrl .= '/';
 		}
 		$this->baseUrl = $baseUrl;
@@ -96,40 +92,32 @@ class FileStorage implements IStorage
 
 	/**
 	 * Checks if an image of the given file information is stored in the storage.
-	 *
-	 * @param IFile $file The image file information
-	 * @return boolean true if image is present in the storage or false otherwise
 	 */
-	public function exist(IFile $file){
+	public function exist(File $file): bool
+	{
 		return file_exists($this->getOriginalFilePathWithFileName($file));
 	}
 
 
 	/**
 	 * Fetches the original image by the given image file information.
-	 *
-	 * @param IFile $file The stored image file information
-	 * @return Image The stored image
 	 */
-	public function original(IFile $file){
+	public function original(File $file): Image
+	{
 		return Image::fromFile($this->getOriginalFilePathWithFileName($file));
 	}
 
 
 	/**
 	 * Stores the given uploaded file.
-	 *
-	 * @param FileUpload $upload
-	 * @return IFile File
-	 * @throws UploaderException
 	 */
-	public function upload(FileUpload $upload, array $settings = array()){
+	public function upload(FileUpload $upload, array $settings = array()): FileEntity|ImageEntity
+	{
 		if($upload->getError()) {
-			throw new UploaderException((string) $upload->getError());
+			throw new UploaderException($upload->getError());
 		}
 		$source = $upload->getTemporaryFile();
 
-		$file = null;
 		if($upload->isImage()) {
 			$file = new ImageEntity();
 
@@ -175,12 +163,11 @@ class FileStorage implements IStorage
 	/**
 	 * Creates the file download HTTP response which can be easily sent using the `send()` method.
 	 *
-	 * @param IRequest $request The image request
-	 * @return FileResponse
 	 * @throws \Nette\Application\BadRequestException
 	 * @throws \Nette\Utils\ImageException
 	 */
-	public function download(IRequest $request){
+	public function download(Request $request): FileResponse
+	{
 		if($request instanceof ImageRequest) {
 			if($request->getDimensions() === ImageRequest::ORIGINAL) {
 				$filename = $this->getOriginalFilePathWithFileName($request->getFile());
@@ -203,11 +190,10 @@ class FileStorage implements IStorage
 	/**
 	 * Returns the URL of the cached version of the image.
 	 *
-	 * @param IRequest $request The image request
-	 * @return string  The URL of the image
 	 * @throws \Nette\Utils\ImageException
 	 */
-	public function link(IRequest $request){
+	public function link(Request $request): string
+	{
 		if($request instanceof ImageRequest) {
 			$this->createCacheImage($request);
 			$filePath = $this->getCacheFilePathWithFileName($request);
@@ -225,28 +211,21 @@ class FileStorage implements IStorage
 
 	/**
 	 * Removes the image from the storage by the given image file information.
-	 *
-	 * @param IFile $file The image information
-	 * @return FileStorage Fluent interface
 	 */
-	public function remove(IFile $file){
+	public function remove(File $file): void
+	{
 		$this->removeCache($file);
 
 		@unlink($this->getOriginalFilePathWithFileName($file));
-
-		return $this;
 	}
 
 
 	/**
 	 * Removes the image from the storage by the given image file information.
-	 *
-	 * @param IFile $file The image information
-	 * @return FileStorage Fluent interface
 	 */
-	public function removeCache(IFile $file){
-		$directory = str_replace($file->getHash(), "", $this->createCacheDirectoryPath($file->getHash()));
-		$findedFiles = Finder::findFiles($file->getHash() . "*")->in($this->cacheDirectory . "/" . $directory);
+	public function removeCache(File $file): void{
+		$directory = str_replace($file->getName(), "", $this->createCacheDirectoryPath($file->getName()));
+		$findedFiles = Finder::findFiles($file->getName() . "*")->in($this->cacheDirectory . "/" . $directory);
 		try{
 			//cache dirs could not exist
 			foreach($findedFiles as $file){
@@ -256,8 +235,6 @@ class FileStorage implements IStorage
 		catch(\Exception $e){
 
 		}
-
-		return $this;
 	}
 
 
@@ -283,7 +260,7 @@ class FileStorage implements IStorage
 			new Directory(dirname($filePathWithFileName));
 			$image->save($filePathWithFileName, 75, $file->getTranslatedMimeType());
 
-			return $image;
+			return $file;
 		}
 
 		return $request->getFile();
@@ -292,13 +269,9 @@ class FileStorage implements IStorage
 
 	/**
 	 * Crops the given image using the given image request options.
-	 *
-	 * @param Image $image The image to resize
-	 * @param IRequest $request The image request
-	 * )* @return Image   The image thumbnail
 	 */
-	protected function crop(Image $image, IRequest $request){
-		if($request->getDimensions() === IRequest::ORIGINAL) {
+	protected function crop(Image $image, ImageRequest $request): Image{
+		if($request->getDimensions() === Request::ORIGINAL) {
 
 			return $image;
 		}
@@ -363,7 +336,7 @@ class FileStorage implements IStorage
 			}
 		}
 
-		$image->resize($resizeWidth, $resizeHeight, Image::FILL);
+		$image->resize($resizeWidth, $resizeHeight, Image::OrBigger);
 		$image->crop($left, $top, $width, $height);
 
 		return $image;
@@ -374,11 +347,11 @@ class FileStorage implements IStorage
 	 * Resizes the given image to the given dimensions using given flags.
 	 *
 	 * @param Image $image The image to resize
-	 * @param IRequest $request The image request
+	 * @param Request $request The image request
 	 * @return Image   The image thumbnail
 	 */
-	protected function resize(Image $image, IRequest $request){
-		if($request->getDimensions() === IRequest::ORIGINAL) {
+	protected function resize(Image $image, Request $request){
+		if($request->getDimensions() === Request::ORIGINAL) {
 			return $image;
 		}
 
@@ -391,10 +364,10 @@ class FileStorage implements IStorage
 	/**
 	 * Creates the file name from the given file information.
 	 *
-	 * @param IFile $file The image file information
+	 * @param File $file The image file information
 	 * @return string Absolute path to original file name
 	 */
-	protected function getOriginalFilePathWithFileName(IFile $file){
+	protected function getOriginalFilePathWithFileName(File $file){
 		return $this->getOriginalFilePath($file) . '/' . $this->getOriginalFileName($file);
 	}
 
@@ -406,10 +379,10 @@ class FileStorage implements IStorage
 	 * in directories prefixed with an underscore. Those directories are not
 	 * fragmented to hash based structure.
 	 *
-	 * @param IFile $file The image file information
+	 * @param File $file The image file information
 	 * @return string
 	 */
-	protected function getOriginalFilePath(IFile $file){
+	protected function getOriginalFilePath(File $file){
 		$name = $file->getName();
 
 		return $this->directory . '/' . "$name[0]/$name[1]";
@@ -419,10 +392,10 @@ class FileStorage implements IStorage
 	/**
 	 * Creates the absolute file name from the given file information.
 	 *
-	 * @param IFile $file The image file information
+	 * @param File $file The image file information
 	 * @return string The absolute file name
 	 */
-	protected function getOriginalFileName(IFile $file){
+	protected function getOriginalFileName(File $file){
 		return $file->getNameWithExtension();
 	}
 
@@ -440,12 +413,9 @@ class FileStorage implements IStorage
 
 	/**
 	 * Creates the internal directory path from the given request.
-	 *
-	 * @param ImageRequest $imageRequest The image request
-	 * @return string
 	 */
-	protected function getCacheFilePath(ImageRequest $imageRequest){
-		$name = $imageRequest->getName();
+	protected function getCacheFilePath(ImageRequest $imageRequest): string{
+		$name = $imageRequest->getFile()->getName();
 		return "$this->cacheDirectory/$name[0]/$name[1]";
 	}
 
@@ -453,14 +423,13 @@ class FileStorage implements IStorage
 	/**
 	 * Returns the file name of the cached version of the image.
 	 *
-	 * @param ImageRequest $imageRequest The image request
 	 * @return string The file name of the cached version of the image
 	 */
-	protected function getCacheFileName(ImageRequest $imageRequest){
+	protected function getCacheFileName(ImageRequest $imageRequest): string{
 		$dimensions = $imageRequest->getDimensions();
 
 		$fileName = $imageRequest->getFile()->getName();
-		$fileExtension = $imageRequest->getfile->getExtension();
+		$fileExtension = $imageRequest->getFile()->getExtension();
 
 		return "$fileName.$dimensions.$fileExtension";
 	}

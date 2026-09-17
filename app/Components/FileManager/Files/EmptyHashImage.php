@@ -12,19 +12,19 @@ use Nette\Utils\Image;
 class EmptyHashImage extends HashImageEntity
 {
 
-	public function getHash()
+	public function getHash(): string
 	{
 		return '_empty';
 	}
 
 
-	public function getMimeType()
+	public function getMimeType(): string
 	{
-		return Image::PNG;
+		return Image::typeToMimeType(Image::PNG);
 	}
 
 
-	public function setHash($hash)
+	public function setHash($hash): void
 	{
 		throw new \LogicException('Unavailable image hash cannot be changed.');
 	}
@@ -36,13 +36,13 @@ class EmptyHashImage extends HashImageEntity
 	}
 
 
-	public function getHeight()
+	public function getHeight(): int
 	{
 		return 1080;
 	}
 
 
-	public function getWidth()
+	public function getWidth(): int
 	{
 		return 1920;
 	}

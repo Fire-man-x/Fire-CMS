@@ -1,19 +1,17 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Components\FileManager\Macro;
+namespace App\Components\FileManager\Request;
 
-use App\Components\FileManager\Files\FileEntity;
-use App\Components\FileManager\Files\IFile;
-use App\Components\FileManager\Files\ImageEntity;
+use App\Components\FileManager\Files\File;
 
 /**
  * Image request interface
  */
-interface IRequest
+interface Request
 {
 
-	const ORIGINAL = 0;
+	const string ORIGINAL = '0';
 
 
 	/**
@@ -40,12 +38,12 @@ interface IRequest
 	/**
 	 * Returns the requested image file information.
 	 */
-	public function getFile(): IFile;
+	public function getFile(): File;
 
 
 	/**
 	 * Sets the requested image file information.
 	 */
-	public function setFile(IFile $file): void;
+	public function setFile(File $file): void;
 
 }

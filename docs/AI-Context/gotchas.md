@@ -142,7 +142,7 @@ latte makra interně) — PHPStan si na args-array nestěžuje.
 
 ## `addFileUpload()` / `IFile::getHash()` — PHPStan false positive (akceptovaný)
 
-`addFileUpload()` je runtime-registrovaná extension metoda (`Zet\FileUpload`), `IFile` interface
+`addFileUpload()` je runtime-registrovaná extension metoda (`Zet\FileUpload`), `File` interface
 nedeklaruje `getHash()` (mají ho jen konkrétní implementace jako `HashImageEntity`). Oboje PHPStan hlásí
 jako "undefined method" — je to ale STEJNÝ, už dřív akceptovaný vzor jako v `app/Forms/
 FilesManagerUploadFormFactory.php` (viz `app/config/phpstan-baseline.neon`, baseline entries pro tenhle

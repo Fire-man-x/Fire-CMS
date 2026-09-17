@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Components\FileManager\FileManager;
-use App\Components\FileManager\Files\IFile;
+use App\Components\FileManager\Files\File;
 use Contributte\FileUpload\Model\IUploadModel;
 use Nette\Http\FileUpload;
 use Nette\SmartObject;
@@ -42,7 +42,7 @@ class MultiFileUploadModel implements IUploadModel
 	/**
 	 * Save uploaded file - saved by File manager
 	 * Save uploaded file - saved by File manager
-	 * @return mixed|IFile Vlastní navrátová hodnota.
+	 * @return mixed|File Vlastní navrátová hodnota.
 	 */
 	public function save(FileUpload $file, array $params = []): mixed
 	{

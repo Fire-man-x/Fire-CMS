@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\FrontModule\Presenters;
 
+use App\Components\FileManager\Request\ImageRequest;
 use App\Components\ViewCounter;
 use App\Model;
 use Nette;
@@ -58,10 +59,10 @@ class FilesPresenter extends BasePresenter
 		}
 
 		$fileEntity = $this->filesModel->toFileEntity($fileInfo);
-		$fileRequest = new \App\Components\FileManager\Macro\ImageRequest($fileEntity, $imageDimensions);
+		$fileRequest = new ImageRequest($fileEntity, $imageDimensions);
 
 		//this create thumbnail
-		$response = $this->fileManager->fetch($fileRequest);
+		//$response = $this->fileManager->fetch($fileRequest);
 		$this->redirect("this");
 	}
 

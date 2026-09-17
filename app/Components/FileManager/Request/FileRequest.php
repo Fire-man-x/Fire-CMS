@@ -1,18 +1,17 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Components\FileManager\Macro;
+namespace App\Components\FileManager\Request;
 
 
+use App\Components\FileManager\Files\File;
 use App\Components\FileManager\Files\FileEntity;
-use App\Components\FileManager\Files\IFile;
-use App\Components\FileManager\Files\ImageEntity;
 use Nette\SmartObject;
 
 /**
  * File request encapsulation
  */
-class FileRequest implements IRequest
+class FileRequest implements Request
 {
 	use SmartObject;
 
@@ -46,10 +45,10 @@ class FileRequest implements IRequest
 	}
 
 
-	public function setFile(IFile|FileEntity $file): void
+	public function setFile(File|FileEntity $file): void
 	{
-		if(!$file instanceof ImageEntity){
-			throw new \LogicException('File is not instance of ImageEntity.');
+		if(!$file instanceof FileEntity){
+			throw new \LogicException('File is not instance of FileEntity.');
 		}
 
 		$this->file = $file;

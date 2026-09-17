@@ -28,10 +28,8 @@ class UploaderException extends RuntimeException
 
 	/**
 	 * Constructs the upload error exception using the given upload error code.
-	 *
-	 * @param string $code
 	 */
-	public function __construct($code)
+	public function __construct(int $code)
 	{
 		parent::__construct($this->messages[$code], $code);
 	}

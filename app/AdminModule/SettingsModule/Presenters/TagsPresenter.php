@@ -73,7 +73,7 @@ class TagsPresenter extends BasePresenter
 	protected function createComponentTagsGrid(string $name): Datagrid
 	{
 		$source = $this->model->findAll()
-			->select("tags.*")
+			->select($this->model->getTableName().".*")
 			->order("title");
 		if ($this->actualLanguage != null) {
 			$source->select(":" . $this->model->getTranslationTable()->getName() . ".name AS title");
@@ -82,7 +82,7 @@ class TagsPresenter extends BasePresenter
 			$source->select("grid_name AS title");
 			$source->select(":" . $this->model->getTranslationTable()->getName() . ".name");
 			$source->select("COUNT(:" . $this->model->getTranslationTable()->getName() . ".language_id) AS language_count");
-			$source->group("tags.tag_id");
+			$source->group($this->model->getTableName().".tag_id");
 		}
 
 		$primaryKey = $this->model->getColumnId();
