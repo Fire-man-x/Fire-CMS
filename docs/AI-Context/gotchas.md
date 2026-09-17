@@ -206,15 +206,79 @@ hlídá checksum souboru přes tabulku `migrations` a při změně obsahu už sp
 by se objevila AŽ PO nasazení na produkci, se historické `CREATE TABLE` soubory nesmí editovat — přejmenování
 by muselo jít přes novou migraci s `RENAME TABLE`.
 
-**SDH pluginy (`SDHAttendance`/`SDHCalendar`/`SDHTowns`/`SDHEvents`/`SDHTests`) jsou z tohoto přejmenování
-VĚDOMĚ VYNECHANÉ.** Jejich modely jedou přes samostatnou DB connection `@database.databaseSdh.context`
-(`app/config/config.local.neon` → `database.databaseSdh`, samostatná databáze `sdh`, fyzicky oddělená od
-`fire-cms`) a nemají v tomto repu žádnou migraci, která by jejich ~50 tabulek (`actions`, `who`, `leagues`,
-`towns`, `attendance`, `tests`, ...) vytvářela — jsou to zjevně legacy tabulky existující v produkční `sdh`
-databázi odjakživa, se stovkami ručně psaných JOIN/UPDATE/INSERT výskytů napříč pluginy bez jediného testu.
-Přejmenování téhle části je samostatný navazující úkol (potřebuje zálohu DB a možnost to ověřit před
-nasazením na živý klubový web) — dokud neproběhne, `SDH*` pluginy zůstávají BEZ prefixu. `SDHGallery` do DB
-vůbec nesahá (souborové úložiště), takže se ho přejmenování netýká.
+**SDH pluginy (`SDHAttendance`/`SDHCalendar`/`SDHTowns`/`SDHEvents`/`SDHTests`) byly od 2026-09-17 dodatečně
+přejmenované taky** (na žádost zadavatele, i přes vyšší riziko — viz `Changelog/2026-09-17-sdh-db-table-prefix.md`).
+Klíčové věci, které je potřeba vědět, než se s tímhle kódem/DB dál pracuje:
+
+- Jejich modely jedou přes samostatnou DB connection `@database.databaseSdh.context`
+  (`app/config/config.local.neon` → `database.databaseSdh`, fyzicky samostatná databáze `sdh`, ne `fire-cms`).
+  `nextras/migrations` (viz `migrations:` v `app/config/config.neon`) běží VÝHRADNĚ proti `database.default`
+  (fire-cms) — `bin/console migrations:continue` tedy NIKDY nepřejmenuje tabulky v `sdh`. Pro každý SDH
+  plugin proto existuje `theme/Plugins/<Plugin>/data/rename-firecms-prefix.sql` s `RENAME TABLE` příkazy,
+  který se musí spustit RUČNĚ přímo proti `sdh` (mysql klient/Adminer) — souběžně s nasazením přejmenovaného
+  PHP kódu, jinak appka nenajde žádnou ze svých tabulek.
+- PHP kód (raw SQL, `setTableName()`, `->table()`) byl přejmenován mechanicky/kontextově (jen po klíčových
+  slovech `FROM`/`JOIN`/`INTO`/`UPDATE`, `tabulka.sloupec`, `->table(...)`, `setTableName(...)`) — NE
+  plošným nahrazením slova, protože stejná anglická slova (`actions`, `who`, `tests`, `events`, ...) se
+  běžně vyskytují i jako názvy form polí/pole v poli (`$values["who"]`, `addContainer("disciplines")`,
+  `redrawControl("events")`), které se přejmenovat NESMĚLY.
+- **`who_subtype` (jednotné číslo, používané ve většině raw SQL JOINů) vs. `who_subtypes` (množné, které
+  nastavuje Model `WhoSubtypes::setTableName()`) jsou v původním kódu nekonzistentní** — přejmenováno 1:1
+  beze změny téhle nesrovnalosti (mimo rozsah přejmenování). Před spuštěním `rename-firecms-prefix.sql` u
+  SDHCalendar ověřte, která z těch dvou tabulek v `sdh` reálně existuje. **Update 2026-09-17 (SDHBase):**
+  live kód (mimo `.bac`/komentáře) žádnou z variant přímo v SQL nepoužívá, jde přes `WhoSubtypes` model —
+  zadavatel proto rozhodl, že kanonický název je `who_subtypes` (množné), a `theme/Plugins/SDHBase/data/
+  schema.sql` tabulku takhle zakládá. Týká se jen NOVĚ zakládaného schématu (`sdh:install-schema`), ne
+  `rename-firecms-prefix.sql` skriptů výše (ty přejmenovávají EXISTUJÍCÍ produkční tabulku, tam se pořád
+  musí ověřit, co v `sdh` reálně je).
+- **`SDHCalendar\Forms\ActionFormFactory`** má `private Explorer $db` bez explicitního argumentu v
+  `config.plugin.neon` (na rozdíl od VŠECH sourozeneckých služeb, které dostávají
+  `@database.databaseSdh.context` explicitně) — díky tomu, jak `Nette\Bridges\DatabaseDI\DatabaseExtension`
+  řeší autowiring (první connection `autowired: true`, každá další `false`, viz `vendor/nette/database/.../
+  DatabaseExtension.php`), se tahle služba autowiruje na `database.default` (fire-cms), NE na `sdh`. Jeho
+  `files` reference proto byly přejmenované na `firecms_files` (core), ne na `firecms_plugin_files` jako
+  všude jinde v tomhle pluginu. Sloupce, které do "files" vkládá (`create_datetime`, `file_name`, žádné
+  `file_folder_id`), navíc neodpovídají skutečnému schématu `firecms_files` — možná jde o dávno rozbitou
+  funkcionalitu (needěláno, mimo rozsah přejmenování), ale stojí za ověření před nasazením.
+- **`SDHTests\AdminModule\Presenters\TestDetailPresenter::onFileForm()`** čte `$this->db`, který není
+  deklarovaný nikde v dědičné hierarchii (`BaseTestPresenter` ani core `BasePresenter` ho nemá) — potvrzeno
+  i PHPStanem (`Access to an undefined property`). Tahle metoda je už teď mrtvý/rozbitý kód, nezávisle na
+  přejmenování.
+- `SDHAttendance`/`SDHCalendar`/`SDHTowns` měly `data/migrations/20260916140000.sql` (INSERT do
+  `firecms_modules`) fyzicky na disku, ale BEZ `migrations:` sekce v `config.plugin.neon` — nikdy se
+  nespouštěly. Doplněno. `SDHEvents`/`SDHTests` neměly migrace vůbec — založeny nově
+  (`data/migrations/20260917000000.sql` + `config.plugin.neon` `migrations:` sekce, stejný vzor jako
+  `PetHotel`).
+- `SDHGallery` do DB vůbec nesahá (souborové úložiště), přejmenování se ho netýká.
+
+## `SDHBase` — sdílené schéma legacy SDH tabulek, MIMO `nextras/migrations`
+
+SDH pluginy (viz sekce výše) sdílí tabulky napříč sebou navzájem — např. `SDHAttendance` přímo
+instancuje `Theme\Plugins\SDHCalendar\Model\Whos` (`whosModel` v `SDHAttendance/config.plugin.neon`),
+`SDHCalendar`/`SDHEvents` měly (do 2026-09-17) BYTE-FOR-BYTE identickou `.bac` migraci zakládající
+`actions`/`events`/`towns`/... a `regions`/`countries` nemají vlastní plugin, ale patří do stejné
+geografické hierarchie jako `towns`/`districts` (viz `rename-firecms-prefix.sql` u `SDHTowns`). Řešením
+je `theme/Plugins/SDHBase` — plugin BEZ vlastní feature, jen s `data/schema.sql` (39 tabulek, `CREATE
+TABLE IF NOT EXISTS`, žádný `DROP`) a `Console\InstallSchemaCommand` (`bin/console sdh:install-schema`).
+
+**Proč to NENÍ klasická `migrations: groups:` sekce jako u ostatních SDH pluginů:** `nextras/migrations`
+je v tomhle repu JEDNA instance `Nextras\Migrations\Bridges\NetteDI\MigrationsExtension` (`migrations:` v
+`app/config/config.neon`) s JEDNÍM `dbal`/`driver` pro všechny grupy dohromady — a ten je nastavený na
+`database.default` (fire-cms). Kdyby `SDHBase` dostal `migrations: groups:` sekci jako sourozenci, tabulky
+by se založily VE ŠPATNÉ databázi (fire-cms, ne `sdh`). Druhá instance stejné extension pro `databaseSdh`
+taky nejde přidat bez kolize — `Nextras\Migrations\Bridges\SymfonyConsole\ContinueCommand` má napevno
+`#[AsCommand(name: 'migrations:continue')]` (Symfony Console nedovolí dvě komandy se stejným jménem).
+Odtud `InstallSchemaCommand` jako VLASTNÍ, jednoduchý příkaz mimo `nextras/migrations` úplně — čte
+`schema.sql`, rozseká na příkazy podle `;\n` a pustí přes `Connection::getPdo()->exec()` (ne
+`Connection::query()` — ten vyžaduje PHPStan `literal-string`, tady jde o důvěryhodný obsah ze souboru).
+
+**Plugin-dependency mezi `SDHBase` a sourozenci NENÍ nijak vynucená.** `App\Model\Plugin\PluginRepository`/
+`PluginInfo` žádný koncept "tenhle plugin vyžaduje tamten" nemá — `SDHBase` musí být zapnutý v
+`theme/config/plugins.neon` PRVNÍ (a zůstat zapnutý, dokud je zapnutý libovolný SDH sourozenec), a po
+zapnutí je potřeba RUČNĚ spustit `bin/console sdh:install-schema` (na rozdíl od `migrations: groups:`
+sekcí to `App\Model\Plugin\PluginMigrator` — instantní migrace při kliknutí na "zapnout" v Admin >
+Plugins — vůbec nezná, ten čte jen `migrations:` NEON sekci). Dokumentováno jen jako komentář nahoře v
+`config.plugin.neon` každého sourozeneckého SDH pluginu, není to nikde technicky vynucené.
 
 Interní bookkeeping tabulka `migrations` (vytváří ji `nextras/migrations`, eviduje spuštěné soubory) je
 záměrně BEZ prefixu — je to infrastruktura knihovny, ne obsahová data aplikace (`PluginMigrator::
