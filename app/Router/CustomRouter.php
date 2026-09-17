@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace App\Router;
 
+use App\Service\DomainService;
 use App\Service\LanguageService;
 use App\Modules\UrlModule\UrlManager;
 use Nette;
-use Nette\Application\Request;
 use Nette\Http;
 use Nette\Routing\Router;
 use Nette\SmartObject;
@@ -28,7 +28,7 @@ class CustomRouter implements Router
 		'category' => 'Front:Categories',
 	);
 
-	public function __construct(UrlManager $urlManager, LanguageService $languages)
+	public function __construct(UrlManager $urlManager, LanguageService $languages, private readonly DomainService $domains)
 	{
 		$this->urlManager = $urlManager;
 		$this->languages = $languages;
@@ -42,17 +42,29 @@ class CustomRouter implements Router
 	{
 		$url = $httpRequest->getUrl()->getPathInfo();
 
-		//locale
-		$existLocale = Nette\Utils\Strings::match($url, "~^([a-z]{2})/([a-z0-9-]*)~");
-		$locale = null;
-		if($existLocale)
-		{
-			$locale = $existLocale[1];
-			$url = $existLocale[2];
-			//language not exits
-			if(!$this->languages->existLanguage($locale))
-			{
-				return null;
+		//locale podle domény (viz App\Service\DomainService) - má přednost před URL prefixem
+		$locale = $this->domains->getLanguageByDomain($httpRequest->getUrl()->getHost());
+
+		if ($locale === null) {
+			//fallback: locale podle URL prefixu /xx/..., stejně jako doteď
+			$existLocale = Nette\Utils\Strings::match($url, "~^([a-z]{2})/([a-z0-9-]*)~");
+			if ($existLocale) {
+				$candidate = (string) $existLocale[1];
+				$rest = (string) $existLocale[2];
+
+				//language not exists
+				if (!$this->languages->existLanguage($candidate)) {
+					return null;
+				}
+
+				//jazyk už má vlastní doménu - starý prefixovaný odkaz na ni natrvalo přesměrujeme
+				$canonicalDomain = $this->domains->getDomainForLanguage($candidate);
+				if ($canonicalDomain !== null) {
+					return $this->redirectToDomain($httpRequest, $canonicalDomain, '/' . $rest);
+				}
+
+				$locale = $candidate;
+				$url = $rest;
 			}
 		}
 
@@ -94,21 +106,33 @@ class CustomRouter implements Router
 		else {
 			$params['action'] = 'default';
 		}
-		$presenter = $this->presenters[$row->type];
 
+		$params['presenter'] = $this->presenters[$row->type];
 		$params['locale'] = $row->language_id;
 		$params['id'] = $row->key;
 
 		return $params;
-
-		/*return new Request(
-			$presenter,
-			$httpRequest->getMethod(),
-			$params,
-			$httpRequest->getPost(),
-			$httpRequest->getFiles(),
-		);*/
 	}
+
+
+	/**
+	 * Params pro Front:Redirect - vrátí 301 na stejnou cestu na cílové doméně jazyka
+	 */
+	private function redirectToDomain(Nette\Http\IRequest $httpRequest, string $domain, string $path): array
+	{
+		$target = new Http\Url();
+		$target->setScheme($httpRequest->getUrl()->getScheme());
+		$target->setHost($domain);
+		$target->setPath($path);
+		$target->setQuery((array) $httpRequest->getQuery());
+
+		return array(
+			'presenter' => 'Front:Redirect',
+			'action' => 'default',
+			'url' => $target->getAbsoluteUrl(),
+		);
+	}
+
 
 	/**
 	 * Constructs absolute URL from Request object.
@@ -120,16 +144,14 @@ class CustomRouter implements Router
 			return null;
 		}
 
-		/* je podchyceno posledni routou, napr. i kvuli Sign:out
-		if($params['presenter'] == 'Front:Default')
-		{
-			$url = new Http\Url($refUrl->getBaseUrl());
-			$url->setQuery($params);
-			return $url->getAbsoluteUrl();
-		}*/
+		$localeId = $params['locale'] ?? $this->languages->getDefaultLanguage();
+		$domain = $this->domains->getDomainForLanguage($localeId);
+		$locale = $domain === null && $this->languages->getDefaultLanguage() != $localeId ? $localeId . "/" : "";
 
-		//locale
-		$locale = isset($params["locale"]) && $this->languages->getDefaultLanguage() != $params["locale"] ? $params["locale"]."/" : "";
+		$url = new Http\Url($refUrl->getBaseUrl());
+		if ($domain !== null) {
+			$url->setHost($domain);
+		}
 
 		//Homepage
 		if($params['presenter'] == "Front:Categories" && isset($params["id"]) && $params["id"] == 1)
@@ -137,7 +159,6 @@ class CustomRouter implements Router
 
 			unset($params['action'], $params['id'], $params['locale']);
 
-			$url = new Http\Url($refUrl->getBaseUrl());
 			$url->setPath($locale);
 			$url->setQuery($params);
 			return $url->getAbsoluteUrl();
@@ -150,26 +171,12 @@ class CustomRouter implements Router
 
 		//normal
 		$type = array_search($params['presenter'], $this->presenters);
-		$urlFromDb = $this->urlManager->getUrlByTypeAndKey($type, $params['id'], $params['locale']);
+		$urlFromDb = $this->urlManager->getUrlByTypeAndKey($type, $params['id'], $localeId);
 
 		unset($params['action'], $params['id'], $params['locale']); // we don't want to have 'action' and 'id' in query parameters
 
-		$url = new Http\Url($refUrl->getBaseUrl());
 		$url->setPath($locale.$urlFromDb);
 		$url->setQuery($params);
 		return $url->getAbsoluteUrl();
-
-		/* Original
-		$url = isset($params['url']) ? $params['url'] : null;
-		$action = isset($params['action']) ? $params['action'] : null;
-		if ($action !== 'default' || !is_string($url)) {
-			return null;
-		}
-		unset($params['action'], $params['url']); // we don't want to have 'action' and 'url' in query parameters
-
-		$url = new Http\Url($refUrl->getBaseUrl() . $url);
-		$url->setQuery($params);
-		return $url->getAbsoluteUrl();
-		*/
 	}
 }

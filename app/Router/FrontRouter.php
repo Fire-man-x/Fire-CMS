@@ -4,13 +4,14 @@ declare(strict_types=1);
 namespace App\Router;
 
 use App\Modules\UrlModule\UrlManager;
+use App\Service\DomainService;
 use App\Service\LanguageService;
 use Nette\Application\Routers\RouteList;
 
 
 class FrontRouter implements RouterProvider
 {
-	public function __construct(private UrlManager $urlManager, private LanguageService $languages)
+	public function __construct(private UrlManager $urlManager, private LanguageService $languages, private DomainService $domains)
 	{
 
 	}
@@ -19,7 +20,7 @@ class FrontRouter implements RouterProvider
 	{
 		$router = new RouteList;
 
-		$router->add(new CustomRouter($this->urlManager, $this->languages));
+		$router->add(new CustomRouter($this->urlManager, $this->languages, $this->domains));
 		/*$router->addRoute('[<locale='.$languages->getDefaultLanguage().' [a-z]{2}>/]<url>', array(
 			'module' => 'Front',
 			'presenter' => array(

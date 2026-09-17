@@ -227,16 +227,7 @@ a:2:{i:0;s:18:"Translation status";i:1;s:14:"Stav překladu";}
 a:2:{i:0;s:10:"Welcome in";i:1;s:10:"Vítejte v";}
 a:2:{i:0;s:3:"Own";i:1;s:4:"Moje";}
 a:2:{i:0;s:8:"Unactive";i:1;s:10:"Neaktivní";}
-a:2:{i:0;s:20:"ublaboo_datagrid.all";i:1;s:4:"Vše";}
-a:2:{i:0;s:29:"ublaboo_datagrid.reset_filter";i:1;s:15:"Resetovat filtr";}
-a:2:{i:0;s:23:"ublaboo_datagrid.action";i:1;s:4:"Akce";}
-a:2:{i:0;s:22:"ublaboo_datagrid.items";i:1;s:8:"Položky";}
-a:2:{i:0;s:21:"ublaboo_datagrid.from";i:1;s:1:"z";}
-a:2:{i:0;s:32:"ublaboo_datagrid.per_page_submit";i:1;s:7:"Odeslat";}
-a:2:{i:0;s:25:"ublaboo_datagrid.previous";i:1;s:11:"Předchozí";}
-a:2:{i:0;s:21:"ublaboo_datagrid.next";i:1;s:7:"Další";}
 a:2:{i:0;s:2:"Ok";i:1;s:2:"Ok";}
-a:2:{i:0;s:30:"ublaboo_datagrid.no_item_found";i:1;s:17:"Žádná položka";}
 a:2:{i:0;s:21:"Personal informations";i:1;s:17:"Osobní informace";}
 a:2:{i:0;s:3:"New";i:1;s:5:"Nový";}
 a:2:{i:0;s:27:"Toolbar with action buttons";i:1;s:39:"Panel nástrojů s akčními tlačítky";}
@@ -251,8 +242,6 @@ a:2:{i:0;s:7:"New url";i:1;s:9:"Nová url";}
 a:2:{i:0;s:15:"Last usage date";i:1;s:27:"Datum posledního použití";}
 a:2:{i:0;s:22:"paginator.itemsPerPage";i:1;s:20:"Položek na stránku";}
 a:2:{i:0;s:14:"paginator.send";i:1;s:7:"Odeslat";}
-a:2:{i:0;s:36:"ublaboo_datagrid.no_item_found_reset";i:1;s:39:"Žádná položka nenalezena, resetujte";}
-a:2:{i:0;s:21:"ublaboo_datagrid.here";i:1;s:3:"zde";}
 a:2:{i:0;s:4:"Sort";i:1;s:8:"Řazení";}
 a:2:{i:0;s:5:"Other";i:1;s:8:"Ostatní";}
 a:2:{i:0;s:13:"Dynamic forms";i:1;s:11:"Formuláře";}
@@ -297,3 +286,30 @@ a:2:{i:0;s:18:"Members - inactive";i:1;s:23:"Členové  - neaktivní";}
 a:2:{i:0;s:22:"Successfully logged in";i:1;s:24:"Úspěšně přihlášen";}
 a:2:{i:0;s:56:"You have not access to resouce '%s' with privilege '%s'.";i:1;s:62:"Nemáte přístup do sekce '%s' s přístupovými právy '%s'.";}
 a:2:{i:0;s:38:"You have not access to administration.";i:1;s:34:"Nemáte přístup do administrace.";}
+a:2:{i:0;s:40:"contributte_datagrid.no_item_found_reset";i:1;s:52:"Nenalezeny žádné položky. Můžete zrušit filtr";}
+a:2:{i:0;s:34:"contributte_datagrid.no_item_found";i:1;s:29:"Nenalezeny žádné položky.";}
+a:2:{i:0;s:25:"contributte_datagrid.here";i:1;s:3:"zde";}
+a:2:{i:0;s:26:"contributte_datagrid.items";i:1;s:8:"Položky";}
+a:2:{i:0;s:24:"contributte_datagrid.all";i:1;s:4:"vše";}
+a:2:{i:0;s:25:"contributte_datagrid.from";i:1;s:1:"z";}
+a:2:{i:0;s:33:"contributte_datagrid.reset_filter";i:1;s:13:"Zrušit filtr";}
+a:2:{i:0;s:34:"contributte_datagrid.group_actions";i:1;s:14:"Hromadné akce";}
+a:2:{i:0;s:25:"contributte_datagrid.show";i:1;s:8:"Zobrazit";}
+a:2:{i:0;s:24:"contributte_datagrid.add";i:1;s:7:"Přidat";}
+a:2:{i:0;s:25:"contributte_datagrid.edit";i:1;s:7:"Upravit";}
+a:2:{i:0;s:37:"contributte_datagrid.show_all_columns";i:1;s:25:"Zobrazit všechny sloupce";}
+a:2:{i:0;s:41:"contributte_datagrid.show_default_columns";i:1;s:26:"Zobrazit výchozí sloupce";}
+a:2:{i:0;s:32:"contributte_datagrid.hide_column";i:1;s:14:"Skrýt sloupec";}
+a:2:{i:0;s:27:"contributte_datagrid.action";i:1;s:4:"Akce";}
+a:2:{i:0;s:29:"contributte_datagrid.previous";i:1;s:11:"Předchozí";}
+a:2:{i:0;s:25:"contributte_datagrid.next";i:1;s:7:"Další";}
+a:2:{i:0;s:27:"contributte_datagrid.choose";i:1;s:6:"Vybrat";}
+a:2:{i:0;s:42:"contributte_datagrid.choose_input_required";i:1;s:41:"Text hromadné akce nesmí být prázdný";}
+a:2:{i:0;s:28:"contributte_datagrid.execute";i:1;s:8:"Provést";}
+a:2:{i:0;s:25:"contributte_datagrid.save";i:1;s:7:"Uložit";}
+a:2:{i:0;s:27:"contributte_datagrid.cancel";i:1;s:7:"Zrušit";}
+a:2:{i:0;s:39:"contributte_datagrid.multiselect_choose";i:1;s:6:"Vybrat";}
+a:2:{i:0;s:41:"contributte_datagrid.multiselect_selected";i:1;s:12:"{0} vybráno";}
+a:2:{i:0;s:41:"contributte_datagrid.filter_submit_button";i:1;s:9:"Filtrovat";}
+a:2:{i:0;s:32:"contributte_datagrid.show_filter";i:1;s:14:"Zobrazit filtr";}
+a:2:{i:0;s:36:"contributte_datagrid.per_page_submit";i:1;s:7:"Změnit";}

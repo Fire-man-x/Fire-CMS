@@ -34,8 +34,11 @@
 	{/block}
 
 	<!-- Bootstrap with Pooper without jQuery -->
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+	{*<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+	*}
 
 
 	<!--link href="{$basePath}/administration/cssistration/theme.litera.css" rel="stylesheet" /-->
@@ -60,9 +63,9 @@
 	</script>
 
 	<!-- Summernote -->
-	<link rel="stylesheet" href="{$basePath}/vendors/summernote-0.8.12/summernote-bs4.css">
-	<script src="{$basePath}/vendors/summernote-0.8.12/summernote-bs4.js"></script>
-	<script src="{$basePath}/vendors/summernote-0.8.12/lang/summernote-cs-CZ.js"></script>
+	<link rel="stylesheet" href="{$basePath}/vendors/summernote-0.9.0/summernote-bs5.min.css">
+	<script src="{$basePath}/vendors/summernote-0.9.0/summernote-bs5.min.js"></script>
+	<script src="{$basePath}/vendors/summernote-0.9.0/lang/summernote-cs-CZ.js"></script>
 
 
 	<!-- Files upload -->
@@ -127,6 +130,7 @@
 				<li n:if="$user->isAllowed('Settings', 'view')" class="nav-item dropdown {if
 						$presenter->isLinkCurrent(':Admin:Settings:Default:*') ||
 						$presenter->isLinkCurrent(':Admin:Settings:Languages:*') ||
+						$presenter->isLinkCurrent(':Admin:Settings:Domains:*') ||
 						$presenter->isLinkCurrent(':Admin:Settings:Users:*') ||
 						$presenter->isLinkCurrent(':Admin:Settings:Roles:*') ||
 						$presenter->isLinkCurrent(':Admin:Settings:Tags:*') ||
@@ -136,6 +140,7 @@
 					<div class="dropdown-menu" aria-labelledby="responsiveNavbarDropdown">
 						<a n:href=":Admin:Settings:Default:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Settings:Default:default') ? 'active', dropdown-item">{_"Main"}</a>
 						<a n:href=":Admin:Settings:Languages:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Settings:Languages:default') ? 'active', dropdown-item">{_"Languages"}</a>
+						<a n:href=":Admin:Settings:Domains:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Settings:Domains:default') ? 'active', dropdown-item">{_"Domains"}</a>
 						{*<a n:href=":Admin:Settings:Metas:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Settings:Metas:default') ? 'active', dropdown-item">{_"Metas"}</a>*}
 						<a n:href=":Admin:Settings:Users:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Settings:Users:default') ? 'active', dropdown-item">{_"Users"}</a>
 						<a n:href=":Admin:Settings:Roles:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Settings:Roles:default') ? 'active', dropdown-item">{_"Roles"}</a>

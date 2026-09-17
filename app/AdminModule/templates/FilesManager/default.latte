@@ -32,10 +32,8 @@
 
 			<div class="btn-toolbar mb-3 justify-content-between" role="toolbar" aria-label="{_"Toolbar with action buttons"}">
 				<div class="input-group">
-					<div class="input-group-prepend">
-						<span class="input-group-text">{_"Bulk editing"}:</span>
-					</div>
-					<select name="files-manager_bulk-edit" class="form-control custom-select">
+					<span class="input-group-text">{_"Bulk editing"}:</span>
+					<select name="files-manager_bulk-edit" class="form-select">
 						{var $prompt =  \PROMPT_VALUE}
 						<option value="" selected="">{$prompt}</option>
 						<option value="selectAll">{_"Select all"}</option>
@@ -44,10 +42,8 @@
 					</select>
 				</div>
 				<div class="input-group">
-					<div class="input-group-prepend">
-						<span class="input-group-text">{_"Sort"}:</span>
-					</div>
-					<select id="files-manager_order-by" name="orderBy" class="form-control custom-select" required="">
+					<span class="input-group-text">{_"Sort"}:</span>
+					<select id="files-manager_order-by" name="orderBy" class="form-select" required="">
 						<option value="" selected="" data-link="{link setOrderBy!, orderBy=>''}">Nejnovějšího</option>
 						<option value="dateDesc" data-link="{link setOrderBy!, orderBy=>'dateDesc'}">Nejstaršího</option>
 						<option value="nameAsc" data-link="{link setOrderBy!, orderBy=>'nameAsc'}">Název A-Z</option>
@@ -106,8 +102,8 @@
 			{snippet fileInfo}
 				{ifset $fileInfo}
 					{form fileNameForm}
-					<div class="form-group row required">
-						<div class="col-sm-3 control-label">{label new_name /} {*_"Name"*}</div>
+					<div class="row mb-3 required">
+						<div class="col-sm-3 col-form-label">{label new_name /} {*_"Name"*}</div>
 
 						<div class="col-sm-9">
 							<div class="input-group">
@@ -122,23 +118,23 @@
 					</div>
 					{input editId}
 					{/form}
-					<div class="form-group row required">
-						<div class="col-sm-3 control-label">{_"Date"}</div>
+					<div class="row mb-3 required">
+						<div class="col-sm-3 col-form-label">{_"Date"}</div>
 						<div class="col-sm-9">{$fileInfo->create_date|date:\DATETIME_FORMAT}</div>
 					</div>
-					<div class="form-group row required">
-						<div class="col-sm-3 control-label">{_"Size"}</div>
+					<div class="row mb-3 required">
+						<div class="col-sm-3 col-form-label">{_"Size"}</div>
 						<div class="col-sm-9">{$fileInfo->size|bytes}</div>
 					</div>
-					<div class="form-group row required">
-						<div class="col-sm-3 control-label">{_"Repair rotation"}</div>
+					<div class="row mb-3 required">
+						<div class="col-sm-3 col-form-label">{_"Repair rotation"}</div>
 						<div class="col-sm-9">
 							<a href="{link repairImageOrientation! fileId => $fileInfo->file_id}" class="ajax btn btn-sm btn-outline-dark"><i class="fa fa-hammer"></i></a>
 							<a href="{link rotateImage! fileId => $fileInfo->file_id, rotateDirection => 'left'}" class="ajax btn btn-sm btn-outline-dark"><i class="fa fa-undo"></i></a>
 							<a href="{link rotateImage! fileId => $fileInfo->file_id, rotateDirection => 'right'}" class="ajax btn btn-sm btn-outline-dark"><i class="fa fa-redo"></i></a>
 						</div>
 					</div>
-					<div class="form-group row required">
+					<div class="row mb-3 required">
 						<div class="col-sm-3"></div>
 
 						<div class="col-sm-9"><a n:href="delete! hash=>$fileInfo->disk_name" class="btn btn-danger"><i class="fa fa-trash"></i> {_"Delete"}</a></div>

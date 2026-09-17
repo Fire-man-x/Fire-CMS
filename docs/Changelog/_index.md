@@ -7,9 +7,21 @@ Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na det
 - **DB tabulky jádra a pluginů dostaly prefix `firecms_`/`firecms_plugin_` (název za prefixem camelCase).** Viz
   [2026-09-17-db-table-prefix.md](2026-09-17-db-table-prefix.md). Core (`app/Model`, `app/Modules`,
   `app/Components/Menu`) + bundlované pluginy (`Sliders`/`Statistics`/`Stalker`/`DynamicForms`) +
-  `PetHotel` přejmenovány (migrace i modely). SDH pluginy (`SDHAttendance`/`SDHCalendar`/`SDHTowns`/
-  `SDHEvents`/`SDHTests`, ~50 tabulek v samostatné legacy DB `sdh`) vědomě ponechány beze změny jako
-  samostatný navazující úkol.
+  `PetHotel` přejmenovány (migrace i modely).
+- **... a dodatečně i zbylé SDH pluginy v `theme/Plugins`.** Viz
+  [2026-09-17-sdh-db-table-prefix.md](2026-09-17-sdh-db-table-prefix.md). `SDHAttendance`/`SDHCalendar`/
+  `SDHTowns`/`SDHEvents`/`SDHTests` (~40 tabulek v samostatné legacy DB `sdh`) přejmenovány na žádost
+  zadavatele i přes vyšší riziko (bez testů, žádný DB přístup k ověření zde) — `RENAME TABLE` skripty
+  musí někdo spustit ručně přímo proti `sdh` před nasazením, `nextras/migrations` tam nedosáhne.
+- **Jazykové mutace jde přiřadit na vlastní doménu (nová tabulka `firecms_domains`).** Viz
+  [2026-09-17-language-domains.md](2026-09-17-language-domains.md). Bez konfigurace se chování nemění;
+  starý `/xx/` prefixový odkaz na jazyk s přiřazenou doménou dostane 301 na tu doménu. Mimochodem opraven
+  bug v `CustomRouter::match()`, kde se spočtený presenter nikdy nezapisoval do vráceného pole.
+- **Nový plugin `SDHBase` zakládá sdílené schéma legacy SDH tabulek (`sdh` databáze) jedním místem.** Viz
+  [2026-09-17-sdh-base-plugin.md](2026-09-17-sdh-base-plugin.md). Nahrazuje duplicitní/kolidující CREATE
+  TABLE pokusy v jednotlivých SDH pluginech (`.sql.bac` soubory) - `bin/console sdh:install-schema`, mimo
+  `nextras/migrations` (ten na `sdh` databázi nedosáhne). `who_subtype` sjednoceno na `who_subtypes`,
+  tabulka `places` (chyběla v exportu) odvozena z kódu - k ověření proti produkci.
 
 ## 2026-09-16
 

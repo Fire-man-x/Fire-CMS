@@ -22,143 +22,147 @@
 	{/capture}
 
 	{form categoryForm}
-		<div id="content-inside" class="col-lg-9 col-xl-8">
-			{if count($languages)>1}
-				<ul id="tabsJustified" class="nav nav-tabs">
-					<li n:foreach="$languages as $language => $languageName" class="nav-item">
-						<a class="nav-link {if $language==$actualLanguage}active{/if}" href="{link this language=>$language}" aria-expanded="false">{$languageName}</a>
-					</li>
-				</ul>
-				<br>
-			{/if}
+		<div class="container-fluid">
+			<div class="row">
+				<div id="content-inside" class="col-lg-9 col-xl-8">
+					{if count($languages)>1}
+						<ul id="tabsJustified" class="nav nav-tabs">
+							<li n:foreach="$languages as $language => $languageName" class="nav-item">
+								<a class="nav-link {if $language==$actualLanguage}active{/if}" href="{link this language=>$language}" aria-expanded="false">{$languageName}</a>
+							</li>
+						</ul>
+						<br>
+					{/if}
 
-			{$form->getRenderer()->renderPair($form['translation']['title']) |noescape}
+					{$form->getRenderer()->renderPair($form['translation']['title']) |noescape}
 
-			{if $type == 'categoryLink'}
-				{$form->getRenderer()->renderPair($form['translation']['link_to_category_id']) |noescape}
-			{elseif $type == 'homepage' || $type == 'textBox'}
-			{else}
-				{$form->getRenderer()->renderPair($form['translation']['url']) |noescape}
-			{/if}
+					{if $type == 'categoryLink'}
+						{$form->getRenderer()->renderPair($form['translation']['link_to_category_id']) |noescape}
+					{elseif $type == 'homepage' || $type == 'textBox'}
+					{else}
+						{$form->getRenderer()->renderPair($form['translation']['url']) |noescape}
+					{/if}
 
-			<div n:if="$type == 'site' || $type == 'homepage' || $type == 'gallery' || $type == 'textBox'">
-				{if $type != 'textBox'}
-					{$form->getRenderer()->renderPair($form['translation']['excerpt']) |noescape}
-				{/if}
-
-				{if $type != 'gallery'}
-					{$form->getRenderer()->renderPair($form['translation']['content']) |noescape}
-				{/if}
-
-				<fieldset n:if="$type == 'gallery'" class="images-sortable">
-					<legend>{_'Images'} <a href="#" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#modal" data-src="{link :Admin:FilesManager:default isWindowMode=>true}" title="{_'Add'}" ><i class="fa fa-plus"></i></a></legend>
-					{input images}
-					{$filesContainer}
-				</fieldset>
-
-				<fieldset n:if="$type != 'textBox'">
-					<legend>{_"SEO"}</legend>
-					{$form->getRenderer()->renderPair($form['translation']['seo_title']) |noescape}
-					{$form->getRenderer()->renderPair($form['translation']['seo_description']) |noescape}
-					{$form->getRenderer()->renderPair($form['translation']['seo_keywords']) |noescape}
-				</fieldset>
-			</div>
-		</div>
-
-		<div id="sidebar-inside" class="col-lg-3 col-xl-4" role="navigation">
-			<fieldset>
-				<legend>{_'Actions'}</legend>
-				<div class="form-group row">
-					<div class="col-sm-3 col-lg-12x control-label">
-						{label active: /}
-					</div>
-
-					<div class="col-sm-9 col-lg-12x">
-						<div class="form-check checkbox">{input active:}</div>
-					</div>
-				</div>
-
-				{$form->getRenderer()->renderPair($form['status']) |noescape}
-
-				<div n:if="$revisionCount" class="form-group row">
-					<div class="col-sm-3 col-lg-12x control-label">
-						<i class="fa fa-history"></i> {_'Older versions'}
-					</div>
-
-					<div class="col-sm-9 col-lg-12x">
-						{var $revisionParamName = \App\AdminModule\Presenters\CategoriesPresenter::$revisionParameter}
-						{capture $revisionsContainer}
-							<ul class="list-unstyled">
-								<li n:foreach="$revisionsList as $revision"><strong n:tag-if="$revision->category_id == $presenter->getParameter($revisionParamName)"><a n:href="this $revisionParamName=>$revision->category_id" title="{_'View'}">{$revision->create_date|date:\DATETIME_FORMAT}</a></strong></li>
-							</ul>
-						{/capture}
-						<a tabindex="0" class="btn btn-outline-dark" role="button" data-bs-toggle="popover" data-bs-placement="bottom" title="&lt;i class=&quot;fa fa-history&quot;&gt;&lt;/i&gt; {_'Older versions'}" data-content="{$revisionsContainer}">
-							{$revisionCount}
-						</a>
-						<a n:if="$presenter->getParameter($revisionParamName)" n:href="this $revisionParamName=>null" class="btn btn-secondary" role="button" title="{_'Restore'}">
-							<i class="fa fa-undo"></i>
-						</a>
-
-					</div>
-				</div>
-
-				{$form->getRenderer()->renderPair($form['type']) |noescape}
-
-				{$form->getRenderer()->renderPair($form['publishing_date']) |noescape}
-
-				{$form->getRenderer()->renderPair($form['expiring_date']) |noescape}
-
-				<div class="form-group row">
-					<div class="col-sm-3 col-lg-12x control-label">
-						{label show_in_menu: /}
-					</div>
-
-					<div class="col-sm-9 col-lg-12x">
-						<div class="form-check checkbox">{input show_in_menu:}</div>
-					</div>
-				</div>
-
-				<div class="form-group row">
-					<div class="col-sm-3 col-lg-12x control-label">
-						{label public: /}
-					</div>
-
-					<div class="col-sm-9 col-lg-12x">
-						<div class="form-check checkbox">{input public:}</div>
-					</div>
-				</div>
-
-				{*<ul class="nav nav-pills nav-stacked">
-					<li class="nav-item"><a class="nav-link" href="#">Overview</a></li>
-					<li class="nav-item"><a class="nav-link" href="#">Reports</a></li>
-					<li class="nav-item"><a class="nav-link" href="#">Analytics</a></li>
-					<li class="nav-item"><a class="nav-link" href="#">Export</a></li>
-				</ul>*}
-				<div class="form-group row">
-					<div class="col-sm-12 control-label"></div>
-
-					<div class="col-sm-12">
-						{input send class=>'btn btn-primary button'}
-						{if $type == 'homepage' || $type == 'textBox'}
-							<a n:href=":Front:Default:default locale=>$actualLanguage" class="btn btn-secondary" title="{_'Show on web'}" target="blank"><i class="fa fa-eye"></i></a>
-						{elseif $type != 'categoryLink' && $type != 'url' && $id && $urlManager->existUrlByTypeAndKey('category', $id, $actualLanguage)}
-							<a n:href=":Front:Categories:detail id=>$id, locale=>$actualLanguage" class="btn btn-secondary" title="{_'Show on web'}" target="blank"><i class="fa fa-eye"></i></a>
+					<div n:if="$type == 'site' || $type == 'homepage' || $type == 'gallery' || $type == 'textBox'">
+						{if $type != 'textBox'}
+							{$form->getRenderer()->renderPair($form['translation']['excerpt']) |noescape}
 						{/if}
+
+						{if $type != 'gallery'}
+							{$form->getRenderer()->renderPair($form['translation']['content']) |noescape}
+						{/if}
+
+						<fieldset n:if="$type == 'gallery'" class="images-sortable">
+							<legend>{_'Images'} <a href="#" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#modal" data-src="{link :Admin:FilesManager:default isWindowMode=>true}" title="{_'Add'}" ><i class="fa fa-plus"></i></a></legend>
+							{input images}
+							{$filesContainer}
+						</fieldset>
+
+						<fieldset n:if="$type != 'textBox'">
+							<legend>{_"SEO"}</legend>
+							{$form->getRenderer()->renderPair($form['translation']['seo_title']) |noescape}
+							{$form->getRenderer()->renderPair($form['translation']['seo_description']) |noescape}
+							{$form->getRenderer()->renderPair($form['translation']['seo_keywords']) |noescape}
+						</fieldset>
 					</div>
 				</div>
-			</fieldset>
 
-			<fieldset>
-				<legend>{_'Tags'}</legend>
-				{input tags class=>'form-control text'}
-			</fieldset>
+				<div id="sidebar-inside" class="col-lg-3 col-xl-4" role="navigation">
+					<fieldset>
+						<legend>{_'Actions'}</legend>
+						<div class="row mb-3">
+							<div class="col-sm-3 col-lg-12x col-form-label">
+								{label active: /}
+							</div>
 
-			<fieldset n:if="$type == 'site' || $type == 'homepage'" class="images-sortable">
-				<legend>{_'Images'} <a href="#" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#modal" data-src="{link :Admin:FilesManager:default isWindowMode=>true}" title="{_'Add'}" ><i class="fa fa-plus"></i></a></legend>
-				{input images}
-				{$filesContainer}
-				{*<img src="/images/thumb.svg" alt="Thumbnail" class="img-thumbnail active" style="width: 6rem;">*}
-			</fieldset>
+							<div class="col-sm-9 col-lg-12x">
+								<div class="form-check">{input active:}</div>
+							</div>
+						</div>
+
+						{$form->getRenderer()->renderPair($form['status']) |noescape}
+
+						<div n:if="$revisionCount" class="row mb-3">
+							<div class="col-sm-3 col-lg-12x col-form-label">
+								<i class="fa fa-history"></i> {_'Older versions'}
+							</div>
+
+							<div class="col-sm-9 col-lg-12x">
+								{var $revisionParamName = \App\AdminModule\Presenters\CategoriesPresenter::$revisionParameter}
+								{capture $revisionsContainer}
+									<ul class="list-unstyled">
+										<li n:foreach="$revisionsList as $revision"><strong n:tag-if="$revision->category_id == $presenter->getParameter($revisionParamName)"><a n:href="this $revisionParamName=>$revision->category_id" title="{_'View'}">{$revision->create_date|date:\DATETIME_FORMAT}</a></strong></li>
+									</ul>
+								{/capture}
+								<a tabindex="0" class="btn btn-outline-dark" role="button" data-bs-toggle="popover" data-bs-placement="bottom" title="&lt;i class=&quot;fa fa-history&quot;&gt;&lt;/i&gt; {_'Older versions'}" data-content="{$revisionsContainer}">
+									{$revisionCount}
+								</a>
+								<a n:if="$presenter->getParameter($revisionParamName)" n:href="this $revisionParamName=>null" class="btn btn-secondary" role="button" title="{_'Restore'}">
+									<i class="fa fa-undo"></i>
+								</a>
+
+							</div>
+						</div>
+
+						{$form->getRenderer()->renderPair($form['type']) |noescape}
+
+						{$form->getRenderer()->renderPair($form['publishing_date']) |noescape}
+
+						{$form->getRenderer()->renderPair($form['expiring_date']) |noescape}
+
+						<div class="row mb-3">
+							<div class="col-sm-3 col-lg-12x col-form-label">
+								{label show_in_menu: /}
+							</div>
+
+							<div class="col-sm-9 col-lg-12x">
+								<div class="form-check">{input show_in_menu:}</div>
+							</div>
+						</div>
+
+						<div class="row mb-3">
+							<div class="col-sm-3 col-lg-12x col-form-label">
+								{label public: /}
+							</div>
+
+							<div class="col-sm-9 col-lg-12x">
+								<div class="form-check">{input public:}</div>
+							</div>
+						</div>
+
+						{*<ul class="nav nav-pills nav-stacked">
+							<li class="nav-item"><a class="nav-link" href="#">Overview</a></li>
+							<li class="nav-item"><a class="nav-link" href="#">Reports</a></li>
+							<li class="nav-item"><a class="nav-link" href="#">Analytics</a></li>
+							<li class="nav-item"><a class="nav-link" href="#">Export</a></li>
+						</ul>*}
+						<div class="row mb-3">
+							<div class="col-sm-12 col-form-label"></div>
+
+							<div class="col-sm-12">
+								{input send class=>'btn btn-primary button'}
+								{if $type == 'homepage' || $type == 'textBox'}
+									<a n:href=":Front:Default:default locale=>$actualLanguage" class="btn btn-secondary" title="{_'Show on web'}" target="blank"><i class="fa fa-eye"></i></a>
+								{elseif $type != 'categoryLink' && $type != 'url' && $id && $urlManager->existUrlByTypeAndKey('category', $id, $actualLanguage)}
+									<a n:href=":Front:Categories:detail id=>$id, locale=>$actualLanguage" class="btn btn-secondary" title="{_'Show on web'}" target="blank"><i class="fa fa-eye"></i></a>
+								{/if}
+							</div>
+						</div>
+					</fieldset>
+
+					<fieldset>
+						<legend>{_'Tags'}</legend>
+						{input tags class=>'form-control text'}
+					</fieldset>
+
+					<fieldset n:if="$type == 'site' || $type == 'homepage'" class="images-sortable">
+						<legend>{_'Images'} <a href="#" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#modal" data-src="{link :Admin:FilesManager:default isWindowMode=>true}" title="{_'Add'}" ><i class="fa fa-plus"></i></a></legend>
+						{input images}
+						{$filesContainer}
+						{*<img src="/images/thumb.svg" alt="Thumbnail" class="img-thumbnail active" style="width: 6rem;">*}
+					</fieldset>
+				</div>
+			</div>
 		</div>
 	{/form}
 

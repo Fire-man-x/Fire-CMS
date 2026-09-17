@@ -25,6 +25,15 @@ search:
 		in: %appDir%/Router
 		implements: App\Router\RouterProvider
 
+	# Příkazový řádek
+	command:
+		in: %appDir%/Model/Console
+		extends: Symfony\Component\Console\Command\Command
+		classes:
+			- *Command
+		files:
+			- *Command.php
+
 
 extensions:
 	router: App\Router\DI\RouterProviderExtension
@@ -171,6 +180,9 @@ services:
 	- App\Model\Languages
 	- App\Forms\LanguageFormFactory
 	languages: App\Service\LanguageService
+	- App\Model\Domains
+	- App\Forms\DomainFormFactory
+	domains: App\Service\DomainService
 	- App\Forms\RoleFormFactory
 	- App\Forms\TagFormFactory
 	modules: App\Model\Modules

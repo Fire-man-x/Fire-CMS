@@ -33,20 +33,20 @@
 		<div id="sidebar-inside" class="col-lg-3 col-xl-4" role="navigation">
 			<fieldset>
 				<legend>{_'Actions'}</legend>
-				<div class="form-group row">
-					<div class="col-sm-3 col-lg-12x control-label">
+				<div class="row mb-3">
+					<div class="col-sm-3 col-lg-12x col-form-label">
 						{label active: /}
 					</div>
 
 					<div class="col-sm-9 col-lg-12x">
-						<div class="form-check checkbox">{input active:}</div>
+						<div class="form-check">{input active:}</div>
 					</div>
 				</div>
 
 				{$form->getRenderer()->renderPair($form['status']) |noescape}
 
-				<div n:if="$revisionCount" class="form-group row">
-					<div class="col-sm-3 col-lg-12x control-label">
+				<div n:if="$revisionCount" class="row mb-3">
+					<div class="col-sm-3 col-lg-12x col-form-label">
 						<i class="fa fa-history"></i> {_'Older versions'}
 					</div>
 
@@ -70,18 +70,18 @@
 
 				{$form->getRenderer()->renderPair($form['expiring_date']) |noescape}
 
-				<div class="form-group row">
-					<div class="col-sm-3 col-lg-12x control-label">
+				<div class="row mb-3">
+					<div class="col-sm-3 col-lg-12x col-form-label">
 						{label public: /}
 					</div>
 
 					<div class="col-sm-9 col-lg-12x">
-						<div class="form-check checkbox">{input public:}</div>
+						<div class="form-check">{input public:}</div>
 					</div>
 				</div>
 
-				<div class="form-group row">
-					<div class="col-sm-12 control-label"></div>
+				<div class="row mb-3">
+					<div class="col-sm-12 col-form-label"></div>
 
 					<div class="col-sm-12">
 						{input send class=>'btn btn-primary button'}

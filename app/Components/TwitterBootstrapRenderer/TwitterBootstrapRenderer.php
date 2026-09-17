@@ -6,11 +6,12 @@ namespace Nette\Forms\Rendering;
 use Nette\Forms\Control;
 use Nette\Forms\Controls;
 use Nette\Forms\Form;
+use Nette\HtmlStringable;
 use Nette\Utils\Html;
 use Vodacek\Forms\Controls\DateInput;
 
 /**
- * Renderer for Twitter Bootstrap v3
+ * Renderer for Twitter Bootstrap v5
  */
 class TwitterBootstrapRenderer extends DefaultFormRenderer
 {
@@ -23,20 +24,24 @@ class TwitterBootstrapRenderer extends DefaultFormRenderer
 	public function __construct()
 	{
 		$this->wrappers['controls']['container'] = null;
-		$this->wrappers['pair']['container'] = 'div class="form-group row"';
-		$this->wrappers['pair']['.error'] = 'has-error';
+		// Bootstrap 5 removed `.form-group` - horizontal rows are plain `.row` + spacing utility.
+		$this->wrappers['pair']['container'] = 'div class="row mb-3"';
 		$this->wrappers['control']['container'] = 'div class="col-sm-9"'; //'div class="col-sm-9 input-group"'
-		$this->wrappers['label']['container'] = 'div class="col-sm-3 control-label"';
-		$this->wrappers['control']['description'] = 'span class=help-block';
-		$this->wrappers['control']['errorcontainer'] = 'span class=help-block';
+		// `.control-label` (Bootstrap 3) renamed to `.col-form-label` in Bootstrap 4/5.
+		$this->wrappers['label']['container'] = 'div class="col-sm-3 col-form-label"';
+		// `.help-block` (Bootstrap 3) replaced by `.form-text` in Bootstrap 4/5.
+		$this->wrappers['control']['description'] = 'small class=form-text';
+		// `.invalid-feedback` is hidden by default and only shown via a sibling `.is-invalid` control
+		// (see 'control .error' below) - unlike Bootstrap 3's `.help-block`, it's not shown unconditionally.
+		$this->wrappers['control']['errorcontainer'] = 'div class="invalid-feedback"';
+		// Bootstrap 4/5 validation styling lives on the control itself, not on the row - there's no
+		// row-level error class to set anymore (Bootstrap 3's `.has-error` had no effect since Bootstrap 4).
+		$this->wrappers['control']['.error'] = 'is-invalid';
 	}
 
 
 	public function render(Form $form, string $mode = null): string
 	{
-
-		// make form and controls compatible with Twitter Bootstrap
-		$form->getElementPrototype()->addClass('form-horizontal');
 
 		/*if ($this->form !== $form) {
 			$this->form = $form;
@@ -68,7 +73,7 @@ class TwitterBootstrapRenderer extends DefaultFormRenderer
 
 		foreach ($errors as $error) {
 			$item = clone $item;
-			if ($error instanceof IHtmlString) {
+			if ($error instanceof HtmlStringable) {
 				$item->addHtml($error);
 			} else {
 				$item->setText($translator ? $translator->translate($error) : $error);
@@ -101,8 +106,13 @@ class TwitterBootstrapRenderer extends DefaultFormRenderer
 				$control->getControlPrototype()->addClass(!$this->usedPrimary ? 'btn btn-primary' : 'btn btn-outline-dark');
 				$this->usedPrimary = true;
 
-			} elseif ($control instanceof Controls\TextBase || $control instanceof Controls\SelectBox ||
-				$control instanceof Controls\MultiSelectBox || $control instanceof Controls\UploadControl ||
+			} elseif ($control instanceof Controls\SelectBox || $control instanceof Controls\MultiSelectBox) {
+				// Bootstrap 4's `.custom-select` was renamed to `.form-select` and became the only
+				// supported way to style a native <select> in Bootstrap 5 - `.form-control` no longer
+				// gives it the right appearance.
+				$control->getControlPrototype()->addClass('form-select');
+
+			} elseif ($control instanceof Controls\TextBase || $control instanceof Controls\UploadControl ||
 				$control instanceof DateInput) {
 				/*if ($control instanceof Controls\TextBase){
 					$icon = \Nette\Utils\Html::el("span")->setText("rusaci")->addClass('input-group-btn glyphicon glyphicon-th');
@@ -111,7 +121,7 @@ class TwitterBootstrapRenderer extends DefaultFormRenderer
 				$control->getControlPrototype()->addClass('form-control');
 
 			} elseif ($control instanceof Controls\Checkbox || $control instanceof Controls\CheckboxList || $control instanceof Controls\RadioList) {
-				$control->getSeparatorPrototype()->setName('div')->addClass("form-check")->addClass($control->getControlPrototype()->type);
+				$control->getSeparatorPrototype()->setName('div')->addClass("form-check");
 				$control->getLabelPrototype()->addClass("form-check-label");
 				$control->getControlPrototype()->addClass("form-check-input");
 			}

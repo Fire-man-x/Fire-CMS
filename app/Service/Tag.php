@@ -172,11 +172,11 @@ class Tag
 	public function findByName(string $language, string $name): array
 	{
 		$items = $this->tagsModel->findAll()
-			->select("tags.grid_name")
-			->select("tags.tag_id")
+			->select($this->tagsModel->getTableName().".grid_name")
+			->select($this->tagsModel->getTableName().".tag_id")
 			->select(":" . Model\Tags::TRANSLATION_TABLE_NAME . ".language_id")
 			->select(":" . Model\Tags::TRANSLATION_TABLE_NAME . ".name")
-			->select("IF(:" . Model\Tags::TRANSLATION_TABLE_NAME . ".name IS NULL, CONCAT(tags.grid_name, ?), :" . Model\Tags::TRANSLATION_TABLE_NAME . ".name) AS label", $this->getDefaultText())
+			->select("IF(:" . Model\Tags::TRANSLATION_TABLE_NAME . ".name IS NULL, CONCAT(".$this->tagsModel->getTableName().".grid_name, ?), :" . Model\Tags::TRANSLATION_TABLE_NAME . ".name) AS label", $this->getDefaultText())
 			->joinWhere(":" . Model\Tags::TRANSLATION_TABLE_NAME, "language_id IS NULL OR language_id = ?", $language)
 			->whereOr(array(
 				"grid_name LIKE ?" => "%" . $name . "%",

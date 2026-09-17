@@ -6,10 +6,12 @@ namespace App\Forms;
 use Nette\Application\UI\Form;
 use Nette\SmartObject;
 use Nette\Utils\DateTime;
+use Vodacek\Forms\Controls\DateInput;
 
 /**
  * Abstract Base Form factory
- * @method self addOwnDate($label = null, $type = self::TYPE_DATETIME_LOCAL)
+ * @method self addOwnDate($label = null, $type = DateInput::TYPE_DATETIME_LOCAL)
+ * @method self addFileUpload(string $name, int $maxFiles = NULL, int $maxFileSize = null)
  */
 abstract class BaseFormFactory
 {
