@@ -46,6 +46,13 @@ class UsersPresenter extends BasePresenter
 		}
 	}
 
+	public function actionPassword(): void
+	{
+		if($this->id) {
+			$this->template->userInfo = $this->users->getById($this->id);
+		}
+	}
+
 
 	/**
 	 * Users grid
@@ -53,16 +60,16 @@ class UsersPresenter extends BasePresenter
 	 * @throws \Contributte\Datagrid\Exception\DatagridColumnStatusException
 	 * @throws \Contributte\Datagrid\Exception\DatagridException
 	 */
-	protected function createComponentUsersGrid(string $name): Datagrid
+	protected function createComponentUsersGrid(): Datagrid
 	{
 		$source = $this->users->findAll()
 			//->select(':roles.title AS role_title')
-			->select('users.*')
+			->select($this->users->getTableName().'.*')
 			->select('"" AS role_title')
 			->order($this->users->getColumnId());
 		$primaryKey = $this->users->getColumnId();
 
-		$grid = new Datagrid($this, $name);
+		$grid = new Datagrid();
 		$grid->setPrimaryKey($primaryKey);
 		$grid->setDataSource($source);
 		$grid->setTranslator($this->translator);
@@ -78,7 +85,7 @@ class UsersPresenter extends BasePresenter
 			->setIcon('check-circle')
 			->setTitle('Set as unactive');
 		$active_column->onChange[] = function($id, $value) {
-			$this->handleActivateUser($id, $value);
+			$this->handleActivateUser((int) $id, (boolean) $value);
 		};
 
 		$grid->addColumnText("username", "Username");

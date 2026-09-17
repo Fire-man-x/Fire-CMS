@@ -51,3 +51,9 @@ INSERT INTO `firecms_users` (`user_id`, `username`, `password`, `email`, `active
 	(3,	'author',	'$2y$10$9mYTRqXK15PZNqOt3Av.TOlB1xa9Wae7h23Phm9BN.xI8DVyJQmsm',	'author@firecms.test',	0,	NULL,	'',	'',	4,	NULL,	NULL),
 	(4,	'subscriber1',	'$2y$10$mYWEI00EarBV25qDxs5zRuYxhk/RlNfhXMDySbMeXThql3JeqZXV2',	'subscriber1@firecms.test',	0,	NULL,	'',	'',	4,	NULL,	NULL),
 	(5,	'subscriber2',	'$2y$10$sqj0wlr5WS1ss1PaEbTsQezx8ed/ct6T.l0a9gJFNu5Z0g.lpQ6AG',	'subscriber2@firecms.test',	0,	NULL,	'',	'',	4,	NULL,	NULL);
+
+INSERT INTO `firecms_fileFolders` (`file_folder_id`, `parent_id`, `name`, `default`, `position`, `level`) VALUES
+	(1,	NULL,	'Nezařazené',	1,	0,	0),
+	(2,	NULL,	'Download',	0,	1,	0),
+	(3,	NULL,	'Upload',	0,	2,	0),
+	(4,	NULL,	'Obrázky',	0,	3,	0);

@@ -3,16 +3,15 @@ declare(strict_types=1);
 
 namespace App\Forms;
 
-use App\Modules\CommentsModule;
-use App\Service\Article;
-use App\Service\LanguageService;
-use App\Modules\UrlModule\UrlManager;
 use App\Model;
+use App\Modules\UrlModule\UrlManager;
+use App\Service\Article;
 use App\Service\Tag;
 use Nette\Application\UI\Form;
 use Nette\Database\Table\ActiveRow;
 use Nette\InvalidArgumentException;
 use Nette\Security\User;
+use Nette\Utils\ArrayHash;
 
 
 class ArticleFormFactory extends BaseFormFactory
@@ -26,30 +25,18 @@ class ArticleFormFactory extends BaseFormFactory
 		'draft' => 'Draft'
 		);
 
-	private Model\Articles $model;
-
-	private Article $articleService;
-
-	private Tag $tagService;
-
-	private UrlManager $urlManager;
-
-	private LanguageService $languages;
-
-	private User $user;
-
 	private string $language;
 
 
-	public function __construct(FormFactory $factory, Model\Articles $model, LanguageService $languages, User $user, Article $articleService, Tag $tagService, UrlManager $urlManager)
+	public function __construct(
+		FormFactory $factory,
+		private Model\Articles $model,
+		private User $user,
+		private Article $articleService,
+		private Tag $tagService,
+		private UrlManager $urlManager)
 	{
 		parent::__construct($factory);
-		$this->model = $model;
-		$this->languages = $languages;
-		$this->user = $user;
-		$this->articleService = $articleService;
-		$this->tagService = $tagService;
-		$this->urlManager = $urlManager;
 	}
 
 
@@ -150,7 +137,7 @@ class ArticleFormFactory extends BaseFormFactory
 	}
 
 
-	public function formSucceeded(Form $form, $values)
+	public function formSucceeded(Form $form, ArrayHash $values)
 	{
 		unset($values->editId);
 
@@ -182,7 +169,7 @@ class ArticleFormFactory extends BaseFormFactory
 			$this->tagService->useTags(Tag::TYPE_ARTICLE, $this->getEditId(), $this->language, $tags);
 
 			//update
-			$this->model->update($this->getEditId(), $values);
+			$this->model->update($this->getEditId(), (array) $values);
 			$this->model->updateTranslation($this->getEditId(), $this->language, $translationContainer);
 
 			//url

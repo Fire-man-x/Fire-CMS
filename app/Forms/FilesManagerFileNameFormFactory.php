@@ -4,33 +4,23 @@ declare(strict_types=1);
 namespace App\Forms;
 
 use App\Model;
-use App\Service\LanguageService;
 use Nette\Application\UI\Form;
 use Nette\Localization\Translator;
+use Nette\Utils\ArrayHash;
 
 
 class FilesManagerFileNameFormFactory extends BaseFormFactory
 {
 
-	private Translator $translator;
-
-	private Model\Files $model;
-
-	private \App\Service\LanguageService $languages;
-
-
-	public function __construct(FormFactory $factory, Translator $translator, Model\Files $model, LanguageService $languages)
+	public function __construct(FormFactory $factory, private Translator $translator, private Model\Files $model)
 	{
 		parent::__construct($factory);
-		$this->translator = $translator;
-		$this->model = $model;
-		$this->languages = $languages;
 	}
 
 
 	public function create(int|string $editId = null): Form
 	{
-		$form = parent::create($editId);
+		$form = parent::create((int) $editId);
 
 		$form->addText("new_name", $this->translator->translate("Name"))
 			//->setRequired()
@@ -52,16 +42,16 @@ class FilesManagerFileNameFormFactory extends BaseFormFactory
 	}
 
 
-	public function formSucceeded(Form $form, $values)
+	public function formSucceeded(Form $form, ArrayHash $values)
 	{
 		unset($values->editId);
 
 		if ($this->isEditMode()) {
-			$this->model->update($this->getEditId(), $values);
+			$this->model->update($this->getEditId(), (array) $values);
 		} else {
 			throw new \InvalidArgumentException("Can not insert file name.");
-			$id = $this->model->insert($values);
-			$form->getPresenter()->id = $id;
+			//$id = $this->model->insert($values);
+			//$form->getPresenter()->id = $id;
 		}
 
 		$form->getPresenter()->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);

@@ -109,20 +109,20 @@ class ArticlesPresenter extends BasePresenter
 		$counts = array(
 			"all"=>$this->articlesModel->findAll()
 				->select("COUNT(*) AS count")
-				->where("articles.status != ?","trash")
-				->where("articles.history_id", null)->fetch()?->count,
+				->where($this->articlesModel->getTableName().".status != ?","trash")
+				->where($this->articlesModel->getTableName().".history_id", null)->fetch()?->count,
 			"personal"=>$this->articlesModel->findAll()
 				->select("COUNT(*) AS count")
-				->where("articles.created_by = ?", $this->user->getId())
-				->where("articles.history_id", null)->fetch()?->count,
+				->where($this->articlesModel->getTableName().".created_by = ?", $this->user->getId())
+				->where($this->articlesModel->getTableName().".history_id", null)->fetch()?->count,
 			"pending"=>$this->articlesModel->findAll()
 				->select("COUNT(*) AS count")
-				->where("articles.status = ?","pending")
-				->where("articles.history_id", null)->fetch()?->count,
+				->where($this->articlesModel->getTableName().".status = ?","pending")
+				->where($this->articlesModel->getTableName().".history_id", null)->fetch()?->count,
 			"trash"=>$this->articlesModel->findAll()
 				->select("COUNT(*) AS count")
-				->where("articles.status = ?","trash")
-				->where("articles.history_id", null)->fetch()?->count
+				->where($this->articlesModel->getTableName().".status = ?","trash")
+				->where($this->articlesModel->getTableName().".history_id", null)->fetch()?->count
 			);
 		$this->template->counts = $counts;
 	}
@@ -144,10 +144,13 @@ class ArticlesPresenter extends BasePresenter
 		$this->template->articles = $this->articlesModel;
 
 		//edit own
-		$articleInfo = $this->articlesModel->getById($this->id);
-		if(!$this->user->isAllowed(new \App\Security\Resource("Articles", $articleInfo ? $articleInfo->created_by : $this->getUser()->getId()),"edit")){
-			throw new \Nette\Application\ForbiddenRequestException("You have not access to 'Articles' with priviledge 'edit'.");
+		if($this->id) {
+			$articleInfo = $this->articlesModel->getById($this->id);
+			if(!$this->user->isAllowed(new \App\Security\Resource("Articles", $articleInfo ? $articleInfo->created_by : $this->getUser()->getId()), "edit")) {
+				throw new \Nette\Application\ForbiddenRequestException("You have not access to 'Articles' with priviledge 'edit'.");
+			}
 		}
+
 
 
 		if($this->id)
@@ -190,36 +193,35 @@ class ArticlesPresenter extends BasePresenter
 
 	/**
 	 * Articles grid
-	 * @param string $name
 	 */
-	protected function createComponentArticlesGrid($name): Datagrid
+	protected function createComponentArticlesGrid(): Datagrid
 	{
 		$source = $this->articlesModel->findAll()
-			->select("articles.*")
-			->select(":category_article.category.grid_name AS category_grid_name")
-			->where("articles.history_id", null)
-			->order("articles.create_date DESC")
-			->order("articles.".$this->articlesModel->getColumnId());
+			->select($this->articlesModel->getTableName().".*")
+			->select(":".$this->categoriesModel::RELATION_ARTICLE_TABLE_NAME.".category.grid_name AS category_grid_name")
+			->where($this->articlesModel->getTableName().".history_id", null)
+			->order($this->articlesModel->getTableName().".create_date DESC")
+			->order($this->articlesModel->getTableName().".".$this->articlesModel->getColumnId());
 		switch ($this->show) {
 			case "personal":
-				$source->where("articles.created_by = ?", $this->user->getId());
+				$source->where($this->articlesModel->getTableName().".created_by = ?", $this->user->getId());
 				break;
 			case "pending":
-				$source->where("articles.status = ?","pending");
+				$source->where($this->articlesModel->getTableName().".status = ?","pending");
 				break;
 			case "trash":
-				$source->where("articles.status = ?","trash");
+				$source->where($this->articlesModel->getTableName().".status = ?","trash");
 				break;
 
 			case null:
 			default:
-			$source->where("articles.status != ?","trash");
+			$source->where($this->articlesModel->getTableName().".status != ?","trash");
 				break;
 		}
 
 		$primaryKey = $this->articlesModel->getColumnId();
 
-		$grid = new Datagrid($this, $name);
+		$grid = new Datagrid();
 		$grid->setPrimaryKey($primaryKey);
 		$grid->setDataSource($source);
 		$grid->setTranslator($this->translator);

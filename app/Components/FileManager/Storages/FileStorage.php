@@ -286,7 +286,7 @@ class FileStorage implements IStorage
 			return $image;
 		}
 
-		return $image;
+		return $request->getFile();
 	}
 
 

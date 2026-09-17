@@ -104,19 +104,19 @@ class CommentsPresenter extends BasePresenter
 		$counts = array(
 			"all"=>$this->commentsModel->findAll()
 				->select("COUNT(*) AS count")
-				->where("comments.status != ?","trash")
-				//->where("comments.history_id", null)
-				->fetchField(),
+				->where($this->commentsModel->getTableName().".status != ?","trash")
+				//->where($this->commentsModel->getTableName().".history_id", null)
+				->fetch()?->count,
 			"pending"=>$this->commentsModel->findAll()
 				->select("COUNT(*) AS count")
-				->where("comments.status = ?","pending")
-				//->where("comments.history_id", null)
-				->fetchField(),
+				->where($this->commentsModel->getTableName().".status = ?","pending")
+				//->where($this->commentsModel->getTableName().".history_id", null)
+				->fetch()?->count,
 			"trash"=>$this->commentsModel->findAll()
 				->select("COUNT(*) AS count")
-				->where("comments.status = ?","trash")
-				//->where("comments.history_id", null)
-				->fetchField()
+				->where($this->commentsModel->getTableName().".status = ?","trash")
+				//->where($this->commentsModel->getTableName().".history_id", null)
+				->fetch()?->count
 			);
 		$this->template->counts = $counts;
 	}
@@ -156,22 +156,22 @@ class CommentsPresenter extends BasePresenter
 	protected function createComponentCommentsGrid(string $name): Datagrid
 	{
 		$source = $this->commentsModel->findAll()
-			->select("comments.*")
-			->select(":category_comment.category.grid_name AS category_grid_name")
-			//->where("comments.history_id", null)
-			->order("comments.create_date DESC")
-			->order("comments.".$this->commentsModel->getColumnId());
+			->select($this->commentsModel->getTableName().".*")
+			->select(":".$this->categoriesModel::RELATION_COMMENT_CATEGORY_TABLE_NAME.".category.grid_name AS category_grid_name")
+			//->where($this->commentsModel->getTableName().".history_id", null)
+			->order($this->commentsModel->getTableName().".create_date DESC")
+			->order($this->commentsModel->getTableName().".".$this->commentsModel->getColumnId());
 		switch ($this->show) {
 			case "pending":
-				$source->where("comments.status = ?","pending");
+				$source->where($this->commentsModel->getTableName().".status = ?","pending");
 				break;
 			case "trash":
-				$source->where("comments.status = ?","trash");
+				$source->where($this->commentsModel->getTableName().".status = ?","trash");
 				break;
 
 			case null:
 			default:
-			$source->where("comments.status != ?","trash");
+			$source->where($this->commentsModel->getTableName().".status != ?","trash");
 				break;
 		}
 

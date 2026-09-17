@@ -37,96 +37,57 @@ class FileEntity implements IFile
 	private int $size;
 
 
-	/**
-	 * @return string
-	 */
-	public function getName()
+	public function getName(): string
 	{
 		return $this->name;
 	}
 
 
-	/**
-	 * @param  string $name
-	 * @return FileEntity
-	 */
-	public function setName($name)
+	public function setName(string $name): void
 	{
 		$this->name = $name;
-
-		return $this;
 	}
 
 
-	/**
-	 * @return string
-	 */
-	public function getExtension()
+	public function getExtension(): string
 	{
 		return $this->extension;
 	}
 
 
-	/**
-	 * @param  string $extension
-	 * @return FileEntity
-	 */
-	public function setExtension($extension)
+	public function setExtension(string $extension): void
 	{
 		$this->extension = $extension;
-
-		return $this;
 	}
 
 
-	/**
-	 * @return string
-	 */
-	public function getNameWithExtension()
+	public function getNameWithExtension(): string
 	{
 		return $this->getName().'.'.$this->getExtension();
 	}
 
 
-	/**
-	 * @return string
-	 */
-	public function getMimeType()
+	public function getMimeType(): string
 	{
 		return $this->mimeType;
 	}
 
 
-	/**
-	 * @param  integer $mimeType
-	 * @return FileEntity
-	 */
-	public function setMimeType($mimeType)
+	public function setMimeType(string $mimeType): void
 	{
 		$this->mimeType = $mimeType;
-
-		return $this;
 	}
 
 
-	/**
-	 * @return int
-	 */
-	public function getSize()
+	public function getSize(): int
 	{
 		return $this->size;
 	}
 
 
-	/**
-	 * @param  int $size
-	 * @return FileEntity
-	 */
-	public function setSize($size)
+	public function setSize(int $size): void
 	{
 		$this->size = $size;
-
-		return $this;
 	}
 
 }

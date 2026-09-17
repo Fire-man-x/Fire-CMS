@@ -41,7 +41,7 @@ class CropNode extends StatementNode
 			$context->beginEscape()->enterHtmlAttribute();
 			$res = $context->format(
 				<<<'XX'
-					echo ' src="'; echo %escape($__imagestore->link(App\Components\FileManager\Requests\ImageRequest::crop(%node, %node?))) %line; echo '"';
+					echo ' src="'; echo %escape($__imagestore->link(App\Components\FileManager\Macro\ImageRequest::crop(%node, %node?))) %line; echo '"';
 					XX,
 				$this->image,
 				$this->args,
@@ -52,7 +52,7 @@ class CropNode extends StatementNode
 		}
 
 		return $context->format(
-			'echo %escape($__imagestore->link(App\Components\FileManager\Requests\ImageRequest::crop(%node, %node?))) %line;',
+			'echo %escape($__imagestore->link(App\Components\FileManager\Macro\ImageRequest::crop(%node, %node?))) %line;',
 			$this->image,
 			$this->args,
 			$this->position,

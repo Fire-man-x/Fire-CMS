@@ -26,60 +26,38 @@ class HashImageEntity extends ImageEntity implements IHashFile
 	private string $hash;
 
 
-	/**
-	 * @return int
-	 */
-	public function getId()
+	public function getId(): int
 	{
 		return $this->id;
 	}
 
 
-	/**
-	 * @param  int $id
-	 * @return HashImageEntity
-	 */
-	public function setId($id)
+	public function setId(int $id): void
 	{
 		$this->id = $id;
-
-		return $this;
 	}
 
 
-	/**
-	 * @return string
-	 */
-	public function getHash()
+	public function getHash(): string
 	{
 		return $this->hash;
 	}
 
 
-	/**
-	 * @param  string $hash
-	 * @return HashImageEntity
-	 */
-	public function setHash($hash)
+	public function setHash(string $hash): void
 	{
 		$this->hash = $this->checkHash($hash);
-
-		return $this;
 	}
 
 
 	/**
 	 * Checks that the given string is valid SHA1 hash and normalizes it to lower case.
-	 *
-	 * @param  string $hash Image hash to validate
+	 * @param string $hash Image hash to validate
+	 * @return string The valid image hash
 	 * @throws HashException If the hash is not valid image hash
-	 * @return string        The valid image hash
 	 */
-	protected function checkHash($hash)
+	protected function checkHash(string $hash): string
 	{
-		if (!is_string($hash)) {
-			throw new HashException($hash);
-		}
 		$hash = Strings::lower($hash);
 		if (!preg_match('/^[0-9a-f]{40}$/', $hash)) {
 			throw new HashException($hash);

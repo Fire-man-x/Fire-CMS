@@ -58,7 +58,7 @@ class FilesPresenter extends BasePresenter
 		}
 
 		$fileEntity = $this->filesModel->toFileEntity($fileInfo);
-		$fileRequest = new \App\Components\FileManager\Requests\ImageRequest($fileEntity, $imageDimensions);
+		$fileRequest = new \App\Components\FileManager\Macro\ImageRequest($fileEntity, $imageDimensions);
 
 		//this create thumbnail
 		$response = $this->fileManager->fetch($fileRequest);

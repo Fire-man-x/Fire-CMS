@@ -30,75 +30,52 @@ class ImageEntity extends FileEntity
 	private array $mimeTypesTranslator = array('image/jpeg' => Image::JPEG, 'image/png' => Image::PNG, 'image/gif' => Image::GIF);
 
 
-	/**
-	 * @param  string $mimeType
-	 * @return ImageEntity
-	 */
-	public function setMimeType($mimeType)
+	public function setMimeType(string $mimeType): void
 	{
 		parent::setMimeType($this->checkMimeType($mimeType));
-
-		return $this;
 	}
 
 
 	/**
 	 * Checks the given image type to be one of the supported types.
 	 *
-	 * @param  string $mimeType
-	 * @return string
 	 * @throws ImageTypeException
 	 */
-	protected function checkMimeType($mimeType)
+	protected function checkMimeType(string $mimeType): string
 	{
 		if (!in_array($mimeType, $this->mimeTypes, true)) {
-			throw new ImageTypeException($mimeType);
+			throw new ImageTypeException((int) $mimeType);
 		}
 
 		return $mimeType;
 	}
 
 
-	/**
-	 * @return integer
-	 */
-	public function getTranslatedMimeType()
+	public function getTranslatedMimeType(): int
 	{
 		return $this->mimeTypesTranslator[parent::getMimeType()];
 	}
 
 
-	/**
-	 * @return integer
-	 */
-	public function getHeight()
+	public function getHeight(): int
 	{
 		return $this->height;
 	}
 
 
-	/**
-	 * @param integer $height
-	 */
-	public function setHeight($height)
+	public function setHeight(int $height): void
 	{
 		$this->height = $height;
 	}
 
 
-	/**
-	 * @return integer
-	 */
-	public function getWidth()
+	public function getWidth(): int
 	{
 		return $this->width;
 	}
 
 
-	/**
-	 * @param integer $width
-	 */
-	public function setWidth($width)
+	public function setWidth(int $width): void
 	{
 		$this->width = $width;
 	}

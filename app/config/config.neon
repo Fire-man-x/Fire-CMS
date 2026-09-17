@@ -29,7 +29,7 @@ search:
 extensions:
 	router: App\Router\DI\RouterProviderExtension
 	#uploadManager: ondrs\UploadManager\DI\Extension
-	fileUpload: Zet\FileUpload\FileUploadExtension
+	fileUpload: Contributte\FileUpload\FileUploadExtension
 	#imageStore: Rostenkowski\ImageStore\Extension
 	fileManager: App\Components\FileManager\DI\Extension
 
@@ -75,9 +75,10 @@ migrations:
 fileUpload:
 	maxFiles: 100
 	maxFileSize: 20M
-	fileFilter: '' #Zet\FileUpload\Filter\ImageFilter
-	uploadModel: App\Model\MultiFileUploadModel #Zet\FileUpload\Model\BaseUploadModel
-	renderer: Zet\FileUpload\Template\Renderer\Bootstrap4Renderer
+	#fileFilter: '' #Zet\FileUpload\Filter\ImageFilter
+	uploadModel: App\Model\MultiFileUploadModel
+	renderer: Contributte\FileUpload\Template\Renderer\Bootstrap4Renderer
+	#uiMode: 'full' # nebo minimal
 
 fileManager:
 	storageDir: %wwwDir%/files

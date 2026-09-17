@@ -37,7 +37,6 @@ abstract class BaseModel
 
 	/**
 	 * Get table name
-	 * @return string
 	 */
 	public function getTableName(): string
 	{

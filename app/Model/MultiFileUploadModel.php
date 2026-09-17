@@ -5,9 +5,9 @@ namespace App\Model;
 
 use App\Components\FileManager\FileManager;
 use App\Components\FileManager\Files\IFile;
+use Contributte\FileUpload\Model\IUploadModel;
 use Nette\Http\FileUpload;
 use Nette\SmartObject;
-use Zet\FileUpload\Model\IUploadModel;
 
 /**
  * Class MultiFileUploadModel

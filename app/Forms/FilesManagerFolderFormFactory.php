@@ -9,10 +9,8 @@ use Nette\Application\UI\Form;
 
 class FilesManagerFolderFormFactory extends BaseFormFactory
 {
-	/** @inject */
-	public \ondrs\UploadManager\Managers\ImageManager $fileManager;
 
-	private int $parentFolder;
+	private ?int $parentFolder = null;
 
 
 	public function __construct(FormFactory $factory, private Model\FileFolders $model)

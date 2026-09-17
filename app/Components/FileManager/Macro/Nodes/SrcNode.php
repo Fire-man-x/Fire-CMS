@@ -36,7 +36,7 @@ class SrcNode extends StatementNode
 		$context->beginEscape()->enterHtmlAttribute();
 		$res = $context->format(
 			<<<'XX'
-				echo ' src="'; echo %escape($__imagestore->link(App\Components\FileManager\Requests\ImageRequest::fromMacro(%node, %node?))) %line; echo '"';
+				echo ' src="'; echo %escape($__imagestore->link(App\Components\FileManager\Macro\ImageRequest::fromMacro(%node, %node?))) %line; echo '"';
 				XX,
 			$this->image,
 			$this->args,

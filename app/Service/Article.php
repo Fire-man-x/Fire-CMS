@@ -50,13 +50,13 @@ class Article
 		//description
 		$allWithTranslations = $this->articlesModel->getTranslationTable()
 			->select(Model\Articles::TRANSLATION_TABLE_NAME.".*")
-			->where("article_descriptions.article_id", $id)
+			->where(Model\Articles::TRANSLATION_TABLE_NAME.".article_id", $id)
 			->fetchAll();
 		foreach ($allWithTranslations as $allWithTranslation){
 			$translation = ArrayHash::from($allWithTranslation->toArray());
 			unset($translation->article_id);
 			unset($translation->update_date);
-			$this->articlesModel->insertTranslation($newId, $allWithTranslation->language, $translation);
+			$this->articlesModel->insertTranslation($newId, $allWithTranslation->language_id, $translation);
 		}
 
 		//article_file

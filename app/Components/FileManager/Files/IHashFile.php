@@ -12,32 +12,24 @@ interface IHashFile extends IFile
 
 	/**
 	 * Returns the file id.
-	 *
-	 * @return int
 	 */
-	public function getId();
+	public function getId(): int;
 
 
 	/**
 	 * Returns the file SHA1 hash.
-	 *
-	 * @return string
 	 */
-	public function getHash();
+	public function getHash(): string;
 
 
 	/**
 	 * Sets the file id.
-	 *
-	 * @param string $id
 	 */
-	public function setId($id);
+	public function setId(int $id): void;
 
 
 	/**
 	 * Sets the file SHA1 hash.
-	 *
-	 * @param string $hash
 	 */
-	public function setHash($hash);
+	public function setHash(string $hash): void;
 }

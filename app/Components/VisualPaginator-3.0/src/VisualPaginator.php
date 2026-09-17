@@ -54,9 +54,9 @@ class VisualPaginator extends Application\UI\Control
 
 	/** ******************** */
 
-	private Nette\Utils\Paginator $paginator;
+	private ?Nette\Utils\Paginator $paginator = null;
 
-	private Nette\Http\Session $session;
+	private ?Nette\Http\Session $session = null;
 
 	private Nette\Localization\Translator $translator;
 

@@ -39,17 +39,13 @@ interface IRequest
 
 	/**
 	 * Returns the requested image file information.
-	 *
-	 * @return IFile|FileEntity|ImageEntity
 	 */
-	public function getFile();
+	public function getFile(): IFile;
 
 
 	/**
 	 * Sets the requested image file information.
-	 *
-	 * @return IRequest
 	 */
-	public function setFile(IFile $file);
+	public function setFile(IFile $file): void;
 
 }

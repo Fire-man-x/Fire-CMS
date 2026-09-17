@@ -55,12 +55,12 @@ class FilesManagerPresenter extends BasePresenter
 	/**
 	 * Category parent
 	 */
-	private int $parent;
+	private ?int $parent = null;
 
 	/**
 	 * Actual language
 	 */
-	public string $actualLanguage;
+	public ?string $actualLanguage = null;
 
 	/**
 	 * Files model

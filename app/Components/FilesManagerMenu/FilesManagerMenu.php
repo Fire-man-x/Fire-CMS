@@ -62,7 +62,9 @@ class FilesManagerMenu extends Control
 	protected function createComponentFolderNameForm(): Form
 	{
 		$this->filesManagerFolderFormFactory->asModal();
-		$this->filesManagerFolderFormFactory->setParentFolder($this->parentFolder);
+		if(isset($this->parentFolder)) {
+			$this->filesManagerFolderFormFactory->setParentFolder($this->parentFolder);
+		}
 		$form = $this->filesManagerFolderFormFactory->create();
 		$form->setTranslator($this->translator);
 		//$form->getElementPrototype()->addClass("ajax");

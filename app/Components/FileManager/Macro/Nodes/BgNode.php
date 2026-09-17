@@ -37,7 +37,7 @@ class BgNode extends StatementNode
 		$res = $context->format(
 			<<<'XX'
 				echo ' style="background-image: url(\'';
-				echo %escape($__imagestore->link(App\Components\FileManager\Requests\ImageRequest::crop(%node, %node?))) %line;
+				echo %escape($__imagestore->link(App\Components\FileManager\Macro\ImageRequest::crop(%node, %node?))) %line;
 				echo '\');"';
 				XX,
 			$this->image,

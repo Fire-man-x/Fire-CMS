@@ -5,6 +5,7 @@ namespace App\Components\FileManager\Macro;
 
 
 use App\Components\FileManager\Files\IFile;
+use App\Components\FileManager\Files\ImageEntity;
 use Nette\SmartObject;
 use Nette\Utils\Image;
 
@@ -19,7 +20,7 @@ class ImageRequest implements IRequest
 	 * The requested image file information.
 	 *
 	 */
-	private IFile $file;
+	private ImageEntity $file;
 
 	/**
 	 * The requested image thumbnail dimensions
@@ -47,7 +48,7 @@ class ImageRequest implements IRequest
 	 * @param integer $flags
 	 * @param boolean $crop
 	 */
-	public function __construct(IFile $file, $dimensions = IRequest::ORIGINAL, $flags = IRequest::ORIGINAL, $crop = false)
+	public function __construct(ImageEntity $file, $dimensions = IRequest::ORIGINAL, $flags = IRequest::ORIGINAL, $crop = false)
 	{
 		if((string)intval($dimensions) == $dimensions && intval($dimensions) === IRequest::ORIGINAL)
 		{
@@ -66,7 +67,7 @@ class ImageRequest implements IRequest
 	 *
 	 * @return ImageRequest
 	 */
-	public static function crop(IFile $image = null, array $args = array())
+	public static function crop(ImageEntity $image = null, array $args = array())
 	{
 		$dimensions = isset($args[0]) ? $args[0] : IRequest::ORIGINAL;
 		$flags = Image::FIT;
@@ -82,7 +83,7 @@ class ImageRequest implements IRequest
 	 *
 	 * @return ImageRequest
 	 */
-	public static function fromMacro(IFile $image = null, array $args = array())
+	public static function fromMacro(ImageEntity $image = null, array $args = array())
 	{
 		return new ImageRequest($image, isset($args[0]) ? $args[0] : IRequest::ORIGINAL, isset($args[1]) ? $args[1] : IRequest::ORIGINAL);
 	}
@@ -94,20 +95,19 @@ class ImageRequest implements IRequest
 	}
 
 
-	public function getFile(): IFile
+	public function getFile(): ImageEntity
 	{
 		return $this->file;
 	}
 
 
-	/**
-	 * @return IRequest
-	 */
-	public function setFile(IFile $file)
+	public function setFile(IFile|ImageEntity $file): void
 	{
-		$this->file = $file;
+		if(!$file instanceof ImageEntity){
+			throw new \LogicException('File is not instance of ImageEntity.');
+		}
 
-		return $this;
+		$this->file = $file;
 	}
 
 

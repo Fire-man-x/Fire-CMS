@@ -30,7 +30,7 @@ class EmptyHashImage extends HashImageEntity
 	}
 
 
-	public function setMimeType($mimeType)
+	public function setMimeType($mimeType): void
 	{
 		throw new \LogicException('Unavailable image hash cannot be changed.');
 	}

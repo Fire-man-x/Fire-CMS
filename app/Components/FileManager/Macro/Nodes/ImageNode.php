@@ -41,7 +41,7 @@ class ImageNode extends StatementNode
 			$context->beginEscape()->enterHtmlAttribute();
 			$res = $context->format(
 				<<<'XX'
-					echo ' href="'; echo %escape($__imagestore->link(App\Components\FileManager\Requests\ImageRequest::fromMacro(%node, %node?))) %line; echo '"';
+					echo ' href="'; echo %escape($__imagestore->link(App\Components\FileManager\Macro\ImageRequest::fromMacro(%node, %node?))) %line; echo '"';
 					XX,
 				$this->image,
 				$this->args,
@@ -52,7 +52,7 @@ class ImageNode extends StatementNode
 		}
 
 		return $context->format(
-			'echo %escape($__imagestore->link(App\Components\FileManager\Requests\ImageRequest::fromMacro(%node, %node?))) %line;',
+			'echo %escape($__imagestore->link(App\Components\FileManager\Macro\ImageRequest::fromMacro(%node, %node?))) %line;',
 			$this->image,
 			$this->args,
 			$this->position,

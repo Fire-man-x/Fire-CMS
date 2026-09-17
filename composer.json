@@ -2,7 +2,7 @@
 	"name": "fire/cms",
 	"description": "Fire CMS system",
 	"type": "project",
-    "not used": "jzechy/jquery-fileupload\": \"*\",\"jzechy/nette-antispam\": \"*\", \"phpstan/phpstan\": \"^1.2\"",
+    "not used": "jzechy/jquery-fileupload\": \"*\",\"jzechy/nette-antispam\": \"*\"",
 	"require": {
 		"php": "~8.3",
 		"nette/nette": "^3.2",
@@ -26,7 +26,8 @@
             "App\\Plugins\\": ["app/Plugins", "theme/Plugins"],
             "App\\": "app",
             "Theme\\": "theme",
-			"Nextras\\Datagrid\\": "./libs/nextras/datagrid/src"
+			"Nextras\\Datagrid\\": "./libs/nextras/datagrid/src",
+			"Contributte\\FileUpload\\": "./libs/jzechy/jquery-fileupload/src"
 		},
         "classmap": [
         ],

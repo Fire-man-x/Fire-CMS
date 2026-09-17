@@ -7,6 +7,7 @@ use App\Components\IViewCounter;
 use App\Modules\CommentsModule\Model\ISubComments;
 use App\Service\LanguageService;
 use Nette\Database\SqlLiteral;
+use Nette\Database\Table\ActiveRow;
 use Nette\Utils\ArrayHash;
 
 /**
@@ -113,7 +114,12 @@ class Articles extends BaseModel implements IViewCounter, ISubTags, ISubComments
 		$data->{$this->getColumnId()} = $articleId;
 		$data->language_id = $language;
 		$this->updateGridName($articleId, $language, $data->title);
-		return $this->getTranslationTable()->insert($data);
+		$inserted = $this->getTranslationTable()->insert($data);
+		if($inserted instanceof ActiveRow){
+			return 1;
+		}else{
+			return (int) $inserted;
+		}
 	}
 
 

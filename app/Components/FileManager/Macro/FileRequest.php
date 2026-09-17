@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace App\Components\FileManager\Macro;
 
 
+use App\Components\FileManager\Files\FileEntity;
 use App\Components\FileManager\Files\IFile;
+use App\Components\FileManager\Files\ImageEntity;
 use Nette\SmartObject;
 
 /**
@@ -15,46 +17,42 @@ class FileRequest implements IRequest
 	use SmartObject;
 
 	/**
-	 * The requested file file information.
+	 * The requested file information.
 	 *
 	 */
-	private IFile $file;
+	private FileEntity $file;
 
 
 	/**
 	 * Constructs the file request from the given file information, requested dimensions and flags.
 	 *
 	 */
-	public function __construct(IFile $file)
+	public function __construct(FileEntity $file)
 	{
 		$this->file = $file;
 	}
 
 	/**
 	 * Creates the file request from the file macro arguments.
-	 *
-	 * @param array $args
-	 * @return FileRequest
 	 */
-	public static function fromFile(IFile $file = null)
+	public static function fromFile(FileEntity $file = null): self
 	{
 		return new FileRequest($file);
 	}
 
-	public function getFile(): IFile
+	public function getFile(): FileEntity
 	{
 		return $this->file;
 	}
 
 
-	/**
-	 * @return IRequest
-	 */
-	public function setFile(IFile $file)
+	public function setFile(IFile|FileEntity $file): void
 	{
-		$this->file = $file;
+		if(!$file instanceof ImageEntity){
+			throw new \LogicException('File is not instance of ImageEntity.');
+		}
 
-		return $this;
+		$this->file = $file;
 	}
 
 	public function getCrop(): bool

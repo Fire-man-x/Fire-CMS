@@ -12,6 +12,7 @@ use Nette\Mail\Message;
 use Nette\Mail\SendmailMailer;
 use Nette\Mail\SmtpMailer;
 use Nette\Security\Passwords;
+use Nette\Utils\ArrayHash;
 use Nette\Utils\Random;
 
 
@@ -78,14 +79,14 @@ class UserFormFactory extends BaseFormFactory
 		return $form;
 	}
 
-	public function formSucceeded(Form $form, \Nette\Utils\ArrayHash $values)
+	public function formSucceeded(Form $form, ArrayHash $values)
 	{
 		unset($values->editId);
 
 		$values->nickname = "";
 
 		if($this->isEditMode()){
-			$this->users->update($this->getEditId(), $values);
+			$this->users->update($this->getEditId(), (array) $values);
 		}else{
 			$username = $values->username;
 			$email = $values->email;

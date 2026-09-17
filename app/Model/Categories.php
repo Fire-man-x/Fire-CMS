@@ -21,7 +21,8 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 		RELATION_ARTICLE_TABLE_NAME = 'firecms_categoryArticle',
 		RELATION_FILE_TABLE_NAME = 'firecms_categoryFiles',
 		RELATION_TAG_TABLE_NAME = 'firecms_categoryTags',
-		RELATION_COMMENT_TABLE_NAME = 'firecms_articleComments';
+		RELATION_COMMENT_ARTICLE_TABLE_NAME = 'firecms_articleComments',
+		RELATION_COMMENT_CATEGORY_TABLE_NAME = 'firecms_categoryComments';
 
 	private LanguageService $languages;
 
@@ -479,7 +480,7 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 	 */
 	public function getRelationCommentsTable(): \Nette\Database\Table\Selection
 	{
-		return $this->database->table(self::RELATION_COMMENT_TABLE_NAME);
+		return $this->database->table(self::RELATION_COMMENT_ARTICLE_TABLE_NAME);
 	}
 
 
@@ -503,7 +504,7 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 		$data[$this->getColumnId()] = $categoryId;
 		$data["comment_id"] = $commentId;
 
-		$this->database->query('INSERT IGNORE INTO ' . self::RELATION_COMMENT_TABLE_NAME . ' ?', $data);
+		$this->database->query('INSERT IGNORE INTO ' . self::RELATION_COMMENT_ARTICLE_TABLE_NAME . ' ?', $data);
 	}
 
 

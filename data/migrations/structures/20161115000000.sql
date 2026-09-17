@@ -341,6 +341,9 @@ CREATE TABLE `firecms_modules` (
   CONSTRAINT `modules_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `firecms_modules` (`module_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+ALTER TABLE `firecms_modules`
+	ADD UNIQUE `name` (`name`);
+
 
 DROP TABLE IF EXISTS `firecms_options`;
 CREATE TABLE `firecms_options` (

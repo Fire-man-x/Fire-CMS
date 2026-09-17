@@ -11,70 +11,52 @@ interface IFile
 {
 	/**
 	 * Returns the file name.
-	 *
-	 * @return string
 	 */
-	public function getName();
+	public function getName(): string;
 
 	/**
 	 * Returns the file extension.
-	 *
-	 * @return string
 	 */
-	public function getExtension();
+	public function getExtension(): string;
 
 	/**
 	 * Returns the file name with extension.
-	 *
-	 * @return string
 	 */
-	public function getNameWithExtension();
+	public function getNameWithExtension(): string;
 
 
 	/**
 	 * Returns the file mime type.
-	 *
-	 * @return string
 	 */
-	public function getMimeType();
+	public function getMimeType(): string;
 
 
 	/**
 	 * Returns the file size.
-	 *
-	 * @return int
 	 */
-	public function getSize();
+	public function getSize(): int;
 
 
 	/**
 	 * Sets the file name.
-	 *
-	 * @param string $name
 	 */
-	public function setName($name);
+	public function setName(string $name): void;
 
 
 	/**
 	 * Sets the file extension.
-	 *
-	 * @param string $extension
 	 */
-	public function setExtension($extension);
+	public function setExtension(string $extension): void;
 
 
 	/**
 	 * Sets the file mime type.
-	 *
-	 * @param string $mimeType
 	 */
-	public function setMimeType($mimeType);
+	public function setMimeType(string $mimeType): void;
 
 
 	/**
 	 * Sets the file size.
-	 *
-	 * @param int $size
 	 */
-	public function setSize($size);
+	public function setSize(int $size): void;
 }

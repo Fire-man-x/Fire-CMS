@@ -14,7 +14,7 @@
 
 {block content}
 	<script type="text/javascript">
-		var changeFolderOfFilesUrl = {link changeFolderOfFiles!}
+		var changeFolderOfFilesUrl = {link changeFolderOfFiles!, 'toFolder'=>0, 'files'=>[]}
 	</script>
 
 	{capture $modalContent}
@@ -36,7 +36,7 @@
 						<span class="input-group-text">{_"Bulk editing"}:</span>
 					</div>
 					<select name="files-manager_bulk-edit" class="form-control custom-select">
-						{var $prompt = PROMPT_VALUE}
+						{var $prompt =  \PROMPT_VALUE}
 						<option value="" selected="">{$prompt}</option>
 						<option value="selectAll">{_"Select all"}</option>
 						<option value="deselectAll">{_"Deselect all"}</option>
