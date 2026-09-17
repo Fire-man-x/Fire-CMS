@@ -11,7 +11,7 @@ class Users extends BaseModel
 {
 
 	const
-		TABLE_NAME = 'users',
+		TABLE_NAME = 'firecms_users',
 		COLUMN_ID = 'user_id',
 		COLUMN_NAME = 'username',
 		COLUMN_PASSWORD_HASH = 'password',

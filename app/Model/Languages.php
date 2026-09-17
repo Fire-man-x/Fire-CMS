@@ -18,7 +18,7 @@ class Languages extends BaseModel
 	{
 		parent::__construct($database);
 
-		$this->setTableName('languages');
+		$this->setTableName('firecms_languages');
 		$this->setColumnId('language_id');
 	}
 

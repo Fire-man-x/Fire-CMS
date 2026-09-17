@@ -45,6 +45,18 @@ final class PluginRepository
 	}
 
 
+	public function find(string $id): ?PluginInfo
+	{
+		foreach ($this->findAll() as $plugin) {
+			if ($plugin->id === $id) {
+				return $plugin;
+			}
+		}
+
+		return null;
+	}
+
+
 	/**
 	 * Whether a plugin of the given directory name is enabled in
 	 * theme/config/plugins.neon, regardless of which location it lives in.

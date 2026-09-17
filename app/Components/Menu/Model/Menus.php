@@ -16,14 +16,14 @@ class Menus extends BaseModel
 {
 
 	const
-		MENU_ITEM_TABLE_NAME = 'menu_items';
+		MENU_ITEM_TABLE_NAME = 'firecms_menuItems';
 
 
 	public function __construct(Explorer $database)
 	{
 		parent::__construct($database);
 
-		$this->setTableName('menus');
+		$this->setTableName('firecms_menus');
 		$this->setColumnId('menu_id');
 	}
 

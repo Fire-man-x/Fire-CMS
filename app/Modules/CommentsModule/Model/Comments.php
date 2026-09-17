@@ -21,7 +21,7 @@ class Comments extends BaseModel
 	{
 		parent::__construct($database);
 
-		$this->setTableName('comments');
+		$this->setTableName('firecms_comments');
 		$this->setColumnId('comment_id');
 	}
 

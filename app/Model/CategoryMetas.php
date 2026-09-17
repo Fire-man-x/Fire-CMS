@@ -21,7 +21,7 @@ class CategoryMetas extends BaseSubMetas
 	{
 		parent::__construct($database, $languages, $user);
 
-		$this->setTableName('category_metas');
+		$this->setTableName('firecms_categoryMetas');
 		$this->setColumnId('category_meta_id');
 		$this->setReferenceColumn('category_id');
 	}

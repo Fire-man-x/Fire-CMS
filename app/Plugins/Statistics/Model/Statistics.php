@@ -22,7 +22,7 @@ class Statistics extends BaseModel
 	{
 		parent::__construct($database);
 
-		$this->setTableName('statistics');
+		$this->setTableName('firecms_plugin_statistics');
 		$this->setColumnId('statistics_id');
 	}
 

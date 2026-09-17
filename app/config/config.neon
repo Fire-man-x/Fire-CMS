@@ -122,6 +122,7 @@ services:
 			- setScanDirs([%appDir%/Plugins, %appDir%/Modules, %appDir%/../theme/Plugins])
 
 	- App\Model\Plugin\PluginRepository(%rootDir%)
+	- App\Model\Plugin\PluginMigrator(%rootDir%)
 	- App\Model\Users
 	- App\Model\UserManager
 	roles: App\Model\Roles
@@ -131,25 +132,6 @@ services:
 	- App\Modules\UrlModule\Model
 	- App\Modules\UrlModule\RedirectionsModel
 	urlManager: App\Modules\UrlModule\UrlManager
-
-	#galleryImageStorage:
-	#	factory: App\Plugins\SDHGallery\Components\GalleryImageStorage
-	#	autowired: false
-	#	arguments:
-	#		directory: %wwwDir%/foto/public
-	#		cacheDirectory: %wwwDir%/foto/public
-	#		baseUrl: /foto/
-
-	#userGalleryImageStorage:
-	#	factory: App\Plugins\SDHGallery\Components\UserGalleryImageStorage
-	#	autowired: false
-	#	arguments:
-	#		directory: %wwwDir%/foto/nopublic/upload
-	#		cacheDirectory: %wwwDir%/foto/nopublic/upload/cache
-	#		baseUrl: /foto/nopublic/upload/cache
-
-	#- App\Plugins\SDHGallery\Components\UserGalleryImageLoader(@userGalleryImageStorage)
-	#- App\Plugins\SDHGallery\Presenters\GalleryPresenter(@galleryImageStorage)
 
 	- App\Model\Categories
 	- App\Service\Category

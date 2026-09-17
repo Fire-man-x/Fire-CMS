@@ -39,9 +39,9 @@ class PetsPresenter extends BasePresenter
 Vynucuje se v `App\AdminModule\Presenters\BasePresenter::checkRequirements()` — přes reflexi přečte
 atributy na třídě NEBO na volané metodě a zavolá `$user->isAllowed($resource, $privilege)`. Při selhání buď
 přesměruje na `:Admin:Sign:in` (nenepřihlášený), nebo při `ForbiddenRequestException` ukáže flash a
-přesměruje. `$resource`/`$privilege` řetězce musí odpovídat záznamům v DB tabulce `modules` (viz
+přesměruje. `$resource`/`$privilege` řetězce musí odpovídat záznamům v DB tabulce `firecms_modules` (viz
 `App\Model\Modules`/`Roles`) — v čerstvém checkoutu bez seed dat tam nic není, takže i správně napsaný
-`#[Secured]` bez odpovídajícího řádku v `modules` fakticky nikoho nepustí (nebo podle nastavení role
+`#[Secured]` bez odpovídajícího řádku v `firecms_modules` fakticky nikoho nepustí (nebo podle nastavení role
 naopak nikoho neblokuje — ověřte konkrétní chování v `Acl`/`AuthorizatorFactory`, než na to spoléháte v
 testu).
 

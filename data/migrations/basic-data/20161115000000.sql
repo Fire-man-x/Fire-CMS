@@ -1,8 +1,8 @@
-INSERT INTO `languages` (`language_id`, `active`, `default`, `position`, `name`, `shortcut`) VALUES
+INSERT INTO `firecms_languages` (`language_id`, `active`, `default`, `position`, `name`, `shortcut`) VALUES
 	('en',	1,	1,	1,	'Angličitina',	'EN'),
 	('jn',	0,	0,	3,	'Jablka',	'JN');
 
-INSERT INTO `modules` (`module_id`, `parent_id`, `name`, `privilege`, `title`) VALUES
+INSERT INTO `firecms_modules` (`module_id`, `parent_id`, `name`, `privilege`, `title`) VALUES
 	(1,	NULL,	'Settings',	NULL,	'Settings'),
 	(2,	NULL,	'Users',	NULL,	'Users'),
 	(3,	NULL,	'Categories',	NULL,	'Categories'),
@@ -15,7 +15,7 @@ INSERT INTO `modules` (`module_id`, `parent_id`, `name`, `privilege`, `title`) V
 	(10,	NULL,	'Comments',	NULL,	'Comments'),
 	(11,	NULL,	'Plugins',	NULL,	'Plugins');
 
-INSERT INTO `options` (`key`, `value`) VALUES
+INSERT INTO `firecms_options` (`key`, `value`) VALUES
 	('image_resolution',	'1000x1000'),
 	('main_description',	'Toto je popis webu'),
 	('main_title',	'FIre CMS / FrontEnd - Testovací stránka'),
@@ -23,14 +23,14 @@ INSERT INTO `options` (`key`, `value`) VALUES
 	('seo_keywords',	'Seo klíčová slova'),
 	('seo_title',	'');
 
-INSERT INTO `roles` (`role_id`, `parent_id`, `default`, `position`, `name`, `title`) VALUES
+INSERT INTO `firecms_roles` (`role_id`, `parent_id`, `default`, `position`, `name`, `title`) VALUES
 	(1,	NULL,	1,	1,	'admin',	'Administrátor'),
 	(2,	NULL,	1,	2,	'editor',	'Redaktor'),
 	(3,	NULL,	1,	3,	'author',	'Editor'),
 	(4,	NULL,	1,	4,	'subscriber',	'Návštěvník');
 
 
-INSERT INTO `role_module` (`role_id`, `module_id`, `privilege`) VALUES
+INSERT INTO `firecms_roleModule` (`role_id`, `module_id`, `privilege`) VALUES
 	(2,	3,	'view'),
 	(2,	4,	'view'),
 	(2,	5,	'view'),
@@ -45,7 +45,7 @@ INSERT INTO `role_module` (`role_id`, `module_id`, `privilege`) VALUES
 	(4,	4,	'view');
 
 
-INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `active`, `nickname`, `first_name`, `surname`, `role_id`, `recovery_password_time`, `recovery_password_token`) VALUES
+INSERT INTO `firecms_users` (`user_id`, `username`, `password`, `email`, `active`, `nickname`, `first_name`, `surname`, `role_id`, `recovery_password_time`, `recovery_password_token`) VALUES
 	(1,	'admin',	'$2y$10$xJ4UKIKHweoiIikx9Fv2tuFc.bq7cQqKYdYnRnX.0Ca6IbdDhinTO',	'admin@firecms.test',	1,	NULL,	'Administrator',	'',	1,	NULL,	NULL),
 	(2,	'editor',	'$2y$10$rQ/ab7dMFHmpf5u8SOmnyuMuRNgxJrZX2nmXDEEtiYp/AL8YuMZmq',	'editor@firecms.test',	1,	NULL,	'Editor',	'',	2,	NULL,	NULL),
 	(3,	'author',	'$2y$10$9mYTRqXK15PZNqOt3Av.TOlB1xa9Wae7h23Phm9BN.xI8DVyJQmsm',	'author@firecms.test',	0,	NULL,	'',	'',	4,	NULL,	NULL),

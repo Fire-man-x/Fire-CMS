@@ -12,7 +12,7 @@ use Nette\Utils\ArrayHash;
 class Tags extends BaseModel
 {
 
-	const TRANSLATION_TABLE_NAME = 'tag_descriptions';
+	const TRANSLATION_TABLE_NAME = 'firecms_tagDescriptions';
 
 	private LanguageService $languages;
 
@@ -21,7 +21,7 @@ class Tags extends BaseModel
 		parent::__construct($database);
 		$this->languages = $languages;
 
-		$this->setTableName('tags');
+		$this->setTableName('firecms_tags');
 		$this->setColumnId('tag_id');
 	}
 

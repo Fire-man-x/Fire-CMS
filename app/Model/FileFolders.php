@@ -18,7 +18,7 @@ class FileFolders extends BaseModel
 	{
 		parent::__construct($database);
 
-		$this->setTableName('file_folders');
+		$this->setTableName('firecms_fileFolders');
 		$this->setColumnId('file_folder_id');
 	}
 

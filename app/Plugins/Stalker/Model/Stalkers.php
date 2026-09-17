@@ -20,7 +20,7 @@ class Stalkers extends BaseModel
 	{
 		parent::__construct($database);
 
-		$this->setTableName('stalkers');
+		$this->setTableName('firecms_plugin_stalkers');
 		$this->setColumnId('stalker_id');
 	}
 

@@ -18,7 +18,7 @@ class DynamicForms extends BaseModel
 {
 
 	const
-		TRANSLATION_TABLE_NAME = 'dynamic_form_descriptions';
+		TRANSLATION_TABLE_NAME = 'firecms_plugin_dynamicFormDescriptions';
 
 	/**
 	 * Languages model
@@ -34,7 +34,7 @@ class DynamicForms extends BaseModel
 		parent::__construct($database);
 		$this->languages = $languages;
 
-		$this->setTableName('dynamic_forms');
+		$this->setTableName('firecms_plugin_dynamicForms');
 		$this->setColumnId('dynamic_form_id');
 	}
 

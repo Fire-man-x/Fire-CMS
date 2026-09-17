@@ -2,6 +2,15 @@
 
 Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na detailní záznam v `Changelog/`.
 
+## 2026-09-17
+
+- **DB tabulky jádra a pluginů dostaly prefix `firecms_`/`firecms_plugin_` (název za prefixem camelCase).** Viz
+  [2026-09-17-db-table-prefix.md](2026-09-17-db-table-prefix.md). Core (`app/Model`, `app/Modules`,
+  `app/Components/Menu`) + bundlované pluginy (`Sliders`/`Statistics`/`Stalker`/`DynamicForms`) +
+  `PetHotel` přejmenovány (migrace i modely). SDH pluginy (`SDHAttendance`/`SDHCalendar`/`SDHTowns`/
+  `SDHEvents`/`SDHTests`, ~50 tabulek v samostatné legacy DB `sdh`) vědomě ponechány beze změny jako
+  samostatný navazující úkol.
+
 ## 2026-09-16
 
 - **`DynamicForms` blokoval `bin/console` na prázdné DB — eager ACL build v `initialize()`.** Viz

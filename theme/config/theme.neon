@@ -16,3 +16,17 @@ tracy:
 	#nette.mailer:
 	#	class: Nette\Mail\IMailer
 	#	factory: Theme\Component\Nextras\src\FileMailer(%tempDir%/mail-panel-mails)
+
+search:
+	petHotelPresenters:
+		in: %rootDir%/theme/Plugins/
+		implements: Nette\Application\IPresenter
+		files:
+			- *Presenter.php
+		# Nette\DI\Extensions\InjectExtension::TagInject - without it, Presenter's own httpRequest/
+		# httpResponse/user/... never get set (injectPrimary() is only called for services tagged
+		# like this) and every action fails with "must not be accessed before initialization".
+		# Nette\Bridges\ApplicationDI\ApplicationExtension adds this tag itself for app/Plugins/*
+		# presenters (found via its own %appDir% scan) - search: does not do it automatically.
+		tags:
+			- nette.inject

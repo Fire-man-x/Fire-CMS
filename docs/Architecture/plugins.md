@@ -62,6 +62,49 @@ Bez toho by šlo na vypnutý plugin routovat i po jeho deaktivaci a spadlo by to
 (autowiring error) místo čistého 404. Pozor: tohle řeší jen ROUTOVÁNÍ. Existuje samostatný, hlubší problém
 na úrovni kompilace DI kontejneru — viz `gotchas.md`, sekce "Vypnutý plugin a kompilace kontejneru".
 
+**`theme/Plugins/*` presentery potřebují vlastní `search:` blok, aby dostaly DI službu — `app/Plugins/*`
+ji má zadarmo.** `PresenterFactory::resolveFallback()` výše řeší jen "na jakou TŘÍDU se má jméno presenteru
+namapovat" — zjištěná třída ale ještě musí existovat jako SLUŽBA v DI kontejneru, jinak `Nette\Bridges\
+ApplicationDI\PresenterFactoryCallback` skončí na `InvalidPresenterException: No services of type ... found`
+(i když routa/jméno presenteru bylo rozpoznané úplně správně — nemá to nic společného s routerem/routováním,
+`theme/Plugins/*` balíček kvůli tomuhle vlastní `App\Router\RouterProvider` implementaci nepotřebuje). `app/
+Plugins/*` presentery tuhle službu dostanou ZDARMA, protože je najde `Nette\Bridges\ApplicationDI\
+ApplicationExtension` při skenu `%appDir%` (viz sekci o "vypnutý plugin a kompilaci kontejneru" výše — STEJNÝ
+mechanismus). `theme/Plugins/*` presentery ale tenhle scan (napevno `%appDir%`) nikdy nenajde.
+
+Řešení NENÍ vypisovat každý presenter ručně do `services:` — Nette má vestavěnou `search:` extension pro
+přesně tohle (stejnou, jakou `app/config/config.neon` už používá pro nalezení routerů), stačí ji použít i
+v `config.plugin.neon` balíčku, namířenou na jeho vlastní adresář:
+
+```neon
+search:
+    petHotelPresenters:            # unikátní klíč napříč VŠEMI config.plugin.neon souborů (viz níže)
+        in: %rootDir%/theme/Plugins/PetHotel
+        implements: Nette\Application\IPresenter
+        files:
+            - *Presenter.php
+        tags:
+            - nette.inject          # POVINNÉ, viz další odstavec
+```
+
+Nový presenter v balíčku se tak zaregistruje automaticky, bez zásahu do `config.plugin.neon` — přesně
+podle toho, jestli je balíček (jeho `config.plugin.neon`) zrovna aktivní v `theme/config/plugins.neon`,
+protože jinak by se tenhle `search:` blok vůbec nenačetl.
+
+**Pozor na `tags: [nette.inject]` — bez něj presenter spadne na "must not be accessed before
+initialization".** `Nette\Bridges\ApplicationDI\ApplicationExtension` u SVÝCH nalezených presenterů (viz
+výše) automaticky přidává tag `Nette\DI\Extensions\InjectExtension::TagInject` (`'nette.inject'`) — bez
+něj `InjectExtension` nikdy nezavolá `Presenter::injectPrimary()` (ani žádné jiné `@inject`/`injectXxx`),
+takže presenterovy vlastní `$httpRequest`/`$httpResponse`/`$user`/... zůstanou needitializované a PRVNÍ
+přístup k nim (uvnitř `Presenter::run()`) spadne na `Error: Typed property ... must not be accessed
+before initialization` — ne na chybějící službu, takže je to snadné splést s něčím jiným.
+`Nette\DI\Extensions\SearchExtension` (co `search:` implementuje) tenhle tag samo nepřidává — je nutné ho
+předat explicitně přes `tags:` v konfiguraci, jak je vidět výše.
+
+Klíč pod `search:` (`petHotelPresenters` výše) musí být napříč VŠEMI `config.plugin.neon` soubory
+unikátní — `search:` bloky z různých souborů se mergují podle klíče stejně jako `migrations: groups:`
+(viz výše), takže kolize jména by tiše nahradila jeden balíčkův blok druhým.
+
 ## Jak jádro volá do pluginu, aniž by ho znalo
 
 Plugin registruje službu/komponentu v `config.plugin.neon` s DI tagem:

@@ -34,7 +34,7 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	 * Language from url
 	 */
 	#[Persistent]
-	public string $locale;
+	public ?string $locale = null;
 
 	/**
 	 * Actual selected language

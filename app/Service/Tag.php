@@ -152,11 +152,11 @@ class Tag
 		}
 
 		//replacement
-		$items = $this->db->query("SELECT `tags`.`grid_name`, `tags`.`tag_id`, `". Model\Tags::TRANSLATION_TABLE_NAME."`.`language_id`, `". Model\Tags::TRANSLATION_TABLE_NAME."`.`name`,
-				IF(`". Model\Tags::TRANSLATION_TABLE_NAME."`.`name` IS NULL, CONCAT(`tags`.`grid_name`, ?), `". Model\Tags::TRANSLATION_TABLE_NAME."`.`name`) AS `label`
+		$items = $this->db->query("SELECT `firecms_tags`.`grid_name`, `firecms_tags`.`tag_id`, `". Model\Tags::TRANSLATION_TABLE_NAME."`.`language_id`, `". Model\Tags::TRANSLATION_TABLE_NAME."`.`name`,
+				IF(`". Model\Tags::TRANSLATION_TABLE_NAME."`.`name` IS NULL, CONCAT(`firecms_tags`.`grid_name`, ?), `". Model\Tags::TRANSLATION_TABLE_NAME."`.`name`) AS `label`
 			FROM `".$model->getRelationTagsTable()->getName()."`
-			LEFT JOIN `tags` ON `".$model->getRelationTagsTable()->getName()."`.`tag_id` = `tags`.`tag_id`
-			LEFT JOIN `". Model\Tags::TRANSLATION_TABLE_NAME."` ON `tags`.`tag_id` = `". Model\Tags::TRANSLATION_TABLE_NAME."`.`tag_id` AND (`language_id` IS NULL OR `language_id` = ?)
+			LEFT JOIN `firecms_tags` ON `".$model->getRelationTagsTable()->getName()."`.`tag_id` = `firecms_tags`.`tag_id`
+			LEFT JOIN `". Model\Tags::TRANSLATION_TABLE_NAME."` ON `firecms_tags`.`tag_id` = `". Model\Tags::TRANSLATION_TABLE_NAME."`.`tag_id` AND (`language_id` IS NULL OR `language_id` = ?)
 			WHERE `".$column."` = ?",
 			$this->getDefaultText(), $language, $id)
 			->fetchAll();

@@ -17,7 +17,7 @@ class Modules extends BaseModel implements IList
 	{
 		parent::__construct($database);
 
-		$this->setTableName('modules');
+		$this->setTableName('firecms_modules');
 		$this->setColumnId('module_id');
 	}
 

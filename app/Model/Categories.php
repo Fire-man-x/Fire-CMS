@@ -16,12 +16,12 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 {
 
 	const string
-		TRANSLATION_TABLE_NAME = 'category_descriptions';
+		TRANSLATION_TABLE_NAME = 'firecms_categoryDescriptions';
 	const string
-		RELATION_ARTICLE_TABLE_NAME = 'category_article',
-		RELATION_FILE_TABLE_NAME = 'category_files',
-		RELATION_TAG_TABLE_NAME = 'category_tags',
-		RELATION_COMMENT_TABLE_NAME = 'article_comments';
+		RELATION_ARTICLE_TABLE_NAME = 'firecms_categoryArticle',
+		RELATION_FILE_TABLE_NAME = 'firecms_categoryFiles',
+		RELATION_TAG_TABLE_NAME = 'firecms_categoryTags',
+		RELATION_COMMENT_TABLE_NAME = 'firecms_articleComments';
 
 	private LanguageService $languages;
 
@@ -30,7 +30,7 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 		parent::__construct($database);
 		$this->languages = $languages;
 
-		$this->setTableName('categories');
+		$this->setTableName('firecms_categories');
 		$this->setColumnId('category_id');
 	}
 

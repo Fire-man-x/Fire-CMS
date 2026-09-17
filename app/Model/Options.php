@@ -17,7 +17,7 @@ class Options extends BaseModel
 	{
 		parent::__construct($database);
 
-		$this->setTableName('options');
+		$this->setTableName('firecms_options');
 		$this->setColumnId('key');
 	}
 

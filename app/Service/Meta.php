@@ -74,7 +74,7 @@ class Meta
 			->select($metaTable.".value AS default_value")
 			->where("language_id = ? OR language_id IS NULL", $language);*/
 
-		$metaTable = "metas";
+		$metaTable = "firecms_metas";
 		$items = $this->metasModel->findAll()
 			->select($metaTable . ".language_id")
 			->select($metaTable . ".key")

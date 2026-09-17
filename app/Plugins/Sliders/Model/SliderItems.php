@@ -16,7 +16,7 @@ class SliderItems extends BaseModel
 	{
 		parent::__construct($database);
 
-		$this->setTableName('slider_items');
+		$this->setTableName('firecms_plugin_sliderItems');
 		$this->setColumnId('slider_id');
 	}
 

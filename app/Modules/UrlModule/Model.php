@@ -17,7 +17,7 @@ class Model extends BaseModel
 	{
 		parent::__construct($database);
 
-		$this->setTableName('urls');
+		$this->setTableName('firecms_urls');
 		$this->setColumnId('url_id');
 	}
 

@@ -21,7 +21,7 @@ class ArticleMetas extends BaseSubMetas
 	{
 		parent::__construct($database, $languages, $user);
 
-		$this->setTableName('article_metas');
+		$this->setTableName('firecms_articleMetas');
 		$this->setColumnId('article_meta_id');
 		$this->setReferenceColumn('article_id');
 	}

@@ -17,7 +17,7 @@ class RedirectionsModel extends BaseModel
 	{
 		parent::__construct($database);
 
-		$this->setTableName('url_redirections');
+		$this->setTableName('firecms_urlRedirections');
 		$this->setColumnId('url_redirection_id');
 	}
 

@@ -25,7 +25,7 @@ class Metas extends BaseModel
 		parent::__construct($database);
 		$this->languages = $languages;
 
-		$this->setTableName('metas');
+		$this->setTableName('firecms_metas');
 		$this->setColumnId('meta_id');
 	}
 

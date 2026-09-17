@@ -21,7 +21,7 @@ class Files extends BaseModel implements IViewCounter
 	{
 		parent::__construct($database);
 
-		$this->setTableName('files');
+		$this->setTableName('firecms_files');
 		$this->setColumnId('file_id');
 	}
 

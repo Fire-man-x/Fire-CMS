@@ -16,11 +16,11 @@ class Articles extends BaseModel implements IViewCounter, ISubTags, ISubComments
 {
 
 	const string
-		TRANSLATION_TABLE_NAME = 'article_descriptions';
+		TRANSLATION_TABLE_NAME = 'firecms_articleDescriptions';
 	const string
-		RELATION_FILE_TABLE_NAME = 'article_files',
-		RELATION_TAG_TABLE_NAME = 'article_tags',
-		RELATION_COMMENT_TABLE_NAME = 'article_comments';
+		RELATION_FILE_TABLE_NAME = 'firecms_articleFiles',
+		RELATION_TAG_TABLE_NAME = 'firecms_articleTags',
+		RELATION_COMMENT_TABLE_NAME = 'firecms_articleComments';
 
 	private static array $statuses = array(
 		'publish',
@@ -37,7 +37,7 @@ class Articles extends BaseModel implements IViewCounter, ISubTags, ISubComments
 		parent::__construct($database);
 		$this->languages = $languages;
 
-		$this->setTableName('articles');
+		$this->setTableName('firecms_articles');
 		$this->setColumnId('article_id');
 	}
 

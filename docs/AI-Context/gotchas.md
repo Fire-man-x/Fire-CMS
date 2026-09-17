@@ -11,6 +11,17 @@ presenter `Sliders` reálně existuje a je aktivní. Při ručním testování p
 (případně s pomlčkami), ne název třídy 1:1. Tohle se dá snadno splést s daleko vážnějším problémem (viz
 další bod) — než začnete hledat bug v kódu, ověřte URL casing.
 
+## `theme/Plugins/*` presentery registrované přes `search:` bez `tags: [nette.inject]`
+
+Automatická registrace presenterů `theme/Plugins/*` balíčku (viz `Architecture/plugins.md`, `search:`
+blok v `config.plugin.neon`) BEZ `tags: [nette.inject]` vypadá zpočátku, že funguje — kontejner
+zkompiluje, `PresenterFactory` presenter najde a vytvoří — ale spadne hned na první akci s `Error: Typed
+property Nette\Application\UI\Presenter::$httpResponse must not be accessed before initialization`
+(NE s chybějící službou). Příčina: `Nette\DI\Extensions\SearchExtension` (co `search:` implementuje)
+zaregistruje třídu jako službu, ale NEPŘIDÁ tag `nette.inject` — bez něj `InjectExtension` nikdy
+nezavolá `Presenter::injectPrimary()`. `Nette\Bridges\ApplicationDI\ApplicationExtension` (auto-registrace
+`app/Plugins/*`/`app/Modules/*` presenterů) tenhle tag přidává samo, proto tam stejný problém nikdy nevidíte.
+
 ## Vypnutý plugin a kompilace kontejneru — POUZE `app/Plugins/*` a `app/Modules/*`
 
 Když je plugin vypnutý v `theme/config/plugins.neon`, jeho třída presenteru pořád fyzicky existuje na
@@ -68,9 +79,9 @@ kontejneru (běží NEPODMÍNĚNĚ při každém bootu — web i CLI, viz `Archi
 application'))`. To eagerly staví celý řetězec: `ContactFormControl` → `ContactFormFactory` →
 `App\Modules\CommentsModule\Comment` (constructor arg `security.user`) → `App\Security\User`
 (constructor arg `authorizator`) → `App\Security\AuthorizatorFactory::create()`, jejíž tělo OKAMŽITĚ
-(ne líně) volá `Roles::getListWithName()` — tj. SELECTuje tabulku `roles`. Na čerstvé/prázdné DB (před
-prvním `bin/console migrations:continue`/`migrations:reset`) tohle spadne na `SQLSTATE[42S02]: Base
-table or view not found: 1146 Table 'roles' doesn't exist` — a to DŘÍV, než konzolový příkaz (nebo
+(ne líně) volá `Roles::getListWithName()` — tj. SELECTuje tabulku `firecms_roles`. Na čerstvé/prázdné DB
+(před prvním `bin/console migrations:continue`/`migrations:reset`) tohle spadne na `SQLSTATE[42S02]: Base
+table or view not found: 1146 Table 'firecms_roles' doesn't exist` — a to DŘÍV, než konzolový příkaz (nebo
 jakýkoliv web request) vůbec dostane šanci cokoliv udělat. Chicken-and-egg past: nejde namigrovat
 prázdnou DB, protože bootstrap kontejneru se sám o sobě pokusí přečíst ACL tabulky, o kterých vůbec
 neví, že ještě neexistují.
@@ -144,9 +155,9 @@ opravdu o STEJNÝ vzor (upload file entity, ne skutečná chyba v typu).
 **není** pokrytý `.gitignore`. Před jakýmkoliv plošným `git add`/commit ověřte `git status`, jestli tam
 tenhle soubor nefiguruje.
 
-## `modules` DB tabulka bývá nenaseedovaná
+## `firecms_modules` DB tabulka bývá nenaseedovaná
 
-ACL (`#[Secured]`/`#[Resource]`/`#[Privilege]`) potřebuje odpovídající řádek v `modules` tabulce (viz
+ACL (`#[Secured]`/`#[Resource]`/`#[Privilege]`) potřebuje odpovídající řádek v `firecms_modules` tabulce (viz
 `App\Model\Modules`/`Roles`). Čerstvý checkout (a i tento repozitář historicky) tuhle tabulku prázdnou —
 nový `#[Secured]` presenter je syntakticky správně, ale bez seed dat se chová podle výchozího chování ACL
 (ověřte konkrétně v `Acl`/`AuthorizatorFactory`, nespoléhejte na to naslepo v testu/demu).
@@ -171,3 +182,40 @@ jestli něco jiného zrovna needituje stejné soubory. Force-refresh cache (`tem
 tehdy, když víte, co přesně invaliduje — v produkčním (ne debug) módu Nette container cache nekontroluje
 mtime configu při každém requestu (`Nette\DI\ContainerLoader::loadOnce()` vs. `loadCurrent()` podle
 `debugMode`), takže změna configu se nemusí projevit hned.
+
+## DB tabulky mají prefix `firecms_` (jádro) / `firecms_plugin_` (plugin) a název za prefixem je camelCase
+
+Od 2026-09-17 mají všechny tabulky Fire CMS jádra prefix `firecms_` a název za prefixem v camelCase
+(`firecms_articles`, `firecms_categories`, `firecms_users`, `firecms_menuItems`, `firecms_articleMetas`,
+`firecms_roleModule`, ...) a všechny tabulky pluginů (`app/Plugins/*` i `theme/Plugins/*`) prefix
+`firecms_plugin_` stejným způsobem (`firecms_plugin_sliders`, `firecms_plugin_statistics`,
+`firecms_plugin_stalkers`, `firecms_plugin_dynamicForms`, `firecms_plugin_dynamicFormDescriptions`,
+`firecms_plugin_properties`/`customers`/`pets`/`petFiles`/`facilities`/`reservations` u `PetHotel`). Prefix
+se řídí tím, KDO tabulku vlastní, ne tím, ve kterém souboru je CREATE TABLE fyzicky napsaná —
+`firecms_plugin_sliders`/`stalkers`/`statistics` jsou definované přímo v
+`data/migrations/structures/20161115000000.sql` (core migrace), protože ty pluginy existovaly už při
+založení repa, ale patří `app/Plugins/Sliders`/`Stalker`/`Statistics`, takže mají plugin prefix, ne core.
+Jen samotný prefix (`firecms_`/`firecms_plugin_`) zůstává s podtržítkem — camelCase se týká pouze části za
+ním.
+
+Historické CREATE TABLE migrace (core `data/migrations/structures|basic-data/*.sql`,
+`app/Plugins/DynamicForms/data/migrations/20171115000000.sql`) byly přepsány přímo na finální prefixované
+názvy — bezpečné jen proto, že v době přejmenování nebyly ještě nikde nasazené (`nextras/migrations`
+hlídá checksum souboru přes tabulku `migrations` a při změně obsahu už spuštěné migrace tvrdě spadne s
+"Previously executed migration has been changed"). Pro libovolnou DALŠÍ core/DynamicForms migraci, která
+by se objevila AŽ PO nasazení na produkci, se historické `CREATE TABLE` soubory nesmí editovat — přejmenování
+by muselo jít přes novou migraci s `RENAME TABLE`.
+
+**SDH pluginy (`SDHAttendance`/`SDHCalendar`/`SDHTowns`/`SDHEvents`/`SDHTests`) jsou z tohoto přejmenování
+VĚDOMĚ VYNECHANÉ.** Jejich modely jedou přes samostatnou DB connection `@database.databaseSdh.context`
+(`app/config/config.local.neon` → `database.databaseSdh`, samostatná databáze `sdh`, fyzicky oddělená od
+`fire-cms`) a nemají v tomto repu žádnou migraci, která by jejich ~50 tabulek (`actions`, `who`, `leagues`,
+`towns`, `attendance`, `tests`, ...) vytvářela — jsou to zjevně legacy tabulky existující v produkční `sdh`
+databázi odjakživa, se stovkami ručně psaných JOIN/UPDATE/INSERT výskytů napříč pluginy bez jediného testu.
+Přejmenování téhle části je samostatný navazující úkol (potřebuje zálohu DB a možnost to ověřit před
+nasazením na živý klubový web) — dokud neproběhne, `SDH*` pluginy zůstávají BEZ prefixu. `SDHGallery` do DB
+vůbec nesahá (souborové úložiště), takže se ho přejmenování netýká.
+
+Interní bookkeeping tabulka `migrations` (vytváří ji `nextras/migrations`, eviduje spuštěné soubory) je
+záměrně BEZ prefixu — je to infrastruktura knihovny, ne obsahová data aplikace (`PluginMigrator::
+deactivate()` na ni má natvrdo napsaný raw SQL dotaz, přejmenování by vyžadovalo patchnout i to).

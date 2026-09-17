@@ -13,7 +13,7 @@ use Nette\Utils\ArrayHash;
 class Roles extends BaseModel implements IList
 {
 
-	const string TABLE_NAME_ROLE_MODULE = 'role_module';
+	const string TABLE_NAME_ROLE_MODULE = 'firecms_roleModule';
 
 	protected Modules $modulesModel;
 
@@ -22,7 +22,7 @@ class Roles extends BaseModel implements IList
 	{
 		parent::__construct($database);
 
-		$this->setTableName('roles');
+		$this->setTableName('firecms_roles');
 		$this->setColumnId('role_id');
 
 		$this->modulesModel = $modulesModel;
