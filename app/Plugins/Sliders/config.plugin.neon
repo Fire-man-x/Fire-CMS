@@ -11,4 +11,7 @@ services:
 	- App\Plugins\Sliders\Forms\SliderItemFormFactory
 
 	#Front
-	pluginSlider: App\Plugins\Sliders\Components\Slider
+	- App\Plugins\Sliders\Components\Slider
+	-
+		factory: App\Plugins\Sliders\Components\SliderComponentFactory
+		tags: [presenter.component: pluginSlider]

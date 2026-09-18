@@ -253,12 +253,6 @@ parameters:
 			path: ../Components/Menu/Menu.php
 
 		-
-			message: '#^Method App\\Components\\Menu\\Menu\:\:arrayRecursiveSearch\(\) should return array but returns null\.$#'
-			identifier: return.type
-			count: 1
-			path: ../Components/Menu/Menu.php
-
-		-
 			message: '#^Method App\\Components\\Menu\\Menu\:\:treeToArray\(\) is unused\.$#'
 			identifier: method.unused
 			count: 1
@@ -292,12 +286,6 @@ parameters:
 			message: '#^Property App\\Components\\Menu\\Menu\:\:\$firstLevelCategories \(Nette\\Database\\Table\\Selection\) does not accept array\<mixed\>\.$#'
 			identifier: assign.propertyType
 			count: 1
-			path: ../Components/Menu/Menu.php
-
-		-
-			message: '#^Undefined variable\: \$link$#'
-			identifier: variable.undefined
-			count: 2
 			path: ../Components/Menu/Menu.php
 
 		-

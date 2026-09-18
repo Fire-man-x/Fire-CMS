@@ -63,9 +63,8 @@ class UsersPresenter extends BasePresenter
 	protected function createComponentUsersGrid(): Datagrid
 	{
 		$source = $this->users->findAll()
-			//->select(':roles.title AS role_title')
 			->select($this->users->getTableName().'.*')
-			->select('"" AS role_title')
+			->select('role.title AS role_title')
 			->order($this->users->getColumnId());
 		$primaryKey = $this->users->getColumnId();
 
