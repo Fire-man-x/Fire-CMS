@@ -247,126 +247,6 @@ parameters:
 			path: ../Components/FilesManagerMenu/FilesManagerMenu.php
 
 		-
-			message: '#^PHPDoc tag @property has invalid value \(\)\: Unexpected token "\\n\\t ", expected type at offset 17 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: ../Components/LiveTranslator/Panel/Panel.php
-
-		-
-			message: '#^PHPDoc tag @property has invalid value \(property\)\: Unexpected token "\\n ", expected variable at offset 67 on line 4$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: ../Components/LiveTranslator/Panel/Panel.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between false and non\-empty\-string will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 1
-			path: ../Components/LiveTranslator/Storage/File.php
-
-		-
-			message: '#^Call to method fetch\(\) on an unknown class Nette\\Database\\Context\\Connection\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Components/LiveTranslator/Storage/NetteDatabase.php
-
-		-
-			message: '#^Call to method query\(\) on an unknown class Nette\\Database\\Context\\Connection\.$#'
-			identifier: class.notFound
-			count: 5
-			path: ../Components/LiveTranslator/Storage/NetteDatabase.php
-
-		-
-			message: '#^Class Nette\\Database\\Context\\Context not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Components/LiveTranslator/Storage/NetteDatabase.php
-
-		-
-			message: '#^Parameter \$context of method LiveTranslator\\Storage\\NetteDatabase\:\:__construct\(\) has invalid type Nette\\Database\\Context\\Context\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Components/LiveTranslator/Storage/NetteDatabase.php
-
-		-
-			message: '#^Parameter \$db of method LiveTranslator\\Storage\\NetteDatabase\:\:__construct\(\) has invalid type Nette\\Database\\Context\\Connection\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Components/LiveTranslator/Storage/NetteDatabase.php
-
-		-
-			message: '#^Property LiveTranslator\\Storage\\NetteDatabase\:\:\$db has unknown class Nette\\Database\\Context\\Connection as its type\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Components/LiveTranslator/Storage/NetteDatabase.php
-
-		-
-			message: '#^Access to private property Nette\\Application\\Application\:\:\$presenter\.$#'
-			identifier: property.private
-			count: 2
-			path: ../Components/LiveTranslator/Translator.php
-
-		-
-			message: '#^Call to an undefined method Nette\\Application\\IPresenter\:\:link\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../Components/LiveTranslator/Translator.php
-
-		-
-			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 2
-			path: ../Components/LiveTranslator/Translator.php
-
-		-
-			message: '#^Call to function is_array\(\) with string\|Stringable will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: ../Components/LiveTranslator/Translator.php
-
-		-
-			message: '#^Call to function is_null\(\) with null will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: ../Components/LiveTranslator/Translator.php
-
-		-
-			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 3
-			path: ../Components/LiveTranslator/Translator.php
-
-		-
-			message: '#^Method LiveTranslator\\Translator\:\:getPresenterLink\(\) should return string but returns null\.$#'
-			identifier: return.type
-			count: 1
-			path: ../Components/LiveTranslator/Translator.php
-
-		-
-			message: '#^PHPDoc tag @param has invalid value \(array\)\: Unexpected token "\\n\\t \* ", expected variable at offset 159 on line 4$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: ../Components/LiveTranslator/Translator.php
-
-		-
-			message: '#^Property LiveTranslator\\Translator\:\:\$presenterLanguageParam \(string\) does not accept default value of type array\.$#'
-			identifier: property.defaultValue
-			count: 1
-			path: ../Components/LiveTranslator/Translator.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: ../Components/LiveTranslator/Translator.php
-
-		-
-			message: '#^Variable \$nplurals in isset\(\) is never defined\.$#'
-			identifier: isset.variable
-			count: 1
-			path: ../Components/LiveTranslator/Translator.php
-
-		-
 			message: '#^Method App\\Components\\Menu\\Menu\:\:arrayRecursiveSearch\(\) invoked with 4 parameters, 2 required\.$#'
 			identifier: arguments.count
 			count: 1
@@ -445,72 +325,6 @@ parameters:
 			path: ../Components/Menu/Model/Menus.php
 
 		-
-			message: '#^Access to constant COLUMN_OAUTH_ID on an unknown class App\\Security\\Users\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Components/Security/FacebookLogin.php
-
-		-
-			message: '#^Access to constant COLUMN_OAUTH_SERVICE on an unknown class App\\Security\\Users\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Components/Security/FacebookLogin.php
-
-		-
-			message: '#^Parameter \#1 \$token of method League\\OAuth2\\Client\\Provider\\Facebook\:\:getResourceOwner\(\) expects League\\OAuth2\\Client\\Token\\AccessToken, League\\OAuth2\\Client\\Token\\AccessTokenInterface given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Components/Security/FacebookLogin.php
-
-		-
-			message: '#^Parameter \#2 \$oauthId of method App\\Model\\UserManager\:\:authenticateByOauth\(\) expects int, string\|null given\.$#'
-			identifier: argument.type
-			count: 2
-			path: ../Components/Security/FacebookLogin.php
-
-		-
-			message: '#^Access to an undefined property Nette\\Security\\IIdentity\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: ../Components/Security/Role.php
-
-		-
-			message: '#^Access to an undefined property Nette\\Security\\IIdentity\:\:\$role\.$#'
-			identifier: property.notFound
-			count: 1
-			path: ../Components/Security/Role.php
-
-		-
-			message: '#^Access to property \$id on an unknown class App\\Security\\Identity\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Components/Security/Role.php
-
-		-
-			message: '#^Access to property \$role on an unknown class App\\Security\\Identity\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Components/Security/Role.php
-
-		-
-			message: '#^Class App\\Security\\Identity not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Components/Security/Role.php
-
-		-
-			message: '#^Instantiated class App\\Security\\Exception not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Components/Security/Role.php
-
-		-
-			message: '#^Throwing object of an unknown class App\\Security\\Exception\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Components/Security/Role.php
-
-		-
 			message: '#^Call to an undefined method Nette\\Application\\UI\\ITemplate\:\:addFilter\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -575,18 +389,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../Components/TextInputCustomLabel.php
-
-		-
-			message: '#^Class Nette\\Forms\\Rendering\\IHtmlString not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Components/TwitterBootstrapRenderer/TwitterBootstrapRenderer.php
-
-		-
-			message: '#^Parameter \#1 \$child of method Nette\\Utils\\Html\:\:addHtml\(\) expects Nette\\HtmlStringable\|string, Nette\\Forms\\Rendering\\IHtmlString&Stringable given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Components/TwitterBootstrapRenderer/TwitterBootstrapRenderer.php
 
 		-
 			message: '#^Ternary operator condition is always true\.$#'
@@ -811,36 +613,6 @@ parameters:
 			path: ../Components/jzechy/nette-antispam/src/Validator.php
 
 		-
-			message: '#^Variable \$builtMail in PHPDoc tag @var does not match assigned variable \$builtMessage\.$#'
-			identifier: varTag.differentVariable
-			count: 1
-			path: ../Components/mail-panel-master/src/FileMailer.php
-
-		-
-			message: '#^Access to an undefined property Latte\\Engine\:\:\$onCompile\.$#'
-			identifier: property.notFound
-			count: 1
-			path: ../Components/mail-panel-master/src/MailPanel.php
-
-		-
-			message: '#^Call to an undefined method Latte\\Engine\:\:getCompiler\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../Components/mail-panel-master/src/MailPanel.php
-
-		-
-			message: '#^Call to method addMacro\(\) on an unknown class Latte\\Macros\\MacroSet\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Components/mail-panel-master/src/MailPanel.php
-
-		-
-			message: '#^Instantiated class Latte\\Macros\\MacroSet not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Components/mail-panel-master/src/MailPanel.php
-
-		-
 			message: '#^Call to an undefined method Nette\\Application\\UI\\Form\:\:addTagInput\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -861,12 +633,6 @@ parameters:
 		-
 			message: '#^Instanceof between string and Nette\\Utils\\DateTime will always evaluate to false\.$#'
 			identifier: instanceof.alwaysFalse
-			count: 1
-			path: ../Forms/BaseFormFactory.php
-
-		-
-			message: '#^PHPDoc tag @method for method App\\Forms\\BaseFormFactory\:\:addOwnDate\(\) parameter \#2 \$type default value contains unresolvable type\.$#'
-			identifier: methodTag.unresolvableType
 			count: 1
 			path: ../Forms/BaseFormFactory.php
 
@@ -901,30 +667,6 @@ parameters:
 			path: ../Forms/BaseFormPartFactory.php
 
 		-
-			message: '#^Access to property \$created_by on an unknown class App\\Forms\\CategorySubtype\\ArrayHash\.$#'
-			identifier: class.notFound
-			count: 2
-			path: ../Forms/CategoryFormFactory.php
-
-		-
-			message: '#^Access to property \$parent_id on an unknown class App\\Forms\\CategorySubtype\\ArrayHash\.$#'
-			identifier: class.notFound
-			count: 2
-			path: ../Forms/CategoryFormFactory.php
-
-		-
-			message: '#^Access to property \$translation on an unknown class App\\Forms\\CategorySubtype\\ArrayHash\.$#'
-			identifier: class.notFound
-			count: 4
-			path: ../Forms/CategoryFormFactory.php
-
-		-
-			message: '#^Access to property \$type on an unknown class App\\Forms\\CategorySubtype\\ArrayHash\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Forms/CategoryFormFactory.php
-
-		-
 			message: '#^Call to an undefined method Nette\\Application\\UI\\Form\:\:addTagInput\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -943,50 +685,14 @@ parameters:
 			path: ../Forms/CategoryFormFactory.php
 
 		-
-			message: '#^Parameter \#1 \$values of method App\\Service\\Category\:\:insert\(\) expects Nette\\Utils\\ArrayHash, App\\Forms\\CategorySubtype\\ArrayHash given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Forms/CategoryFormFactory.php
-
-		-
-			message: '#^Parameter \#2 \$values of method App\\Forms\\CategorySubtype\\ICategoryFormType\:\:onSuccessFormPart\(\) expects array, Nette\\Utils\\ArrayHash given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Forms/CategoryFormFactory.php
-
-		-
-			message: '#^Parameter \#2 \$values of method App\\Service\\Category\:\:update\(\) expects array, App\\Forms\\CategorySubtype\\ArrayHash given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Forms/CategoryFormFactory.php
-
-		-
 			message: '#^Property App\\Forms\\CategoryFormFactory\:\:\$languages is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
 			path: ../Forms/CategoryFormFactory.php
 
 		-
-			message: '#^Method App\\Forms\\CategorySubtype\\CategoryLinkFormPart\:\:onSuccessFormPart\(\) has invalid return type App\\Forms\\CategorySubtype\\ArrayHash\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Forms/CategorySubtype/CategoryLinkFormPart.php
-
-		-
-			message: '#^Method App\\Forms\\CategorySubtype\\DefaultFormPart\:\:onSuccessFormPart\(\) has invalid return type App\\Forms\\CategorySubtype\\ArrayHash\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Forms/CategorySubtype/DefaultFormPart.php
-
-		-
 			message: '#^Call to an undefined method App\\Model\\Categories\:\:validateUrl\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: ../Forms/CategorySubtype/GalleryFormPart.php
-
-		-
-			message: '#^Method App\\Forms\\CategorySubtype\\GalleryFormPart\:\:onSuccessFormPart\(\) has invalid return type App\\Forms\\CategorySubtype\\ArrayHash\.$#'
-			identifier: class.notFound
 			count: 1
 			path: ../Forms/CategorySubtype/GalleryFormPart.php
 
@@ -1003,40 +709,16 @@ parameters:
 			path: ../Forms/CategorySubtype/GalleryFormPart.php
 
 		-
-			message: '#^Method App\\Forms\\CategorySubtype\\HomepageFormPart\:\:onSuccessFormPart\(\) has invalid return type App\\Forms\\CategorySubtype\\ArrayHash\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Forms/CategorySubtype/HomepageFormPart.php
-
-		-
 			message: '#^Property App\\Forms\\CategorySubtype\\HomepageFormPart\:\:\$categoryModel is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
 			path: ../Forms/CategorySubtype/HomepageFormPart.php
 
 		-
-			message: '#^Method App\\Forms\\CategorySubtype\\ICategoryFormType\:\:onSuccessFormPart\(\) has invalid return type App\\Forms\\CategorySubtype\\ArrayHash\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Forms/CategorySubtype/ICategoryFormType.php
-
-		-
-			message: '#^Method App\\Forms\\CategorySubtype\\TextBoxFormPart\:\:onSuccessFormPart\(\) has invalid return type App\\Forms\\CategorySubtype\\ArrayHash\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Forms/CategorySubtype/TextBoxFormPart.php
-
-		-
 			message: '#^Property App\\Forms\\CategorySubtype\\TextBoxFormPart\:\:\$categoryModel is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
 			path: ../Forms/CategorySubtype/TextBoxFormPart.php
-
-		-
-			message: '#^Method App\\Forms\\CategorySubtype\\UrlFormPart\:\:onSuccessFormPart\(\) has invalid return type App\\Forms\\CategorySubtype\\ArrayHash\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Forms/CategorySubtype/UrlFormPart.php
 
 		-
 			message: '#^Call to an undefined method Nette\\ComponentModel\\IComponent\:\:getControlPrototype\(\)\.$#'
@@ -1237,12 +919,6 @@ parameters:
 			path: ../FrontModule/Presenters/ArticlesPresenter.php
 
 		-
-			message: '#^Access to private property \$layout of parent class Nette\\Application\\UI\\Presenter\.$#'
-			identifier: property.private
-			count: 1
-			path: ../FrontModule/Presenters/BasePresenter.php
-
-		-
 			message: '#^Call to an undefined method Nette\\Security\\UserStorage\:\:setNamespace\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -1397,12 +1073,6 @@ parameters:
 			identifier: variable.undefined
 			count: 1
 			path: ../Model/Categories.php
-
-		-
-			message: '#^Parameter \#1 \$hash of method App\\Model\\Files\:\:findByHash\(\) expects string, int given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Model/Files.php
 
 		-
 			message: '#^Property App\\Model\\Metas\:\:\$languages is never read, only written\.$#'
@@ -1709,6 +1379,18 @@ parameters:
 			identifier: phpDoc.parseError
 			count: 1
 			path: ../Presenters/BasePresenter.php
+
+		-
+			message: '#^Parameter \#1 \$token of method League\\OAuth2\\Client\\Provider\\Facebook\:\:getResourceOwner\(\) expects League\\OAuth2\\Client\\Token\\AccessToken, League\\OAuth2\\Client\\Token\\AccessTokenInterface given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../Security/FacebookLogin.php
+
+		-
+			message: '#^Access to an undefined property Nette\\Security\\IIdentity\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../Security/Role.php
 
 		-
 			message: '#^Call to an undefined method App\\Model\\Categories\:\:getAllInLanguage\(\)\.$#'

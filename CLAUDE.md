@@ -90,13 +90,30 @@ Jediný front controller `www/index.php` → `app/bootstrap.php`, který postupn
 Načítání tříd zajišťuje Nette **RobotLoader**, ne striktní PSR-4 sken Composeru — `bootstrap.php` volá
 `createRobotLoader()` nad celým adresářem app a indexuje třídy tokenizací souborů nezávisle na jejich
 fyzické cestě. Composerí `psr-4` mapa (`App\ -> app`, `App\Plugins\ -> app/Plugins`+`theme/Plugins`,
-`Theme\ -> theme`) se většinou dodržuje jako konvence, ale není závazná: např. vše pod `App\Security\*`
-(User, AuthorizatorFactory, Acl, Role, FacebookLogin) fyzicky leží v `app/Components/Security/`, ne v
-`app/Security/`. Neodvozujte cestu k souboru třídy jen z jejího namespace.
+`Theme\ -> theme`) se většinou dodržuje jako konvence, ale RobotLoader ji nevynucuje, takže se v repu
+příležitostně objeví třída fyzicky mimo cestu odpovídající jejímu namespace (do 2026-09-17 tomu tak bylo
+u `App\Security\*`, viz `docs/Changelog/2026-09-18-security-app-security-move.md` — od přesunu do
+`app/Security/` už PSR-4 odpovídá). Neodvozujte cestu k souboru třídy jen z jejího namespace, vždy
+dohledejte skutečné umístění (`find`/grep) — RobotLoader ho stejně najde napříč `app/` bez ohledu na to,
+jestli je Composer autoloader (a s ním nástroje jako `tests/` nebo PHPStan, které na RobotLoaderu nestojí)
+zrovna v souladu.
 
 `libs/nextras/datagrid` je lokálně vendorovaná kopie knihovny pro datagrid, zapojená přes ruční `psr-4`
 záznam navíc v `composer.json` (`Nextras\Datagrid\`) — nejde o skutečný Composer balíček, takže ho
-nenajdete ve `vendor/` ani v `composer.lock`.
+nenajdete ve `vendor/` ani v `composer.lock`. `libs/` není součástí PHPStan `scanDirectories`/`paths`
+(`app/config/phpstan.neon`), takže `composer stan` kód pod `libs/` vůbec nekontroluje — spouštějte
+`composer stan -- libs/<balíček>` ručně, pokud tam děláte netriviální změnu.
+
+`LiveTranslator` (vícejazyčnost, viz sekce "Obsahový model" níže) byl do 2026-09-18 stejným způsobem
+ručně vendorovaný v `libs/LiveTranslator`, ale od téhož dne je to skutečný Composer balíček
+`vladahejda/livetranslator`, natažený jako `type: vcs` repozitář z
+`https://github.com/Fire-man-x/LiveTranslator` (fork s opravami pro PHP 8.3/aktuální Nette — viz
+`docs/Changelog/2026-09-18-livetranslator-php83-nette-compat.md` a
+`docs/Changelog/2026-09-18-livetranslator-composer-package.md`). Žije tedy normálně ve `vendor/` a je
+pokrytý `composer stan` i `composer update` jako každý jiný balíček. **Pozor:** `vladahejda/livetranslator`
+existuje i na Packagistu (starý, opuštěný balíček z roku 2013, jen `dev-master` bez PHP 8/Nette 3
+podpory) — proto je v `composer.json` napevno zamčená přesná verze `"2.0"`, ne rozsah — s volným
+rozsahem by `composer update` mohl sáhnout po tom starém.
 
 ### Routování a hledání presenterů
 V `app/Router/` jsou tři poskytovatelé routerů, automaticky registrovaní přes Nette DI extension `search`
@@ -132,8 +149,8 @@ přes `App\DI\IPluginServiceLocator` / `IPluginComponentLocator` — takto se pl
 jádra, aniž by presenter znal konkrétní třídu pluginu.
 
 ### Autorizace (ACL)
-`App\Security\User` / `AuthorizatorFactory` / `Acl` / `Role` (fyzicky v `app/Components/Security/`)
-sestavují Nette ACL z modelů `Roles` a `Modules` (oprávnění řízená databází). Řízení přístupu na
+`App\Security\User` / `AuthorizatorFactory` / `Acl` / `Role` (fyzicky v `app/Security/`) sestavují
+Nette ACL z modelů `Roles` a `Modules` (oprávnění řízená databází). Řízení přístupu na
 presenterech/akcích v administraci se deklaruje PHP atributy z `app/Attributes/`: `#[Secured]` +
 `#[Resource('...')]` + `#[Privilege('...')]`. Vynucují se v
 `App\AdminModule\Presenters\BasePresenter::checkRequirements()`, která přes reflexi přečte atributy na

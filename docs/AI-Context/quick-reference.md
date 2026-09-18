@@ -14,7 +14,7 @@ kořenovém `CLAUDE.md` — ten je závazný, tohle je jen shrnutí pro rychlou 
 | Datagrid knihovna? | `Contributte\Datagrid\Datagrid` (nový kód). Ne `Ublaboo\DataGrid\DataGrid` (staré, viz composer.json historie). |
 | ACL? | `#[Secured] #[Resource('X')] #[Privilege('y')]` atributy z `app/Attributes/`. Vynucuje `AdminModule\Presenters\BasePresenter::checkRequirements()`. |
 | Routing admin? | `/administrace/<presenter>/<action>[/<id>]`, presenter jméno v URL malými písmeny/pomlčkami (`pets`, `dynamic-forms`), NE PascalCase. |
-| Testy? | `composer test` (Nette Tester nad `tests/`) — pilotní integrační testy nad in-memory SQLite, zatím jen `UrlManager::validateUrl`. Viz `AI-Context/gotchas.md`. |
+| Testy? | `composer test` (Nette Tester nad `tests/`) — integrační testy nad in-memory SQLite (`UrlManager`, `CustomRouter`) + unit test `App\Security\Role`. Zdaleka nepokrývá celé `app/`. Viz `AI-Context/gotchas.md`. |
 | PHPStan gate? | Level 5 (`composer stan`) je fakticky vynucovaná brána (s ~2000řádkovou baseline dluhu). `composer stan9`/`stan10` pro přísnější kontrolu nového kódu — spouštějte cíleně na měněné soubory, ne na celý strom. |
 
 ## Konvence nového kódu (viz CLAUDE.md "Tvrdá pravidla")
@@ -35,8 +35,10 @@ Grid (`Contributte\Datagrid\Datagrid`, zdroj `IDatagridSource::getDatagridSource
 
 ## Než začnete upravovat
 
-1. **Neodvozujte cestu souboru z namespace** — RobotLoader to nevynucuje (`App\Security\*` fyzicky v
-   `app/Components/Security/`). Vždy dohledejte skutečné umístění.
+1. **Neodvozujte cestu souboru z namespace** — RobotLoader to nevynucuje. Do 2026-09-17 tomu tak bylo u
+   `App\Security\*` (fyzicky v `app/Components/Security/`); od 2026-09-18 přesunuto do `app/Security/`
+   (viz `docs/Changelog/2026-09-18-security-app-security-move.md`), ale princip platí obecně dál — vždy
+   dohledejte skutečné umístění.
    Ta samá poznámka platí i pro `App\Model\Plugin\*` proti `App\DI\*`, jde skrz strom napříč — grep, ne odhad.
 2. **Jádro vs. plugin** — pokud editujete něco mimo `app/Plugins/**`, uvědomte si, že to ovlivní všechny
    klientské projekty forknuté z tohoto jádra (viz `Architecture/overview.md`).

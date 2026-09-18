@@ -62,11 +62,11 @@ class AuthorizatorFactory
 		$acl->addResource('Admin');
 		foreach($roleHasSomePermission as $roleWithPermission)
 		{
-			$acl->allow($roleWithPermission, 'Admin', Permission::ALL);
+			$acl->allow($roleWithPermission, 'Admin', Permission::All);
 		}
 
 		//DENY everything, what you can't to do, but with own you can do everything
-		$acl->deny(Permission::ALL, Permission::ALL, Permission::ALL, function (Permission $acl, $role, $resource, $privilege) {
+		$acl->deny(Permission::All, Permission::All, Permission::All, function (Permission $acl, $role, $resource, $privilege) {
 			//dump("Deny function");
 			//dump($acl, $role, $resource, $privilege);
 			//if ($role === Role::admin)
@@ -87,7 +87,7 @@ class AuthorizatorFactory
 		});
 
 		//ADMIN can do everything
-		$acl->allow('admin', Permission::ALL, Permission::ALL);
+		$acl->allow('admin', Permission::All, Permission::All);
 
 		return $acl;
 	}

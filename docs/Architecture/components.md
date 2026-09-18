@@ -14,9 +14,10 @@ patří.
   (`n:image`, `n:src`, `n:crop`, `n:bg` — viz `App\Components\FileManager\Macro\*`), registrovaná přes
   `App\Components\FileManager\DI\Extension` (výchozí makro-extension `Macro\ImageMacro`, dá se přidat
   další přes `fileManager: macros: [...]` v `config.neon`).
-- `Security` — `App\Security\User`/`AuthorizatorFactory`/`Acl`/`Role`, fyzicky pod
-  `app/Components/Security/`, ale v namespace `App\Security\*` (viz "RobotLoader vs. PSR-4" v
-  `overview.md`).
+
+`App\Security\User`/`AuthorizatorFactory`/`Acl`/`Role` byly do 2026-09-17 fyzicky součástí tohoto stromu
+(`app/Components/Security/`), i když v namespace `App\Security\*` — od 2026-09-18 přesunuty do
+`app/Security/`, viz "RobotLoader vs. PSR-4" v `overview.md`. Do `app/Components/` už nepatří.
 
 ### `TPresenter` trait vzor
 

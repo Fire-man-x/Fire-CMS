@@ -58,10 +58,10 @@ class UserManager implements Authenticator
 		$row = $this->usersModel->findByName($username)->fetch();
 
 		if (!$row) {
-			throw new AuthenticationException('The username is incorrect.', self::IDENTITY_NOT_FOUND);
+			throw new AuthenticationException('The username is incorrect.', self::IdentityNotFound);
 
 		} elseif (!$this->passwords->verify($password, $row[Users::COLUMN_PASSWORD_HASH])) {
-			throw new AuthenticationException('The password is incorrect.', self::INVALID_CREDENTIAL);
+			throw new AuthenticationException('The password is incorrect.', self::InvalidCredential);
 
 		} elseif ($this->passwords->needsRehash($row[Users::COLUMN_PASSWORD_HASH])) {
 			$row->update([
@@ -84,7 +84,7 @@ class UserManager implements Authenticator
 	 * Performs an OAuth authentication.
 	 * @throws AuthenticationException
 	 */
-	public function authenticateByOauth(string $oauthService, int $oauthId, string $oauthEmail): SimpleIdentity
+	public function authenticateByOauth(string $oauthService, string $oauthId, string $oauthEmail): SimpleIdentity
 	{
 		$user = $this->usersModel->findByOAuthId($oauthService, $oauthId);
 		if(!$user) {
@@ -95,7 +95,7 @@ class UserManager implements Authenticator
 		$user = $user->fetch();
 
 		if(!$user) {
-			throw new AuthenticationException('Authentication by OAuth is incorrect.', self::IDENTITY_NOT_FOUND);
+			throw new AuthenticationException('Authentication by OAuth is incorrect.', self::IdentityNotFound);
 		}
 
 		$arr = $user->toArray();

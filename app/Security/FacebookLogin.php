@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Security;
 
 use App\Model\UserManager;
+use App\Model\Users;
 use Contributte\OAuth2Client\Flow\Facebook\FacebookAuthCodeFlow;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\FacebookUser;

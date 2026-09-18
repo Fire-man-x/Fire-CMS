@@ -4,6 +4,23 @@ Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na det
 
 ## 2026-09-18
 
+- **`LiveTranslator` přesunut z ruční kopie v `libs/` na skutečný Composer balíček.** Viz
+  [2026-09-18-livetranslator-composer-package.md](2026-09-18-livetranslator-composer-package.md).
+  `composer.json` → `repositories` (vcs fork `Fire-man-x/LiveTranslator`) + `require
+  vladahejda/livetranslator: "2.0"` (zamčeno natvrdo, na Packagistu existuje stejnojmenný starý balíček).
+  `libs/LiveTranslator/` zatím ponecháno na disku, ale odpojeno.
+- **`libs/LiveTranslator` opraven pro PHP 8.3/aktuální Nette — spadal na každém requestu.** Viz
+  [2026-09-18-livetranslator-php83-nette-compat.md](2026-09-18-livetranslator-php83-nette-compat.md).
+  Root cause: `$presenterLanguageParam` default `array()` vs. návratový typ `string`; `Application::$presenter`
+  je teď privátní (`getPresenter()`). Přidán regresní test.
+- **`App\Security\*` přesunuto z `app/Components/Security/` do `app/Security/` (PSR-4 konečně sedí).**
+  Viz [2026-09-18-security-app-security-move.md](2026-09-18-security-app-security-move.md). Nahrazuje
+  dopolední `composer.json` classmap workaround z položky níže — ten je teď zase prázdný.
+- **Rozšířeny testy o `CustomRouter`, `App\Security\Role` a zbytek `UrlManager`.** Viz
+  [2026-09-18-nette-tester-more-tests.md](2026-09-18-nette-tester-more-tests.md). Nový
+  `composer.json` classmap pro `App\Security\*` (nahrazeno přesunem, viz položka výše). Mimochodem
+  zjištěno: jednoargumentová varianta konstruktoru `Role` je mrtvý/rozbitý kód (chybějící třídy
+  `Identity`/`Exception`) — needěláno, k rozhodnutí.
 - **Založena testovací infrastruktura (Nette Tester, `composer test`).** Viz
   [2026-09-18-nette-tester-setup.md](2026-09-18-nette-tester-setup.md). Integrační testy nad in-memory
   SQLite Explorerem (bez DI kontejneru), pilotně `UrlManager::validateUrl`. Mimochodem zdokumentovaná

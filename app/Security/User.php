@@ -47,7 +47,7 @@ class User extends \Nette\Security\User
 		//bdump(func_get_args(), 'isAllowed');
 		$isAllowed = parent::isAllowed($resource, $privilege);
 
-		if ($resource instanceof IUserAccessibleEntity && $isAllowed === false) {
+		if ($resource instanceof UserAccessibleResourceEntity && $isAllowed === false) {
 			return $resource->checkAccess($this->id, $privilege, $createdByUserId);
 		}
 

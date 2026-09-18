@@ -103,9 +103,14 @@ a nejde je smazat jako běžný uživatel z tohoto shellu — případně smazat
 ## RobotLoader vs. PSR-4 — necesta souboru z namespace
 
 `bootstrap.php` indexuje třídy tokenizací (`createRobotLoader()`), ne podle Composer psr-4 mapy. Composer
-psr-4 (`App\ -> app`, ...) je dodržovaná konvence, ne vynucené pravidlo. Známý příklad: celé `App\Security\*`
-(`User`, `AuthorizatorFactory`, `Acl`, `Role`, `FacebookLogin`) fyzicky leží v `app/Components/Security/`.
-Když hledáte třídu, `find`/`grep`, nehádejte cestu z namespace.
+psr-4 (`App\ -> app`, ...) je dodržovaná konvence, ne vynucené pravidlo — RobotLoader porušení nezachytí,
+ale Composer autoloader (na kterém stojí `tests/` i PHPStan) třídu mimo odpovídající cestu prostě nenajde.
+
+**Historický příklad (opraveno 2026-09-18):** celé `App\Security\*` (`User`, `AuthorizatorFactory`, `Acl`,
+`Role`, `FacebookLogin`) do 2026-09-17 fyzicky leželo v `app/Components/Security/`, ne v `app/Security/` —
+viz `docs/Changelog/2026-09-18-security-app-security-move.md`. Přesunuto, `composer.json` už kvůli tomu
+žádný `classmap` navíc nepotřebuje. Když příště narazíte na podobný nesoulad u jiné třídy, `find`/`grep`,
+nehádejte cestu z namespace.
 
 ## `ublaboo/datagrid` → `contributte/datagrid`
 
@@ -306,3 +311,112 @@ chování `UrlManager::validateUrl()`: kontrola unikátnosti URL **ignoruje `typ
 se unikátnost napříč CELOU tabulkou `firecms_urls`, ne jen v rámci stejného typu obsahu nebo jazyka. Není
 to bug, který by šlo mimochodem opravit v rámci založení testů (mění to chování jádra) — jen zdokumentovaná
 past pro příště, kdyby se to zdálo jako nechtěná chyba.
+
+### Rozšíření (2026-09-18): `App\Security\*`, `CustomRouter`, další `UrlManager` metody
+
+- Testy nad `App\Security\Role` původně (2026-09-18, dopoledne) vyžadovaly `composer.json` →
+  `autoload.classmap: ["app/Components/Security"]`, protože `App\Security\*` tehdy fyzicky leželo mimo
+  PSR-4 cestu odpovídající namespace. Po přesunu tříd do `app/Security/` (viz
+  `docs/Changelog/2026-09-18-security-app-security-move.md` a sekci "RobotLoader vs. PSR-4" výše) je
+  `classmap` prázdný a nepotřebný — Composer PSR-4 mapu (`App\ -> app`) teď dodrží sama. Narazíte-li
+  příště na testovanou třídu se stejným rozporem cesta/namespace, tenhle `classmap` je vzorové řešení:
+  přidejte její adresář do pole a spusťte `composer dump-autoload`.
+- **`App\Security\Role`, konstruktor s jedním argumentem (`Nette\Security\User`/`App\Security\Identity`),
+  je mrtvý/rozbitý kód** — `grep -rn "new Role("` v repu ukazuje, že se všude reálně volá jen dvouargumentová
+  varianta (`new Role($roleName, $userId)`, viz `App\Model\UserManager`). Jednoargumentová větev navíc
+  odkazuje na `App\Security\Identity` a `Exception` (bez `use`, tedy `App\Security\Exception`) — ani jedna
+  z těch tříd v repu neexistuje, takže by při skutečném zavolání spadla na fatální
+  `Error: Class "App\Security\Identity"/"App\Security\Exception" not found` místo očekávané výjimky.
+  `tests/Security/RoleTest.phpt` proto záměrně testuje jen tu skutečně používanou dvouargumentovou větev
+  (unit test bez DB — dobrý příklad, kde to jde, protože `Role` na rozdíl od většiny `app/Model` nezávisí
+  na `Nette\Database\Explorer`). Neopravováno v rámci zakládání testů — jde o změnu chování jádra, ne o
+  testovací infrastrukturu.
+- **`tests/Router/CustomRouterTest.phpt`** pokrývá `App\Router\CustomRouter::match()` — přímo tu finální
+  část metody, kde byl 2026-09-17 opravený bug s nezapisovaným presenterem (viz
+  `Changelog/2026-09-17-language-domains.md`), plus rozpoznávání jazyka podle domény vs. URL prefixu
+  `/xx/`. Zdokumentovaná past testem: **jakýkoliv URL segment tvaru `xx/...` (dvě malá písmena + lomítko)
+  se VŽDY zkusí interpretovat jako jazykový prefix** — pokud `xx` není aktivní jazyk, `match()` vrátí
+  `null` rovnou, BEZ pokusu o obyčejné vyhledání té URL (`testUnregisteredTwoLetterPrefixFailsHardInsteadOfFallingBackToPlainLookup`).
+  Test staví `Nette\Http\Request` přes nový `tests/Helpers/RequestFactory.php` — `UrlScript` musí dostat
+  explicitní `scriptPath = "/"` (ne prázdný řetězec), jinak `getPathInfo()` vrací vždy prázdný string (viz
+  zdroj `Nette\Http\UrlScript::setScriptPath()`), protože prázdný scriptPath se interně nahradí celou
+  cestou.
+- **`tests/Modules/UrlModule/UrlManagerLookups.phpt`** doplňuje zbylé čtecí metody `UrlManager`
+  (`getUrlInfoByTypeAndKey`/`existUrlByTypeAndKey`/`getUrlByTypeAndKey`/`getRedirectionInfoByUrl`) — stejný
+  SQLite Explorer, žádné nové vzory.
+- PHPStan (`composer stan -- tests`) defaultně analyzuje jen `*.php`, ne `*.phpt` — pomocné třídy pod
+  `tests/Helpers` tedy PHPStan kontroluje, samotné testovací scénáře (`*.phpt`) ne. Jejich "kontrolou" je
+  úspěšný běh `composer test`.
+
+## Vendorovaná legacy knihovna po přesunu do PHP8.3/aktuálního Nette umí spadnout na drobnostech
+
+`libs/LiveTranslator` (viz `docs/Changelog/2026-09-18-livetranslator-php83-nette-compat.md`) spadl po
+přesunu z `app/Components/LiveTranslator` do `libs/LiveTranslator` na každém requestu s
+`TypeError: ...getPresenterLanguageParam(): Return value must be of type string, array returned`. Dvě
+věci, na které narazíte znovu u jiné staré/vendorované knihovny při podobném "oprašování":
+
+- **Výchozí hodnota property neodpovídající jejímu deklarovanému typu je pod `declare(strict_types=1)`
+  tichá bomba** — `private $presenterLanguageParam = array();` s docblockem/návratovým typem metody
+  `string` fungovalo donedávna jen proto, že `setPresenterLanguageParam()` (jediné místo, co by default
+  přepsalo) se nikde reálně nevolá (v `config.neon` zakomentované). Jakmile se k defaultu přistoupí
+  (getter s návratovým typem), spadne to bez ohledu na to, jestli byla knihovna vůbec "použitá" ve smyslu
+  nastavené konfigurace. Stejný vzorec (mezivýsledek nesedící s deklarovaným typem) byl i ve
+  `Storage\File::__construct()`: `realpath()` může vrátit `false`, přiřazení do `protected string
+  $storageDir` by vybouchlo ještě PŘED vlastní kontrolou `false === ...`.
+- **`Nette\Application\Application::$presenter` je v aktuální Nette privátní** (`getPresenter(): ?IPresenter`
+  je jediná veřejná cesta) — starý kód počítal s dobou, kdy šlo sáhnout přímo na `->presenter`. Hledejte
+  `->presenter` (bez `get`) jako grep vzorek při portování podobného starého Nette kódu.
+
+V okamžiku téhle opravy byla knihovna ještě ručně vendorovaná v `libs/LiveTranslator` (psr-4 v
+`composer.json`) — od téhož dne je ale nahrazená skutečným Composer balíčkem staženým do `vendor/`, viz
+sekce níže. `vendor/` taky není v PHPStan `paths`, takže `composer stan -- vendor/vladahejda/livetranslator`
+je pořád potřeba spouštět ručně, pokud tam děláte netriviální změnu. Regresní test na přesně tenhle pád:
+`tests/LiveTranslator/TranslatorPhp83RegressionTest.phpt` — funguje beze změny bez ohledu na to, odkud se
+třídy `LiveTranslator\*` reálně natáhnou (jen namespace, ne cesta k souboru).
+
+**Dodatek — druhý bug skrytý za prvním:** Po opravě výše se objevilo
+`ErrorException: unserialize(): Extra data starting at offset 39 of 40 bytes` v
+`Storage/File.php::getAllTranslations()`. Byl v kódu odjakživa, jen se k němu nikdy nedostalo, dokud
+padalo něco dřív v tomtéž volání (`Panel::getPanel()` → `getPresenterLanguageParam()` →
+`isCurrentLangDefault()` → `getAllStrings()` → `getAllTranslations()` — teprve po opravě prvního bugu se
+provedení dostalo až sem). **Ponaučení pro příště: když opravíte jeden pád v řetězci volání, počítejte
+s tím, že hned za ním může čekat další, dosud nikdy neprovedený kód** — netvařte se, že jedna oprava
+znamená hotovo, dokud se skutečně neprojde celá cesta (proto přidán i konkrétní regresní test níže, ne
+jen manuální ověření jednoho pádu).
+
+Konkrétní root cause: `unserialize()` dostávala celý řádek ze souboru VČETNĚ koncového `"\n"`
+(`fgets()`/`file()` newline nezahazují) — `unserialize()` bere i jediný bajt navíc za koncem
+serializovaného pole jako "extra data" a vyhodí warning, který Nette Tester i Tracy v dev módu převádí
+na `ErrorException`. Postihovalo to KAŽDÝ řádek v `data/localization/*` (315+83 záznamů), jen to bylo
+v `getTranslation()` odjakživa maskované přes `@unserialize()` — `getAllTranslations()`/`__destruct()`
+tohle `@` neměly. Fix: `unserialize(rtrim($radek, "\n"))` na všech třech místech, co parsují syrový
+řádek ze souboru. Regresní test: `tests/LiveTranslator/FileStorageUnserializeTest.phpt` (fixture s
+UTF-8 diakritikou — `s:N:"..."` v serializovaném PHP je délka v BAJTECH, ne ve znacích, takže na čistě
+ASCII textu by šlo o stejný bug, jen hůř demonstrovatelný na jednom příkladu).
+
+## `LiveTranslator` jako Composer VCS balíček místo ruční kopie v `libs/`
+
+Od 2026-09-18 se `LiveTranslator` netahá z `libs/LiveTranslator` (psr-4), ale je to skutečný Composer
+balíček `vladahejda/livetranslator` z vlastního forku `https://github.com/Fire-man-x/LiveTranslator`
+(obsahuje výše popsané opravy pro PHP 8.3/aktuální Nette, tag `2.0`). Zapojení v `composer.json`:
+
+```json
+"repositories": [
+    {"type": "vcs", "url": "https://github.com/Fire-man-x/LiveTranslator"}
+],
+"require": {
+    "vladahejda/livetranslator": "2.0"
+}
+```
+
+**Proč přesná verze `"2.0"`, ne `^2.0` nebo `*`:** `vladahejda/livetranslator` už existuje na Packagistu —
+starý, opuštěný balíček z roku 2013 (jen `dev-master`, PHP/Nette verze neuvedené, prakticky Nette 2.x
+éra). Composer u stejného jména balíčku slučuje verze ze VŠECH nakonfigurovaných repozitářů (Packagist +
+náš `vcs`), takže volný rozsah verze by teoreticky mohl nechtěně sáhnout po tom starém. Přesné zamčení na
+`2.0` tohle riziko eliminuje. Přidáváte-li podobně vendorovanou knihovnu z vlastního forku, vždy nejdřív
+zkontrolujte `https://packagist.org/packages/<vendor>/<name>.json`, jestli pod stejným jménem něco cizího
+už neexistuje.
+
+Po přechodu z `libs/` na `vendor/` nebyla potřeba žádná změna v `tests/LiveTranslator/*` — testy odkazují
+jen na PHP namespace (`LiveTranslator\Translator` apod.), ne na cestu k souboru, takže je Composer
+autoloader normálně přesměroval na novou lokaci.

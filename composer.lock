@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "227270ee05ca2720ec114b3b6b57303e",
+    "content-hash": "74eb16d38ca2138af7d8e88cea894327",
     "packages": [
         {
             "name": "contributte/console",
@@ -3935,6 +3935,60 @@
                 }
             ],
             "time": "2026-03-17T15:56:42+00:00"
+        },
+        {
+            "name": "vladahejda/livetranslator",
+            "version": "2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Fire-man-x/LiveTranslator.git",
+                "reference": "44e52fb7f1afde5840941052fa33f1c3d81bca2e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Fire-man-x/LiveTranslator/zipball/44e52fb7f1afde5840941052fa33f1c3d81bca2e",
+                "reference": "44e52fb7f1afde5840941052fa33f1c3d81bca2e",
+                "shasum": ""
+            },
+            "require": {
+                "nette/nette": "~3.2",
+                "php": "~8.3"
+            },
+            "require-dev": {
+                "nette/tester": "@dev"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "LiveTranslator"
+                ]
+            },
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Patrik Votoček",
+                    "homepage": "http://patrik.votocek.cz"
+                },
+                {
+                    "name": "Tomáš Votruba",
+                    "homepage": "http://tomasvotruba.cz"
+                },
+                {
+                    "name": "Vladislav Hejda",
+                    "homepage": "http://hejdav.cz"
+                }
+            ],
+            "description": "Translator for Nette (PHP framework).",
+            "keywords": [
+                "nette",
+                "translator"
+            ],
+            "support": {
+                "source": "https://github.com/Fire-man-x/LiveTranslator/tree/2.0"
+            },
+            "time": "2026-09-18T08:16:35+00:00"
         }
     ],
     "packages-dev": [
@@ -4015,6 +4069,77 @@
                 "source": "https://github.com/nette/tester/tree/v2.6.2"
             },
             "time": "2026-09-13T00:11:01+00:00"
+        },
+        {
+            "name": "nextras/mail-panel",
+            "version": "v2.7.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nextras/mail-panel.git",
+                "reference": "2ae4d508507b35ffe4edca58a00dc30fb53505d1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nextras/mail-panel/zipball/2ae4d508507b35ffe4edca58a00dc30fb53505d1",
+                "reference": "2ae4d508507b35ffe4edca58a00dc30fb53505d1",
+                "shasum": ""
+            },
+            "require": {
+                "latte/latte": "~2.6 || ~3.0",
+                "nette/http": "~3.0",
+                "nette/mail": "~3.1 || ~4.0",
+                "nette/utils": "~3.0 || ~4.0",
+                "php": "~7.1 || ~8.0",
+                "tracy/tracy": "~2.4"
+            },
+            "require-dev": {
+                "mockery/mockery": "~1.3.3",
+                "nette/tester": "~2.0",
+                "phpstan/phpstan": "1.4.10"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.7-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Nextras\\MailPanel\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Jan Drábek",
+                    "homepage": "http://www.jandrabek.cz"
+                },
+                {
+                    "name": "Jan Marek",
+                    "homepage": "http://www.janmarek.net"
+                },
+                {
+                    "name": "Jan Škrášek",
+                    "email": "hrach.cz@gmail.com"
+                }
+            ],
+            "description": "MailPanel is extension for Nette Framework which captures sent e-mails in development mode and shows them in debugger bar.",
+            "keywords": [
+                "debugging",
+                "framework",
+                "mail",
+                "mail panel",
+                "mailing",
+                "mailpanel"
+            ],
+            "support": {
+                "issues": "https://github.com/nextras/mail-panel/issues",
+                "source": "https://github.com/nextras/mail-panel/tree/v2.7.1"
+            },
+            "time": "2026-05-03T21:36:35+00:00"
         },
         {
             "name": "phpstan/phpstan",

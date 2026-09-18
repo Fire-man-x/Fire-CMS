@@ -44,7 +44,7 @@ class Users extends BaseModel
 	}
 
 
-	public function findByOAuthId(string $oauthService, int $oauthId): \Nette\Database\Table\Selection
+	public function findByOAuthId(string $oauthService, string $oauthId): \Nette\Database\Table\Selection
 	{
 		return $this->findAll()
 			->where(self::COLUMN_OAUTH_SERVICE, $oauthService)

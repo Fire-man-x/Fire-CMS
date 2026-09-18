@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Security;
 
+use Exception;
+use Nette\Security\SimpleIdentity;
 use Nette\Security\User;
 
 class Role implements \Nette\Security\Role
@@ -16,15 +18,15 @@ class Role implements \Nette\Security\Role
 	public $role = null;
 
 
-	function __construct()
+	public function __construct()
 	{
 		$args = func_get_args(); // get input args
 		// instance of User or Identity
 		if (func_num_args() == 1) {
 			if ($args[0] instanceof User) {
-				$this->role = $args[0]->getIdentity()->role;
+				$this->role = $args[0]->getIdentity()->getRoles();
 				$this->id = $args[0]->getIdentity()->id;
-			} elseif ($args[0] instanceof Identity) {
+			} elseif ($args[0] instanceof SimpleIdentity) {
 				$this->role = $args[0]->role;
 				$this->id = $args[0]->id;
 			} else {

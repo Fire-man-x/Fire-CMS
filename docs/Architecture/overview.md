@@ -23,12 +23,15 @@ kontejner z:
 Třídy se načítají přes Nette **RobotLoader**, ne striktní PSR-4 sken Composeru — `bootstrap.php` volá
 `createRobotLoader()` nad celým `app/` a indexuje třídy tokenizací souborů nezávisle na jejich fyzické
 cestě. Composerí `psr-4` mapa (`App\ -> app`, `App\Plugins\ -> app/Plugins`+`theme/Plugins`, `Theme\ ->
-theme`) se většinou dodržuje jako konvence, ale RobotLoader ji nevynucuje — např. celé `App\Security\*`
-fyzicky leží v `app/Components/Security/`. Necesta souboru z namespace se tedy nedá spolehlivě odvodit,
-vždy je potřeba dohledat skutečné umístění (`find`/grep), ne hádat podle jmenného prostoru.
+theme`) se většinou dodržuje jako konvence, ale RobotLoader ji nevynucuje, takže se historicky v repu
+objevily třídy fyzicky mimo cestu odpovídající jejich namespace — např. do 2026-09-17 celé `App\Security\*`
+leželo v `app/Components/Security/`, ne v `app/Security/` (od 2026-09-18 přesunuto, viz
+`docs/Changelog/2026-09-18-security-app-security-move.md`). Cestu souboru se tedy nedá spolehlivě odvodit
+jen z namespace, vždy je potřeba dohledat skutečné umístění (`find`/grep), ne hádat podle jmenného
+prostoru — Composer autoloader (na kterém stojí `tests/` i PHPStan, na rozdíl od RobotLoaderu za běhu
+appky) na takový nesoulad narazí a třídu prostě nenajde.
 
-Nový kód (viz `data/migrations/`, nové pluginy) by se měl PSR-4 mapě/RobotLoaderu držet i tak — jde jen o
-to, že historický kód tuto disciplínu nemá a nebude se kvůli tomu retroaktivně přesouvat.
+Nový kód (viz `data/migrations/`, nové pluginy) by se měl PSR-4 mapě/RobotLoaderu držet i tak.
 
 ## Vysokoúrovňový pohled
 
