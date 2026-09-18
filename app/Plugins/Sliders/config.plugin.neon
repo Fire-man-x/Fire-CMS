@@ -3,6 +3,14 @@
 #		Admin:Comments: App\Modules\CommentsModule\AdminModule\*Presenter
 #		*: App\*Module\Presenters\*Presenter
 
+migrations:
+	groups:
+		sliders:
+			enabled: true
+			directory: %appDir%/Plugins/Sliders/data/migrations
+			dependencies: [structures]
+			generator: null
+
 services:
 	#Admin
 	- App\Plugins\Sliders\Model\Sliders

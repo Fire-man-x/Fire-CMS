@@ -92,7 +92,7 @@
 
 			<div n:if="$user->isLoggedIn() && $user->isAllowed('Admin')" class="collapse navbar-collapse" id="navbarResponsive">
 			<ul class="nav navbar-nav me-auto ">
-				<li n:if="$user->isAllowed('Categories', 'view') || /*$user->isAllowed('Articles', 'view') ||*/ $user->isAllowed('FilesManager', 'view') || $user->isAllowed('Menus', 'view')" class="nav-item dropdown {if
+				<li n:if="$user->isAllowed('Categories', 'view') || $user->isAllowed('Articles', 'view') || $user->isAllowed('FilesManager', 'view') || $user->isAllowed('Menus', 'view')" class="nav-item dropdown {if
 						$presenter->isLinkCurrent(':Admin:Categories:*') ||
 						$presenter->isLinkCurrent(':Admin:Articles:*') ||
 						$presenter->isLinkCurrent(':Admin:FilesManager:*') ||

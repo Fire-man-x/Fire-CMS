@@ -5,11 +5,17 @@ namespace App\AdminModule\SettingsModule\Presenters;
 
 
 
+use App\Attributes\Privilege;
+use App\Attributes\Resource;
+use App\Attributes\Secured;
 use App\Forms\SettingFormFactory;
 
 /**
  * Settings Default presenter.
  */
+#[Secured]
+#[Resource('Settings')]
+#[Privilege('view')]
 class DefaultPresenter extends BasePresenter
 {
 

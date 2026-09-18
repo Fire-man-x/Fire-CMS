@@ -67,7 +67,7 @@ class RoleFormFactory extends BaseFormFactory
 			//if default - dont update name
 			$isDefault = $this->model->findAll()
 				->where($this->model->getColumnId(), $this->getEditId())
-				->fetchField("default");
+				->fetch()?->default;
 			if($isDefault){
 				unset($values->name);
 			}
@@ -93,7 +93,7 @@ class RoleFormFactory extends BaseFormFactory
 	}
 
 
-	public function createModuleForm($editId = null): Form
+	public function createModuleForm(int $editId = null): Form
 	{
 		$form = parent::create($editId);
 
@@ -125,7 +125,7 @@ class RoleFormFactory extends BaseFormFactory
 	}
 
 
-	public function formModuleSucceeded($form, $values)
+	public function formModuleSucceeded($form, $values): void
 	{
 		unset($values->editId);
 		$otherPrivileges = $this->modelModules->getAllOtherPrivileges()->fetchAssoc("parent_id|module_id");
@@ -140,11 +140,11 @@ class RoleFormFactory extends BaseFormFactory
 			} else {
 				$privilege = Acl::$privileges[$privilege];
 			}
-			$this->model->updateRoleModule($this->getEditId(), $moduleId, $privilege);
+			$this->model->updateRoleModule((int) $this->getEditId(), $moduleId, $privilege);
 		}
 		foreach ($otherPrivileges as $moduleId => $otherPrivilege) {
 			foreach ($otherPrivilege as $subModuleId => $privilege) {
-				$this->model->updateRoleModule($this->getEditId(), $subModuleId,
+				$this->model->updateRoleModule((int)  $this->getEditId(), $subModuleId,
 					$otherPrivilegesValues[$moduleId][$subModuleId] == "allow" ? $privilege["privilege"] : null
 					);
 			}
@@ -161,7 +161,7 @@ class RoleFormFactory extends BaseFormFactory
 	/**
 	 * Set default values to modal form
 	 */
-	public function setModuleFormDefaultValues(Form $form, int $editId)
+	public function setModuleFormDefaultValues(Form $form, int $editId): void
 	{
 		$defaults = $this->model->getRoleModules($editId);
 		array_walk($defaults, function(&$value) {

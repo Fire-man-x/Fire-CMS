@@ -2,19 +2,6 @@ INSERT INTO `firecms_languages` (`language_id`, `active`, `default`, `position`,
 	('en',	1,	1,	1,	'Angličitina',	'EN'),
 	('jn',	0,	0,	3,	'Jablka',	'JN');
 
-INSERT INTO `firecms_modules` (`module_id`, `parent_id`, `name`, `privilege`, `title`) VALUES
-	(1,	NULL,	'Settings',	NULL,	'Settings'),
-	(2,	NULL,	'Users',	NULL,	'Users'),
-	(3,	NULL,	'Categories',	NULL,	'Categories'),
-	(4,	NULL,	'Articles',	NULL,	'Articles'),
-	(5,	NULL,	'FilesManager',	NULL,	'Files manager'),
-	(6,	NULL,	'Menus',	NULL,	'Menus'),
-	(7,	NULL,	'Tags',	NULL,	'Tags'),
-	(8,	4,	NULL,	'approve_article',	'Approve article'),
-	(9,	2,	NULL,	'visit_tags',	'Tags'),
-	(10,	NULL,	'Comments',	NULL,	'Comments'),
-	(11,	NULL,	'Plugins',	NULL,	'Plugins');
-
 INSERT INTO `firecms_options` (`key`, `value`) VALUES
 	('image_resolution',	'1000x1000'),
 	('main_description',	'Toto je popis webu'),
@@ -25,6 +12,23 @@ INSERT INTO `firecms_options` (`key`, `value`) VALUES
 	('main_email',	'info@example.com'),
 	('themePath',	'sdh');
 
+INSERT INTO `firecms_modules` (`parent_id`, `name`, `privilege`, `title`) VALUES
+	(NULL,	'Settings',	NULL,	'Settings'),
+	(NULL,	'Users',	NULL,	'Users'),
+	(NULL,	'Roles',	NULL,	'Roles'),
+	(NULL,	'Categories',	NULL,	'Categories'),
+	(NULL,	'Articles',	NULL,	'Articles'),
+	(5,	NULL,	'approve_article',	'Approve article'),
+	(2,	NULL,	'visit_tags',	'Tags'),
+	(NULL,	'Plugins',	NULL,	'Plugins'),
+	(NULL,	'Domains',	NULL,	'Domains'),
+	(NULL,	'Languages',	NULL,	'Languages'),
+	(NULL,	'Metas',	NULL,	'Metas'),
+	(NULL,	'FilesManager',	NULL,	'Files manager'),
+	(NULL,	'Menus',	NULL,	'Menus'),
+	(NULL,	'Tags',	NULL,	'Tags'),
+	(NULL,	'Comments',	NULL,	'Comments');
+
 INSERT INTO `firecms_roles` (`role_id`, `parent_id`, `default`, `position`, `name`, `title`) VALUES
 	(1,	NULL,	1,	1,	'admin',	'Administrátor'),
 	(2,	NULL,	1,	2,	'editor',	'Redaktor'),
@@ -33,18 +37,18 @@ INSERT INTO `firecms_roles` (`role_id`, `parent_id`, `default`, `position`, `nam
 
 
 INSERT INTO `firecms_roleModule` (`role_id`, `module_id`, `privilege`) VALUES
-	(2,	3,	'view'),
-	(2,	4,	'view'),
-	(2,	5,	'view'),
-	(2,	8,	'approve_article'),
-	(2,	9,	'visit_tags'),
-	(3,	1,	'edit'),
-	(3,	2,	'view'),
-	(3,	3,	'add'),
-	(4,	1,	'view'),
-	(4,	2,	'view'),
-	(4,	3,	'view'),
-	(4,	4,	'view');
+	(2,	4,	'edit'),
+	(2,	5,	'edit'),
+	(2,	6,	'approve_article'),
+	(2,	7,	'visit_tags'),
+	(2,	11,	'edit'),
+	(2,	13,	'edit'),
+	(2,	14,	'edit'),
+	(3,	5,	'add'),
+	(3,	7,	'visit_tags'),
+	(3,	11,	'add'),
+	(3,	14,	'add'),
+	(4,	5,	'view');
 
 
 INSERT INTO `firecms_users` (`user_id`, `username`, `password`, `email`, `active`, `nickname`, `first_name`, `surname`, `role_id`, `recovery_password_time`, `recovery_password_token`) VALUES

@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace App\Plugins\Sliders\AdminModule\Presenters;
 
 use App\AdminModule\Presenters\BasePresenter;
+use App\Attributes\Privilege;
+use App\Attributes\Resource;
+use App\Attributes\Secured;
 use App\Model\Files;
 use App\Plugins\Sliders\Forms\SliderFormFactory;
 use App\Plugins\Sliders\Forms\SliderItemFormFactory;
@@ -18,6 +21,9 @@ use Nette\InvalidArgumentException;
 /**
  * Sliders presenter.
  */
+#[Secured]
+#[Resource('Sliders')]
+#[Privilege('view')]
 class SlidersPresenter extends BasePresenter
 {
 
@@ -174,6 +180,9 @@ class SlidersPresenter extends BasePresenter
 	/**
 	 * Add handler
 	 */
+	#[Secured]
+	#[Resource('Sliders')]
+	#[Privilege('add')]
 	public function handleAdd(): void
 	{
 		$this->factorySlider->resetEditMode();
@@ -184,6 +193,9 @@ class SlidersPresenter extends BasePresenter
 	/**
 	 * Edit handler
 	 */
+	#[Secured]
+	#[Resource('Sliders')]
+	#[Privilege('edit')]
 	public function handleEdit(int $slider_id): void
 	{
 		$this->factorySlider->setEditId($slider_id);
@@ -195,6 +207,9 @@ class SlidersPresenter extends BasePresenter
 	/**
 	 * Delete handler
 	 */
+	#[Secured]
+	#[Resource('Sliders')]
+	#[Privilege('delete')]
 	public function handleDelete(int $slider_id): void
 	{
 		if (!$this->modelSliders->getById($slider_id)?->default) {
@@ -210,6 +225,9 @@ class SlidersPresenter extends BasePresenter
 	/**
 	 * Add item handler
 	 */
+	#[Secured]
+	#[Resource('Sliders')]
+	#[Privilege('edit')]
 	public function handleAddItem(string $language): void
 	{
 		//$this->factorySliderItem->setLanguage($language);
@@ -221,6 +239,9 @@ class SlidersPresenter extends BasePresenter
 	/**
 	 * Edit item handler
 	 */
+	#[Secured]
+	#[Resource('Sliders')]
+	#[Privilege('edit')]
 	public function handleEditItem(string $language, int $position): void
 	{
 		$this->factorySliderItem->setEditId($position);
@@ -233,6 +254,9 @@ class SlidersPresenter extends BasePresenter
 	/**
 	 * Remove item handler
 	 */
+	#[Secured]
+	#[Resource('Sliders')]
+	#[Privilege('edit')]
 	public function handleRemoveItem(string $language, int $position): void
 	{
 		$this->modelSliderItems->delete(array(
@@ -251,6 +275,9 @@ class SlidersPresenter extends BasePresenter
 	/**
 	 * Add item image handler
 	 */
+	#[Secured]
+	#[Resource('Sliders')]
+	#[Privilege('edit')]
 	public function handleAddItemImage(array $files, ?string $language = null): void
 	{
 		if(empty($files)){
@@ -276,6 +303,9 @@ class SlidersPresenter extends BasePresenter
 	/**
 	 * Add item image handler
 	 */
+	#[Secured]
+	#[Resource('Sliders')]
+	#[Privilege('edit')]
 	public function handleSortItems(string $language, array $items): void
 	{
 		if(!$language){

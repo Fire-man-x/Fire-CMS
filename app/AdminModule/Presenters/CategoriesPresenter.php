@@ -11,7 +11,6 @@ use App\Forms\CategoryFormFactory;
 use App\Forms\MetaValueFormFactory;
 use App\Model\Categories;
 use App\Model\Files;
-use App\Modules\CommentsModule;
 use App\Modules\UrlModule\UrlManager;
 use App\Service\Category;
 use App\Service\LanguageService;
@@ -23,6 +22,9 @@ use Nette\Application\Attributes\Persistent;
 /**
  * Category Presenter
  */
+#[Secured]
+#[Resource('Categories')]
+#[Privilege('view')]
 class CategoriesPresenter extends BasePresenter
 {
 	/**

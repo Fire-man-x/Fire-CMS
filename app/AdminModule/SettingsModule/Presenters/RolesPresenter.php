@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace App\AdminModule\SettingsModule\Presenters;
 
+use App\Attributes\Privilege;
+use App\Attributes\Resource;
+use App\Attributes\Secured;
 use App\Forms\RoleFormFactory;
 use App\Model\Roles;
 use Contributte\Datagrid\Datagrid;
@@ -11,6 +14,9 @@ use Nette;
 /**
  * Roles presenter.
  */
+#[Secured]
+#[Resource('Roles')]
+#[Privilege('view')]
 class RolesPresenter extends BasePresenter
 {
 
@@ -165,6 +171,7 @@ class RolesPresenter extends BasePresenter
 	public function handleEdit(int $role_id): void
 	{
 		$this->factory->setEditId($role_id);
+		/** @see self::createComponentRoleForm() */
 		/** @var Nette\Application\UI\Form $form */
 		$form = $this["roleForm"];
 		$this->factory->setDefaultValues($form, $role_id);
@@ -193,8 +200,9 @@ class RolesPresenter extends BasePresenter
 	public function handleEditRolePermission(int $role_id): void
 	{
 		$this->factory->setEditId($role_id);
+		/** @see self::createComponentRoleModulesForm() */
 		/** @var Nette\Application\UI\Form $form */
-		$form = $this["roleForm"];
+		$form = $this["roleModulesForm"];
 		$this->factory->setModuleFormDefaultValues($form, $role_id);
 		$this->redrawControl("roleModulesForm");
 	}

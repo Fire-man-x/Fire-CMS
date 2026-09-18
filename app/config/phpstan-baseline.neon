@@ -1069,12 +1069,6 @@ parameters:
 			path: ../Model/Metas.php
 
 		-
-			message: '#^Call to function is_null\(\) with string will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: ../Model/Roles.php
-
-		-
 			message: '#^Negated boolean expression is always false\.$#'
 			identifier: booleanNot.alwaysFalse
 			count: 1
@@ -1331,6 +1325,12 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: ../Plugins/DynamicForms/Forms/DynamicFormFormFactory.php
+
+		-
+			message: '#^Access to an undefined property Nette\\Application\\UI\\Presenter\:\:\$language\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../Plugins/Sliders/Components/SliderComponentFactory.php
 
 		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'

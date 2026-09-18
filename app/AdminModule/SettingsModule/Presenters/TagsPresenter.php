@@ -17,6 +17,9 @@ use Nette\Application\Attributes\Persistent;
 /**
  * Tags presenter.
  */
+#[Secured]
+#[Resource('Tags')]
+#[Privilege('view')]
 class TagsPresenter extends BasePresenter
 {
 

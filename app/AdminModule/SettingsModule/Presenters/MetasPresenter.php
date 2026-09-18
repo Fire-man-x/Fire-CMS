@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace App\AdminModule\SettingsModule\Presenters;
 
+use App\Attributes\Privilege;
+use App\Attributes\Resource;
+use App\Attributes\Secured;
 use App\Model\Metas;
 use App\Forms\MetaFormFactory;
 use App\Service\LanguageService;
@@ -13,6 +16,9 @@ use Nette;
 /**
  * Metas presenter.
  */
+#[Secured]
+#[Resource('Metas')]
+#[Privilege('view')]
 class MetasPresenter extends BasePresenter
 {
 

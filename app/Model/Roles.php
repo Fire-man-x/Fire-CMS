@@ -119,7 +119,7 @@ class Roles extends BaseModel implements IList
 	 * Update all priviledges
 	 * @throws \InvalidArgumentException
 	 */
-	public function updateRoleModule(int $role_id, int $module_id, string $privilege)
+	public function updateRoleModule(int $role_id, int $module_id, ?string $privilege)
 	{
 		/*if (!is_null($privilege) && !in_array($privilege, Acl::$privileges)) {
 			throw new \InvalidArgumentException("Permission '$privilege' is not allowed.");

@@ -3,16 +3,21 @@ declare(strict_types=1);
 
 namespace App\AdminModule\SettingsModule\Presenters;
 
-use App\Model\Languages;
+use App\Attributes\Privilege;
+use App\Attributes\Resource;
+use App\Attributes\Secured;
 use App\Forms\LanguageFormFactory;
+use App\Model\Languages;
 use Contributte\Datagrid\Column\ColumnLink;
 use Contributte\Datagrid\Datagrid;
-use JetBrains\PhpStorm\NoReturn;
 use Nette;
 
 /**
  * Languages presenter.
  */
+#[Secured]
+#[Resource('Languages')]
+#[Privilege('view')]
 class LanguagesPresenter extends BasePresenter
 {
 

@@ -24,6 +24,9 @@ use Nette\Application\Attributes\Persistent;
 /**
  * Article Presenter
  */
+#[Secured]
+#[Resource('Articles')]
+#[Privilege('view')]
 class ArticlesPresenter extends BasePresenter
 {
 	/**
