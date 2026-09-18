@@ -6,3 +6,4 @@ www/files/*
 www/theme/*/.sass-cache
 vendor/*
 !vendor/.htaccess
+tests/temp

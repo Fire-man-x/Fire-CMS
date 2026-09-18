@@ -2,6 +2,13 @@
 
 Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na detailní záznam v `Changelog/`.
 
+## 2026-09-18
+
+- **Založena testovací infrastruktura (Nette Tester, `composer test`).** Viz
+  [2026-09-18-nette-tester-setup.md](2026-09-18-nette-tester-setup.md). Integrační testy nad in-memory
+  SQLite Explorerem (bez DI kontejneru), pilotně `UrlManager::validateUrl`. Mimochodem zdokumentovaná
+  past: `validateUrl()` hlídá unikátnost URL napříč celou tabulkou, ignoruje `type`/`language_id`.
+
 ## 2026-09-17
 
 - **DB tabulky jádra a pluginů dostaly prefix `firecms_`/`firecms_plugin_` (název za prefixem camelCase).** Viz

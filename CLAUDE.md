@@ -45,16 +45,28 @@ composer stan9 / composer stan10 # stejná analýza vynucená na úroveň 9 / 10
 composer stan-generate-baseline  # znovu vygeneruje app/config/phpstan-baseline.neon
 composer stan-report             # tabulkový report zapsaný do log/phpstan-report.txt
 composer stan-report-json        # JSON report zapsaný do log/phpstan-report.json
+composer test                    # Nette Tester nad tests/; lze zadat i konkrétní cestu:
+composer test -- tests/Modules/UrlModule
 ```
 
 - PHPStan baseline je fakticky prázdný (1 řádek), takže spuštění `composer stan` nad celým stromem `app/`
   aktuálně odhalí i již existující chyby nesouvisející s vaší konkrétní změnou (např. v
   `app/Model/Articles.php`). Analýzu proto směřujte jen na soubory/adresáře, kterých se vaše změna skutečně
   týká, a neberte šum z celého repozitáře jako chybu, kterou jste způsobili vy.
-- Projekt nemá vlastní automatizovanou sadu testů. `nette/tester` je sice vývojová závislost, ale jediné
-  soubory `*Test*.php` v repozitáři leží uvnitř vendorovaných komponent třetích stran (např.
-  `app/Components/VisualPaginator-3.0/tests`, `app/Components/mail-panel-master/tests`) a testují tyto
-  knihovny, ne tuto aplikaci.
+- Od 2026-09-18 existuje `tests/` (Nette Tester, spouští se přes `composer test`) — integrační testy nad
+  in-memory SQLite `Nette\Database\Explorer` sestaveným ručně bez DI kontejneru
+  (`tests/Helpers/SqliteDatabase.php`), bez závislosti na `config.local.neon`. Pokrytí je zatím pilotní
+  (`UrlManager::validateUrl`), ne kompletní regresní sada — `app/Model/BaseModel` je přímo svázaný s
+  `Explorer` (konkrétní třída, ne interface), takže čisté unit testy bez DB jsou v jádru vzácné a smysluplné
+  testy jsou většinou integrační. `BaseModel::insert()` navíc používá MySQL-specifické
+  `SELECT LAST_INSERT_ID()`, které SQLite nezná — testovací fixture data vkládejte přímo přes
+  `Explorer::query()`, ne přes model. Nové PHP soubory pod `tests/` vyžadují `composer dump-autoload`
+  (`autoload-dev.psr-4: Tests\\ → tests`). `composer stan` tenhle strom nekontroluje (`paths` jen na
+  `app/`) — nový test kód proto ověřte ručně přes `composer stan -- tests`. Podrobnosti a další pasti viz
+  `docs/AI-Context/gotchas.md` sekce "Testování přes Nette Tester".
+- Vendorované komponenty třetích stran mají vlastní testy nezávislé na tomhle (např.
+  `app/Components/VisualPaginator-3.0/tests`, `app/Components/mail-panel-master/tests`) — testují tyto
+  knihovny, ne aplikaci, a `composer test` je nespouští.
 - Chybí jakékoliv JS/CSS build nástroje (žádný `package.json`) — frontendové assety pod `www/` se servírují
   tak, jak jsou.
 - Aplikace je klasický cíl pro Apache + mod_rewrite (`www/.htaccess` přesměrovává vše kromě statických

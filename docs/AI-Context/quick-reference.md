@@ -14,7 +14,7 @@ kořenovém `CLAUDE.md` — ten je závazný, tohle je jen shrnutí pro rychlou 
 | Datagrid knihovna? | `Contributte\Datagrid\Datagrid` (nový kód). Ne `Ublaboo\DataGrid\DataGrid` (staré, viz composer.json historie). |
 | ACL? | `#[Secured] #[Resource('X')] #[Privilege('y')]` atributy z `app/Attributes/`. Vynucuje `AdminModule\Presenters\BasePresenter::checkRequirements()`. |
 | Routing admin? | `/administrace/<presenter>/<action>[/<id>]`, presenter jméno v URL malými písmeny/pomlčkami (`pets`, `dynamic-forms`), NE PascalCase. |
-| Testy? | Žádné vlastní (jen vendor testy uvnitř třetí-stranových komponent). |
+| Testy? | `composer test` (Nette Tester nad `tests/`) — pilotní integrační testy nad in-memory SQLite, zatím jen `UrlManager::validateUrl`. Viz `AI-Context/gotchas.md`. |
 | PHPStan gate? | Level 5 (`composer stan`) je fakticky vynucovaná brána (s ~2000řádkovou baseline dluhu). `composer stan9`/`stan10` pro přísnější kontrolu nového kódu — spouštějte cíleně na měněné soubory, ne na celý strom. |
 
 ## Konvence nového kódu (viz CLAUDE.md "Tvrdá pravidla")

@@ -283,3 +283,26 @@ Plugins — vůbec nezná, ten čte jen `migrations:` NEON sekci). Dokumentován
 Interní bookkeeping tabulka `migrations` (vytváří ji `nextras/migrations`, eviduje spuštěné soubory) je
 záměrně BEZ prefixu — je to infrastruktura knihovny, ne obsahová data aplikace (`PluginMigrator::
 deactivate()` na ni má natvrdo napsaný raw SQL dotaz, přejmenování by vyžadovalo patchnout i to).
+
+## Testování přes Nette Tester (`composer test`, od 2026-09-18)
+
+`tests/` je nový, samostatný strom mimo `app/` — `composer stan` ho nekontroluje (`app/config/phpstan.neon`
+má `paths` jen na `app/`), takže na testy spouštějte `composer stan -- tests` ručně, pokud tam přidáváte
+netriviální logiku. Autoload testovacích tříd (`Tests\*`) jde přes `autoload-dev.psr-4` v `composer.json`
+(`Tests\\` → `tests`) — po přidání nové třídy pod `tests/` je potřeba `composer dump-autoload`, jinak
+Tester spadne na "Class not found" (RobotLoader se testů netýká, ten indexuje jen `%appDir%`).
+
+**Proč integrační testy nad in-memory SQLite, ne mock DB ani reálná MySQL:** `App\Model\BaseModel` je tenký
+obal přímo nad `Nette\Database\Explorer` (konkrétní třída, ne interface) — mockovat by šlo jen přes
+partial mock frameworku, což je křehké. Nette Database ale umí i sqlite driver, takže
+`tests/Helpers/SqliteDatabase::create()` postaví `Explorer` ručně (Connection + Structure + MemoryStorage
+cache), BEZ DI kontejneru, BEZ `config.local.neon` (tam bývají ostrá přihlašovací data). Nevýhoda:
+**`BaseModel::insert()` volá MySQL-specifické `SELECT LAST_INSERT_ID()`, které SQLite nezná** — cokoliv,
+co interně volá `BaseModel::insert()`, se přes tenhle Explorer testovat nedá (test data pro fixture proto
+vkládejte přímo přes `Explorer::query('INSERT INTO ...')`, ne přes model).
+
+**Pilotní test `tests/Modules/UrlModule/UrlManagerValidateUrl.phpt`** mimochodem zdokumentoval netriviální
+chování `UrlManager::validateUrl()`: kontrola unikátnosti URL **ignoruje `type` i `language_id`** — hlídá
+se unikátnost napříč CELOU tabulkou `firecms_urls`, ne jen v rámci stejného typu obsahu nebo jazyka. Není
+to bug, který by šlo mimochodem opravit v rámci založení testů (mění to chování jádra) — jen zdokumentovaná
+past pro příště, kdyby se to zdálo jako nechtěná chyba.

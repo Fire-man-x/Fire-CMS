@@ -59,11 +59,13 @@ composer stan-report             # tabulkový report do log/phpstan-report.txt
 composer stan-report-json        # JSON report do log/phpstan-report.json
 ```
 
-Projekt nemá vlastní automatizovanou sadu testů (`nette/tester` je závislost, ale jediné `*Test*.php`
-soubory jsou uvnitř vendorovaných komponent třetích stran a testují je, ne aplikaci). Chybí jakékoliv
-JS/CSS build nástroje — frontendové assety pod `www/` se servírují tak, jak jsou. Aplikace běží na Apache +
-mod_rewrite (`www/.htaccess`); v repozitáři není příkaz pro PHP built-in server ani CLI runtime mimo
-Composer skripty výše.
+Od 2026-09-18 existuje `composer test` (Nette Tester nad `tests/`, viz `AI-Context/gotchas.md` sekce
+"Testování přes Nette Tester"). Jde o integrační testy nad in-memory SQLite Explorerem sestaveným ručně
+(bez DI kontejneru) — vhodné pro `Model`/business-logic třídy nezávislé na presenterech. Pokrytí je zatím
+pilotní (`UrlManager::validateUrl`), ne kompletní regresní sada. Chybí jakékoliv JS/CSS build nástroje —
+frontendové assety pod `www/` se servírují tak, jak jsou. Aplikace běží na Apache + mod_rewrite
+(`www/.htaccess`); v repozitáři není příkaz pro PHP built-in server ani CLI runtime mimo Composer skripty
+výše.
 
 ## Kde hledat dál
 

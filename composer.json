@@ -34,8 +34,14 @@
         "files": [
         ]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests"
+        }
+    },
 	"scripts": {
 		"console": "@php bin/console",
+		"test": "@php \"vendor/bin/tester\" tests -C -s",
 		"stan": "@php \"vendor/bin/phpstan\" analyse --configuration \"app/config/phpstan.neon\" -vvv --ansi",
 		"stan-generate-baseline": "@php \"vendor/bin/phpstan\" analyse --configuration \"app/config/phpstan.neon\" --generate-baseline \"app/config/phpstan-baseline.neon\" -vvv --ansi",
 		"stan-report": "@php \"vendor/bin/phpstan\" analyse --configuration \"app/config/phpstan.neon\" --error-format=table > \"log/phpstan-report.txt\" 2>&1",
@@ -45,6 +51,7 @@
     },
 	"scripts-descriptions": {
 		"console": "Runs a PHP application console command. Usage: \"composer console -- --help\"",
+		"test": "Runs Nette Tester over the tests/ directory. Usage: \"composer test\" or \"composer test -- tests/Modules/UrlModule\"",
 		"stan": "Runs PHPStan for static code analysis. Usage: \"composer stan {path to file or folder}\"",
 		"stan-generate-baseline": "Runs PHPStan and generate baseline.",
 		"stan-report": "Runs PHPStan and saves table output to log/phpstan-report.txt.",
