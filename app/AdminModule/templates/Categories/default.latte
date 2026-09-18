@@ -142,7 +142,7 @@
 							<div class="col-sm-12">
 								{input send class=>'btn btn-primary button'}
 								{if $type == 'homepage' || $type == 'textBox'}
-									<a n:href=":Front:Default:default locale=>$actualLanguage" class="btn btn-secondary" title="{_'Show on web'}" target="blank"><i class="fa fa-eye"></i></a>
+									<a n:href=":Front:Homepage:default locale=>$actualLanguage" class="btn btn-secondary" title="{_'Show on web'}" target="blank"><i class="fa fa-eye"></i></a>
 								{elseif $type != 'categoryLink' && $type != 'url' && $id && $urlManager->existUrlByTypeAndKey('category', $id, $actualLanguage)}
 									<a n:href=":Front:Categories:detail id=>$id, locale=>$actualLanguage" class="btn btn-secondary" title="{_'Show on web'}" target="blank"><i class="fa fa-eye"></i></a>
 								{/if}

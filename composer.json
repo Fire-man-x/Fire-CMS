@@ -16,7 +16,7 @@
         "jwage/easy-csv": "*",
 		"nextras/migrations": "^3.5",
 		"contributte/console": "^0.11.0",
-		"vladahejda/livetranslator": "2.0"
+		"vladahejda/livetranslator": "^2.0"
     },
 	"require-dev": {
 		"nette/tester": "*",

@@ -8,7 +8,7 @@ use App\Model;
 use Nette;
 
 
-class DefaultPresenter extends BasePresenter
+class HomepagePresenter extends BasePresenter
 {
 
 	/** @inject */
@@ -53,7 +53,7 @@ class DefaultPresenter extends BasePresenter
 			throw new Nette\Application\BadRequestException("Category homepage doesn't exist.");
 		}
 		//breadcrumb
-		$this->addBreadCrumbLink($category->title, $this->link(":Front:Default:default"), null, false );
+		$this->addBreadCrumbLink($category->title, $this->link(":Front:Homepage:default"), null, false );
 
 		$category = Nette\Utils\ArrayHash::from($category->toArray());
 

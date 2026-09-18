@@ -137,7 +137,7 @@ class Menu extends Control
 	 * @param int $level
 	 * @param int|null $maxSublevel
 	 */
-	private function arrayRecursiveSearch(array $inItems, string $searchValue): array
+	private function arrayRecursiveSearch(array $inItems, string $searchValue): ?array
 	{
 		foreach ($inItems as $itemId => $item) {
 
@@ -230,16 +230,16 @@ class Menu extends Control
 	/**
 	 * Decode tree to array
 	 */
-	private function linkByType($type, $key, $language)
+	private function linkByType(string $type, int $key, string $language)
 	{
 		switch ($type) {
 			case "homepage":
-				return $this->getPresenter()->link(":Front:Default:default", array("id" => null));
+				return $this->getPresenter()->link(":Front:Homepage:default", array("id" => null));
 
 			case "categoryLink":
 				//find target
-				$targetCategory = $this->subCategories[$link];
-				if($this->detectCirculation($link, $targetCategory['url'])){
+				$targetCategory = $this->subCategories[$key];
+				if($this->detectCirculation($key, $targetCategory['url'])){
 					return "#error: Circulation detected";
 				}
 				return $this->linkByType($targetCategory['type'], $targetCategory['id'], $language);

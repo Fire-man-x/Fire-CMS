@@ -66,7 +66,7 @@ class CategoriesPresenter extends BasePresenter
 
 		//Not logged in, so redirect to sign
 		if ($category->public == 0 && !$this->getUser()->isLoggedIn() && !$this->isLinkCurrent(":Front:Sign:*")) {
-			$this->forward(':Front:Sign:inFast', array('id' => null, 'backlink' => $this->isLinkCurrent(":Front:Default:default") ? null : $this->storeRequest()));
+			$this->forward(':Front:Sign:inFast', array('id' => null, 'backlink' => $this->isLinkCurrent(":Front:Homepage:default") ? null : $this->storeRequest()));
 		}
 
 		//parent breadcrumb

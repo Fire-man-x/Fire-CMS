@@ -417,6 +417,3 @@ náš `vcs`), takže volný rozsah verze by teoreticky mohl nechtěně sáhnout 
 zkontrolujte `https://packagist.org/packages/<vendor>/<name>.json`, jestli pod stejným jménem něco cizího
 už neexistuje.
 
-Po přechodu z `libs/` na `vendor/` nebyla potřeba žádná změna v `tests/LiveTranslator/*` — testy odkazují
-jen na PHP namespace (`LiveTranslator\Translator` apod.), ne na cestu k souboru, takže je Composer
-autoloader normálně přesměroval na novou lokaci.

@@ -165,7 +165,7 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 		$this->getUser()->getStorage()->setNamespace("front");
 
 		//base breadcrumb
-		$this->addBreadCrumbLink('Home', '/'/*$this->link('//:Front:Default:', array("id"=>null))*/, 'fa fa-home');
+		$this->addBreadCrumbLink('Home', '/'/*$this->link('//:Front:Homepage:', array("id"=>null))*/, 'fa fa-home');
 
 		//options
 		$options = $this->options->findAll()->fetchPairs("key", "value");

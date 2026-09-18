@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "74eb16d38ca2138af7d8e88cea894327",
+    "content-hash": "614ddc72b2c7cd8ca8a108bb4f44f101",
     "packages": [
         {
             "name": "contributte/console",
@@ -3938,16 +3938,16 @@
         },
         {
             "name": "vladahejda/livetranslator",
-            "version": "2.0",
+            "version": "2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Fire-man-x/LiveTranslator.git",
-                "reference": "44e52fb7f1afde5840941052fa33f1c3d81bca2e"
+                "reference": "36c8e386818983564dea96c248df6b17d0c7a546"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Fire-man-x/LiveTranslator/zipball/44e52fb7f1afde5840941052fa33f1c3d81bca2e",
-                "reference": "44e52fb7f1afde5840941052fa33f1c3d81bca2e",
+                "url": "https://api.github.com/repos/Fire-man-x/LiveTranslator/zipball/36c8e386818983564dea96c248df6b17d0c7a546",
+                "reference": "36c8e386818983564dea96c248df6b17d0c7a546",
                 "shasum": ""
             },
             "require": {
@@ -3986,9 +3986,9 @@
                 "translator"
             ],
             "support": {
-                "source": "https://github.com/Fire-man-x/LiveTranslator/tree/2.0"
+                "source": "https://github.com/Fire-man-x/LiveTranslator/tree/2.2"
             },
-            "time": "2026-09-18T08:16:35+00:00"
+            "time": "2026-09-18T09:37:08+00:00"
         }
     ],
     "packages-dev": [

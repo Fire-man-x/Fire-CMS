@@ -83,7 +83,7 @@ class FrontRouter implements RouterProvider
 
 		$router->addRoute('[<locale='.$this->languages->getDefaultLanguage().' [a-z]{2}>/]<presenter>/<action>[/<id>]', array(
 			'module' => 'Front',
-			'presenter' => 'Default',
+			'presenter' => 'Homepage',
 			'action' => 'default'
 			));
 
