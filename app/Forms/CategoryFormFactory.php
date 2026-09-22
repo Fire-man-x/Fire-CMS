@@ -243,7 +243,7 @@ class CategoryFormFactory extends BaseFormFactory
 		$values->expiring_date = $this->checkDateTimeFormat($values->expiring_date);
 
 		//categoryFormType
-		$values = $this->categoryFormType->onSuccessFormPart($form, $values, $this->getEditId());
+		$values = $this->categoryFormType->onSuccessFormPart($form, $values, (int) $this->getEditId());
 
 		//url
 		$url = null;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace App\Forms;
 
 use App\Model;
+use App\Service\ProjectFolders;
 use Nette\Application\UI\Form;
-use Nette\DI\Container;
 use Nette\Localization\Translator;
 use Nette\Utils\Finder;
 
@@ -13,21 +13,9 @@ use Nette\Utils\Finder;
 class SettingFormFactory extends BaseFormFactory
 {
 
-	private Model\Options $model;
-
-	private Translator $translator;
-
-	private string $themePath;
-
-
-	public function __construct(FormFactory $factory, Model\Options $model, Translator $translator, Container $context)
+	public function __construct(FormFactory $factory, private Model\Options $model, private Translator $translator, private ProjectFolders $projectFolders)
 	{
 		parent::__construct($factory);
-		$this->model = $model;
-		$this->translator = $translator;
-
-		$parameters = $context->getParameters();
-		$this->themePath = $parameters['themePath'];
 	}
 
 
@@ -42,9 +30,9 @@ class SettingFormFactory extends BaseFormFactory
 		$form->addText('main_description', 'Web description');
 		//$form['Setting_id']->setDefaultValue($editId);
 		$form->addText('main_email', 'Email')
-			->setType('email')
+			->setHtmlType('email')
 			->setRequired()
-			->addRule(Form::EMAIL, VALIDATE_FORMAT);
+			->addRule(Form::Email, VALIDATE_FORMAT);
 
 		$form->addGroup("Default SEO");
 		$form->addText('seo_title', 'SEO title');
@@ -55,12 +43,12 @@ class SettingFormFactory extends BaseFormFactory
 		$form->addText('image_resolution', $this->translator->translate('Resize image after upload to'))
 			->setRequired(false)
 			->setTranslator(null)
-			->addRule(Form::PATTERN, VALIDATE_FORMAT, "[0-9]*x[0-9]*")
+			->addRule(Form::Pattern, VALIDATE_FORMAT, "[0-9]*x[0-9]*")
 			->getControlPrototype()->placeholder("1000x1000");
 
 		//templates
 		$templatesItems = array('default' => $this->translator->translate('Default'));
-		$dirs = Finder::findDirectories()->in($this->themePath);
+		$dirs = Finder::findDirectories()->in($this->projectFolders->getWwwThemeDir());
 		foreach($dirs as $dir)
 		{
 			/** @var \SplFileInfo $dir */

@@ -22,7 +22,7 @@ class SignPresenter extends BasePresenter
 	protected function createComponentSignInForm(): Nette\Application\UI\Form
 	{
 		$form = $this->signInFactory->create(function () {
-			$this->redirect('Default:default');
+			$this->redirect('Homepage:default');
 		});
 		$form->setTranslator($this->translator);
 
@@ -37,7 +37,7 @@ class SignPresenter extends BasePresenter
 	{
 		$form = $this->signUpFactory->create(function () {
 			$this->flashMessage("Registration was successful", FLASH_SUCCESS);
-			$this->redirect('Default:');
+			$this->redirect('Homepage:default');
 		});
 		$form->setTranslator($this->translator);
 

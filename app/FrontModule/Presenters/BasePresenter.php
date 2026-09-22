@@ -4,16 +4,15 @@ declare(strict_types=1);
 namespace App\FrontModule\Presenters;
 
 use Alnux\NetteBreadCrumb\BreadCrumb;
-use App\Components\FilesManagerMenu\FilesManagerMenu;
 use App\Components\LanguageChanger;
 use App\Components\Menu;
 use App\Components\Shortcodes;
-use App\Components\ThemePath;
 use App\FrontModule\Components;
 use App\Model;
 use App\Modules\CommentsModule\Components\Comments\Comments;
 use App\Plugins\Statistics\Statistics;
 use App\Service\LanguageService;
+use App\Service\ProjectFolders;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\BadRequestException;
 use Nette\Application\Helpers;
@@ -69,7 +68,7 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	public Shortcodes $shortcodes;
 
 	/** @inject */
-	public ThemePath $themePathComponent;
+	public ProjectFolders $projectFolders;
 
 	/** @inject */
 	public Components\LoginLinkControl\LoginLinkControl $loginLink;
@@ -77,12 +76,12 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	/**
 	 * Theme path getter
 	 */
-	protected function getThemePath(): string
+	protected function getWwwThemePath(): string
 	{
 		if(!isset($this->themePath))
 		{
 			$themePathOption = $this->options->getByKey('themePath');
-			$this->themePath = $this->themePathComponent->getThemePath().'/'.$themePathOption."/templates";
+			$this->themePath = $this->projectFolders->getWwwThemeDir().'/'.$themePathOption."/templates";
 		}
 		return $this->themePath;
 	}
@@ -95,8 +94,9 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	{
 		list(, $presenter) = Helpers::splitName($this->getName());
 		$list = [
-			$this->getThemePath()."/$presenter/".$this->getView().".latte",
-			$this->getThemePath()."/$presenter.".$this->getView().".latte",
+			$this->projectFolders->getThemeDir()."/FrontModule/templates/$presenter/".$this->getView().".latte",
+			$this->getWwwThemePath()."/$presenter/".$this->getView().".latte",
+			$this->getWwwThemePath()."/$presenter.".$this->getView().".latte",
 		];
 
 		//parent templates
@@ -116,14 +116,16 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 		list($module, $presenter) = Helpers::splitName($this->getName());
 		$layout = $this->getLayout() ?: 'layout';
 		$dir = dirname($this->getReflection()->getFileName());
-		$dir = is_dir($this->getThemePath()) ? $dir : dirname($dir);
+		$dir = is_dir($this->getWwwThemePath()) ? $dir : dirname($dir);
 		$list = [
-			$this->getThemePath()."/$presenter/@$layout.latte",
-			$this->getThemePath()."/$presenter.@$layout.latte"
+			$this->projectFolders->getThemeDir()."/FrontModule/templates/$presenter/@$layout.latte",
+			$this->projectFolders->getThemeDir()."/FrontModule/templates/@$layout.latte",
+			$this->getWwwThemePath()."/$presenter/@$layout.latte",
+			$this->getWwwThemePath()."/$presenter.@$layout.latte",
 		];
 		do {
 			//todo: dava 2x stejny layout
-			$list[] = $this->getThemePath()."/@$layout.latte";
+			$list[] = $this->getWwwThemePath()."/@$layout.latte";
 			$dir = dirname($dir);
 		} while ($dir && $module && (list($module) = Helpers::splitName($module)));
 
@@ -183,7 +185,7 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 		$statisticsPlugin->addHit();
 
 		//themePath
-		$this->template->themePath = $this->getThemePath();
+		$this->template->themePath = $this->getWwwThemePath();
 	}
 
 
@@ -251,7 +253,7 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	protected function createComponentBreadCrumb(): BreadCrumb
 	{
 		$breadCrumb = parent::createComponentBreadCrumb();
-		$path = $this->getThemePath()."/BreadCrumb.latte";
+		$path = $this->getWwwThemePath()."/BreadCrumb.latte";
 		if(file_exists($path)) {
 			$breadCrumb->customTemplate($path);
 		}
@@ -267,7 +269,7 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	{
 		$control = $this->menu;
 		$control->setLanguage($this->language);
-		$path = $this->getThemePath()."/Menu.latte";
+		$path = $this->getWwwThemePath()."/Menu.latte";
 		if(file_exists($path)) {
 			$control->customTemplate($path);
 		}
@@ -283,7 +285,7 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	{
 		$control = $this->languageChanger;
 		$control->setLanguage($this->language);
-		$path = $this->getThemePath()."/LanguageChanger.latte";
+		$path = $this->getWwwThemePath()."/LanguageChanger.latte";
 		if(file_exists($path)) {
 			$control->customTemplate($path);
 		}

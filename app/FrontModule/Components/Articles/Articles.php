@@ -111,7 +111,7 @@ class Articles extends Control
 			->order("create_date DESC");
 		if($fromCategory){
 			//$articles->where("article:category_article.category_id", $fromCategory == null ? 1 : $fromCategory);
-			$articles->where("article:category_article.category_id", $fromCategory);
+			$articles->where("article:".Model\Categories::RELATION_ARTICLE_TABLE_NAME.".category_id", $fromCategory);
 		}
 		if($this->query){
 			$articles->whereOr(array(

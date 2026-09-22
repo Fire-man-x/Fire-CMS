@@ -11,7 +11,7 @@
 {var $timeout = $slider->duration + $slider->speed}
 <script type="text/javascript">
 
-	$('.owl-carousel#slider_{$slider->slider_id}').owlCarousel({
+	$('.owl-carousel#slider_'+{$slider->slider_id}).owlCarousel({
 		loop: true,
 		margin: 10,
 		/*responsiveClass:true,*/

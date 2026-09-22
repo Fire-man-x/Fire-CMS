@@ -3,7 +3,7 @@
 # https://nette.org/security-warning
 #
 parameters:
-	themePath: "%wwwDir%/theme"
+	themePath: "%rootDir%/www/theme"
 
 application:
 	errorPresenter: Error
@@ -213,12 +213,12 @@ services:
 	- App\FrontModule\Components\LoginLinkControl\LoginLinkControl
 	- App\Modules\CommentsModule\Components\Comments\Comments
 	- App\Components\ViewCounter
-	- App\Components\ThemePath(%themePath%)
 	shortcodes: App\Components\Shortcodes
 
 	#Services
 	- App\Service\Meta
 	- App\Service\Tag
+	- App\Service\ProjectFolders(%rootDir%, %appDir%, %wwwDir%, %wwwDir%/theme)
 
 	translator:
 		factory: LiveTranslator\Translator("en") #default lang "en" is overrided in BaseFrontPresenter

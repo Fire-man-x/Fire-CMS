@@ -78,7 +78,3 @@ class ViewCounter
 	}
 
 }
-
-interface IViewCounter{
-	public function addViewCount(int $itemId, string $language): void;
-}

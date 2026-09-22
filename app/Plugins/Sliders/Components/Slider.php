@@ -68,7 +68,7 @@ class Slider extends BaseControl
 
 		$this->template->slider = $slider;
 		$sliderItems = $this->modelSliderItems->findById($slider->slider_id)
-			->select("slider_items.*")
+			->select($this->modelSliderItems->getTableName().".*")
 			->select("file.*")
 			->where("language_id", $this->language)
 			->order("position")
