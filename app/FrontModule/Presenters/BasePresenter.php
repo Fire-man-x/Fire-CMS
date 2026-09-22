@@ -44,7 +44,7 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	public LanguageService $languages;
 
 	/** @inject */
-	public Model\Options $options;
+	public Model\Settings $options;
 
 	/** @inject */
 	public Menu\Menu $menu;
@@ -80,7 +80,7 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	{
 		if(!isset($this->themePath))
 		{
-			$themePathOption = $this->options->getByKey('themePath');
+			$themePathOption = $this->options->getByKey('themePath', $this->language);
 			$this->themePath = $this->projectFolders->getWwwThemeDir().'/'.$themePathOption."/templates";
 		}
 		return $this->themePath;
@@ -170,7 +170,7 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 		$this->addBreadCrumbLink('Home', '/'/*$this->link('//:Front:Homepage:', array("id"=>null))*/, 'fa fa-home');
 
 		//options
-		$options = $this->options->findAll()->fetchPairs("key", "value");
+		$options = $this->options->getAllForLanguage($this->language);
 		$this->template->options = $options;
 
 		//register shortcode to template

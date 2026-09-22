@@ -175,7 +175,7 @@ services:
 	- App\Forms\MenuFormFactory
 
 	#Admin\Settings
-	- App\Model\Options
+	- App\Model\Settings
 	- App\Forms\SettingFormFactory
 	- App\Model\Languages
 	- App\Forms\LanguageFormFactory

@@ -2,6 +2,17 @@
 
 Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na detailní záznam v `Changelog/`.
 
+## 2026-09-22
+
+- **`firecms_options` převedeno na `firecms_settings` + `firecms_settingDescriptions` (per-jazyk).** Viz
+  [2026-09-22-options-to-settings.md](2026-09-22-options-to-settings.md). Dvě nové migrace —
+  `data/migrations/structures/20260922130000.sql` (DDL) + `data/migrations/basic-data/20260922140000.sql`
+  (přenos dat + drop staré tabulky, schválně odděleno kvůli pořadí skupin structures→basic-data) —
+  `App\Model\Options` → `App\Model\Settings`, `SettingFormFactory` přepsán na kontejner-na-jazyk
+  (vzor `TagFormFactory`). `$options` template proměnná má beze změny stejný tvar, žádná šablona se
+  neupravovala. Migrace zatím nespuštěné proti dev DB (jen otestované v izolovaných zahazovacích
+  databázích pro scénáře "fresh install" i "už naseedované prostředí").
+
 ## 2026-09-18
 
 - **`LiveTranslator` přesunut z ruční kopie v `libs/` na skutečný Composer balíček.** Viz

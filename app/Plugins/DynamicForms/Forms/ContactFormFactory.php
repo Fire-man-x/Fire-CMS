@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Plugins\DynamicForms\Forms;
 
-use App\Model\Options;
+use App\Model\Settings;
 use App\Modules\CommentsModule\Comment;
 use App\Plugins\DynamicForms\Model\DynamicForms;
 use App\Forms\BaseFormFactory;
@@ -22,7 +22,7 @@ class ContactFormFactory extends BaseFormFactory
 
 	private DynamicForms $model;
 
-	private Options $modelOptions;
+	private Settings $modelOptions;
 
 	private Comment $commentService;
 
@@ -34,7 +34,7 @@ class ContactFormFactory extends BaseFormFactory
 	/**
 	 * ContactFormFactory constructor.
 	 */
-	public function __construct(FormFactory $factory, DynamicForms $model, Options $modelOptions, Comment $commentService, IMailer $mailer)
+	public function __construct(FormFactory $factory, DynamicForms $model, Settings $modelOptions, Comment $commentService, IMailer $mailer)
 	{
 		parent::__construct($factory);
 		$this->model = $model;
@@ -161,7 +161,7 @@ class ContactFormFactory extends BaseFormFactory
 		$translation = $this->model->findTranslationBy($dynamicForm->dynamic_form_id, $this->language)->fetch();
 		if(isset($dynamicForm->where_to_send) && $dynamicForm->where_to_send == 'email')
 		{
-			$mainEmail = $this->modelOptions->getByKey('main_email');
+			$mainEmail = $this->modelOptions->getByKey('main_email', $this->language);
 
 			$message = new Message();
 			$message->setFrom($mainEmail);

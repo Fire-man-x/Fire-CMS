@@ -28,7 +28,7 @@ class MultiFileUploadModel implements IUploadModel
 	/**
 	 * MultiFileUploadModel constructor
 	 */
-	public function __construct(FileManager $fileManager, Options $options)
+	public function __construct(FileManager $fileManager, Settings $options)
 	{
 		$this->fileManager = $fileManager;
 
