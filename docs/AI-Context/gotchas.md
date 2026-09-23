@@ -184,6 +184,16 @@ do jedné a použije se `directory` jen jednoho z nich. Do 2026-09-23 měl `SDHB
 `statistics` (stejnou jako `app/Plugins/Statistics`), a migrace pluginu Statistics se proto nikdy nespustila.
 Pojmenovávejte skupinu podle pluginu (`sdh-base-structures`, `stalker`, …).
 
+## `Form::Min`/`Max`/`Range` u `addDate()` na frontendu — `www/vendors/netteForms.min.js` je verze 2.4
+
+Frontendový layout (`theme/FrontModule/templates/@layout.latte`) načítá `www/vendors/netteForms.min.js` ve verzi
+2.4 (2016). Ten validátor `min`/`max`/`range` řeší přes `parseFloat()`, takže u `<input type="date">` porovná
+`2026 >= "2026-09-23"` → `false` a **odmítne každé platné datum**, formulář v prohlížeči nejde odeslat.
+Server (Nette Forms 3.3) to validuje správně, takže `curl` test projde a chyba je vidět jen v prohlížeči.
+U datumových polí proto dávejte `min`/`max` jen jako HTML atribut (`setHtmlAttribute('min', ...)`) a kontrolu
+dělejte v `onValidate` (vzor: `theme/Plugins/PetHotel/FrontModule/Components/HotelSearch/HotelSearch.php`).
+Systémové řešení je aktualizovat netteForms.js v jádru (`www/vendors/`) na verzi odpovídající Nette Forms 3.x.
+
 ## Testování přes `curl` na sdíleném/multi-tenant boxu
 
 Tenhle vývojový box hostuje víc projektů (fire-cms, pet-hotel, další klientské projekty) přes stejný

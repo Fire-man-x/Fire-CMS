@@ -62,6 +62,21 @@ class Languages extends BaseModel
 
 
 	/**
+	 * Nastaví výchozí jazyk. Výchozí je vždy právě jeden (ostatním se `default` zruší) a je aktivní -
+	 * LanguageService::getDefaultLanguage() hledá výchozí jazyk jen mezi aktivními.
+	 */
+	public function setDefault(string $languageId): void
+	{
+		$this->database->transaction(function () use ($languageId): void {
+			$this->findAll()
+				->where($this->getColumnId() . ' != ?', $languageId)
+				->update(['default' => false]);
+			$this->findById($languageId)->update(['default' => true, 'active' => true]);
+		});
+	}
+
+
+	/**
 	 * Delete
 	 */
 	public function delete(int|string $id): ?int

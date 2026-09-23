@@ -12,7 +12,14 @@ tracy:
 #		files:
 #			- *Plugin.php
 
-#services:
+services:
+	#Překlady tématu (theme/data/localization/cs.front) - mají přednost před překlady pluginů,
+	#viz App\Localization\ChainTranslatorStorage
+	-
+		factory: App\Localization\ReadOnlyFileStorage(%rootDir%/theme/data/localization)
+		autowired: false
+		tags: [translator.themeStorage]
+
 	#nette.mailer:
 	#	class: Nette\Mail\IMailer
 	#	factory: Theme\Component\Nextras\src\FileMailer(%tempDir%/mail-panel-mails)

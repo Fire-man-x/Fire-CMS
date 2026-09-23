@@ -313,3 +313,5 @@ a:2:{i:0;s:41:"contributte_datagrid.multiselect_selected";i:1;s:12:"{0} vybráno
 a:2:{i:0;s:41:"contributte_datagrid.filter_submit_button";i:1;s:9:"Filtrovat";}
 a:2:{i:0;s:32:"contributte_datagrid.show_filter";i:1;s:14:"Zobrazit filtr";}
 a:2:{i:0;s:36:"contributte_datagrid.per_page_submit";i:1;s:7:"Změnit";}
+a:2:{i:0;s:78:"The default language cannot be unset. Set another language as default instead.";i:1;s:67:"Výchozí jazyk nelze zrušit. Nastavte jako výchozí jiný jazyk.";}
+a:2:{i:0;s:43:"The default language cannot be deactivated.";i:1;s:34:"Výchozí jazyk nelze deaktivovat.";}

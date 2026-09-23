@@ -135,6 +135,41 @@ vyřešeno přes `App\DI\IPluginServiceLocator` / `IPluginComponentLocator`. `pr
 (`App\DI\PluginMenuItem`) se sbírají v `App\DI\PluginServiceLocator::getList()` a vykreslují v admin
 `@layout.latte` dropdownu "Other" — dynamicky, podle toho, co je zrovna aktivní.
 
+## Překlady pluginu a tématu (`<plugin>/data/localization/`, `theme/data/localization/`)
+
+Plugin si nese vlastní překladové soubory ve stejném formátu jako `data/localization/` jádra
+(`<jazyk>.<namespace>`, tj. `cs.admin` a `cs.front`, jeden `serialize([původní, překlad])` na řádek).
+Zapojí je službou v `config.plugin.neon`:
+
+```neon
+services:
+    -
+        factory: App\Localization\ReadOnlyFileStorage(%rootDir%/theme/Plugins/PetHotel/data/localization)
+        autowired: false   # jinak by kolidovala s hlavním úložištěm při autowiringu ITranslatorStorage
+        tags: [translator.pluginStorage]
+```
+
+Téma (šablony v `theme/`, např. `@layout.latte`, homepage) má překlady v `theme/data/localization/`,
+zapojené stejně v `theme/config/theme.neon`, jen s tagem **`translator.themeStorage`**.
+
+Služba `translatorStorage` v `app/config/config.neon` je `App\Localization\ChainTranslatorStorage`, která
+složí hlavní `data/localization/`, úložiště s tagem `translator.themeStorage` a úložiště s tagem
+`translator.pluginStorage`:
+
+- **Čtení v pořadí projekt → téma → pluginy.** Projekt (např. přes LiveTranslator panel) i téma tak můžou
+  text pluginu přepsat bez zásahu do pluginu. Obecný klíč, který má i jádro (`Search`, `Phone`, ...), se
+  proto vždycky zobrazí s překladem jádra. Mezi pluginy navzájem rozhoduje pořadí registrace. Stejný klíč
+  ve dvou pluginech proto překládejte stejně.
+- Oddělený tag pro téma je nutný: `tagged()` vrací služby v pořadí načtení konfigurace a
+  `theme/config/theme.neon` se načítá až po `plugins.neon`, takže se společným tagem by vyhrál plugin.
+- **Zápis** (LiveTranslator panel): jen do hlavního úložiště. `ReadOnlyFileStorage` soubory pluginu nemění ani
+  nezakládá (původní `LiveTranslator\Storage\File` otevírá chybějící soubor přes `w+`).
+
+Zdrojové texty v kódu pluginu jsou anglicky (stejně jako v `app/`), překládají se jen pro jazyk jiný než
+výchozí `en`. Komponenta mimo presenter (vlastní `Control`) nemá translator automaticky: předejte
+`Nette\Localization\Translator` konstruktorem a nastavte ho šabloně (`$this->template->setTranslator()`) i
+formuláři (`$form->setTranslator()`), viz `theme/Plugins/PetHotel/FrontModule/Components/HotelSearch/`.
+
 ## Správa pluginů v administraci
 
 `:Admin:Plugins:default` (`App\AdminModule\Presenters\PluginsPresenter`) — datagrid nad `App\Model\Plugin\

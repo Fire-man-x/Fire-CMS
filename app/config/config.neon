@@ -244,7 +244,13 @@ services:
 			#	cs: "nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4 ? 1 : 2));",
 			#])
 			##- setPresenterLanguageParam(lang)
-	translatorStorage: LiveTranslator\Storage\File(%appDir%/../data/localization/)
+	# hlavní úložiště projektu + read-only překlady tématu a pluginů (služby s tagy translator.themeStorage
+	# a translator.pluginStorage), priorita v tomto pořadí - viz App\Localization\ChainTranslatorStorage
+	translatorStorage: App\Localization\ChainTranslatorStorage(
+		LiveTranslator\Storage\File(%appDir%/../data/localization/)
+		tagged(translator.themeStorage)
+		tagged(translator.pluginStorage)
+	)
 
 	user: App\Security\User
 	authorizator: App\Security\AuthorizatorFactory::create(@modules, @roles)

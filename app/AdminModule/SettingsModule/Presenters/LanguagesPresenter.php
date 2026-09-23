@@ -69,6 +69,9 @@ class LanguagesPresenter extends BasePresenter
 		$activeColumn->onChange[] = function($id, $value) {
 			$this->handleActivate((string) $id, (bool) $value);
 		};
+		// výchozí jazyk musí zůstat aktivní (LanguageService hledá výchozí jen mezi aktivními) - místo
+		// přepínače jen text stavu (column_status.latte bez dropdownu); serverová kontrola je v handleActivate()
+		$activeColumn->setRenderCondition(fn($item): bool => !$item->default);
 
 		//default
 		$grid->addColumnLink('default', 'D.', 'setDefault!', 'default', array($paramKey => $primaryKey))
@@ -184,8 +187,12 @@ class LanguagesPresenter extends BasePresenter
 	 */
 	public function handleActivate(string $languageId, bool $status = false): void
 	{
-		$this->model->update($languageId, array("active" => $status));
-		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
+		if (!$status && $this->model->getById($languageId)?->default) {
+			$this->flashMessage('The default language cannot be deactivated.', FLASH_FAILED);
+		} else {
+			$this->model->update($languageId, array("active" => $status));
+			$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
+		}
 
 		if ($this->isAjax()) {
 			$this->redrawControl('flashes');
@@ -202,8 +209,7 @@ class LanguagesPresenter extends BasePresenter
 	 */
 	public function handleSetDefault(string $languageId): void
 	{
-		$this->model->findAll()->update(array("default" => false));
-		$this->model->update($languageId, array("default" => true));
+		$this->model->setDefault($languageId);
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 		$this->redirect('this');
 	}

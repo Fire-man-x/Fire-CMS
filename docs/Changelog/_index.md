@@ -4,6 +4,18 @@ Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na det
 
 ## 2026-09-23
 
+- **Oprava: formulář jazyka mohl vytvořit dva výchozí jazyky.** Nově `Languages::setDefault()` (jádro). Viz
+  [2026-09-23-languages-single-default.md](2026-09-23-languages-single-default.md).
+- **Překlady tématu v `theme/data/localization/` (tag `translator.themeStorage`, přednost před pluginy) + přeložená homepage a layout.** Viz
+  [2026-09-23-theme-translations.md](2026-09-23-theme-translations.md).
+- **Překlady pluginů v `<plugin>/data/localization/` (`App\Localization\ChainTranslatorStorage`, jádro) + PetHotel přeložený** (`cs.admin`, `cs.front`, anglické zdrojové texty). Viz
+  [2026-09-23-plugin-translations-pethotel.md](2026-09-23-plugin-translations-pethotel.md).
+- **PetHotel: maximální váha psa u jednotek (`maxPetWeight`) a filtr „Velikost psa“ ve vyhledávání.** Viz
+  [2026-09-23-pethotel-facility-max-weight.md](2026-09-23-pethotel-facility-max-weight.md). Vyžaduje migraci.
+- **PetHotel: vyhledávání ubytování podle města a termínu** (komponenta `hotelSearch`, volná kapacita z kalendáře rezervací). Viz
+  [2026-09-23-pethotel-hotel-search.md](2026-09-23-pethotel-hotel-search.md).
+- **PetHotel: výpis hotelů přes komponentu HotelList s filtrem podle města**, chipy měst na homepage na něj odkazují. Viz
+  [2026-09-23-pethotel-hotel-list-town-filter.md](2026-09-23-pethotel-hotel-list-town-filter.md).
 - **PetHotel: bezpečnější přihlášení kódem.** Vstup majitele jen s vlastním ubytováním, e-mail v session místo URL,
   kód hned po registraci, ubytování na existující účet až po ověření kódem. Viz
   [2026-09-23-pethotel-login-hardening.md](2026-09-23-pethotel-login-hardening.md).
