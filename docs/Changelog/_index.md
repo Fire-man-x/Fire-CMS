@@ -4,6 +4,11 @@ Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na det
 
 ## 2026-09-23
 
+- **Tabulky Stalker, Statistics a Sliders přesunuty z core migrace do vlastních migrací pluginů** (Stalker/Statistics nově registrované). Viz
+  [2026-09-23-stalker-statistics-plugin-migrations.md](2026-09-23-stalker-statistics-plugin-migrations.md).
+  Smazána core migrace `structures/20200324212900.sql` (její ALTER je zapracovaný do plugin migrace).
+- **Všechny tabulky mají `createDate` + `updateDate` hned za `id` a cizími klíči.** Viz
+  [2026-09-23-create-update-date-columns.md](2026-09-23-create-update-date-columns.md). Migrace přepsány (reset DB).
 - **Plugin DynamicForms převeden na camelCase sloupce a PK `id`.** Viz
   [2026-09-23-dynamicforms-camelcase-id.md](2026-09-23-dynamicforms-camelcase-id.md). Migrace pluginu přepsána
   (nutný reset jeho tabulek), model implementuje `Translatable`.

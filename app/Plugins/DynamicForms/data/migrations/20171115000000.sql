@@ -1,6 +1,8 @@
 DROP TABLE IF EXISTS `firecms_plugin_dynamicForms`;
 CREATE TABLE `firecms_plugin_dynamicForms` (
   `id` int unsigned NOT null AUTO_INCREMENT,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `itemsSpecifications` text NOT null,
   `templateName` varchar(50) NOT null,
   `whereToSend` varchar(20) DEFAULT null,
@@ -15,6 +17,8 @@ DROP TABLE IF EXISTS `firecms_plugin_dynamicFormDescriptions`;
 CREATE TABLE `firecms_plugin_dynamicFormDescriptions` (
   `dynamicFormId` int unsigned NOT null,
   `languageId` char(2) NOT null,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `title` varchar(50) NOT null,
   `items` text NOT null,
   `submitMessage` varchar(200) DEFAULT null,
@@ -30,7 +34,8 @@ CREATE TABLE `firecms_plugin_dynamicFormSendedValues` (
   `id` int unsigned NOT null AUTO_INCREMENT,
   `dynamicFormId` int unsigned NOT null,
   `languageId` char(2) NOT null,
-  `createDate` datetime NOT null,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `sendedValues` text NOT null,
   PRIMARY KEY (`id`),
   KEY `dynamicFormId` (`dynamicFormId`),

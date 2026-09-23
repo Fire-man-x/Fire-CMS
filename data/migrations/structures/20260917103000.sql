@@ -4,6 +4,8 @@
 CREATE TABLE `firecms_domains` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `languageId` char(2) NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `domain` varchar(255) NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT 1,
   `default` tinyint(1) NOT NULL DEFAULT 1,

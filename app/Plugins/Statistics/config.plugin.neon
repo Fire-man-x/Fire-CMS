@@ -1,3 +1,11 @@
+migrations:
+	groups:
+		statistics:
+			enabled: true
+			directory: %appDir%/Plugins/Statistics/data/migrations
+			dependencies: [structures]
+			generator: null
+
 services:
 	#Front
 	- App\Plugins\Statistics\Model\Statistics

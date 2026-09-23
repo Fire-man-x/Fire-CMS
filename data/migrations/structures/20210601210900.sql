@@ -1,4 +1,4 @@
 ALTER TABLE `firecms_users`
-CHANGE COLUMN `roleId` `roleId` INT(11) UNSIGNED NOT NULL AFTER `email`,
+CHANGE COLUMN `roleId` `roleId` INT(11) UNSIGNED NOT NULL AFTER `id`,
 ADD COLUMN `oauthService` VARCHAR(20) NULL DEFAULT NULL AFTER `recoveryPasswordToken`,
 ADD COLUMN `oauthId` VARCHAR(20) NULL DEFAULT NULL AFTER `oauthService`;

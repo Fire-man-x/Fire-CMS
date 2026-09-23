@@ -196,10 +196,11 @@ Od 2026-09-17 mají všechny tabulky Fire CMS jádra prefix `firecms_` a název 
 `firecms_plugin_` stejným způsobem (`firecms_plugin_sliders`, `firecms_plugin_statistics`,
 `firecms_plugin_stalkers`, `firecms_plugin_dynamicForms`, `firecms_plugin_dynamicFormDescriptions`,
 `firecms_plugin_properties`/`customers`/`pets`/`petFiles`/`facilities`/`reservations` u `PetHotel`). Prefix
-se řídí tím, KDO tabulku vlastní, ne tím, ve kterém souboru je CREATE TABLE fyzicky napsaná —
-`firecms_plugin_sliders`/`stalkers`/`statistics` jsou definované přímo v
-`data/migrations/structures/20161115000000.sql` (core migrace), protože ty pluginy existovaly už při
-založení repa, ale patří `app/Plugins/Sliders`/`Stalker`/`Statistics`, takže mají plugin prefix, ne core.
+se řídí tím, KDO tabulku vlastní. Od 2026-09-23 core migrace (`data/migrations/`) nezakládá žádnou
+`firecms_plugin_*` tabulku. Každý plugin v `app/Plugins` (`Sliders`, `Stalker`, `Statistics`, `DynamicForms`) má
+své tabulky ve vlastní migraci `app/Plugins/<Plugin>/data/migrations/`, registrované v `config.plugin.neon`
+(`migrations: groups:` s `dependencies: [structures]`). Dřív byly `sliders`/`stalkers`/`statistics` přímo
+v `structures/20161115000000.sql`.
 Jen samotný prefix (`firecms_`/`firecms_plugin_`) zůstává s podtržítkem — camelCase se týká pouze části za
 ním.
 
@@ -291,6 +292,22 @@ Výjimka: `firecms_languages.languageId` (`char(2)`, ne AUTO_INCREMENT). Na co s
   (`` `t`.`sloupec` ``). Jinak je `SqlBuilder` vykládá jako odkazy na navázané tabulky (`t.sloupec` → hledá
   referenci `t`). Řetězcové literály do fragmentu nevkládejte: `tryDelimite()` obalí backtickami i slova uvnitř
   `'cs'`. Hodnoty předávejte jako parametr `?` (`select($sql, $param)`, `where($sql, ...$params)`).
+
+## `bin/console` běží v produkčním režimu a změny v `*.neon` nevidí
+
+`app/bootstrap.php` zapíná debug režim jen pro konkrétní cookie a IP (`setDebugMode('…@IP')`). CLI (`bin/console`)
+ho proto nikdy nemá a používá produkční kontejner `temp/cache/nette.configurator/Container_*.php` s
+`'debugMode' => false`. V produkčním režimu Nette **nekontroluje změny v neon souborech**. Kontejner zkompilovaný
+jednou zůstává, dokud ho někdo nesmaže. Web v debug režimu má vlastní kontejner, který se obnovuje sám, takže
+v prohlížeči všechno funguje a v CLI ne.
+
+Typický projev: nová skupina migrací v `config.plugin.neon` (např. `stalker`, `statistics` 2026-09-23) se při
+`migrations:reset`/`continue` vůbec nespustí. Kontrola:
+`grep -o "Plugins/[A-Za-z]*/data/migrations" temp/cache/nette.configurator/Container_*.php`.
+
+Po každé změně konfigurace (nový plugin, skupina migrací, služba) smažte před spuštěním CLI
+`temp/cache/nette.configurator/` (adresář patří `www-data`, takže přes `sudo`). Adresář nepřesouvejte ani
+nezakládejte pod jiným uživatelem, protože web by do něj pak nemohl zapisovat.
 
 ## Po resetu DB nebo změně schématu smazat cache struktury Nette Database
 

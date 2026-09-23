@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS `firecms_settings`;
 CREATE TABLE `firecms_settings` (
 	`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 	`createDate` datetime NOT NULL DEFAULT current_timestamp(),
-	`modifyDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+	`updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
 	`imageResolution` varchar(20) NOT NULL,
 	`themePath` varchar(100) DEFAULT NULL,
 	PRIMARY KEY (`id`)
@@ -14,7 +14,7 @@ CREATE TABLE `firecms_settingDescriptions` (
 	`settingId` int(11) unsigned NOT NULL,
 	`languageId` char(2) NOT NULL,
 	`createDate` datetime NOT NULL DEFAULT current_timestamp(),
-	`modifyDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+	`updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
 	`mainTitle` varchar(255) DEFAULT NULL,
 	`mainDescription` text DEFAULT NULL,
 	`mainEmail` varchar(100) DEFAULT NULL,

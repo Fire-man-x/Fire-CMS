@@ -8,13 +8,13 @@ DROP TABLE IF EXISTS `firecms_articles`;
 CREATE TABLE `firecms_articles` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `historyId` int(11) unsigned DEFAULT NULL,
-  `createDate` datetime NOT NULL,
+  `createdBy` int(11) unsigned NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
   `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `publishingDate` datetime NOT NULL,
   `expiringDate` datetime DEFAULT NULL,
   `active` tinyint(1) NOT NULL DEFAULT 1,
   `status` enum('publish','pending','draft','auto-draft','trash') NOT NULL DEFAULT 'draft',
-  `createdBy` int(11) unsigned NOT NULL,
   `public` tinyint(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
   KEY `historyId` (`historyId`),
@@ -28,6 +28,8 @@ DROP TABLE IF EXISTS `firecms_articleComments`;
 CREATE TABLE `firecms_articleComments` (
   `articleId` int(11) unsigned NOT NULL,
   `commentId` int(11) unsigned NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   KEY `articleId` (`articleId`),
   KEY `commentId` (`commentId`),
   CONSTRAINT `articleComments_ibfk_3` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -39,6 +41,8 @@ DROP TABLE IF EXISTS `firecms_articleDescriptions`;
 CREATE TABLE `firecms_articleDescriptions` (
   `articleId` int(11) unsigned NOT NULL,
   `languageId` char(2) NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `slug` varchar(255) DEFAULT NULL,
   `title` varchar(512) DEFAULT NULL,
   `excerpt` text DEFAULT NULL,
@@ -59,6 +63,8 @@ DROP TABLE IF EXISTS `firecms_articleFiles`;
 CREATE TABLE `firecms_articleFiles` (
   `articleId` int(11) unsigned NOT NULL,
   `fileId` int(11) unsigned NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `isMain` tinyint(1) NOT NULL,
   `position` tinyint(1) NOT NULL,
   PRIMARY KEY (`articleId`,`fileId`),
@@ -74,8 +80,9 @@ CREATE TABLE `firecms_articleMetas` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `articleId` int(11) unsigned NOT NULL,
   `metaId` int(11) unsigned NOT NULL,
-  `createDate` datetime NOT NULL,
   `createdBy` int(10) unsigned NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `value` text NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `articleIdMetaId` (`articleId`,`metaId`),
@@ -91,6 +98,8 @@ DROP TABLE IF EXISTS `firecms_articleTags`;
 CREATE TABLE `firecms_articleTags` (
   `articleId` int(11) unsigned NOT NULL,
   `tagId` int(11) unsigned NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`articleId`,`tagId`),
   KEY `tagId` (`tagId`),
   KEY `articleId` (`articleId`),
@@ -104,7 +113,8 @@ CREATE TABLE `firecms_categories` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `parentId` int(11) unsigned DEFAULT NULL,
   `historyId` int(11) unsigned DEFAULT NULL,
-  `createDate` datetime NOT NULL,
+  `createdBy` int(11) unsigned NOT NULL DEFAULT 1,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
   `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `publishingDate` datetime NOT NULL DEFAULT current_timestamp(),
   `expiringDate` datetime DEFAULT NULL,
@@ -114,7 +124,6 @@ CREATE TABLE `firecms_categories` (
   `level` int(11) NOT NULL DEFAULT 0,
   `categoryLeft` int(11) DEFAULT NULL,
   `categoryRight` int(11) DEFAULT NULL,
-  `createdBy` int(11) unsigned NOT NULL DEFAULT 1,
   `type` enum('homepage','site','url','categoryLink','gallery','textBox') NOT NULL DEFAULT 'site',
   `showInMenu` tinyint(1) NOT NULL DEFAULT 1,
   `public` tinyint(1) NOT NULL DEFAULT 1,
@@ -134,6 +143,8 @@ DROP TABLE IF EXISTS `firecms_categoryArticle`;
 CREATE TABLE `firecms_categoryArticle` (
   `categoryId` int(11) unsigned NOT NULL,
   `articleId` int(11) unsigned NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `isMain` tinyint(1) NOT NULL,
   PRIMARY KEY (`categoryId`,`articleId`),
   KEY `categoryId` (`categoryId`),
@@ -147,6 +158,8 @@ DROP TABLE IF EXISTS `firecms_categoryComments`;
 CREATE TABLE `firecms_categoryComments` (
   `categoryId` int(11) unsigned NOT NULL,
   `commentId` int(11) unsigned NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   KEY `categoryId` (`categoryId`),
   KEY `commentId` (`commentId`),
   CONSTRAINT `categoryComments_ibfk_3` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -158,6 +171,8 @@ DROP TABLE IF EXISTS `firecms_categoryDescriptions`;
 CREATE TABLE `firecms_categoryDescriptions` (
   `categoryId` int(11) unsigned NOT NULL,
   `languageId` char(2) NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `slug` varchar(255) DEFAULT NULL,
   `title` varchar(512) DEFAULT NULL,
   `excerpt` text DEFAULT NULL,
@@ -178,6 +193,8 @@ DROP TABLE IF EXISTS `firecms_categoryFiles`;
 CREATE TABLE `firecms_categoryFiles` (
   `categoryId` int(11) unsigned NOT NULL,
   `fileId` int(11) unsigned NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `isMain` tinyint(1) NOT NULL,
   `position` tinyint(1) NOT NULL,
   PRIMARY KEY (`categoryId`,`fileId`),
@@ -193,8 +210,9 @@ CREATE TABLE `firecms_categoryMetas` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `categoryId` int(11) unsigned NOT NULL,
   `metaId` int(11) unsigned NOT NULL,
-  `createDate` datetime NOT NULL,
   `createdBy` int(10) unsigned NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `value` text NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `categoryIdMetaId` (`categoryId`,`metaId`),
@@ -210,6 +228,8 @@ DROP TABLE IF EXISTS `firecms_categoryTags`;
 CREATE TABLE `firecms_categoryTags` (
   `categoryId` int(11) unsigned NOT NULL,
   `tagId` int(11) unsigned NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   KEY `categoryId` (`categoryId`),
   KEY `tagId` (`tagId`),
   CONSTRAINT `categoryTags_ibfk_3` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -222,11 +242,12 @@ CREATE TABLE `firecms_comments` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `parentId` int(11) unsigned DEFAULT NULL,
   `languageId` char(2) NOT NULL,
+  `createdBy` int(10) unsigned DEFAULT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `left` int(10) unsigned NOT NULL,
   `right` int(10) unsigned NOT NULL,
-  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
   `status` enum('publish','pending','trash') NOT NULL,
-  `createdBy` int(10) unsigned DEFAULT NULL,
   `author` varchar(100) DEFAULT NULL,
   `authorEmail` varchar(100) DEFAULT NULL,
   `title` varchar(150) NOT NULL,
@@ -247,7 +268,8 @@ DROP TABLE IF EXISTS `firecms_files`;
 CREATE TABLE `firecms_files` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `fileFolderId` int(11) unsigned NOT NULL,
-  `createDate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `originalName` varchar(100) NOT NULL,
   `newName` varchar(100) NOT NULL DEFAULT '',
   `diskName` varchar(50) NOT NULL,
@@ -267,6 +289,7 @@ CREATE TABLE `firecms_fileFolders` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `parentId` int(11) unsigned DEFAULT NULL,
   `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `name` varchar(200) NOT NULL,
   `default` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `position` int(11) NOT NULL,
@@ -280,6 +303,8 @@ CREATE TABLE `firecms_fileFolders` (
 DROP TABLE IF EXISTS `firecms_languages`;
 CREATE TABLE `firecms_languages` (
   `languageId` char(2) NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `active` tinyint(1) NOT NULL DEFAULT 1,
   `default` tinyint(1) NOT NULL DEFAULT 0,
   `position` int(11) NOT NULL,
@@ -292,6 +317,8 @@ CREATE TABLE `firecms_languages` (
 DROP TABLE IF EXISTS `firecms_menus`;
 CREATE TABLE `firecms_menus` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `active` tinyint(1) NOT NULL DEFAULT 1,
   `name` varchar(256) NOT NULL,
   `location` varchar(256) NOT NULL,
@@ -304,6 +331,8 @@ DROP TABLE IF EXISTS `firecms_menuItems`;
 CREATE TABLE `firecms_menuItems` (
   `menuId` int(11) unsigned NOT NULL,
   `categoryId` int(11) unsigned NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `position` tinyint(1) NOT NULL,
   PRIMARY KEY (`menuId`,`categoryId`),
   KEY `categoryId` (`categoryId`),
@@ -317,6 +346,8 @@ DROP TABLE IF EXISTS `firecms_metas`;
 CREATE TABLE `firecms_metas` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `languageId` char(2) DEFAULT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `type` varchar(20) NOT NULL,
   `isManual` tinyint(1) NOT NULL DEFAULT 1,
   `key` varchar(200) NOT NULL,
@@ -331,6 +362,8 @@ DROP TABLE IF EXISTS `firecms_modules`;
 CREATE TABLE `firecms_modules` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `parentId` int(11) unsigned DEFAULT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `name` varchar(50) DEFAULT NULL,
   `privilege` varchar(50) DEFAULT NULL,
   `title` varchar(50) NOT NULL,
@@ -346,6 +379,8 @@ ALTER TABLE `firecms_modules`
 DROP TABLE IF EXISTS `firecms_options`;
 CREATE TABLE `firecms_options` (
   `key` varchar(100) NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `value` text NOT NULL,
   PRIMARY KEY (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -355,6 +390,8 @@ DROP TABLE IF EXISTS `firecms_roles`;
 CREATE TABLE `firecms_roles` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `parentId` int(11) unsigned DEFAULT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `default` tinyint(1) NOT NULL DEFAULT 0,
   `position` tinyint(1) NOT NULL,
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
@@ -370,6 +407,8 @@ DROP TABLE IF EXISTS `firecms_roleModule`;
 CREATE TABLE `firecms_roleModule` (
   `roleId` int(11) unsigned NOT NULL,
   `moduleId` int(11) unsigned NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `privilege` varchar(15) NOT NULL,
   PRIMARY KEY (`roleId`,`moduleId`),
   KEY `moduleId` (`moduleId`),
@@ -378,67 +417,11 @@ CREATE TABLE `firecms_roleModule` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
-DROP TABLE IF EXISTS `firecms_plugin_sliders`;
-CREATE TABLE `firecms_plugin_sliders` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `location` varchar(100) NOT NULL,
-  `createDate` datetime NOT NULL,
-  `duration` int(10) unsigned NOT NULL,
-  `speed` int(10) unsigned NOT NULL,
-  `navigation` tinyint(1) unsigned NOT NULL,
-  `manual` tinyint(1) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
-DROP TABLE IF EXISTS `firecms_plugin_sliderItems`;
-CREATE TABLE `firecms_plugin_sliderItems` (
-  `sliderId` int(11) unsigned NOT NULL,
-  `languageId` char(2) NOT NULL,
-  `position` tinyint(1) unsigned NOT NULL,
-  `fileId` int(11) unsigned NOT NULL,
-  `url` varchar(256) NOT NULL DEFAULT '',
-  `text` varchar(256) NOT NULL DEFAULT '',
-  PRIMARY KEY (`sliderId`,`languageId`,`position`),
-  KEY `languageId` (`languageId`),
-  KEY `fileId` (`fileId`),
-  KEY `sliderId` (`sliderId`),
-  CONSTRAINT `sliderItems_ibfk_2` FOREIGN KEY (`sliderId`) REFERENCES `firecms_plugin_sliders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `sliderItems_ibfk_5` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `sliderItems_ibfk_6` FOREIGN KEY (`fileId`) REFERENCES `firecms_files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
-DROP TABLE IF EXISTS `firecms_plugin_stalkers`;
-CREATE TABLE `firecms_plugin_stalkers` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `createDate` timestamp NOT NULL DEFAULT current_timestamp(),
-  `createdBy` int(10) unsigned NOT NULL,
-  `ip` tinytext NOT NULL,
-  `url` text NOT NULL,
-  `data` text DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `createdBy` (`createdBy`),
-  CONSTRAINT `stalkers_ibfk_1` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
-DROP TABLE IF EXISTS `firecms_plugin_statistics`;
-CREATE TABLE `firecms_plugin_statistics` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `createDate` timestamp NOT NULL DEFAULT current_timestamp(),
-  `session` varchar(26) NOT NULL,
-  `ip` tinytext NOT NULL,
-  `agent` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
 DROP TABLE IF EXISTS `firecms_tags`;
 CREATE TABLE `firecms_tags` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -447,6 +430,8 @@ DROP TABLE IF EXISTS `firecms_tagDescriptions`;
 CREATE TABLE `firecms_tagDescriptions` (
   `tagId` int(11) unsigned NOT NULL,
   `languageId` char(2) NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`tagId`,`languageId`,`name`),
   KEY `languageId` (`languageId`),
@@ -459,6 +444,9 @@ CREATE TABLE `firecms_tagDescriptions` (
 DROP TABLE IF EXISTS `firecms_users`;
 CREATE TABLE `firecms_users` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `roleId` int(11) unsigned NOT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `username` varchar(60) NOT NULL,
   `password` varchar(60) NOT NULL,
   `email` varchar(100) NOT NULL,
@@ -466,7 +454,6 @@ CREATE TABLE `firecms_users` (
   `nickname` varchar(50) DEFAULT NULL,
   `firstName` varchar(50) NOT NULL,
   `surname` varchar(50) NOT NULL,
-  `roleId` int(11) unsigned NOT NULL,
   `recoveryPasswordTime` datetime DEFAULT NULL,
   `recoveryPasswordToken` varchar(24) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -480,10 +467,11 @@ DROP TABLE IF EXISTS `firecms_urls`;
 CREATE TABLE `firecms_urls` (
 						`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 						`languageId` char(2) NOT NULL,
+						`createDate` datetime NOT NULL DEFAULT current_timestamp(),
+						`updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
 						`type` varchar(128) NOT NULL,
 						`key` int(10) unsigned NOT NULL,
 						`url` varchar(2000) NOT NULL,
-						`createDate` datetime NOT NULL DEFAULT current_timestamp(),
 						PRIMARY KEY (`id`),
 						UNIQUE KEY `languageIdTypeKey` (`languageId`,`type`,`key`),
 						CONSTRAINT `urls_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -493,9 +481,10 @@ DROP TABLE IF EXISTS `firecms_urlRedirections`;
 CREATE TABLE `firecms_urlRedirections` (
 									`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 									`languageId` char(2) NOT NULL,
+									`createDate` datetime NOT NULL DEFAULT current_timestamp(),
+									`updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
 									`oldUrl` varchar(2000) NOT NULL,
 									`newUrl` varchar(2000) NOT NULL,
-									`createDate` datetime NOT NULL DEFAULT current_timestamp(),
 									`lastUsageDate` datetime DEFAULT NULL,
 									PRIMARY KEY (`id`),
 									KEY `languageId` (`languageId`),
