@@ -45,7 +45,7 @@ class HomepagePresenter extends BasePresenter
 
 	public function renderDefault(): void
 	{
-		$category = $this->categoriesModel->getAllWithTranslation($this->language)
+		/*$category = $this->categoriesModel->getAllWithTranslation($this->language)
 			->where("active", true)
 			->where("historyId", null)
 			->where("type", "homepage")->fetch();
@@ -79,7 +79,7 @@ class HomepagePresenter extends BasePresenter
 				//"url"=>$lanuageItem->url,
 				"locale"=>$lanuageItem->languageId
 				)));
-		}
+		}*/
 
 	}
 }

@@ -19,6 +19,9 @@ use Nette\Utils\Finder;
  * This factory first asks Nette's standard mapping. When the resulting class
  * does not exist, it looks the presenter up in an index built by scanning the
  * configured plugin/module directories for *Presenter.php files.
+ *
+ * Ať se najde jakákoliv třída, přednost má stejnojmenná třída v namespace `Theme\` (adresář theme/) -
+ * viz themeOverride().
  */
 final class PresenterFactory extends NettePresenterFactory
 {
@@ -63,14 +66,34 @@ final class PresenterFactory extends NettePresenterFactory
 	{
 		$default = parent::formatPresenterClass($presenter);
 		if (class_exists($default)) {
-			return $default;
+			return self::themeOverride($default);
 		}
 
 		if (isset($this->map[$presenter])) {
-			return $this->map[$presenter];
+			return self::themeOverride($this->map[$presenter]);
 		}
 
-		return $this->resolveFallback($presenter) ?? $default;
+		$class = $this->resolveFallback($presenter);
+
+		return $class !== null ? self::themeOverride($class) : $default;
+	}
+
+
+	/**
+	 * Přepis presenteru z theme: k `App\X` se použije `Theme\X` (tedy `theme/X.php` místo `app/X.php`),
+	 * pokud existuje - např. `Theme\FrontModule\Presenters\SignPresenter` místo
+	 * `App\FrontModule\Presenters\SignPresenter`. Typicky z původní třídy dědí a mění jen část chování;
+	 * šablony se pak dohledávají i u původní třídy (viz `App\Presenters\BasePresenter::formatTemplateFiles()`).
+	 */
+	private static function themeOverride(string $class): string
+	{
+		if (!str_starts_with($class, 'App\\')) {
+			return $class;
+		}
+
+		$themeClass = 'Theme\\' . substr($class, 4);
+
+		return class_exists($themeClass) ? $themeClass : $class;
 	}
 
 

@@ -34,14 +34,14 @@ class SignUpFormFactory
 			->setHtmlAttribute("autofocus");
 
 		$form->addText('email', 'Your e-mail')
-			->setType("email")
+			->setHtmlType("email")
 			->setRequired('Please enter your e-mail.')
-			->addRule($form::EMAIL);
+			->addRule($form::Email);
 
 		$form->addPassword('password', 'Create a password')
 			->setOption('description', sprintf('at least %d characters', self::PASSWORD_MIN_LENGTH))
 			->setRequired('Please create a password.')
-			->addRule($form::MIN_LENGTH, null, self::PASSWORD_MIN_LENGTH);
+			->addRule($form::MinLength, null, self::PASSWORD_MIN_LENGTH);
 
 		$form->addSubmit('send', 'Sign up');
 

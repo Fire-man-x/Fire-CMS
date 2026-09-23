@@ -14,7 +14,8 @@ Migrace byly přepsané přímo (bez nových migračních skriptů), protože da
   přípona `_ibfk_N` zůstává (vzor `settingDescriptions_ibfk_1`).
 - Migrace pluginů (`app/Plugins/*/data/migrations`, `theme/Plugins/*/data/migrations`) — jen odkazy na sloupce
   jádra (`INSERT INTO firecms_modules (parentId, …)`, `REFERENCES firecms_users (id)`, …). Vlastní tabulky
-  pluginů v `theme/Plugins` (`PetHotel`, SDH…) zůstávají beze změny v původním pojmenování. Plugin
+  pluginů SDH v `theme/Plugins` zůstávají beze změny v původním pojmenování. `PetHotel` byl převeden
+  dodatečně, viz `2026-09-23-pethotel-camelcase.md`. Plugin
   `app/Plugins/DynamicForms` byl převeden dodatečně, viz `2026-09-23-dynamicforms-camelcase-id.md`.
 - `app/Model/BaseModel.php` — `$columnId` má výchozí hodnotu `'id'`; nový `setForeignKeyColumn()` /
   `getForeignKeyColumn()` = název sloupce, pod kterým na tabulku odkazují ostatní tabulky. Modely místo

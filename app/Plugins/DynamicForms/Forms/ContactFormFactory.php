@@ -99,8 +99,8 @@ class ContactFormFactory extends BaseFormFactory
 						break;
 					case 'email':
 						$control = $form->addText($item['name'], $caption);
-						$control->setType('email');
-						$control->addRule(Form::EMAIL, VALIDATE_FORMAT);
+						$control->setHtmlType('email');
+						$control->addRule(Form::Email, VALIDATE_FORMAT);
 						$control->setRequired(VALIDATE_REQUIRED);
 						break;
 					case 'input':

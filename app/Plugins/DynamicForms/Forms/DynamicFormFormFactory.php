@@ -100,14 +100,14 @@ class DynamicFormFormFactory extends BaseFormFactory
 			->setPrompt(PROMPT_VALUE);
 		//afterSendInformations
 		$controlAfterSendInformation = $form->addText('afterSendInformationsEmail', 'Email')
-			->setType('email');
-		$controlAfterSendInformation->addConditionOn($controlWhereToSend, Form::EQUAL, 'email')
-				->addRule(Form::FILLED, VALIDATE_REQUIRED)
-				->addRule(Form::EMAIL, VALIDATE_FORMAT);
+			->setHtmlType('email');
+		$controlAfterSendInformation->addConditionOn($controlWhereToSend, Form::Equal, 'email')
+				->addRule(Form::Filled, VALIDATE_REQUIRED)
+				->addRule(Form::Email, VALIDATE_FORMAT);
 		$controlAfterSendInformation->getLabelPrototype()->addAttributes(array('id' => $controlAfterSendInformation->getHtmlId().'-label'));
 
 		//add toggle
-		$controlWhereToSend->addCondition(Form::EQUAL, 'email')
+		$controlWhereToSend->addCondition(Form::Equal, 'email')
 			->toggle($controlAfterSendInformation->getHtmlId())
 			->toggle($controlAfterSendInformation->getHtmlId().'-label');
 

@@ -20,6 +20,21 @@ tracy:
 		- LiveTranslator\Panel\Panel
 
 search:
+	# Presentery v theme/ - přepisy presenterů z app/ (viz App\Application\PresenterFactory::themeOverride()).
+	# Musí být služby, jinak je PresenterFactoryCallback nenajde ("No services of type ..."). theme/Plugins je
+	# vynechané záměrně - presentery theme pluginů registruje search: blok v config.plugin.neon daného pluginu,
+	# jen když je plugin zapnutý (u vypnutého by chyběly jeho služby a kompilace kontejneru by spadla).
+	themePresenters:
+		in: %rootDir%/theme
+		implements: Nette\Application\IPresenter
+		files:
+			- *Presenter.php
+		exclude:
+			files:
+				- Plugins
+		tags:
+			- nette.inject
+
 	# Routery
 	router:
 		in: %appDir%/Router

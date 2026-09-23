@@ -17,6 +17,32 @@ obdobně), i když fyzicky leží jinde (`app/Plugins/Sliders/AdminModule/Presen
 `app/Modules/CommentsModule/AdminModule/CommentsPresenter.php`) — viz [plugins.md](plugins.md) jak je
 `PresenterFactory` najde.
 
+## Přepis presenteru z `theme/`
+
+Presenter jádra se v klientském projektu upraví bez zásahu do `app/` takto: v `theme/` vytvořte třídu se
+stejnou relativní cestou a názvem, jen s namespace `Theme\` místo `App\`, a nechte ji dědit z původní třídy:
+
+```php
+// theme/FrontModule/Presenters/SignPresenter.php
+namespace Theme\FrontModule\Presenters;
+
+class SignPresenter extends \App\FrontModule\Presenters\SignPresenter
+{
+	public function actionIn(): void { ... }
+}
+```
+
+- **Výběr třídy:** `App\Application\PresenterFactory::themeOverride()` vezme `Theme\X`, pokud existuje,
+  jinak `App\X`.
+- **Registrace do DI:** `search: themePresenters` v `app/config/config.neon` skenuje celé `theme/` kromě
+  `theme/Plugins`.
+- **Šablony:** hledají se nejdřív v `theme/`, pak u původní třídy v `app/`
+  (`App\Presenters\BasePresenter::formatTemplateFiles()`), takže stačí přepsat jen ty, které se mění.
+- **Po přidání přepisu je potřeba smazat `temp/cache/nette.configurator`**, protože v produkčním módu
+  se kontejner sám nepřekompiluje.
+- **Omezení:** presentery z `app/Plugins` se takhle přepsat nedají (viz
+  `Changelog/2026-09-23-theme-presenter-override.md`).
+
 ## ACL — `#[Secured]`/`#[Resource]`/`#[Privilege]`
 
 Definováno v `app/Attributes/`. Dá se dát na třídu presenteru (platí pro celý presenter) i na konkrétní

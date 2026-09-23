@@ -178,6 +178,12 @@ configu. Neplatí to univerzálně pro všechny extensions (některé čtou svoj
 ale kdykoliv extension dokumentuje "discovery via tag", je bezpečné tag zaregistrovat z libovolného configu
 včetně pluginového.
 
+**Klíč skupiny v `migrations: groups:` musí být unikátní napříč VŠEMI `config.plugin.neon`.** NEON sekce
+`migrations:` z více souborů se slučují podle klíče, takže dvě skupiny se stejným klíčem se tiše spojí
+do jedné a použije se `directory` jen jednoho z nich. Do 2026-09-23 měl `SDHBase` skupinu
+`statistics` (stejnou jako `app/Plugins/Statistics`), a migrace pluginu Statistics se proto nikdy nespustila.
+Pojmenovávejte skupinu podle pluginu (`sdh-base-structures`, `stalker`, …).
+
 ## Testování přes `curl` na sdíleném/multi-tenant boxu
 
 Tenhle vývojový box hostuje víc projektů (fire-cms, pet-hotel, další klientské projekty) přes stejný
@@ -215,6 +221,19 @@ by muselo jít přes novou migraci s `RENAME TABLE`.
 **SDH pluginy (`SDHAttendance`/`SDHCalendar`/`SDHTowns`/`SDHEvents`/`SDHTests`) byly od 2026-09-17 dodatečně
 přejmenované taky** (na žádost zadavatele, i přes vyšší riziko — viz `Changelog/2026-09-17-sdh-db-table-prefix.md`).
 Klíčové věci, které je potřeba vědět, než se s tímhle kódem/DB dál pracuje:
+
+> **Update 2026-09-23:** Většina bodů níže je historická. SDH tabulky už nejsou v samostatné databázi `sdh`.
+> Leží v hlavní DB (fire-cms) jako `firecms_plugin_*` a zakládá je migrace `SDHBase` (skupina
+> `sdh-base-structures`). Modely jedou přes výchozí connection (`@database.databaseSdh.context` je
+> v `config.plugin.neon` zakomentované). Sloupce mají konvence jádra (camelCase, PK `id`, FK `<entita>Id`,
+> `createDate`/`updateDate`). Tabulka se jmenuje `firecms_plugin_whoSubtypes` (množné číslo) a
+> `ActionFormFactory` zapisuje do `firecms_plugin_files`. Data ze staré `sdh` se přenesou ručně přes
+> `theme/Plugins/SDHBase/data/import-from-sdh.sql`. Viz `Changelog/2026-09-23-sdh-camelcase-id.md`.
+>
+> **Past při převodu snake_case → camelCase:** když funkce měla parametr `$who_id` a lokální
+> proměnnou `$whoId` s jiným významem (hash klíč), po převodu splynou a lokální proměnná přepíše parametr
+> (stalo se v `ResultCalculating::addResult()`). PHPStan to najde jen tehdy, když se liší typy.
+> Před převodem proto vyhledejte páry `$foo_bar` + `$fooBar` ve stejné funkci.
 
 - Jejich modely jedou přes samostatnou DB connection `@database.databaseSdh.context`
   (`app/config/config.local.neon` → `database.databaseSdh`, fyzicky samostatná databáze `sdh`, ne `fire-cms`).
@@ -318,6 +337,10 @@ přestože v kódu ani v DB takový sloupec není). Po každé změně schématu
 (adresáře patří `www-data`, takže je potřeba `sudo`, nebo je přesuňte stranou, protože `temp/` je zapisovatelné).
 
 ## `SDHBase` — sdílené schéma legacy SDH tabulek, MIMO `nextras/migrations`
+
+> **Update 2026-09-23:** Neplatí. `SDHBase` už nemá `schema.sql` ani `sdh:install-schema`. Tabulky zakládá
+> klasická migrace `data/migrations/20260601000000.sql` ve skupině `sdh-base-structures` proti hlavní DB.
+> Text níže popisuje stav z 2026-09-17 a je zachovaný kvůli kontextu.
 
 SDH pluginy (viz sekce výše) sdílí tabulky napříč sebou navzájem — např. `SDHAttendance` přímo
 instancuje `Theme\Plugins\SDHCalendar\Model\Whos` (`whosModel` v `SDHAttendance/config.plugin.neon`),

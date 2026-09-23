@@ -71,7 +71,7 @@ class SliderItemFormFactory extends BaseFormFactory
 		$form = parent::create($editId);
 
 		$form->addText('url', 'URL')
-			->setType("url");
+			->setHtmlType("url");
 
 		$form->addText('text', 'Text');
 

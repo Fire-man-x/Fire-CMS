@@ -4,6 +4,16 @@ Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na det
 
 ## 2026-09-23
 
+- **PetHotel: bezpečnější přihlášení kódem.** Vstup majitele jen s vlastním ubytováním, e-mail v session místo URL,
+  kód hned po registraci, ubytování na existující účet až po ověření kódem. Viz
+  [2026-09-23-pethotel-login-hardening.md](2026-09-23-pethotel-login-hardening.md).
+- **Presenter v `theme/` přepíše stejnojmenný presenter z `app/`** (`Theme\X` místo `App\X`, šablony se berou
+  i z původního). Viz [2026-09-23-theme-presenter-override.md](2026-09-23-theme-presenter-override.md).
+- **SDH pluginy převedeny na konvence jádra (camelCase, PK `id`, `createDate`/`updateDate`) + import ze staré DB `sdh`.** Viz
+  [2026-09-23-sdh-camelcase-id.md](2026-09-23-sdh-camelcase-id.md). Opravena kolize klíče skupiny migrací `statistics`
+  (SDHBase vs. plugin Statistics), `who_subtypes` → `firecms_plugin_whoSubtypes`.
+- **Plugin PetHotel převeden na camelCase sloupce.** Viz [2026-09-23-pethotel-camelcase.md](2026-09-23-pethotel-camelcase.md).
+  Migrace přepsané (reset DB), kód pluginu převedený včetně vypočtených aliasů.
 - **Tabulky Stalker, Statistics a Sliders přesunuty z core migrace do vlastních migrací pluginů** (Stalker/Statistics nově registrované). Viz
   [2026-09-23-stalker-statistics-plugin-migrations.md](2026-09-23-stalker-statistics-plugin-migrations.md).
   Smazána core migrace `structures/20200324212900.sql` (její ALTER je zapracovaný do plugin migrace).
