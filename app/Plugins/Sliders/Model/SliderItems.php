@@ -17,7 +17,7 @@ class SliderItems extends BaseModel
 		parent::__construct($database);
 
 		$this->setTableName('firecms_plugin_sliderItems');
-		$this->setColumnId('slider_id');
+		$this->setColumnId('sliderId');
 	}
 
 
@@ -26,7 +26,7 @@ class SliderItems extends BaseModel
 	 */
 	public function insert(ArrayHash $data): int
 	{
-		$data->position = $this->getNextPosition($data->language_id);
+		$data->position = $this->getNextPosition($data->languageId);
 		return parent::insert($data);
 	}
 
@@ -49,7 +49,7 @@ class SliderItems extends BaseModel
 	 */
 	protected function getNextPosition(string $language): int
 	{
-		return $this->findAll()->select("IFNULL(MAX(position),0)+1 AS position")->where("language_id", $language)->fetchField();
+		return $this->findAll()->select("IFNULL(MAX(position),0)+1 AS position")->where("languageId", $language)->fetchField();
 	}
 
 
@@ -57,13 +57,13 @@ class SliderItems extends BaseModel
 	 * Change positions of items
 	 * @param array<int|int> $positions Array with sorted old positions
 	 */
-	public function changePositions(int $slider_id, string $language, array $positions): void
+	public function changePositions(int $sliderId, string $language, array $positions): void
 	{
 		$maxPos = $this->getNextPosition($language);
 		foreach ($positions as $newPosition => $oldPosition){
 			$this->findAll()
-				->where("slider_id", $slider_id)
-				->where("language_id", $language)
+				->where("sliderId", $sliderId)
+				->where("languageId", $language)
 				->where("position", $oldPosition)
 				->update(array(
 					"position"=>$maxPos+$newPosition +1 //because of index from 0
@@ -72,8 +72,8 @@ class SliderItems extends BaseModel
 
 		//return to base position
 		$this->findAll()
-				->where("slider_id", $slider_id)
-				->where("language_id", $language)
+				->where("sliderId", $sliderId)
+				->where("languageId", $language)
 				->update(array(
 					"position"=> new \Nette\Database\SqlLiteral("position - ?", array($maxPos))
 				));

@@ -11,8 +11,8 @@
 	{capture $filesContainer}
 		{snippet files}
 			{ifset $files}
-				<div n:foreach="$files as $file" class="img-thumbnail d-inline-block {if $file->is_main}selected{/if}" data-file-id="{$file->file->getId()}">
-					<a n:tag-if="!$isWindowMode" nx:href="fileInfo! hash=>$file->file->getHash()" data-bs-toggle="popover" titlex="{_'Actions'}" data-content="<a href='{link removeImage! file_id=>$file->file->getId()}' class='ajax'><i class='fa fa-times'></i></a>" data-bs-placement="bottom" titlex="{$file->file->getName()}">
+				<div n:foreach="$files as $file" class="img-thumbnail d-inline-block {if $file->isMain}selected{/if}" data-file-id="{$file->file->getId()}">
+					<a n:tag-if="!$isWindowMode" nx:href="fileInfo! hash=>$file->file->getHash()" data-bs-toggle="popover" titlex="{_'Actions'}" data-content="<a href='{link removeImage! fileId=>$file->file->getId()}' class='ajax'><i class='fa fa-times'></i></a>" data-bs-placement="bottom" titlex="{$file->file->getName()}">
 						<img n:src="$file->file, '130x130'" alt="{$file->file->getName()}" class="">
 						<small class="d-block text-xs-center">{$file->file->getName()}</small>
 					</a>
@@ -60,9 +60,9 @@
 
 						<fieldset n:if="$type != 'textBox'">
 							<legend>{_"SEO"}</legend>
-							{$form->getRenderer()->renderPair($form['translation']['seo_title']) |noescape}
-							{$form->getRenderer()->renderPair($form['translation']['seo_description']) |noescape}
-							{$form->getRenderer()->renderPair($form['translation']['seo_keywords']) |noescape}
+							{$form->getRenderer()->renderPair($form['translation']['seoTitle']) |noescape}
+							{$form->getRenderer()->renderPair($form['translation']['seoDescription']) |noescape}
+							{$form->getRenderer()->renderPair($form['translation']['seoKeywords']) |noescape}
 						</fieldset>
 					</div>
 				</div>
@@ -91,7 +91,7 @@
 								{var $revisionParamName = \App\AdminModule\Presenters\CategoriesPresenter::$revisionParameter}
 								{capture $revisionsContainer}
 									<ul class="list-unstyled">
-										<li n:foreach="$revisionsList as $revision"><strong n:tag-if="$revision->category_id == $presenter->getParameter($revisionParamName)"><a n:href="this $revisionParamName=>$revision->category_id" title="{_'View'}">{$revision->create_date|date:\DATETIME_FORMAT}</a></strong></li>
+										<li n:foreach="$revisionsList as $revision"><strong n:tag-if="$revision->id == $presenter->getParameter($revisionParamName)"><a n:href="this $revisionParamName=>$revision->id" title="{_'View'}">{$revision->createDate|date:\DATETIME_FORMAT}</a></strong></li>
 									</ul>
 								{/capture}
 								<a tabindex="0" class="btn btn-outline-dark" role="button" data-bs-toggle="popover" data-bs-placement="bottom" title="&lt;i class=&quot;fa fa-history&quot;&gt;&lt;/i&gt; {_'Older versions'}" data-content="{$revisionsContainer}">
@@ -106,17 +106,17 @@
 
 						{$form->getRenderer()->renderPair($form['type']) |noescape}
 
-						{$form->getRenderer()->renderPair($form['publishing_date']) |noescape}
+						{$form->getRenderer()->renderPair($form['publishingDate']) |noescape}
 
-						{$form->getRenderer()->renderPair($form['expiring_date']) |noescape}
+						{$form->getRenderer()->renderPair($form['expiringDate']) |noescape}
 
 						<div class="row mb-3">
 							<div class="col-sm-3 col-lg-12x col-form-label">
-								{label show_in_menu: /}
+								{label showInMenu: /}
 							</div>
 
 							<div class="col-sm-9 col-lg-12x">
-								<div class="form-check">{input show_in_menu:}</div>
+								<div class="form-check">{input showInMenu:}</div>
 							</div>
 						</div>
 

@@ -73,8 +73,8 @@ abstract class BaseSubMetas extends BaseModel
 	 */
 	public function insert(ArrayHash $data): int
 	{
-		$data->create_date = new SqlLiteral("NOW()");
-		$data->created_by = $this->user->getId();
+		$data->createDate = new SqlLiteral("NOW()");
+		$data->createdBy = $this->user->getId();
 		return parent::insert($data);
 	}
 
@@ -91,14 +91,14 @@ abstract class BaseSubMetas extends BaseModel
 		}
 		foreach ($data as $key => $value) {
 			$query = $this->findByColumnId($columnId)
-				->where("meta_id", $key);
+				->where("metaId", $key);
 			$exist = $query->fetch();
 			if($exist){
 				$query->update(array("value" => $value));
 			} else {
 				$this->insert(ArrayHash::from(array(
 					$this->getReferenceColumn() => $columnId,
-					"meta_id" => $key,
+					"metaId" => $key,
 					"value" => $value
 					)));
 			}

@@ -22,9 +22,15 @@ abstract class BaseModel
 	private string $tableName;
 
 	/**
-	 * Primary key column_id
+	 * Primary key column (AUTO_INCREMENT sloupce se v DB jmenují `id`)
 	 */
-	private string $columnId;
+	private string $columnId = 'id';
+
+	/**
+	 * Název sloupce, pod kterým na primární klíč této tabulky odkazují ostatní tabulky
+	 * (překladové/vazební tabulky), např. `articleId` pro `firecms_articles.id`
+	 */
+	private string $foreignKeyColumn;
 
 	protected Explorer $database;
 
@@ -61,11 +67,7 @@ abstract class BaseModel
 	 */
 	public function getColumnId(): string
 	{
-		if(isset($this->columnId)){
-			return $this->columnId;
-		} else {
-			throw new \InvalidArgumentException("Column ID is not defined.");
-		}
+		return $this->columnId;
 	}
 
 	/**
@@ -74,6 +76,27 @@ abstract class BaseModel
 	protected function setColumnId(string $columnId): void
 	{
 		$this->columnId = $columnId;
+	}
+
+
+	/**
+	 * Get foreign key column name - sloupec, kterým na tuto tabulku odkazují ostatní tabulky
+	 */
+	public function getForeignKeyColumn(): string
+	{
+		if(isset($this->foreignKeyColumn)){
+			return $this->foreignKeyColumn;
+		} else {
+			throw new \InvalidArgumentException("Foreign key column is not defined.");
+		}
+	}
+
+	/**
+	 * Set foreign key column name
+	 */
+	protected function setForeignKeyColumn(string $foreignKeyColumn): void
+	{
+		$this->foreignKeyColumn = $foreignKeyColumn;
 	}
 
 

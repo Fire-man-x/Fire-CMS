@@ -51,12 +51,12 @@
 					<div class="form-group row required">
 						<div class="col-sm-3 control-label">{_"Date"}</div>
 
-						<div class="col-sm-9">{$fileInfo->create_date|date:\DATETIME_FORMAT}</div>
+						<div class="col-sm-9">{$fileInfo->createDate|date:\DATETIME_FORMAT}</div>
 					</div>
 					<div class="form-group row required">
 						<div class="col-sm-3"></div>
 
-						<div class="col-sm-9"><a n:href="delete! hash=>$fileInfo->disk_name" class="ajax btn btn-danger"><i class="fa fa-trash"></i> {_"Delete"}</a></div>
+						<div class="col-sm-9"><a n:href="delete! hash=>$fileInfo->diskName" class="ajax btn btn-danger"><i class="fa fa-trash"></i> {_"Delete"}</a></div>
 					</div>
 				{else}
 					<div>

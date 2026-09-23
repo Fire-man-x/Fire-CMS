@@ -45,8 +45,9 @@ class MetasPresenter extends BasePresenter
 	 */
 	protected function createComponentMetasGrid(string $name): Datagrid
 	{
-		$source = $this->model->findAll()->order("language_id ASC")->order("key ASC")->order($this->model->getColumnId());
+		$source = $this->model->findAll()->order("languageId ASC")->order("key ASC")->order($this->model->getColumnId());
 		$primaryKey = $this->model->getColumnId();
+		$paramKey = $this->model->getForeignKeyColumn();
 
 		$grid = new Datagrid($this, $name);
 		$grid->setPrimaryKey($primaryKey);
@@ -56,10 +57,10 @@ class MetasPresenter extends BasePresenter
 		$that = $this;
 
 		//columns
-		$grid->addColumnText("language_id", "Language");
+		$grid->addColumnText("languageId", "Language");
 		//override default value
-		$grid->addColumnCallback("language_id", function(ColumnText $column, $data){
-			if (!$data->language_id) {
+		$grid->addColumnCallback("languageId", function(ColumnText $column, $data){
+			if (!$data->languageId) {
 				$column->setRenderer(function() {
 					return $this->translator->translate(MetaFormFactory::$allLanguages);
 				});
@@ -67,7 +68,7 @@ class MetasPresenter extends BasePresenter
 			else
 			{
 				$column->setRenderer(function() use ($data) {
-					return $this->languages->getLanguage($data->language_id);
+					return $this->languages->getLanguage($data->languageId);
 				});
 			}
 		});
@@ -86,7 +87,7 @@ class MetasPresenter extends BasePresenter
 			});
 
 		//Actions
-		$grid->addAction('edit', 'Edit', 'edit!', array($primaryKey => $primaryKey))
+		$grid->addAction('edit', 'Edit', 'edit!', array($paramKey => $primaryKey))
 			->setClass('btn btn-primary btn-sm ajax')
 			->setIcon(ICON_EDIT)
 			->setTitle('Edit')
@@ -95,7 +96,7 @@ class MetasPresenter extends BasePresenter
 				"data-bs-target" => "#modal"
 			));
 
-		$grid->addAction('delete', 'Delete', 'delete!', array($primaryKey => $primaryKey))
+		$grid->addAction('delete', 'Delete', 'delete!', array($paramKey => $primaryKey))
 			->setClass('btn btn-danger btn-sm ajax')
 			->setIcon(ICON_DELETE)
 			->setTitle('Delete')
@@ -143,10 +144,10 @@ class MetasPresenter extends BasePresenter
 	/**
 	 * Edit handler
 	 */
-	public function handleEdit(int $meta_id): void
+	public function handleEdit(int $metaId): void
 	{
-		$this->factory->setEditId($meta_id);
-		$this->factory->setDefaultValues($this["metaForm"], $meta_id);
+		$this->factory->setEditId($metaId);
+		$this->factory->setDefaultValues($this["metaForm"], $metaId);
 		$this->redrawControl("metaForm");
 	}
 
@@ -154,9 +155,9 @@ class MetasPresenter extends BasePresenter
 	/**
 	 * Delete handler
 	 */
-	public function handleDelete(int $meta_id): void
+	public function handleDelete(int $metaId): void
 	{
-		$this->model->delete($meta_id);
+		$this->model->delete($metaId);
 		$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
 
 		$this->redirect('this');

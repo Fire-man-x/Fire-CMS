@@ -18,7 +18,7 @@ class Model extends BaseModel
 		parent::__construct($database);
 
 		$this->setTableName('firecms_urls');
-		$this->setColumnId('url_id');
+		$this->setForeignKeyColumn('urlId');
 	}
 
 	public function getAllForGrid(): \Nette\Database\Table\Selection

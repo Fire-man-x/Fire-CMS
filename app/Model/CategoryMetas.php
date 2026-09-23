@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Service\LanguageService;
+use Nette\Database\Table\Selection;
 
 /**
  * CategoryMetas Model
@@ -14,25 +15,21 @@ class CategoryMetas extends BaseSubMetas
 
 	/**
 	 * Constructor
-	 * @param \Nette\Database\Explorer $database
-	 * @param LanguageService $languages
 	 */
 	public function __construct(\Nette\Database\Explorer $database, LanguageService $languages, \Nette\Security\User $user)
 	{
 		parent::__construct($database, $languages, $user);
 
 		$this->setTableName('firecms_categoryMetas');
-		$this->setColumnId('category_meta_id');
-		$this->setReferenceColumn('category_id');
+		$this->setForeignKeyColumn('categoryMetaId');
+		$this->setReferenceColumn('categoryId');
 	}
 
 
 	/**
 	 * Find by category id
-	 * @param int $id
-	 * @return \Nette\Database\Table\Selection
 	 */
-	public function findByCategoryId($id)
+	public function findByCategoryId(int $id): Selection
 	{
 		return $this->findByColumnId($id);
 	}

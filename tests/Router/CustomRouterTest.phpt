@@ -37,7 +37,7 @@ final class CustomRouterTest extends TestCase
 
 		$this->db = SqliteDatabase::create([
 			'CREATE TABLE firecms_languages (
-				language_id TEXT PRIMARY KEY,
+				languageId TEXT PRIMARY KEY,
 				active INTEGER NOT NULL DEFAULT 1,
 				"default" INTEGER NOT NULL DEFAULT 0,
 				position INTEGER NOT NULL,
@@ -45,25 +45,25 @@ final class CustomRouterTest extends TestCase
 				shortcut TEXT NOT NULL
 			)',
 			'CREATE TABLE firecms_domains (
-				domain_id INTEGER PRIMARY KEY AUTOINCREMENT,
-				language_id TEXT NOT NULL,
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				languageId TEXT NOT NULL,
 				domain TEXT NOT NULL,
 				active INTEGER NOT NULL DEFAULT 1,
 				"default" INTEGER NOT NULL DEFAULT 1,
 				position INTEGER NOT NULL DEFAULT 0
 			)',
 			'CREATE TABLE firecms_urls (
-				url_id INTEGER PRIMARY KEY AUTOINCREMENT,
-				language_id TEXT NOT NULL,
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				languageId TEXT NOT NULL,
 				type TEXT NOT NULL,
 				key INTEGER NOT NULL,
 				url TEXT NOT NULL
 			)',
 			'CREATE TABLE firecms_urlRedirections (
-				url_redirection_id INTEGER PRIMARY KEY AUTOINCREMENT,
-				language_id TEXT NOT NULL,
-				old_url TEXT NOT NULL,
-				new_url TEXT NOT NULL
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				languageId TEXT NOT NULL,
+				oldUrl TEXT NOT NULL,
+				newUrl TEXT NOT NULL
 			)',
 		]);
 
@@ -156,7 +156,7 @@ final class CustomRouterTest extends TestCase
 	private function insertLanguage(string $languageId, bool $active, bool $default, int $position): void
 	{
 		$this->db->query(
-			'INSERT INTO firecms_languages (language_id, active, "default", position, name, shortcut) VALUES (?, ?, ?, ?, ?, ?)',
+			'INSERT INTO firecms_languages (languageId, active, "default", position, name, shortcut) VALUES (?, ?, ?, ?, ?, ?)',
 			$languageId,
 			$active,
 			$default,
@@ -169,7 +169,7 @@ final class CustomRouterTest extends TestCase
 	private function insertDomain(string $languageId, string $domain, bool $active, bool $default): void
 	{
 		$this->db->query(
-			'INSERT INTO firecms_domains (language_id, domain, active, "default") VALUES (?, ?, ?, ?)',
+			'INSERT INTO firecms_domains (languageId, domain, active, "default") VALUES (?, ?, ?, ?)',
 			$languageId,
 			$domain,
 			$active,
@@ -180,7 +180,7 @@ final class CustomRouterTest extends TestCase
 	private function insertUrl(string $languageId, string $type, int $key, string $url): void
 	{
 		$this->db->query(
-			'INSERT INTO firecms_urls (language_id, type, key, url) VALUES (?, ?, ?, ?)',
+			'INSERT INTO firecms_urls (languageId, type, key, url) VALUES (?, ?, ?, ?)',
 			$languageId,
 			$type,
 			$key,

@@ -28,10 +28,10 @@ class LanguageFormFactory extends BaseFormFactory
 
 		$form->addCheckbox('default', 'Default');
 
-		$form->addText('language_id', 'Id')
+		$form->addText('languageId', 'Id')
 			->setRequired(VALIDATE_REQUIRED)
 			->getControlPrototype()->maxlength(2);
-		$form['language_id']->setDefaultValue($editId);
+		$form['languageId']->setDefaultValue($editId);
 
 		$form->addText('name', 'Name')
 			->setRequired(VALIDATE_REQUIRED)
@@ -63,7 +63,7 @@ class LanguageFormFactory extends BaseFormFactory
 		unset($values->editId);
 
 		if ($this->isEditMode()) {
-			$this->model->update($this->getEditId(), $values);
+			$this->model->update($this->getEditId(), (array) $values);
 		} else {
 			$this->model->insert($values);
 		}
@@ -72,10 +72,13 @@ class LanguageFormFactory extends BaseFormFactory
 
 	/**
 	 * Set default values to modal form
+	 * @param int|string $editId ID jazyka je jeho kód (`languageId`, např. "en"), ne číslo
 	 */
-	public function setDefaultValues(Form $form, int $editId)
+	public function setDefaultValues(Form $form, int|string $editId)
 	{
-		parent::setDefaultValues($form, $editId);
+		if (!$this->isModal()) {
+			throw new \InvalidArgumentException("Can not use in non 'modal' mode.");
+		}
 
 		$defaults = $this->model->getById($editId);
 

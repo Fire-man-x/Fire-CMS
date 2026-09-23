@@ -46,6 +46,7 @@ class LanguagesPresenter extends BasePresenter
 	{
 		$source = $this->model->findAll()->order("default DESC")->order($this->model->getColumnId());
 		$primaryKey = $this->model->getColumnId();
+		$paramKey = $this->model->getForeignKeyColumn();
 
 		$grid = new Datagrid();
 		$grid->setPrimaryKey($primaryKey);
@@ -66,11 +67,11 @@ class LanguagesPresenter extends BasePresenter
 			->setIcon('check-circle')
 			->setTitle('Set as unactive');
 		$activeColumn->onChange[] = function($id, $value) {
-			$this->handleActivate($id, $value);
+			$this->handleActivate((string) $id, (bool) $value);
 		};
 
 		//default
-		$grid->addColumnLink('default', 'D.', 'setDefault!', 'default', array($primaryKey => $primaryKey))
+		$grid->addColumnLink('default', 'D.', 'setDefault!', 'default', array($paramKey => $primaryKey))
 			->setClass('btn btn-outline-primary btn-sm')
 			->setIcon('ban') //default ban icon
 			->setTitle($this->translator->translate('Set as default'))
@@ -94,7 +95,7 @@ class LanguagesPresenter extends BasePresenter
 		$grid->addColumnText("shortcut", "Shortcut");
 
 		//Actions
-		$grid->addAction('edit', 'Edit', 'edit!', array($primaryKey => $primaryKey))
+		$grid->addAction('edit', 'Edit', 'edit!', array($paramKey => $primaryKey))
 			->setClass('btn btn-primary btn-sm ajax')
 			->setIcon(ICON_EDIT)
 			->setTitle('Edit')
@@ -103,7 +104,7 @@ class LanguagesPresenter extends BasePresenter
 				"data-bs-target" => "#modal"
 			));
 
-		$grid->addAction('delete', 'Delete', 'delete!', array($primaryKey => $primaryKey))
+		$grid->addAction('delete', 'Delete', 'delete!', array($paramKey => $primaryKey))
 			->setClass(function($item) {
 				return 'btn btn-danger btn-sm ajax'.($item->default ? ' disabled' : '');
 			})
@@ -153,12 +154,12 @@ class LanguagesPresenter extends BasePresenter
 	/**
 	 * Edit handler
 	 */
-	public function handleEdit(int|string $language_id): void
+	public function handleEdit(int|string $languageId): void
 	{
-		$this->factory->setEditId($language_id);
+		$this->factory->setEditId($languageId);
 		/** @var Nette\Application\UI\Form $form */
 		$form = $this["languageForm"];
-		$this->factory->setDefaultValues($form, $language_id);
+		$this->factory->setDefaultValues($form, $languageId);
 		$this->redrawControl("languageForm");
 	}
 
@@ -166,10 +167,10 @@ class LanguagesPresenter extends BasePresenter
 	/**
 	 * Delete handler
 	 */
-	public function handleDelete(int|string $language_id): void
+	public function handleDelete(int|string $languageId): void
 	{
-		if(!$this->model->getById($language_id)?->default){
-			$this->model->delete($language_id);
+		if(!$this->model->getById($languageId)?->default){
+			$this->model->delete($languageId);
 			$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
 		}  else {
 			$this->flashMessage(FAIL_DELETE, FLASH_FAILED);
@@ -181,15 +182,15 @@ class LanguagesPresenter extends BasePresenter
 	/**
 	 * Activate
 	 */
-	public function handleActivate(int $language_id, bool $status = false): void
+	public function handleActivate(string $languageId, bool $status = false): void
 	{
-		$this->model->update($language_id, array("active" => $status));
+		$this->model->update($languageId, array("active" => $status));
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 
 		if ($this->isAjax()) {
 			$this->redrawControl('flashes');
 			//$this['categoriesGrid']->setDataSource($this->categoryRepository->getAdminSelection('all'));
-			$this['languagesGrid']->redrawItem($language_id, 'language_id');
+			$this['languagesGrid']->redrawItem($languageId, 'languageId');
 		} else {
 			$this->redirect('this');
 		}
@@ -199,10 +200,10 @@ class LanguagesPresenter extends BasePresenter
 	/**
 	 * Activate
 	 */
-	public function handleSetDefault(int $language_id): void
+	public function handleSetDefault(string $languageId): void
 	{
 		$this->model->findAll()->update(array("default" => false));
-		$this->model->update($language_id, array("default" => true));
+		$this->model->update($languageId, array("default" => true));
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 		$this->redirect('this');
 	}

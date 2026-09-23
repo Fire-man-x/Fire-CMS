@@ -6,6 +6,7 @@ namespace App\Forms;
 use App\Service\LanguageService;
 use App\Model;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 
 
 class TagFormFactory extends BaseFormFactory
@@ -52,11 +53,11 @@ class TagFormFactory extends BaseFormFactory
 		
 		foreach ($values as $languageId => $value) {
 			$query = $this->model->getTranslationTable()
-				->where("language_id", $languageId)
+				->where("languageId", $languageId)
 				->where("name", $value->name);
 
 			if($this->isEditMode()){
-				$query->where($this->model->getColumnId()." != ?", $this->getEditId());
+				$query->where($this->model->getForeignKeyColumn()." != ?", $this->getEditId());
 			}
 			$name = $query->fetch();
 			if($name){
@@ -85,11 +86,11 @@ class TagFormFactory extends BaseFormFactory
 		if ($this->isEditMode()) {
 			foreach ($this->languages->getLanguages() as $languageId => $language) {
 				if($values[$languageId]["name"]){
-					$this->model->updateTranslation($this->getEditId(), $languageId, $values[$languageId]);
+					$this->model->updateTranslation((int) $this->getEditId(), $languageId, $values[$languageId]);
 				}
 			}
 		} elseif(!$allEmpty) {
-			$id = $this->model->insert(array());
+			$id = $this->model->insert(ArrayHash::from([]));
 			foreach ($this->languages->getLanguages() as $languageId => $language) {
 				if($values[$languageId]["name"]){
 					$this->model->insertTranslation($id, $languageId, $values[$languageId]);
@@ -105,8 +106,8 @@ class TagFormFactory extends BaseFormFactory
 	public function setDefaultValues(Form $form, int $editId)
 	{
 		$defaults = $this->model->getTranslationTable()
-			->where($this->model->getColumnId(), $editId)
-			->fetchAssoc("language_id");
+			->where($this->model->getForeignKeyColumn(), $editId)
+			->fetchAssoc("languageId");
 
 		$form->setDefaults($defaults);
 	}

@@ -123,7 +123,7 @@ class CategoryFormFactory extends BaseFormFactory
 
 
 		$form->addCheckbox('active', 'Active');
-		$form->addCheckbox('show_in_menu', 'Show in menu')
+		$form->addCheckbox('showInMenu', 'Show in menu')
 			->setDefaultValue(true);
 		$form->addCheckbox('public', 'Public')
 			->setDefaultValue(true);
@@ -131,12 +131,12 @@ class CategoryFormFactory extends BaseFormFactory
 			->setRequired(VALIDATE_REQUIRED)
 			->setDefaultValue("draft");
 
-		$form->addText('publishing_date', 'Publishing date')
+		$form->addText('publishingDate', 'Publishing date')
 			->setRequired(VALIDATE_REQUIRED)
 			->setDefaultValue(date(DATETIME_FORMAT))
 			->getControlPrototype()->addClass(DATETIMEPICKER_CLASS);
 
-		$form->addText('expiring_date', 'Expiration date')
+		$form->addText('expiringDate', 'Expiration date')
 			->getControlPrototype()->addClass(DATETIMEPICKER_CLASS)->placeholder("Never");
 
 		$types = array();
@@ -158,7 +158,7 @@ class CategoryFormFactory extends BaseFormFactory
 		} elseif ($this->type == "url") {
 			$this->categoryFormType = new UrlFormPart();
 		} elseif ($this->type == "categoryLink") {
-			$this->categoryFormType = new CategoryLinkFormPart($this->model, $this->translator);
+			$this->categoryFormType = new CategoryLinkFormPart($this->model, $this->translator, $this->language);
 		} elseif ($this->type == "textBox") {
 			$this->categoryFormType = new TextBoxFormPart($this->model, $this->translator);
 		} else {
@@ -179,7 +179,7 @@ class CategoryFormFactory extends BaseFormFactory
 		//defaults
 		if($this->isEditMode()){
 			if($revision){ //category revision
-				$data = $this->model->findById($revision)->where("history_id", $this->getEditId())->fetch();
+				$data = $this->model->findById($revision)->where("historyId", $this->getEditId())->fetch();
 				$dataTranslation = $this->model->findTranslationBy($revision, $this->language)->fetch();
 			}else{ //normal category
 				$data = $this->model->getById($this->getEditId());
@@ -192,9 +192,9 @@ class CategoryFormFactory extends BaseFormFactory
 
 			/* @var $values ActiveRow */
 			$values = $data->toArray();
-			$values["publishing_date"] = $data->publishing_date->format(DATETIME_FORMAT);
-			if($data->expiring_date){
-				$values["expiring_date"] = $data->expiring_date->format(DATETIME_FORMAT);
+			$values["publishingDate"] = $data->publishingDate->format(DATETIME_FORMAT);
+			if($data->expiringDate){
+				$values["expiringDate"] = $data->expiringDate->format(DATETIME_FORMAT);
 			}
 			$values['translation'] = $dataTranslation == false ? array() : $dataTranslation->toArray();
 			//url
@@ -235,12 +235,12 @@ class CategoryFormFactory extends BaseFormFactory
 		//images
 		unset($values->images);
 
-		//publishing_date
-		$values->publishing_date = $this->checkDateTimeFormat($values->publishing_date);
-		if($values->publishing_date == null){
-			$values->publishing_date = new \DateTime();
+		//publishingDate
+		$values->publishingDate = $this->checkDateTimeFormat($values->publishingDate);
+		if($values->publishingDate == null){
+			$values->publishingDate = new \DateTime();
 		}
-		$values->expiring_date = $this->checkDateTimeFormat($values->expiring_date);
+		$values->expiringDate = $this->checkDateTimeFormat($values->expiringDate);
 
 		//categoryFormType
 		$values = $this->categoryFormType->onSuccessFormPart($form, $values, (int) $this->getEditId());
@@ -276,9 +276,9 @@ class CategoryFormFactory extends BaseFormFactory
 			$form->getPresenter()->redirect('this');
 		} else {
 			if(isset($this->parent)){
-				$values->parent_id = $this->parent;
+				$values->parentId = $this->parent;
 			}
-			$values->created_by = $this->user->getId();
+			$values->createdBy = $this->user->getId();
 
 			//insert
 			$id = $this->categoryService->insert($values, $this->language, $translationContainer);

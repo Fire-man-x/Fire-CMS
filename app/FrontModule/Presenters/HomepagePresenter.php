@@ -47,7 +47,7 @@ class HomepagePresenter extends BasePresenter
 	{
 		$category = $this->categoriesModel->getAllWithTranslation($this->language)
 			->where("active", true)
-			->where("history_id", null)
+			->where("historyId", null)
 			->where("type", "homepage")->fetch();
 		if(!$category){
 			throw new Nette\Application\BadRequestException("Category homepage doesn't exist.");
@@ -58,26 +58,26 @@ class HomepagePresenter extends BasePresenter
 		$category = Nette\Utils\ArrayHash::from($category->toArray());
 
 		//author
-		$user = $this->usersModel->getById($category->created_by)?->toArray();
+		$user = $this->usersModel->getById($category->createdBy)?->toArray();
 		$user['author'] = $this->userManager->makeName($user);
 		$category->author = $user;
 
 		$this->template->category = $category;
-		$files = $this->categoriesModel->getRelationFile($category->category_id);
+		$files = $this->categoriesModel->getRelationFile($category->categoryId);
 		$this->template->files = array();
 		foreach ($files as $file){
 			$this->template->files[] = $this->filesModel->toFileEntity($file);
 		}
 
 		//set menu item
-		$this->menu->setActiveMenuItem($category->category_id);
+		$this->menu->setActiveMenuItem($category->categoryId);
 
 		//set links to languageChanger
-		$lanuageItems = $this->categoriesModel->getAllWithTranslation()->where("category.".$this->categoriesModel->getColumnId(), $category->category_id)->fetchAll();
+		$lanuageItems = $this->categoriesModel->getAllWithTranslation()->where("category.".$this->categoriesModel->getColumnId(), $category->categoryId)->fetchAll();
 		foreach ($lanuageItems as $lanuageItem) {
-			$this->languageChanger->setLinkForLanguage($lanuageItem->language_id, $this->link("this", array(
+			$this->languageChanger->setLinkForLanguage($lanuageItem->languageId, $this->link("this", array(
 				//"url"=>$lanuageItem->url,
-				"locale"=>$lanuageItem->language_id
+				"locale"=>$lanuageItem->languageId
 				)));
 		}
 

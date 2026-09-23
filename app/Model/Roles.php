@@ -23,7 +23,7 @@ class Roles extends BaseModel implements IList
 		parent::__construct($database);
 
 		$this->setTableName('firecms_roles');
-		$this->setColumnId('role_id');
+		$this->setForeignKeyColumn('roleId');
 
 		$this->modulesModel = $modulesModel;
 	}
@@ -76,28 +76,28 @@ class Roles extends BaseModel implements IList
 	public function getRolesModules(): \Nette\Database\Table\Selection
 	{
 		return $this->getRolesModuleTable()
-				->select(self::TABLE_NAME_ROLE_MODULE.".*, role.name AS role_name, module.name AS module_name");
+				->select(self::TABLE_NAME_ROLE_MODULE.".*, role.name AS roleName, module.name AS moduleName");
 	}
 
 
 	/**
 	 * Get role modules
 	 */
-	public function getRoleModules(int $role_id): array
+	public function getRoleModules(int $roleId): array
 	{
-		$role_modules = $this->getRolesModules()->where(self::TABLE_NAME_ROLE_MODULE.".role_id", $role_id);
+		$role_modules = $this->getRolesModules()->where(self::TABLE_NAME_ROLE_MODULE.".roleId", $roleId);
 		$rules = array();
 		foreach ($role_modules as $role_module) {
 			//create if not exist
-			if (!isset($rules[$role_module->module_id])) {
-				$rules[$role_module->module_id] = $role_module;
+			if (!isset($rules[$role_module->moduleId])) {
+				$rules[$role_module->moduleId] = $role_module;
 			}
 
 			//store higher priviledge
-			$storedKey = array_search($rules[$role_module->module_id]->privilege, Acl::$privilegesPriority);
+			$storedKey = array_search($rules[$role_module->moduleId]->privilege, Acl::$privilegesPriority);
 			$searchedKey = array_search($role_module->privilege, Acl::$privilegesPriority);
 			if ($searchedKey > $storedKey) {
-				$rules[$role_module->module_id] = $role_module;
+				$rules[$role_module->moduleId] = $role_module;
 			}
 		}
 
@@ -119,23 +119,23 @@ class Roles extends BaseModel implements IList
 	 * Update all priviledges
 	 * @throws \InvalidArgumentException
 	 */
-	public function updateRoleModule(int $role_id, int $module_id, ?string $privilege)
+	public function updateRoleModule(int $roleId, int $moduleId, ?string $privilege)
 	{
 		/*if (!is_null($privilege) && !in_array($privilege, Acl::$privileges)) {
 			throw new \InvalidArgumentException("Permission '$privilege' is not allowed.");
 		} else {*/
 			//delete all privileges
 			$this->getRolesModuleTable()
-				->where("role_id", $role_id)
-				->where("module_id", $module_id)
+				->where("roleId", $roleId)
+				->where("moduleId", $moduleId)
 				->delete();
 
 			//insert again
-			if (!is_null($privilege) && $role_id != 1) { //$role_id=1 => "admin"
+			if (!is_null($privilege) && $roleId != 1) { //$roleId=1 => "admin"
 				$this->getRolesModuleTable()
 					->insert(array(
-						"role_id" => $role_id,
-						"module_id" => $module_id,
+						"roleId" => $roleId,
+						"moduleId" => $moduleId,
 						"privilege" => $privilege
 				));
 			}

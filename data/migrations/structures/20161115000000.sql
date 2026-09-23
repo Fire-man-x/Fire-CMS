@@ -6,339 +6,337 @@ SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
 DROP TABLE IF EXISTS `firecms_articles`;
 CREATE TABLE `firecms_articles` (
-  `article_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `history_id` int(11) unsigned DEFAULT NULL,
-  `create_date` datetime NOT NULL,
-  `update_date` datetime DEFAULT NULL ON UPDATE current_timestamp(),
-  `publishing_date` datetime NOT NULL,
-  `expiring_date` datetime DEFAULT NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `historyId` int(11) unsigned DEFAULT NULL,
+  `createDate` datetime NOT NULL,
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `publishingDate` datetime NOT NULL,
+  `expiringDate` datetime DEFAULT NULL,
   `active` tinyint(1) NOT NULL DEFAULT 1,
   `status` enum('publish','pending','draft','auto-draft','trash') NOT NULL DEFAULT 'draft',
-  `grid_name` varchar(512) DEFAULT NULL,
-  `created_by` int(11) unsigned NOT NULL,
+  `createdBy` int(11) unsigned NOT NULL,
   `public` tinyint(1) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`article_id`),
-  KEY `history_id` (`history_id`),
-  KEY `created_by` (`created_by`),
-  CONSTRAINT `articles_ibfk_1` FOREIGN KEY (`history_id`) REFERENCES `firecms_articles` (`article_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `articles_ibfk_2` FOREIGN KEY (`created_by`) REFERENCES `firecms_users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`id`),
+  KEY `historyId` (`historyId`),
+  KEY `createdBy` (`createdBy`),
+  CONSTRAINT `articles_ibfk_1` FOREIGN KEY (`historyId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `articles_ibfk_2` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_articleComments`;
 CREATE TABLE `firecms_articleComments` (
-  `article_id` int(11) unsigned NOT NULL,
-  `comment_id` int(11) unsigned NOT NULL,
-  KEY `article_id` (`article_id`),
-  KEY `comment_id` (`comment_id`),
-  CONSTRAINT `article_comments_ibfk_3` FOREIGN KEY (`article_id`) REFERENCES `firecms_articles` (`article_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `article_comments_ibfk_4` FOREIGN KEY (`comment_id`) REFERENCES `firecms_comments` (`comment_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  `articleId` int(11) unsigned NOT NULL,
+  `commentId` int(11) unsigned NOT NULL,
+  KEY `articleId` (`articleId`),
+  KEY `commentId` (`commentId`),
+  CONSTRAINT `articleComments_ibfk_3` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `articleComments_ibfk_4` FOREIGN KEY (`commentId`) REFERENCES `firecms_comments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_articleDescriptions`;
 CREATE TABLE `firecms_articleDescriptions` (
-  `article_id` int(11) unsigned NOT NULL,
-  `language_id` char(2) NOT NULL,
+  `articleId` int(11) unsigned NOT NULL,
+  `languageId` char(2) NOT NULL,
   `slug` varchar(255) DEFAULT NULL,
   `title` varchar(512) DEFAULT NULL,
   `excerpt` text DEFAULT NULL,
   `content` longtext DEFAULT NULL,
-  `seo_title` text DEFAULT NULL,
-  `seo_description` text DEFAULT NULL,
-  `seo_keywords` text DEFAULT NULL,
-  `view_count` int(11) unsigned NOT NULL DEFAULT 0,
-  PRIMARY KEY (`article_id`,`language_id`),
-  KEY `language_id` (`language_id`),
-  KEY `article_id` (`article_id`),
-  CONSTRAINT `article_descriptions_ibfk_1` FOREIGN KEY (`language_id`) REFERENCES `firecms_languages` (`language_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `article_descriptions_ibfk_2` FOREIGN KEY (`article_id`) REFERENCES `firecms_articles` (`article_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  `seoTitle` text DEFAULT NULL,
+  `seoDescription` text DEFAULT NULL,
+  `seoKeywords` text DEFAULT NULL,
+  `viewCount` int(11) unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`articleId`,`languageId`),
+  KEY `languageId` (`languageId`),
+  KEY `articleId` (`articleId`),
+  CONSTRAINT `articleDescriptions_ibfk_1` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `articleDescriptions_ibfk_2` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_articleFiles`;
 CREATE TABLE `firecms_articleFiles` (
-  `article_id` int(11) unsigned NOT NULL,
-  `file_id` int(11) unsigned NOT NULL,
-  `is_main` tinyint(1) NOT NULL,
+  `articleId` int(11) unsigned NOT NULL,
+  `fileId` int(11) unsigned NOT NULL,
+  `isMain` tinyint(1) NOT NULL,
   `position` tinyint(1) NOT NULL,
-  PRIMARY KEY (`article_id`,`file_id`),
-  KEY `file_id` (`file_id`),
-  KEY `article_id` (`article_id`),
-  CONSTRAINT `article_files_ibfk_1` FOREIGN KEY (`article_id`) REFERENCES `firecms_articles` (`article_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `article_files_ibfk_2` FOREIGN KEY (`file_id`) REFERENCES `firecms_files` (`file_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`articleId`,`fileId`),
+  KEY `fileId` (`fileId`),
+  KEY `articleId` (`articleId`),
+  CONSTRAINT `articleFiles_ibfk_1` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `articleFiles_ibfk_2` FOREIGN KEY (`fileId`) REFERENCES `firecms_files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_articleMetas`;
 CREATE TABLE `firecms_articleMetas` (
-  `article_meta_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `article_id` int(11) unsigned NOT NULL,
-  `meta_id` int(11) unsigned NOT NULL,
-  `create_date` datetime NOT NULL,
-  `created_by` int(10) unsigned NOT NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `articleId` int(11) unsigned NOT NULL,
+  `metaId` int(11) unsigned NOT NULL,
+  `createDate` datetime NOT NULL,
+  `createdBy` int(10) unsigned NOT NULL,
   `value` text NOT NULL,
-  PRIMARY KEY (`article_meta_id`),
-  UNIQUE KEY `article_id_meta_id` (`article_id`,`meta_id`),
-  KEY `created_by` (`created_by`),
-  KEY `meta_id` (`meta_id`),
-  CONSTRAINT `article_metas_ibfk_1` FOREIGN KEY (`article_id`) REFERENCES `firecms_articles` (`article_id`),
-  CONSTRAINT `article_metas_ibfk_3` FOREIGN KEY (`created_by`) REFERENCES `firecms_users` (`user_id`),
-  CONSTRAINT `article_metas_ibfk_5` FOREIGN KEY (`meta_id`) REFERENCES `firecms_metas` (`meta_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `articleIdMetaId` (`articleId`,`metaId`),
+  KEY `createdBy` (`createdBy`),
+  KEY `metaId` (`metaId`),
+  CONSTRAINT `articleMetas_ibfk_1` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`),
+  CONSTRAINT `articleMetas_ibfk_3` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`),
+  CONSTRAINT `articleMetas_ibfk_5` FOREIGN KEY (`metaId`) REFERENCES `firecms_metas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_articleTags`;
 CREATE TABLE `firecms_articleTags` (
-  `article_id` int(11) unsigned NOT NULL,
-  `tag_id` int(11) unsigned NOT NULL,
-  PRIMARY KEY (`article_id`,`tag_id`),
-  KEY `tag_id` (`tag_id`),
-  KEY `article_id` (`article_id`),
-  CONSTRAINT `article_tags_ibfk_3` FOREIGN KEY (`article_id`) REFERENCES `firecms_articles` (`article_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `article_tags_ibfk_4` FOREIGN KEY (`tag_id`) REFERENCES `firecms_tags` (`tag_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  `articleId` int(11) unsigned NOT NULL,
+  `tagId` int(11) unsigned NOT NULL,
+  PRIMARY KEY (`articleId`,`tagId`),
+  KEY `tagId` (`tagId`),
+  KEY `articleId` (`articleId`),
+  CONSTRAINT `articleTags_ibfk_3` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `articleTags_ibfk_4` FOREIGN KEY (`tagId`) REFERENCES `firecms_tags` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_categories`;
 CREATE TABLE `firecms_categories` (
-  `category_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `parent_id` int(11) unsigned DEFAULT NULL,
-  `history_id` int(11) unsigned DEFAULT NULL,
-  `create_date` datetime NOT NULL,
-  `update_date` datetime DEFAULT NULL ON UPDATE current_timestamp(),
-  `publishing_date` datetime NOT NULL DEFAULT current_timestamp(),
-  `expiring_date` datetime DEFAULT NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `parentId` int(11) unsigned DEFAULT NULL,
+  `historyId` int(11) unsigned DEFAULT NULL,
+  `createDate` datetime NOT NULL,
+  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `publishingDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `expiringDate` datetime DEFAULT NULL,
   `active` tinyint(1) NOT NULL DEFAULT 1,
   `status` enum('publish','pending','draft','auto-draft') NOT NULL DEFAULT 'draft',
-  `grid_name` varchar(512) DEFAULT NULL,
   `position` int(11) DEFAULT NULL,
   `level` int(11) NOT NULL DEFAULT 0,
-  `category_left` int(11) DEFAULT NULL,
-  `category_right` int(11) DEFAULT NULL,
-  `created_by` int(11) unsigned NOT NULL DEFAULT 1,
+  `categoryLeft` int(11) DEFAULT NULL,
+  `categoryRight` int(11) DEFAULT NULL,
+  `createdBy` int(11) unsigned NOT NULL DEFAULT 1,
   `type` enum('homepage','site','url','categoryLink','gallery','textBox') NOT NULL DEFAULT 'site',
-  `show_in_menu` tinyint(1) NOT NULL DEFAULT 1,
+  `showInMenu` tinyint(1) NOT NULL DEFAULT 1,
   `public` tinyint(1) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`category_id`),
-  KEY `fk_parent_id` (`parent_id`) USING BTREE,
-  KEY `category_left_category_right` (`category_left`,`category_right`),
-  KEY `active_yn_parent_id_position` (`active`,`parent_id`,`position`),
-  KEY `created_by` (`created_by`),
-  KEY `history_id` (`history_id`),
-  CONSTRAINT `categories_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `firecms_categories` (`category_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `categories_ibfk_2` FOREIGN KEY (`created_by`) REFERENCES `firecms_users` (`user_id`) ON UPDATE CASCADE,
-  CONSTRAINT `categories_ibfk_3` FOREIGN KEY (`history_id`) REFERENCES `firecms_categories` (`category_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`id`),
+  KEY `fkParentId` (`parentId`) USING BTREE,
+  KEY `categoryLeftCategoryRight` (`categoryLeft`,`categoryRight`),
+  KEY `activeYnParentIdPosition` (`active`,`parentId`,`position`),
+  KEY `createdBy` (`createdBy`),
+  KEY `historyId` (`historyId`),
+  CONSTRAINT `categories_ibfk_1` FOREIGN KEY (`parentId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `categories_ibfk_2` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`) ON UPDATE CASCADE,
+  CONSTRAINT `categories_ibfk_3` FOREIGN KEY (`historyId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_categoryArticle`;
 CREATE TABLE `firecms_categoryArticle` (
-  `category_id` int(11) unsigned NOT NULL,
-  `article_id` int(11) unsigned NOT NULL,
-  `is_main` tinyint(1) NOT NULL,
-  PRIMARY KEY (`category_id`,`article_id`),
-  KEY `category_id` (`category_id`),
-  KEY `article_id` (`article_id`),
-  CONSTRAINT `category_article_ibfk_3` FOREIGN KEY (`category_id`) REFERENCES `firecms_categories` (`category_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `category_article_ibfk_4` FOREIGN KEY (`article_id`) REFERENCES `firecms_articles` (`article_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  `categoryId` int(11) unsigned NOT NULL,
+  `articleId` int(11) unsigned NOT NULL,
+  `isMain` tinyint(1) NOT NULL,
+  PRIMARY KEY (`categoryId`,`articleId`),
+  KEY `categoryId` (`categoryId`),
+  KEY `articleId` (`articleId`),
+  CONSTRAINT `categoryArticle_ibfk_3` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `categoryArticle_ibfk_4` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_categoryComments`;
 CREATE TABLE `firecms_categoryComments` (
-  `category_id` int(11) unsigned NOT NULL,
-  `comment_id` int(11) unsigned NOT NULL,
-  KEY `category_id` (`category_id`),
-  KEY `comment_id` (`comment_id`),
-  CONSTRAINT `category_comments_ibfk_3` FOREIGN KEY (`category_id`) REFERENCES `firecms_categories` (`category_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `category_comments_ibfk_4` FOREIGN KEY (`comment_id`) REFERENCES `firecms_comments` (`comment_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  `categoryId` int(11) unsigned NOT NULL,
+  `commentId` int(11) unsigned NOT NULL,
+  KEY `categoryId` (`categoryId`),
+  KEY `commentId` (`commentId`),
+  CONSTRAINT `categoryComments_ibfk_3` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `categoryComments_ibfk_4` FOREIGN KEY (`commentId`) REFERENCES `firecms_comments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_categoryDescriptions`;
 CREATE TABLE `firecms_categoryDescriptions` (
-  `category_id` int(11) unsigned NOT NULL,
-  `language_id` char(2) NOT NULL,
+  `categoryId` int(11) unsigned NOT NULL,
+  `languageId` char(2) NOT NULL,
   `slug` varchar(255) DEFAULT NULL,
   `title` varchar(512) DEFAULT NULL,
   `excerpt` text DEFAULT NULL,
   `content` longtext DEFAULT NULL,
-  `seo_title` text DEFAULT NULL,
-  `seo_description` text DEFAULT NULL,
-  `seo_keywords` text DEFAULT NULL,
-  `view_count` int(11) unsigned NOT NULL DEFAULT 0,
-  PRIMARY KEY (`category_id`,`language_id`),
-  KEY `rel_category_category_description` (`category_id`) USING BTREE,
-  KEY `language_id` (`language_id`),
-  CONSTRAINT `category_descriptions_ibfk_2` FOREIGN KEY (`language_id`) REFERENCES `firecms_languages` (`language_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `category_descriptions_ibfk_3` FOREIGN KEY (`category_id`) REFERENCES `firecms_categories` (`category_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  `seoTitle` text DEFAULT NULL,
+  `seoDescription` text DEFAULT NULL,
+  `seoKeywords` text DEFAULT NULL,
+  `viewCount` int(11) unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`categoryId`,`languageId`),
+  KEY `relCategoryCategoryDescription` (`categoryId`) USING BTREE,
+  KEY `languageId` (`languageId`),
+  CONSTRAINT `categoryDescriptions_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `categoryDescriptions_ibfk_3` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_categoryFiles`;
 CREATE TABLE `firecms_categoryFiles` (
-  `category_id` int(11) unsigned NOT NULL,
-  `file_id` int(11) unsigned NOT NULL,
-  `is_main` tinyint(1) NOT NULL,
+  `categoryId` int(11) unsigned NOT NULL,
+  `fileId` int(11) unsigned NOT NULL,
+  `isMain` tinyint(1) NOT NULL,
   `position` tinyint(1) NOT NULL,
-  PRIMARY KEY (`category_id`,`file_id`),
-  KEY `category_id` (`category_id`),
-  KEY `file_id` (`file_id`),
-  CONSTRAINT `category_files_ibfk_3` FOREIGN KEY (`category_id`) REFERENCES `firecms_categories` (`category_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `category_files_ibfk_4` FOREIGN KEY (`file_id`) REFERENCES `firecms_files` (`file_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`categoryId`,`fileId`),
+  KEY `categoryId` (`categoryId`),
+  KEY `fileId` (`fileId`),
+  CONSTRAINT `categoryFiles_ibfk_3` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `categoryFiles_ibfk_4` FOREIGN KEY (`fileId`) REFERENCES `firecms_files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_categoryMetas`;
 CREATE TABLE `firecms_categoryMetas` (
-  `category_meta_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `category_id` int(11) unsigned NOT NULL,
-  `meta_id` int(11) unsigned NOT NULL,
-  `create_date` datetime NOT NULL,
-  `created_by` int(10) unsigned NOT NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `categoryId` int(11) unsigned NOT NULL,
+  `metaId` int(11) unsigned NOT NULL,
+  `createDate` datetime NOT NULL,
+  `createdBy` int(10) unsigned NOT NULL,
   `value` text NOT NULL,
-  PRIMARY KEY (`category_meta_id`),
-  UNIQUE KEY `category_id_meta_id` (`category_id`,`meta_id`),
-  KEY `created_by` (`created_by`),
-  KEY `meta_id` (`meta_id`),
-  CONSTRAINT `category_metas_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `firecms_categories` (`category_id`),
-  CONSTRAINT `category_metas_ibfk_3` FOREIGN KEY (`created_by`) REFERENCES `firecms_users` (`user_id`),
-  CONSTRAINT `category_metas_ibfk_5` FOREIGN KEY (`meta_id`) REFERENCES `firecms_metas` (`meta_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `categoryIdMetaId` (`categoryId`,`metaId`),
+  KEY `createdBy` (`createdBy`),
+  KEY `metaId` (`metaId`),
+  CONSTRAINT `categoryMetas_ibfk_1` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`),
+  CONSTRAINT `categoryMetas_ibfk_3` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`),
+  CONSTRAINT `categoryMetas_ibfk_5` FOREIGN KEY (`metaId`) REFERENCES `firecms_metas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_categoryTags`;
 CREATE TABLE `firecms_categoryTags` (
-  `category_id` int(11) unsigned NOT NULL,
-  `tag_id` int(11) unsigned NOT NULL,
-  KEY `category_id` (`category_id`),
-  KEY `tag_id` (`tag_id`),
-  CONSTRAINT `category_tags_ibfk_3` FOREIGN KEY (`category_id`) REFERENCES `firecms_categories` (`category_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `category_tags_ibfk_4` FOREIGN KEY (`tag_id`) REFERENCES `firecms_tags` (`tag_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  `categoryId` int(11) unsigned NOT NULL,
+  `tagId` int(11) unsigned NOT NULL,
+  KEY `categoryId` (`categoryId`),
+  KEY `tagId` (`tagId`),
+  CONSTRAINT `categoryTags_ibfk_3` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `categoryTags_ibfk_4` FOREIGN KEY (`tagId`) REFERENCES `firecms_tags` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_comments`;
 CREATE TABLE `firecms_comments` (
-  `comment_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `parent_id` int(11) unsigned DEFAULT NULL,
-  `language_id` char(2) NOT NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `parentId` int(11) unsigned DEFAULT NULL,
+  `languageId` char(2) NOT NULL,
   `left` int(10) unsigned NOT NULL,
   `right` int(10) unsigned NOT NULL,
-  `create_date` datetime NOT NULL DEFAULT current_timestamp(),
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
   `status` enum('publish','pending','trash') NOT NULL,
-  `created_by` int(10) unsigned DEFAULT NULL,
+  `createdBy` int(10) unsigned DEFAULT NULL,
   `author` varchar(100) DEFAULT NULL,
-  `author_email` varchar(100) DEFAULT NULL,
+  `authorEmail` varchar(100) DEFAULT NULL,
   `title` varchar(150) NOT NULL,
   `text` text NOT NULL,
-  `user_ip` tinytext NOT NULL,
-  `user_agent` tinytext NOT NULL,
-  PRIMARY KEY (`comment_id`),
-  KEY `created_by` (`created_by`),
-  KEY `parent_id` (`parent_id`),
-  KEY `language_id` (`language_id`),
-  CONSTRAINT `comments_ibfk_3` FOREIGN KEY (`created_by`) REFERENCES `firecms_users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `comments_ibfk_4` FOREIGN KEY (`parent_id`) REFERENCES `firecms_comments` (`comment_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `comments_ibfk_6` FOREIGN KEY (`language_id`) REFERENCES `firecms_languages` (`language_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  `userIp` tinytext NOT NULL,
+  `userAgent` tinytext NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `createdBy` (`createdBy`),
+  KEY `parentId` (`parentId`),
+  KEY `languageId` (`languageId`),
+  CONSTRAINT `comments_ibfk_3` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `comments_ibfk_4` FOREIGN KEY (`parentId`) REFERENCES `firecms_comments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `comments_ibfk_6` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_files`;
 CREATE TABLE `firecms_files` (
-  `file_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `file_folder_id` int(11) unsigned NOT NULL,
-  `create_date` timestamp NOT NULL DEFAULT current_timestamp(),
-  `original_name` varchar(100) NOT NULL,
-  `new_name` varchar(100) NOT NULL DEFAULT '',
-  `disk_name` varchar(50) NOT NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `fileFolderId` int(11) unsigned NOT NULL,
+  `createDate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `originalName` varchar(100) NOT NULL,
+  `newName` varchar(100) NOT NULL DEFAULT '',
+  `diskName` varchar(50) NOT NULL,
   `extension` varchar(5) NOT NULL,
-  `mime_type` varchar(20) NOT NULL,
+  `mimeType` varchar(20) NOT NULL,
   `size` int(11) NOT NULL,
-  `is_image` tinyint(1) NOT NULL,
-  `view_count` int(11) unsigned NOT NULL DEFAULT 0,
-  PRIMARY KEY (`file_id`),
-  KEY `file_folder_id` (`file_folder_id`),
-  CONSTRAINT `files_ibfk_2` FOREIGN KEY (`file_folder_id`) REFERENCES `firecms_fileFolders` (`file_folder_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  `isImage` tinyint(1) NOT NULL,
+  `viewCount` int(11) unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `fileFolderId` (`fileFolderId`),
+  CONSTRAINT `files_ibfk_2` FOREIGN KEY (`fileFolderId`) REFERENCES `firecms_fileFolders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_fileFolders`;
 CREATE TABLE `firecms_fileFolders` (
-  `file_folder_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `parent_id` int(11) unsigned DEFAULT NULL,
-  `create_date` datetime NOT NULL DEFAULT current_timestamp(),
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `parentId` int(11) unsigned DEFAULT NULL,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
   `name` varchar(200) NOT NULL,
   `default` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `position` int(11) NOT NULL,
   `level` int(11) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`file_folder_id`),
-  KEY `parent_id` (`parent_id`),
-  CONSTRAINT `file_folders_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `firecms_fileFolders` (`file_folder_id`) ON DELETE SET NULL ON UPDATE CASCADE
+  PRIMARY KEY (`id`),
+  KEY `parentId` (`parentId`),
+  CONSTRAINT `fileFolders_ibfk_2` FOREIGN KEY (`parentId`) REFERENCES `firecms_fileFolders` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_languages`;
 CREATE TABLE `firecms_languages` (
-  `language_id` char(2) NOT NULL,
+  `languageId` char(2) NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT 1,
   `default` tinyint(1) NOT NULL DEFAULT 0,
   `position` int(11) NOT NULL,
   `name` varchar(20) NOT NULL,
   `shortcut` varchar(2) NOT NULL,
-  PRIMARY KEY (`language_id`)
+  PRIMARY KEY (`languageId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_menus`;
 CREATE TABLE `firecms_menus` (
-  `menu_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `active` tinyint(1) NOT NULL DEFAULT 1,
   `name` varchar(256) NOT NULL,
   `location` varchar(256) NOT NULL,
-  `created_by` tinyint(11) DEFAULT NULL,
-  PRIMARY KEY (`menu_id`)
+  `createdBy` tinyint(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_menuItems`;
 CREATE TABLE `firecms_menuItems` (
-  `menu_id` int(11) unsigned NOT NULL,
-  `category_id` int(11) unsigned NOT NULL,
+  `menuId` int(11) unsigned NOT NULL,
+  `categoryId` int(11) unsigned NOT NULL,
   `position` tinyint(1) NOT NULL,
-  PRIMARY KEY (`menu_id`,`category_id`),
-  KEY `category_id` (`category_id`),
-  KEY `menu_id` (`menu_id`),
-  CONSTRAINT `menu_items_ibfk_1` FOREIGN KEY (`menu_id`) REFERENCES `firecms_menus` (`menu_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `menu_items_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `firecms_categories` (`category_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`menuId`,`categoryId`),
+  KEY `categoryId` (`categoryId`),
+  KEY `menuId` (`menuId`),
+  CONSTRAINT `menuItems_ibfk_1` FOREIGN KEY (`menuId`) REFERENCES `firecms_menus` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `menuItems_ibfk_2` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_metas`;
 CREATE TABLE `firecms_metas` (
-  `meta_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `language_id` char(2) DEFAULT NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `languageId` char(2) DEFAULT NULL,
   `type` varchar(20) NOT NULL,
-  `is_manual` tinyint(1) NOT NULL DEFAULT 1,
+  `isManual` tinyint(1) NOT NULL DEFAULT 1,
   `key` varchar(200) NOT NULL,
   `value` text NOT NULL,
-  PRIMARY KEY (`meta_id`),
-  UNIQUE KEY `language_id_type_key` (`language_id`,`type`,`key`),
-  CONSTRAINT `metas_ibfk_2` FOREIGN KEY (`language_id`) REFERENCES `firecms_languages` (`language_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `languageIdTypeKey` (`languageId`,`type`,`key`),
+  CONSTRAINT `metas_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_modules`;
 CREATE TABLE `firecms_modules` (
-  `module_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `parent_id` int(11) unsigned DEFAULT NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `parentId` int(11) unsigned DEFAULT NULL,
   `name` varchar(50) DEFAULT NULL,
   `privilege` varchar(50) DEFAULT NULL,
   `title` varchar(50) NOT NULL,
-  PRIMARY KEY (`module_id`),
-  KEY `parent_id` (`parent_id`),
-  CONSTRAINT `modules_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `firecms_modules` (`module_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`id`),
+  KEY `parentId` (`parentId`),
+  CONSTRAINT `modules_ibfk_1` FOREIGN KEY (`parentId`) REFERENCES `firecms_modules` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 ALTER TABLE `firecms_modules`
@@ -355,154 +353,153 @@ CREATE TABLE `firecms_options` (
 
 DROP TABLE IF EXISTS `firecms_roles`;
 CREATE TABLE `firecms_roles` (
-  `role_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `parent_id` int(11) unsigned DEFAULT NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `parentId` int(11) unsigned DEFAULT NULL,
   `default` tinyint(1) NOT NULL DEFAULT 0,
   `position` tinyint(1) NOT NULL,
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  PRIMARY KEY (`role_id`),
+  PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
-  KEY `parent_id` (`parent_id`),
-  CONSTRAINT `roles_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `firecms_roles` (`role_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `parentId` (`parentId`),
+  CONSTRAINT `roles_ibfk_1` FOREIGN KEY (`parentId`) REFERENCES `firecms_roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_uca1400_ai_ci;
 
 
 DROP TABLE IF EXISTS `firecms_roleModule`;
 CREATE TABLE `firecms_roleModule` (
-  `role_id` int(11) unsigned NOT NULL,
-  `module_id` int(11) unsigned NOT NULL,
+  `roleId` int(11) unsigned NOT NULL,
+  `moduleId` int(11) unsigned NOT NULL,
   `privilege` varchar(15) NOT NULL,
-  PRIMARY KEY (`role_id`,`module_id`),
-  KEY `module_id` (`module_id`),
-  CONSTRAINT `role_module_ibfk_6` FOREIGN KEY (`module_id`) REFERENCES `firecms_modules` (`module_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `role_module_ibfk_7` FOREIGN KEY (`role_id`) REFERENCES `firecms_roles` (`role_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`roleId`,`moduleId`),
+  KEY `moduleId` (`moduleId`),
+  CONSTRAINT `roleModule_ibfk_6` FOREIGN KEY (`moduleId`) REFERENCES `firecms_modules` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `roleModule_ibfk_7` FOREIGN KEY (`roleId`) REFERENCES `firecms_roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_plugin_sliders`;
 CREATE TABLE `firecms_plugin_sliders` (
-  `slider_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `location` varchar(100) NOT NULL,
-  `create_date` datetime NOT NULL,
+  `createDate` datetime NOT NULL,
   `duration` int(10) unsigned NOT NULL,
   `speed` int(10) unsigned NOT NULL,
   `navigation` tinyint(1) unsigned NOT NULL,
   `manual` tinyint(1) unsigned NOT NULL,
-  PRIMARY KEY (`slider_id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_plugin_sliderItems`;
 CREATE TABLE `firecms_plugin_sliderItems` (
-  `slider_id` int(11) unsigned NOT NULL,
-  `language_id` char(2) NOT NULL,
+  `sliderId` int(11) unsigned NOT NULL,
+  `languageId` char(2) NOT NULL,
   `position` tinyint(1) unsigned NOT NULL,
-  `file_id` int(11) unsigned NOT NULL,
+  `fileId` int(11) unsigned NOT NULL,
   `url` varchar(256) NOT NULL DEFAULT '',
   `text` varchar(256) NOT NULL DEFAULT '',
-  PRIMARY KEY (`slider_id`,`language_id`,`position`),
-  KEY `language_id` (`language_id`),
-  KEY `file_id` (`file_id`),
-  KEY `slider_id` (`slider_id`),
-  CONSTRAINT `slider_items_ibfk_2` FOREIGN KEY (`slider_id`) REFERENCES `firecms_plugin_sliders` (`slider_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `slider_items_ibfk_5` FOREIGN KEY (`language_id`) REFERENCES `firecms_languages` (`language_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `slider_items_ibfk_6` FOREIGN KEY (`file_id`) REFERENCES `firecms_files` (`file_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`sliderId`,`languageId`,`position`),
+  KEY `languageId` (`languageId`),
+  KEY `fileId` (`fileId`),
+  KEY `sliderId` (`sliderId`),
+  CONSTRAINT `sliderItems_ibfk_2` FOREIGN KEY (`sliderId`) REFERENCES `firecms_plugin_sliders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `sliderItems_ibfk_5` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `sliderItems_ibfk_6` FOREIGN KEY (`fileId`) REFERENCES `firecms_files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_plugin_stalkers`;
 CREATE TABLE `firecms_plugin_stalkers` (
-  `stalker_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `create_date` timestamp NOT NULL DEFAULT current_timestamp(),
-  `created_by` int(10) unsigned NOT NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `createDate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `createdBy` int(10) unsigned NOT NULL,
   `ip` tinytext NOT NULL,
   `url` text NOT NULL,
   `data` text DEFAULT NULL,
-  PRIMARY KEY (`stalker_id`),
-  KEY `created_by` (`created_by`),
-  CONSTRAINT `stalkers_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `firecms_users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`id`),
+  KEY `createdBy` (`createdBy`),
+  CONSTRAINT `stalkers_ibfk_1` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_plugin_statistics`;
 CREATE TABLE `firecms_plugin_statistics` (
-  `statistics_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `create_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `createDate` timestamp NOT NULL DEFAULT current_timestamp(),
   `session` varchar(26) NOT NULL,
   `ip` tinytext NOT NULL,
   `agent` text NOT NULL,
-  PRIMARY KEY (`statistics_id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_tags`;
 CREATE TABLE `firecms_tags` (
-  `tag_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `create_date` datetime NOT NULL DEFAULT current_timestamp(),
-  `grid_name` varchar(512) DEFAULT NULL,
-  PRIMARY KEY (`tag_id`)
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_tagDescriptions`;
 CREATE TABLE `firecms_tagDescriptions` (
-  `tag_id` int(11) unsigned NOT NULL,
-  `language_id` char(2) NOT NULL,
+  `tagId` int(11) unsigned NOT NULL,
+  `languageId` char(2) NOT NULL,
   `name` varchar(100) NOT NULL,
-  PRIMARY KEY (`tag_id`,`language_id`,`name`),
-  KEY `language_id` (`language_id`),
-  KEY `tag_id` (`tag_id`),
-  CONSTRAINT `tag_descriptions_ibfk_3` FOREIGN KEY (`tag_id`) REFERENCES `firecms_tags` (`tag_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `tag_descriptions_ibfk_4` FOREIGN KEY (`language_id`) REFERENCES `firecms_languages` (`language_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`tagId`,`languageId`,`name`),
+  KEY `languageId` (`languageId`),
+  KEY `tagId` (`tagId`),
+  CONSTRAINT `tagDescriptions_ibfk_3` FOREIGN KEY (`tagId`) REFERENCES `firecms_tags` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `tagDescriptions_ibfk_4` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `firecms_users`;
 CREATE TABLE `firecms_users` (
-  `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `username` varchar(60) NOT NULL,
   `password` varchar(60) NOT NULL,
   `email` varchar(100) NOT NULL,
   `active` tinyint(1) NOT NULL,
   `nickname` varchar(50) DEFAULT NULL,
-  `first_name` varchar(50) NOT NULL,
+  `firstName` varchar(50) NOT NULL,
   `surname` varchar(50) NOT NULL,
-  `role_id` int(11) unsigned NOT NULL,
-  `recovery_password_time` datetime DEFAULT NULL,
-  `recovery_password_token` varchar(24) DEFAULT NULL,
-  PRIMARY KEY (`user_id`),
-  KEY `login_key` (`username`),
-  KEY `nickname_key` (`nickname`),
-  KEY `role_id` (`role_id`),
-  CONSTRAINT `users_ibfk_2` FOREIGN KEY (`role_id`) REFERENCES `firecms_roles` (`role_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  `roleId` int(11) unsigned NOT NULL,
+  `recoveryPasswordTime` datetime DEFAULT NULL,
+  `recoveryPasswordToken` varchar(24) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `loginKey` (`username`),
+  KEY `nicknameKey` (`nickname`),
+  KEY `roleId` (`roleId`),
+  CONSTRAINT `users_ibfk_2` FOREIGN KEY (`roleId`) REFERENCES `firecms_roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `firecms_urls`;
 CREATE TABLE `firecms_urls` (
-						`url_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-						`language_id` char(2) NOT NULL,
+						`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+						`languageId` char(2) NOT NULL,
 						`type` varchar(128) NOT NULL,
 						`key` int(10) unsigned NOT NULL,
 						`url` varchar(2000) NOT NULL,
-						`create_date` datetime NOT NULL DEFAULT current_timestamp(),
-						PRIMARY KEY (`url_id`),
-						UNIQUE KEY `language_id_type_key` (`language_id`,`type`,`key`),
-						CONSTRAINT `urls_ibfk_2` FOREIGN KEY (`language_id`) REFERENCES `firecms_languages` (`language_id`) ON DELETE CASCADE ON UPDATE CASCADE
+						`createDate` datetime NOT NULL DEFAULT current_timestamp(),
+						PRIMARY KEY (`id`),
+						UNIQUE KEY `languageIdTypeKey` (`languageId`,`type`,`key`),
+						CONSTRAINT `urls_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `firecms_urlRedirections`;
 CREATE TABLE `firecms_urlRedirections` (
-									`url_redirection_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-									`language_id` char(2) NOT NULL,
-									`old_url` varchar(2000) NOT NULL,
-									`new_url` varchar(2000) NOT NULL,
-									`create_date` datetime NOT NULL DEFAULT current_timestamp(),
-									`last_usage_date` datetime DEFAULT NULL,
-									PRIMARY KEY (`url_redirection_id`),
-									KEY `language_id` (`language_id`),
-									CONSTRAINT `url_redirections_ibfk_2` FOREIGN KEY (`language_id`) REFERENCES `firecms_languages` (`language_id`) ON DELETE CASCADE ON UPDATE CASCADE
+									`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+									`languageId` char(2) NOT NULL,
+									`oldUrl` varchar(2000) NOT NULL,
+									`newUrl` varchar(2000) NOT NULL,
+									`createDate` datetime NOT NULL DEFAULT current_timestamp(),
+									`lastUsageDate` datetime DEFAULT NULL,
+									PRIMARY KEY (`id`),
+									KEY `languageId` (`languageId`),
+									CONSTRAINT `urlRedirections_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 

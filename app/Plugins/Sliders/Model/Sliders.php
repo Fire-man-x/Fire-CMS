@@ -19,7 +19,7 @@ class Sliders extends BaseModel
 		parent::__construct($database);
 
 		$this->setTableName('firecms_plugin_sliders');
-		$this->setColumnId('slider_id');
+		$this->setForeignKeyColumn('sliderId');
 	}
 
 
@@ -28,7 +28,7 @@ class Sliders extends BaseModel
 	 */
 	public function insert(ArrayHash $data): int
 	{
-		$data->create_date = new SqlLiteral("NOW()");
+		$data->createDate = new SqlLiteral("NOW()");
 		return parent::insert($data);
 	}
 

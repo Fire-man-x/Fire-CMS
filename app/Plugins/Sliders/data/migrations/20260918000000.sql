@@ -1,2 +1,2 @@
-INSERT INTO `firecms_modules` (`parent_id`, `name`, `privilege`, `title`)
+INSERT INTO `firecms_modules` (`parentId`, `name`, `privilege`, `title`)
 VALUES (null, 'Sliders', null, 'Sliders');

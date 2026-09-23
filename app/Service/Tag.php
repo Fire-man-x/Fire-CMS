@@ -85,18 +85,18 @@ class Tag
 				}
 
 				if ($finded) {
-					//insert to tag_id universal name
-					$this->tagsModel->insertTranslation($finded["tag_id"], $language, ArrayHash::from(array(
-							"name" => $finded["grid_name"]
+					//insert to tagId universal name
+					$this->tagsModel->insertTranslation($finded["id"], $language, ArrayHash::from(array(
+							"name" => $finded["defaultName"]
 					)));
-					$tagId = $finded["tag_id"];
+					$tagId = $finded["id"];
 				}
 			}
 
 			if (!isset($tagId)) { //normal insert
 				$exist = $this->tagsModel->getTranslationTable()
 					->where("name", $tag)
-					->where("language_id", $language)
+					->where("languageId", $language)
 					->fetch();
 				if (!$exist) {
 					$tagId = $this->tagsModel->insert(ArrayHash::from(array()));
@@ -104,7 +104,7 @@ class Tag
 							"name" => $tag
 					)));
 				} else {
-					$tagId = $exist->tag_id;
+					$tagId = $exist->tagId;
 				}
 			}
 
@@ -116,13 +116,12 @@ class Tag
 		/*
 		$tagTable = "tags";
 		$items = $this->tagsModel->getAll()
-			->select($tagTable.".language_id")
+			->select($tagTable.".languageId")
 			->select($tagTable.".key")
 			->select($tagTable.".value AS default_value")
 			->select("category.*")
 			->joinWhere(":".$model->getTableName(), $model->getReferenceColumn()." = ?", $id)
-			->order("is_main DESC")
-			->order("category.grid_name");
+			->order("isMain DESC");
 
 		return $items;*/
 	}
@@ -137,28 +136,30 @@ class Tag
 
 		//@note: not working
 		/*$items = $model->getRelationTagsTable()
-			->select("tag.grid_name")
-			->select("tag.tag_id")
-			->select("tag:".Model\Tags::TRANSLATION_TABLE_NAME.".language_id")
+			->select("tag.tagId")
+			->select("tag:".Model\Tags::TRANSLATION_TABLE_NAME.".languageId")
 			->select("tag:".Model\Tags::TRANSLATION_TABLE_NAME.".name")
-			->select("IF(:" . Model\Tags::TRANSLATION_TABLE_NAME . ".name IS NULL, CONCAT(tags.grid_name, ?), :" . Model\Tags::TRANSLATION_TABLE_NAME . ".name) AS label", $defaultText)
-			->joinWhere("tag:".Model\Tags::TRANSLATION_TABLE_NAME, "language_id IS NULL OR language_id = ?", $language)
+			->select("IF(:" . Model\Tags::TRANSLATION_TABLE_NAME . ".name IS NULL, CONCAT(tags.name, ?), :" . Model\Tags::TRANSLATION_TABLE_NAME . ".name) AS label", $defaultText)
+			->joinWhere("tag:".Model\Tags::TRANSLATION_TABLE_NAME, "languageId IS NULL OR languageId = ?", $language)
 			->where($model->getColumnId(), $id)
 			->fetchAll();
 		*/
 		$column = '';
 		if($model instanceof Model\BaseModel){
-			$column = $model->getColumnId();
+			$column = $model->getForeignKeyColumn();
 		}
 
 		//replacement
-		$items = $this->db->query("SELECT `firecms_tags`.`grid_name`, `firecms_tags`.`tag_id`, `". Model\Tags::TRANSLATION_TABLE_NAME."`.`language_id`, `". Model\Tags::TRANSLATION_TABLE_NAME."`.`name`,
-				IF(`". Model\Tags::TRANSLATION_TABLE_NAME."`.`name` IS NULL, CONCAT(`firecms_tags`.`grid_name`, ?), `". Model\Tags::TRANSLATION_TABLE_NAME."`.`name`) AS `label`
+		//název ve výchozím jazyce webu - pro štítky bez překladu do $language (s poznámkou "(default)")
+		$defaultNameSql = $this->tagsModel->getTitleSql("`firecms_tags`.`id`");
+		$titleParams = $this->tagsModel->getTitleParams();
+		$items = $this->db->query("SELECT ".$defaultNameSql." AS `defaultName`, `firecms_tags`.`id`, `". Model\Tags::TRANSLATION_TABLE_NAME."`.`languageId`, `". Model\Tags::TRANSLATION_TABLE_NAME."`.`name`,
+				IF(`". Model\Tags::TRANSLATION_TABLE_NAME."`.`name` IS NULL, CONCAT(".$defaultNameSql.", ?), `". Model\Tags::TRANSLATION_TABLE_NAME."`.`name`) AS `label`
 			FROM `".$model->getRelationTagsTable()->getName()."`
-			LEFT JOIN `firecms_tags` ON `".$model->getRelationTagsTable()->getName()."`.`tag_id` = `firecms_tags`.`tag_id`
-			LEFT JOIN `". Model\Tags::TRANSLATION_TABLE_NAME."` ON `firecms_tags`.`tag_id` = `". Model\Tags::TRANSLATION_TABLE_NAME."`.`tag_id` AND (`language_id` IS NULL OR `language_id` = ?)
+			LEFT JOIN `firecms_tags` ON `".$model->getRelationTagsTable()->getName()."`.`tagId` = `firecms_tags`.`id`
+			LEFT JOIN `". Model\Tags::TRANSLATION_TABLE_NAME."` ON `firecms_tags`.`id` = `". Model\Tags::TRANSLATION_TABLE_NAME."`.`tagId` AND (`languageId` IS NULL OR `languageId` = ?)
 			WHERE `".$column."` = ?",
-			$this->getDefaultText(), $language, $id)
+			...[...$titleParams, ...$titleParams, $this->getDefaultText(), $language, $id])
 			->fetchAll();
 
 		return $items;
@@ -171,21 +172,21 @@ class Tag
 	 */
 	public function findByName(string $language, string $name): array
 	{
+		//název ve výchozím jazyce webu - pro štítky bez překladu do $language (s poznámkou "(default)")
+		$defaultNameSql = $this->tagsModel->getTitleSql("`" . $this->tagsModel->getTableName() . "`.`id`");
+		$titleParams = $this->tagsModel->getTitleParams();
 		$items = $this->tagsModel->findAll()
-			->select($this->tagsModel->getTableName().".grid_name")
-			->select($this->tagsModel->getTableName().".tag_id")
-			->select(":" . Model\Tags::TRANSLATION_TABLE_NAME . ".language_id")
+			->select($defaultNameSql . " AS `defaultName`", ...$titleParams)
+			->select($this->tagsModel->getTableName().".id")
+			->select(":" . Model\Tags::TRANSLATION_TABLE_NAME . ".languageId")
 			->select(":" . Model\Tags::TRANSLATION_TABLE_NAME . ".name")
-			->select("IF(:" . Model\Tags::TRANSLATION_TABLE_NAME . ".name IS NULL, CONCAT(".$this->tagsModel->getTableName().".grid_name, ?), :" . Model\Tags::TRANSLATION_TABLE_NAME . ".name) AS label", $this->getDefaultText())
-			->joinWhere(":" . Model\Tags::TRANSLATION_TABLE_NAME, "language_id IS NULL OR language_id = ?", $language)
-			->whereOr(array(
-				"grid_name LIKE ?" => "%" . $name . "%",
-				"name LIKE ?" => "%" . $name . "%"
-			))
+			->select("IF(:" . Model\Tags::TRANSLATION_TABLE_NAME . ".name IS NULL, CONCAT(" . $defaultNameSql . ", ?), :" . Model\Tags::TRANSLATION_TABLE_NAME . ".name) AS label", ...[...$titleParams, $this->getDefaultText()])
+			->joinWhere(":" . Model\Tags::TRANSLATION_TABLE_NAME, "languageId IS NULL OR languageId = ?", $language)
+			->where($defaultNameSql . " LIKE ? OR name LIKE ?", ...[...$titleParams, "%" . $name . "%", "%" . $name . "%"])
 			->order("name")
 			->fetchAll();
 		$rows = array_map(iterator_to_array(...), $items);
-		return (array) Arrays::associate($rows, 'tag_id');
+		return (array) Arrays::associate($rows, 'id');
 	}
 
 }

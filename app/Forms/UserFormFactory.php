@@ -5,12 +5,16 @@ namespace App\Forms;
 
 use App\Model;
 use App\Model\Users;
+use Latte\Engine;
 use Nette\Application\UI\Form;
+use Nette\Database\SqlLiteral;
+use Nette\Forms\Rendering\TwitterBootstrapRenderer;
 use Nette\Http\Request;
 use Nette\Localization\Translator;
 use Nette\Mail\Message;
 use Nette\Mail\SendmailMailer;
 use Nette\Mail\SmtpMailer;
+use Nette\Security\AuthenticationException;
 use Nette\Security\Passwords;
 use Nette\Utils\ArrayHash;
 use Nette\Utils\Random;
@@ -18,7 +22,7 @@ use Nette\Utils\Random;
 
 class UserFormFactory extends BaseFormFactory
 {
-	private int $user_id;
+	private int $userId;
 
 	private Model\Users $users;
 
@@ -57,13 +61,13 @@ class UserFormFactory extends BaseFormFactory
 		$form->addText('email', 'Email')
 			->setRequired(VALIDATE_REQUIRED);
 
-		$form->addSelect('role_id', $this->translator->translate('Role in system'), $this->roles->getListWithName())
+		$form->addSelect('roleId', $this->translator->translate('Role in system'), $this->roles->getListWithName())
 			->setTranslator(null);
 
 		$form->addGroup("Personal informations");
 		$form->addText('nickname', 'Nickname');
 
-		$form->addText('first_name', 'First name');
+		$form->addText('firstName', 'First name');
 
 		$form->addText('surname', 'Surname');
 
@@ -90,19 +94,19 @@ class UserFormFactory extends BaseFormFactory
 		}else{
 			$username = $values->username;
 			$email = $values->email;
-			$password = \Nette\Utils\Random::generate();
+			$password = Random::generate();
 			unset($values->username, $values->email);
 			$form->getPresenter()->id = $this->userManager->add($username, $email, $password, $values);
 		}
 	}
 
 
-	public function createNewPassword(int $user_id): Form
+	public function createNewPassword(int $userId): Form
 	{
-		$this->user_id = $user_id;
+		$this->userId = $userId;
 
 		$form = new Form;
-		$form->setRenderer(new \Nette\Forms\Rendering\TwitterBootstrapRenderer());
+		$form->setRenderer(new TwitterBootstrapRenderer());
 
 		$form->addPassword('old_password', 'Old password')
 			->setRequired('Please enter your password.');
@@ -125,23 +129,23 @@ class UserFormFactory extends BaseFormFactory
 	{
 		try {
 			$this->users->findAll()
-				->where("user_id",  $this->user_id)
+				->where("id",  $this->userId)
 				->update(array(
 						Users::COLUMN_PASSWORD_HASH => $this->passwords->hash($values->new_password)
 				)
 			);
-		} catch (Nette\Security\AuthenticationException $e) {
+		} catch (AuthenticationException $e) {
 			$form->addError($e->getMessage());
 		}
 	}
 
 
-	public function createRecoveryPassword(int $user_id): Form
+	public function createRecoveryPassword(int $userId): Form
 	{
-		$this->user_id = $user_id;
+		$this->userId = $userId;
 
 		$form = new Form;
-		$form->setRenderer(new \Nette\Forms\Rendering\TwitterBootstrapRenderer());
+		$form->setRenderer(new TwitterBootstrapRenderer());
 
 		$form->addText('username', 'Username')
 			->setRequired(VALIDATE_REQUIRED)
@@ -175,12 +179,12 @@ class UserFormFactory extends BaseFormFactory
 				$message->setBody("Odkaz pro reset hesla: " . $this->generateResetUrl($email));
 			}
 			if ($this->smtp) {
-				$mailer = new SmtpMailer(array(
-					'host' => $this->smtp[0],
-					'username' => $this->smtp[1],
-					'password' => $this->smtp[2],
-					'secure' => isset($this->smtp[3]) ? $this->smtp[3] : '',
-				));
+				$mailer = new SmtpMailer(
+					host: $this->smtp[0],
+					username: $this->smtp[1],
+					password: $this->smtp[2],
+					encryption: isset($this->smtp[3]) ? $this->smtp[3] : '',
+				);
 				$mailer->send($message);
 			} else {
 				$mailer = new SendmailMailer();
@@ -194,12 +198,12 @@ class UserFormFactory extends BaseFormFactory
 		/*
 		try {
 			$this->users->getAll()
-				->where("user_id",  $this->user_id)
+				->where("id",  $this->userId)
 				->update(array(
-					Users::COLUMN_PASSWORD_HASH => \Nette\Security\Passwords::hash($values->new_password)
+					Users::COLUMN_PASSWORD_HASH => Passwords::hash($values->new_password)
 				)
 			);
-		} catch (Nette\Security\AuthenticationException $e) {
+		} catch (AuthenticationException $e) {
 			$form->addError($e->getMessage());
 		}
 		 */
@@ -207,15 +211,15 @@ class UserFormFactory extends BaseFormFactory
 
 
 	/**
-	 * @param $user_id
+	 * @param $userId
 	 */
-	protected function generateResetUrl($user_id): string {
+	protected function generateResetUrl($userId): string {
 		$baseUrl = $this->httpRequest->getUrl()->getHostUrl();
 		$token = Random::generate(24);
 		$signal = $this->link("this", array('token' => $token));
-		$this->users->update($user_id, array(
-			'recovery_password_time' => new \Nette\Database\SqlLiteral("NOW()"),
-			'recovery_password_token' => $token
+		$this->users->update($userId, array(
+			'recoveryPasswordTime' => new SqlLiteral("NOW()"),
+			'recoveryPasswordToken' => $token
 		));
 		return $baseUrl . $signal;
 	}

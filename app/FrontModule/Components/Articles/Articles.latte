@@ -1,7 +1,7 @@
 {if count($articles)}
 	{foreach $articles as $article}
 		<div class="post-preview">
-			<a href="{plink :Front:Articles:detail id=>$article->article_id}">
+			<a href="{plink :Front:Articles:detail id=>$article->articleId}">
 				<h2 class="post-title">
 					{$article->title}
 				</h2>
@@ -16,7 +16,7 @@
 					{$article->excerpt|noescape}
 				</div>
 			</div>
-			<p class="post-meta text-right">{_"Posted by <a href='%s'>%s</a> on %s", "#",$article->author['author'], $article->publishing_date->format(\DATETIME_FORMAT) |noescape} {_'viewed'} {$article->view_count}</p>
+			<p class="post-meta text-right">{_"Posted by <a href='%s'>%s</a> on %s", "#",$article->author['author'], $article->publishingDate->format(\DATETIME_FORMAT) |noescape} {_'viewed'} {$article->viewCount}</p>
 		</div>
 		<hr n:if="!$iterator->isLast()" />
 	{/foreach}

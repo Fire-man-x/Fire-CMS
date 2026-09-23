@@ -18,7 +18,10 @@ class CategoryLinkFormPart implements ICategoryFormType
 	private array $categoriesList;
 
 
-	public function __construct(Model\Categories $categoryModel, Translator $translator)
+	/**
+	 * @param string|null $language Jazyk administrace pro názvy kategorií v selectu (null = výchozí jazyk webu)
+	 */
+	public function __construct(Model\Categories $categoryModel, Translator $translator, private ?string $language = null)
 	{
 		$this->categoryModel = $categoryModel;
 		$this->translator = $translator;
@@ -39,15 +42,18 @@ class CategoryLinkFormPart implements ICategoryFormType
 			->setRequired(VALIDATE_REQUIRED);
 
 		//link to category
-		$this->categoriesList = $this->categoryModel->findAll()
+		$categories = $this->categoryModel->findAll()
+			->select($this->categoryModel->getTableName() . ".*");
+		$this->categoryModel->selectTitle($categories, "`" . $this->categoryModel->getTableName() . "`.`id`", $this->language);
+		$this->categoriesList = $categories
 			->order("IF(type=?,0,1)", "homepage")
-			->order("grid_name")
-			->fetchAll(); //("category_id", "grid_name");
+			->order("title")
+			->fetchAll();
 
 		$list = array();
 		foreach ($this->categoriesList as $category) {
-			$list[$category->category_id] = \Nette\Utils\Html::el(null, array("class" => !$category->active ? "font-italic" : ""))
-					->setValue($category->category_id)->setText($category->grid_name);
+			$list[$category->id] = \Nette\Utils\Html::el(null, array("class" => !$category->active ? "font-italic" : ""))
+					->setValue($category->id)->setText((string) $category->title);
 		}
 		$translationContainer->addSelect('link_to_category_id', $this->translator->translate('Category'), $list)
 			->setTranslator(null);

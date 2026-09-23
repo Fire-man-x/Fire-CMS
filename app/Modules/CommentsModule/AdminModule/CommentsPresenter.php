@@ -105,17 +105,17 @@ class CommentsPresenter extends BasePresenter
 			"all"=>$this->commentsModel->findAll()
 				->select("COUNT(*) AS count")
 				->where($this->commentsModel->getTableName().".status != ?","trash")
-				//->where($this->commentsModel->getTableName().".history_id", null)
+				//->where($this->commentsModel->getTableName().".historyId", null)
 				->fetch()?->count,
 			"pending"=>$this->commentsModel->findAll()
 				->select("COUNT(*) AS count")
 				->where($this->commentsModel->getTableName().".status = ?","pending")
-				//->where($this->commentsModel->getTableName().".history_id", null)
+				//->where($this->commentsModel->getTableName().".historyId", null)
 				->fetch()?->count,
 			"trash"=>$this->commentsModel->findAll()
 				->select("COUNT(*) AS count")
 				->where($this->commentsModel->getTableName().".status = ?","trash")
-				//->where($this->commentsModel->getTableName().".history_id", null)
+				//->where($this->commentsModel->getTableName().".historyId", null)
 				->fetch()?->count
 			);
 		$this->template->counts = $counts;
@@ -140,7 +140,7 @@ class CommentsPresenter extends BasePresenter
 		$this->template->comments = $this->commentsModel;
 
 		//edit own
-		$createdBy = $this->commentsModel->getById($this->id)?->created_by;
+		$createdBy = $this->commentsModel->getById($this->id)?->createdBy;
 		if(!$this->user->isAllowed(new \App\Security\Resource("Comments", $createdBy),"edit")){
 			throw new \Nette\Application\ForbiddenRequestException("You have not access to 'Comments' with priviledge 'edit'.");
 		}
@@ -157,9 +157,8 @@ class CommentsPresenter extends BasePresenter
 	{
 		$source = $this->commentsModel->findAll()
 			->select($this->commentsModel->getTableName().".*")
-			->select(":".$this->categoriesModel::RELATION_COMMENT_CATEGORY_TABLE_NAME.".category.grid_name AS category_grid_name")
-			//->where($this->commentsModel->getTableName().".history_id", null)
-			->order($this->commentsModel->getTableName().".create_date DESC")
+			//->where($this->commentsModel->getTableName().".historyId", null)
+			->order($this->commentsModel->getTableName().".createDate DESC")
 			->order($this->commentsModel->getTableName().".".$this->commentsModel->getColumnId());
 		switch ($this->show) {
 			case "pending":
@@ -176,6 +175,7 @@ class CommentsPresenter extends BasePresenter
 		}
 
 		$primaryKey = $this->commentsModel->getColumnId();
+		$paramKey = $this->commentsModel->getForeignKeyColumn();
 
 		$grid = new DataGrid($this, $name);
 		$grid->setPrimaryKey($primaryKey);
@@ -186,10 +186,10 @@ class CommentsPresenter extends BasePresenter
 		$userManager = $this->userManager;
 		$grid->addColumnText("author", "Author")
 			->setRenderer(function ($row) use ($usersList, $userManager) {
-				if($row["created_by"]){
-					return $userManager->makeName($usersList[$row["created_by"]]);
+				if($row["createdBy"]){
+					return $userManager->makeName($usersList[$row["createdBy"]]);
 				}else{
-					return $row["author"]."<br>". \Nette\Utils\Html::el("a",array("href"=>"mailto:".$row["author_email"]))->setText($row["author_email"]);
+					return $row["author"]."<br>". \Nette\Utils\Html::el("a",array("href"=>"mailto:".$row["authorEmail"]))->setText($row["authorEmail"]);
 				}
 			})
 			->setTemplateEscaping(false);
@@ -197,10 +197,10 @@ class CommentsPresenter extends BasePresenter
 		$translator = $this->translator;
 		$presenter = $this->getPresenter();
 		$grid->addColumnText("title", "Title")
-			->setRenderer(function ($row) use ($translator, $primaryKey,$presenter) {
+			->setRenderer(function ($row) use ($translator, $paramKey, $presenter) {
 				$replyTo = "";
-				if($row["parent_id"]){
-					$replyTo = "<br><small><a href=\"".$presenter->link("reply!", array($primaryKey=>$row["parent_id"]))."\" class=\"ajax\" data-bs-toggle=\"modal\" data-bs-target=\"#modal\">".$translator->translate("From comment...")."</a></small>";
+				if($row["parentId"]){
+					$replyTo = "<br><small><a href=\"".$presenter->link("reply!", array($paramKey=>$row["parentId"]))."\" class=\"ajax\" data-bs-toggle=\"modal\" data-bs-target=\"#modal\">".$translator->translate("From comment...")."</a></small>";
 				}
 				return Nette\Utils\Strings::truncate($row["title"], 50).$replyTo;
 			})
@@ -211,12 +211,12 @@ class CommentsPresenter extends BasePresenter
 				return Nette\Utils\Strings::truncate($row["text"], 100);
 			});
 
-		$grid->addColumnDateTime("create_date", "Create date")
+		$grid->addColumnDateTime("createDate", "Create date")
 			->setFormat(DATETIME_FORMAT);
 
 		//Actions
 		if($this->show == "pending"){
-			$grid->addAction('approve', 'Approve', 'approve!', array($primaryKey => $primaryKey))
+			$grid->addAction('approve', 'Approve', 'approve!', array($paramKey => $primaryKey))
 				->setClass(function($item) {
 					return 'btn btn-success btn-sm ajax'.(!$this->user->isAllowed("Comments", "approve_comment") ? ' disabled' : '');
 				})
@@ -228,9 +228,9 @@ class CommentsPresenter extends BasePresenter
 					"data-confirm-text" => $this->translator->translate('Approve?'),
 				));
 		}
-		$grid->addAction('reply', 'Reply', 'reply!', array($primaryKey => $primaryKey))
+		$grid->addAction('reply', 'Reply', 'reply!', array($paramKey => $primaryKey))
 			->setClass(function($item) {
-				return 'btn btn-primary btn-sm'.(!$this->user->isAllowed(new \App\Security\Resource("Comments", $item["created_by"]), "edit") ? ' disabled' : '');
+				return 'btn btn-primary btn-sm'.(!$this->user->isAllowed(new \App\Security\Resource("Comments", $item["createdBy"]), "edit") ? ' disabled' : '');
 			})
 			->setIcon('reply')
 			->setTitle('Reply')
@@ -239,9 +239,9 @@ class CommentsPresenter extends BasePresenter
 				"data-bs-target" => "#modal"
 			));
 
-		$grid->addAction('delete', 'Delete', 'delete!', array($primaryKey => $primaryKey))
+		$grid->addAction('delete', 'Delete', 'delete!', array($paramKey => $primaryKey))
 			->setClass(function($item) {
-				return 'btn btn-danger btn-sm ajax'.(!$this->user->isAllowed(new \App\Security\Resource("Comments", $item["created_by"]), "edit") ? ' disabled' : '');
+				return 'btn btn-danger btn-sm ajax'.(!$this->user->isAllowed(new \App\Security\Resource("Comments", $item["createdBy"]), "edit") ? ' disabled' : '');
 			})
 			->setIcon(ICON_DELETE)
 			->setTitle('Delete')
@@ -274,21 +274,21 @@ class CommentsPresenter extends BasePresenter
 
 	/**
 	 * Activate
-	 * @param int $comment_id
+	 * @param int $commentId
 	 * @param boolean $status
 	 * @SecuredInside
 	 * @Resource(Comments)
 	 * @Privilege(edit)
 	 */
-	public function handleActivate($comment_id, $status = 0)
+	public function handleActivate(int $commentId, $status = 0)
 	{
 		//edit own
-		$createdBy = $this->commentsModel->getById($comment_id)?->created_by;
+		$createdBy = $this->commentsModel->getById($commentId)?->createdBy;
 		if(!$this->user->isAllowed(new \App\Security\Resource("Comments", $createdBy),"edit")){
 			throw new \Nette\Application\ForbiddenRequestException("You have not access to 'Comments' with priviledge 'edit'.");
 		}
-		$this->commentService->makeBackup($comment_id);
-		$this->commentsModel->update($comment_id, array("active" => (boolean) $status));
+		$this->commentService->makeBackup($commentId);
+		$this->commentsModel->update($commentId, array("active" => (boolean) $status));
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 		$this->redirect('this');
 	}
@@ -296,15 +296,15 @@ class CommentsPresenter extends BasePresenter
 
 	/**
 	 * Approve
-	 * @param int $comment_id
+	 * @param int $commentId
 	 */
 	#[Secured]
 	#[Resource('Comments')]
 	#[Privilege('approve_comment')]
-	public function handleApprove($comment_id)
+	public function handleApprove(int $commentId)
 	{
-		$this->commentService->makeBackup($comment_id);
-		$this->commentsModel->statusPublish($comment_id);
+		$this->commentService->makeBackup($commentId);
+		$this->commentsModel->statusPublish($commentId);
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 		$this->redirect('this');
 	}
@@ -312,46 +312,46 @@ class CommentsPresenter extends BasePresenter
 
 	/**
 	 * Add handler
-	 * @param int $comment_id
+	 * @param int $commentId
 	 */
 	#[Secured]
 	#[Resource('Comments')]
 	#[Privilege('edit')]
-	public function handleReply($comment_id)
+	public function handleReply(int $commentId)
 	{
-		$this->template->commentInfo = $this->commentsModel->getById($comment_id);;
+		$this->template->commentInfo = $this->commentsModel->getById($commentId);;
 
-		//$this->commentFactory->setEditId($comment_id);
-		$this->commentFactory->setDefaultValuesReply($this["commentReplyForm"], $comment_id);
+		//$this->commentFactory->setEditId($commentId);
+		$this->commentFactory->setDefaultValuesReply($this["commentReplyForm"], $commentId);
 		$this->redrawControl("commentReplyForm");
 	}
 
 
 	/**
 	 * Edit handler
-	 * @param int $comment_id
+	 * @param int $commentId
 	 */
 	#[Secured]
 	#[Resource('Comments')]
 	#[Privilege('edit')]
-	public function handleEdit($comment_id)
+	public function handleEdit(int $commentId)
 	{
-		$this->commentFactory->setEditId($comment_id);
-		$this->commentFactory->setDefaultValues($this["commentForm"], $comment_id);
+		$this->commentFactory->setEditId($commentId);
+		$this->commentFactory->setDefaultValues($this["commentForm"], $commentId);
 		$this->redrawControl("commentForm");
 	}
 
 
 	/**
 	 * Delete handler
-	 * @param int $comment_id
+	 * @param int $commentId
 	 */
 	#[Secured]
 	#[Resource('Comments')]
 	#[Privilege('delete')]
-	public function handleDelete($comment_id)
+	public function handleDelete(int $commentId)
 	{
-		$this->commentService->delete($comment_id);
+		$this->commentService->delete($commentId);
 		$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
 
 		$this->redirect('this');

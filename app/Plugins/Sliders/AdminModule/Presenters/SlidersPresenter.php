@@ -70,11 +70,11 @@ class SlidersPresenter extends BasePresenter
 		$this->template->languages = $this->languages->getLanguages();
 		$this->template->sliderInfo = $this->modelSliders->getById($this->id);
 		$this->template->items = $this->modelSliderItems->findAll()
-			->select("slider_items.*")
+			->select($this->modelSliderItems->getTableName() . ".*")
 			->select("file.*")
-			->where("slider_id", $this->id)
+			->where("sliderId", $this->id)
 			->order("position")
-			->fetchAssoc("language_id|position");
+			->fetchAssoc("languageId|position");
 
 		foreach ($this->template->items as &$languageItem){
 			foreach ($languageItem as &$item){
@@ -91,6 +91,7 @@ class SlidersPresenter extends BasePresenter
 	{
 		$source = $this->modelSliders->findAll()->order("name");
 		$primaryKey = $this->modelSliders->getColumnId();
+		$paramKey = $this->modelSliders->getForeignKeyColumn();
 
 		$grid = new Datagrid($this, $name);
 		$grid->setPrimaryKey($primaryKey);
@@ -101,7 +102,7 @@ class SlidersPresenter extends BasePresenter
 		$grid->addColumnText("location", "Template location");
 
 		//Actions
-		$grid->addAction('edit', 'Edit', 'edit!', array($primaryKey => $primaryKey))
+		$grid->addAction('edit', 'Edit', 'edit!', array($paramKey => $primaryKey))
 			->setClass('btn btn-primary btn-sm ajax')
 			->setIcon(ICON_EDIT)
 			->setTitle('Edit')
@@ -115,7 +116,7 @@ class SlidersPresenter extends BasePresenter
 			->setIcon('list')
 			->setTitle('Settings');
 
-		$grid->addAction('delete', 'Delete', 'delete!', array($primaryKey => $primaryKey))
+		$grid->addAction('delete', 'Delete', 'delete!', array($paramKey => $primaryKey))
 			->setClass('btn btn-danger btn-sm ajax')
 			->setIcon(ICON_DELETE)
 			->setTitle('Delete')
@@ -196,10 +197,10 @@ class SlidersPresenter extends BasePresenter
 	#[Secured]
 	#[Resource('Sliders')]
 	#[Privilege('edit')]
-	public function handleEdit(int $slider_id): void
+	public function handleEdit(int $sliderId): void
 	{
-		$this->factorySlider->setEditId($slider_id);
-		$this->factorySlider->setDefaultValues($this["sliderForm"], $slider_id);
+		$this->factorySlider->setEditId($sliderId);
+		$this->factorySlider->setDefaultValues($this["sliderForm"], $sliderId);
 		$this->redrawControl("sliderForm");
 	}
 
@@ -210,14 +211,11 @@ class SlidersPresenter extends BasePresenter
 	#[Secured]
 	#[Resource('Sliders')]
 	#[Privilege('delete')]
-	public function handleDelete(int $slider_id): void
+	public function handleDelete(int $sliderId): void
 	{
-		if (!$this->modelSliders->getById($slider_id)?->default) {
-			$this->modelSliders->delete($slider_id);
-			$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
-		} else {
-			$this->flashMessage(FAIL_DELETE, FLASH_FAILED);
-		}
+		//tabulka nemá sloupec `default` (dřívější kontrola `->default` vždy spadla) - slider lze smazat vždy
+		$this->modelSliders->delete($sliderId);
+		$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
 		$this->redirect('this');
 	}
 
@@ -260,8 +258,8 @@ class SlidersPresenter extends BasePresenter
 	public function handleRemoveItem(string $language, int $position): void
 	{
 		$this->modelSliderItems->delete(array(
-			"slider_id" => $this->id,
-			"language_id" => $language,
+			"sliderId" => $this->id,
+			"languageId" => $language,
 			"position" => $position
 			));
 		if ($this->isAjax()) {
@@ -290,9 +288,9 @@ class SlidersPresenter extends BasePresenter
 		//add image
 		foreach($files as $file){
 			$this->modelSliderItems->insert(Nette\Utils\ArrayHash::from(array(
-				"slider_id" => $this->id,
-				"file_id" => $file,
-				"language_id" => $language
+				"sliderId" => $this->id,
+				"fileId" => $file,
+				"languageId" => $language
 			)));
 		}
 

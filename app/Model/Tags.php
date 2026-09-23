@@ -3,14 +3,16 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Model\TranslatedTitleTrait\TranslatedTitleTrait;
 use App\Service\LanguageService;
 use Nette\Utils\ArrayHash;
 
 /**
  * Tags Model
  */
-class Tags extends BaseModel
+class Tags extends BaseModel implements Translatable
 {
+	use TranslatedTitleTrait;
 
 	const TRANSLATION_TABLE_NAME = 'firecms_tagDescriptions';
 
@@ -22,7 +24,7 @@ class Tags extends BaseModel
 		$this->languages = $languages;
 
 		$this->setTableName('firecms_tags');
-		$this->setColumnId('tag_id');
+		$this->setForeignKeyColumn('tagId');
 	}
 
 
@@ -32,7 +34,7 @@ class Tags extends BaseModel
 	public function getTranslationTable(): \Nette\Database\Table\Selection
 	{
 		return $this->database->table(self::TRANSLATION_TABLE_NAME)
-			->where(self::TRANSLATION_TABLE_NAME.".language_id", array_keys($this->languages->getActiveLanguages())); //only active languages
+			->where(self::TRANSLATION_TABLE_NAME.".languageId", array_keys($this->languages->getActiveLanguages())); //only active languages
 	}
 
 
@@ -41,10 +43,10 @@ class Tags extends BaseModel
 	 */
 	public function insertTranslation(int $tagId, string $language, ArrayHash $data): int
 	{
-		$data->{$this->getColumnId()} = $tagId;
-		$data->language_id = $language;
-		$this->updateGridName($tagId, $language, $data->name);
-		return $this->getTranslationTable()->insert($data);
+		$data->{$this->getForeignKeyColumn()} = $tagId;
+		$data->languageId = $language;
+		$inserted = $this->getTranslationTable()->insert($data);
+		return $inserted instanceof \Nette\Database\Table\ActiveRow ? 1 : (int) $inserted;
 	}
 
 
@@ -56,7 +58,6 @@ class Tags extends BaseModel
 		$finded = $this->findTranslationBy($tagId, $language);
 		if ($finded->fetch()) {
 			$finded->update($data);
-			$this->updateGridName($tagId, $language, $data->name);
 		} else {
 			$this->insertTranslation($tagId, $language, $data);
 		}
@@ -64,14 +65,11 @@ class Tags extends BaseModel
 
 
 	/**
-	 * Update grid name
+	 * Sloupec překladové tabulky s názvem položky (viz TranslatedTitleTrait)
 	 */
-	public function updateGridName(int $tagId, string $language, string $name)
+	protected function getTitleColumn(): string
 	{
-		if($language == $this->languages->getDefaultLanguage() ||
-			($language != $this->languages->getDefaultLanguage() && $this->getById($tagId)?->grid_name == null)){
-			$this->update($tagId, array("grid_name"=>$name));
-		}
+		return 'name';
 	}
 
 
@@ -81,8 +79,8 @@ class Tags extends BaseModel
 	public function findTranslationBy(int $tagId, string $language): \Nette\Database\Table\Selection
 	{
 		return $this->getTranslationTable()
-				->where($this->getColumnId(), $tagId)
-				->where("language_id", $language);
+				->where($this->getForeignKeyColumn(), $tagId)
+				->where("languageId", $language);
 	}
 
 }

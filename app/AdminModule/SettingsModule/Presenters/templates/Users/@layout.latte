@@ -1,7 +1,7 @@
 {layout '../../../../templates/@layout.latte'}
 
 {block h1}
-	{_"User"} {if $userInfo}"{if $userInfo->first_name || $userInfo->surname}{$userInfo->first_name} {$userInfo->surname}{else}{$userInfo->username}{/if}"{/if}
+	{_"User"} {if $userInfo}"{if $userInfo->firstName || $userInfo->surname}{$userInfo->firstName} {$userInfo->surname}{else}{$userInfo->username}{/if}"{/if}
 {/block}
 
 {block menu}

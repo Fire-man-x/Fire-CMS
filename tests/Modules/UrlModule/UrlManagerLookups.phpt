@@ -35,17 +35,17 @@ final class UrlManagerLookupsTest extends TestCase
 
 		$this->db = SqliteDatabase::create([
 			'CREATE TABLE firecms_urls (
-				url_id INTEGER PRIMARY KEY AUTOINCREMENT,
-				language_id TEXT NOT NULL,
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				languageId TEXT NOT NULL,
 				type TEXT NOT NULL,
 				key INTEGER NOT NULL,
 				url TEXT NOT NULL
 			)',
 			'CREATE TABLE firecms_urlRedirections (
-				url_redirection_id INTEGER PRIMARY KEY AUTOINCREMENT,
-				language_id TEXT NOT NULL,
-				old_url TEXT NOT NULL,
-				new_url TEXT NOT NULL
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				languageId TEXT NOT NULL,
+				oldUrl TEXT NOT NULL,
+				newUrl TEXT NOT NULL
 			)',
 		]);
 
@@ -95,7 +95,7 @@ final class UrlManagerLookupsTest extends TestCase
 
 		$row = $this->urlManager->getRedirectionInfoByUrl('stary-clanek', 'cs');
 
-		Assert::same('clanek-test', $row['new_url']);
+		Assert::same('clanek-test', $row['newUrl']);
 	}
 
 	public function testGetRedirectionInfoByUrlThrowsWhenMissing(): void
@@ -109,7 +109,7 @@ final class UrlManagerLookupsTest extends TestCase
 	private function insertUrl(string $languageId, string $type, int $key, string $url): void
 	{
 		$this->db->query(
-			'INSERT INTO firecms_urls (language_id, type, key, url) VALUES (?, ?, ?, ?)',
+			'INSERT INTO firecms_urls (languageId, type, key, url) VALUES (?, ?, ?, ?)',
 			$languageId,
 			$type,
 			$key,
@@ -120,7 +120,7 @@ final class UrlManagerLookupsTest extends TestCase
 	private function insertRedirection(string $languageId, string $oldUrl, string $newUrl): void
 	{
 		$this->db->query(
-			'INSERT INTO firecms_urlRedirections (language_id, old_url, new_url) VALUES (?, ?, ?)',
+			'INSERT INTO firecms_urlRedirections (languageId, oldUrl, newUrl) VALUES (?, ?, ?)',
 			$languageId,
 			$oldUrl,
 			$newUrl,

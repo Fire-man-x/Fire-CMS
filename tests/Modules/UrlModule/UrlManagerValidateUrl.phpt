@@ -32,17 +32,17 @@ final class UrlManagerValidateUrlTest extends TestCase
 
 		$this->db = SqliteDatabase::create([
 			'CREATE TABLE firecms_urls (
-				url_id INTEGER PRIMARY KEY AUTOINCREMENT,
-				language_id TEXT NOT NULL,
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				languageId TEXT NOT NULL,
 				type TEXT NOT NULL,
 				key INTEGER NOT NULL,
 				url TEXT NOT NULL
 			)',
 			'CREATE TABLE firecms_urlRedirections (
-				url_redirection_id INTEGER PRIMARY KEY AUTOINCREMENT,
-				language_id TEXT NOT NULL,
-				old_url TEXT NOT NULL,
-				new_url TEXT NOT NULL
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				languageId TEXT NOT NULL,
+				oldUrl TEXT NOT NULL,
+				newUrl TEXT NOT NULL
 			)',
 		]);
 
@@ -84,7 +84,7 @@ final class UrlManagerValidateUrlTest extends TestCase
 
 	public function testUniquenessIsGlobalAcrossTypesAndLanguages(): void
 	{
-		// Pozor: validateUrl() nefiltruje podle `type` ani `language_id` — URL musí
+		// Pozor: validateUrl() nefiltruje podle `type` ani `languageId` — URL musí
 		// být unikátní napříč celou tabulkou firecms_urls, ne jen v rámci
 		// stejného typu/jazyka. Viz docs/AI-Context/gotchas.md.
 		$this->insertUrl('en', 'page', 1, 'foo');
@@ -95,7 +95,7 @@ final class UrlManagerValidateUrlTest extends TestCase
 	private function insertUrl(string $languageId, string $type, int $key, string $url): void
 	{
 		$this->db->query(
-			'INSERT INTO firecms_urls (language_id, type, key, url) VALUES (?, ?, ?, ?)',
+			'INSERT INTO firecms_urls (languageId, type, key, url) VALUES (?, ?, ?, ?)',
 			$languageId,
 			$type,
 			$key,

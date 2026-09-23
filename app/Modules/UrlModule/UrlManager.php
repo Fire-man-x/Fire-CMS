@@ -67,7 +67,7 @@ class UrlManager
 		}
 
 		$urlInfo = $this->model->findAll()
-			->where('language_id', $languageId)
+			->where('languageId', $languageId)
 			->where('type', $type)
 			->where('key', $key)
 			->fetch();
@@ -112,7 +112,7 @@ class UrlManager
 		}
 
 		$urlInfo = $this->model->findAll()
-			->where('language_id', $languageId)
+			->where('languageId', $languageId)
 			->where('url', $url)
 			->fetch();
 
@@ -153,40 +153,40 @@ class UrlManager
 			if($oldUrl != $webalizedUrl) {
 				//update old redirection if exist
 				$this->redirectionsModel->findAll()
-					->where("language_id", $language)
-					->where("old_url", $oldUrl)
-					->update(array("new_url" => $webalizedUrl));
+					->where("languageId", $language)
+					->where("oldUrl", $oldUrl)
+					->update(array("newUrl" => $webalizedUrl));
 
 				//update all old to new
 				$this->redirectionsModel->findAll()
-					->where("language_id", $language)
-					->where("new_url", $oldUrl)
-					->update(array("new_url" => $webalizedUrl));
+					->where("languageId", $language)
+					->where("newUrl", $oldUrl)
+					->update(array("newUrl" => $webalizedUrl));
 
 				//insert
-				$this->redirectionsModel->insert(array(
-					"language_id" => $language,
-					"old_url" => $oldUrl,
-					"new_url" => $webalizedUrl
-				));
+				$this->redirectionsModel->insert(ArrayHash::from([
+					"languageId" => $language,
+					"oldUrl" => $oldUrl,
+					"newUrl" => $webalizedUrl
+				]));
 
 				//remove recursive
 				$this->redirectionsModel->findAll()
-					->where("language_id", $language)
-					->where("old_url", $webalizedUrl)
+					->where("languageId", $language)
+					->where("oldUrl", $webalizedUrl)
 					->delete();
 
 			}
 
 			//update url
-			$this->model->update($urlInfo["url_id"], array("url" => $webalizedUrl));
+			$this->model->update($urlInfo["id"], array("url" => $webalizedUrl));
 
 		}catch(InvalidArgumentException $e) {
 			//insert url
 			$this->model->insert(ArrayHash::from(array(
 				"type" => $type,
 				"key" => $key,
-				"language_id" => $language,
+				"languageId" => $language,
 				"url" => $webalizedUrl
 			)));
 		}
@@ -194,7 +194,7 @@ class UrlManager
 
 	/**
 	 * Validate URL handler
-	 * @param int $category_id
+	 * @param int $categoryId
 	 */
 	public function validateUrl(string $url, $type, $key, $notInKey = null): string
 	{
@@ -228,8 +228,8 @@ class UrlManager
 		}
 
 		$urlInfo = $this->redirectionsModel->findAll()
-			->where('language_id', $languageId)
-			->where('old_url', $url)
+			->where('languageId', $languageId)
+			->where('oldUrl', $url)
 			->fetch();
 
 		if(!$urlInfo)

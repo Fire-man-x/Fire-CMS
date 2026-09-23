@@ -1,12 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Access to constant TYPE_ARTICLE on an unknown class App\\Modules\\CommentsModule\\Meta\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../AdminModule/Presenters/ArticlesPresenter.php
-
-		-
 			message: '#^Default value of the parameter \#2 \$status \(int\) of method App\\AdminModule\\Presenters\\ArticlesPresenter\:\:handleActivate\(\) is incompatible with type bool\.$#'
 			identifier: parameter.defaultValue
 			count: 1
@@ -25,18 +19,6 @@ parameters:
 			path: ../AdminModule/Presenters/BasePresenter.php
 
 		-
-			message: '#^Instantiated class App\\AdminModule\\Presenters\\InvalidArgumentException not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../AdminModule/Presenters/CategoriesPresenter.php
-
-		-
-			message: '#^Throwing object of an unknown class App\\AdminModule\\Presenters\\InvalidArgumentException\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../AdminModule/Presenters/CategoriesPresenter.php
-
-		-
 			message: '#^Access to an undefined property App\\AdminModule\\Presenters\\FilesManagerPresenter\:\:\$context\.$#'
 			identifier: property.notFound
 			count: 2
@@ -49,7 +31,7 @@ parameters:
 			path: ../AdminModule/Presenters/FilesManagerPresenter.php
 
 		-
-			message: '#^Cannot access property \$disk_name on array\<string, mixed\>\.$#'
+			message: '#^Cannot access property \$diskName on array\<string, mixed\>\.$#'
 			identifier: property.nonObject
 			count: 1
 			path: ../AdminModule/Presenters/FilesManagerPresenter.php
@@ -289,12 +271,6 @@ parameters:
 			path: ../Components/Menu/Menu.php
 
 		-
-			message: '#^Access to constant RELATION_ARTICLE_TABLE_NAME on an unknown class App\\Components\\Menu\\Model\\Categories\.$#'
-			identifier: class.notFound
-			count: 2
-			path: ../Components/Menu/Model/Menus.php
-
-		-
 			message: '#^Default value of the parameter \#3 \$data \(array\) of method App\\Components\\Menu\\Model\\Menus\:\:insertRelationMenuItem\(\) is incompatible with type Nette\\Utils\\ArrayHash\.$#'
 			identifier: parameter.defaultValue
 			count: 1
@@ -325,12 +301,6 @@ parameters:
 			path: ../Components/Shortcodes.php
 
 		-
-			message: '#^Call to static method bytes\(\) on an unknown class Latte\\Runtime\\Filters\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Components/Shortcodes.php
-
-		-
 			message: '#^PHPDoc tag @var has invalid value \(\)\: Unexpected token "\\n\\t ", expected type at offset 12 on line 2$#'
 			identifier: phpDoc.parseError
 			count: 1
@@ -349,31 +319,13 @@ parameters:
 			path: ../Components/TextInputCustomLabel.php
 
 		-
-			message: '#^Method App\\Controls\\Controls\\TextInputCustomLabel\:\:getLabel\(\) has invalid return type App\\Controls\\Controls\\Html\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Components/TextInputCustomLabel.php
-
-		-
-			message: '#^Method App\\Controls\\Controls\\TextInputCustomLabel\:\:getLabel\(\) should return App\\Controls\\Controls\\Html\|string but returns Nette\\Utils\\Html\.$#'
-			identifier: return.type
-			count: 1
-			path: ../Components/TextInputCustomLabel.php
-
-		-
-			message: '#^PHPDoc tag @param has invalid value \(string\)\: Unexpected token "\\n\\t \* ", expected variable at offset 58 on line 3$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: ../Components/TextInputCustomLabel.php
-
-		-
-			message: '#^Parameter \#2 \$callback of static method Nette\\Forms\\Container\:\:extensionMethod\(\) expects callable\(Nette\\Forms\\Container\)\: mixed, Closure\(mixed, mixed, mixed\=, array\|null\=\)\: App\\Controls\\Controls\\TextInputCustomLabel given\.$#'
+			message: '#^Parameter \#2 \$callback of static method Nette\\Forms\\Container\:\:extensionMethod\(\) expects callable\(Nette\\Forms\\Container\)\: mixed, Closure\(mixed, mixed, mixed\=, array\|null\=\)\: App\\Components\\TextInputCustomLabel given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../Components/TextInputCustomLabel.php
 
 		-
-			message: '#^Parameter \#2 \$maxLength of class App\\Controls\\Controls\\TextInputCustomLabel constructor expects int\|null, array\|null given\.$#'
+			message: '#^Parameter \#2 \$maxLength of class App\\Components\\TextInputCustomLabel constructor expects int\|null, array\|null given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../Components/TextInputCustomLabel.php
@@ -745,24 +697,6 @@ parameters:
 			path: ../Forms/LanguageFormFactory.php
 
 		-
-			message: '#^Cannot access property \$key on array\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: ../Forms/MetaFormFactory.php
-
-		-
-			message: '#^Cannot access property \$language_id on array\.$#'
-			identifier: property.nonObject
-			count: 2
-			path: ../Forms/MetaFormFactory.php
-
-		-
-			message: '#^Cannot access property \$type on array\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: ../Forms/MetaFormFactory.php
-
-		-
 			message: '#^Call to an undefined method Nette\\ComponentModel\\IComponent\:\:getControlPrototype\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -777,12 +711,6 @@ parameters:
 		-
 			message: '#^Method Nette\\Application\\UI\\Control\:\:flashMessage\(\) invoked with 3 parameters, 1\-2 required\.$#'
 			identifier: arguments.count
-			count: 1
-			path: ../Forms/TagFormFactory.php
-
-		-
-			message: '#^Parameter \#1 \$data of method App\\Model\\BaseModel\:\:insert\(\) expects Nette\\Utils\\ArrayHash, array given\.$#'
-			identifier: argument.type
 			count: 1
 			path: ../Forms/TagFormFactory.php
 
@@ -835,44 +763,8 @@ parameters:
 			path: ../Forms/UserFormFactory.php
 
 		-
-			message: '#^Call to method getMessage\(\) on an unknown class App\\Forms\\Nette\\Security\\AuthenticationException\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Forms/UserFormFactory.php
-
-		-
-			message: '#^Call to method renderToString\(\) on an unknown class App\\Forms\\Engine\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Forms/UserFormFactory.php
-
-		-
-			message: '#^Caught class App\\Forms\\Nette\\Security\\AuthenticationException not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Forms/UserFormFactory.php
-
-		-
-			message: '#^Class Nette\\Mail\\SmtpMailer constructor invoked with 1 parameter, 3\-9 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: ../Forms/UserFormFactory.php
-
-		-
 			message: '#^If condition is always true\.$#'
 			identifier: if.alwaysTrue
-			count: 1
-			path: ../Forms/UserFormFactory.php
-
-		-
-			message: '#^Instantiated class App\\Forms\\Engine not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Forms/UserFormFactory.php
-
-		-
-			message: '#^Parameter \#1 \$host of class Nette\\Mail\\SmtpMailer constructor expects string, array\<string, mixed\> given\.$#'
-			identifier: argument.type
 			count: 1
 			path: ../Forms/UserFormFactory.php
 
@@ -925,12 +817,6 @@ parameters:
 			path: ../FrontModule/Presenters/BasePresenter.php
 
 		-
-			message: '#^Call to static method fromFile\(\) on an unknown class App\\Components\\FileManager\\Requests\\FileRequest\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../FrontModule/Presenters/FilesPresenter.php
-
-		-
 			message: '#^Parameter \#2 \$itemId of method App\\Components\\ViewCounter\:\:itemViewed\(\) expects int, string given\.$#'
 			identifier: argument.type
 			count: 1
@@ -945,12 +831,6 @@ parameters:
 		-
 			message: '#^Default value of the parameter \#3 \$data \(array\) of method App\\Model\\Articles\:\:insertRelationFile\(\) is incompatible with type Nette\\Utils\\ArrayHash\.$#'
 			identifier: parameter.defaultValue
-			count: 1
-			path: ../Model/Articles.php
-
-		-
-			message: '#^Method App\\Model\\Articles\:\:deleteAllRelationTags\(\) invoked with 0 parameters, 1 required\.$#'
-			identifier: arguments.count
 			count: 1
 			path: ../Model/Articles.php
 
@@ -973,55 +853,13 @@ parameters:
 			path: ../Model/BaseSubMetas.php
 
 		-
-			message: '#^Default value of the parameter \#3 \$data \(array\) of method App\\Model\\Categories\:\:insertRelationArticle\(\) is incompatible with type Nette\\Utils\\ArrayHash\.$#'
-			identifier: parameter.defaultValue
-			count: 1
-			path: ../Model/Categories.php
-
-		-
 			message: '#^Default value of the parameter \#3 \$data \(array\) of method App\\Model\\Categories\:\:insertRelationFile\(\) is incompatible with type Nette\\Utils\\ArrayHash\.$#'
 			identifier: parameter.defaultValue
 			count: 1
 			path: ../Model/Categories.php
 
 		-
-			message: '#^Method App\\Model\\Categories\:\:deleteAllRelationTags\(\) invoked with 0 parameters, 1 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: ../Model/Categories.php
-
-		-
-			message: '#^Method App\\Model\\Categories\:\:deleteRelationArticle\(\) should return int but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: ../Model/Categories.php
-
-		-
-			message: '#^Method App\\Model\\Categories\:\:deleteRelationFile\(\) should return int but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: ../Model/Categories.php
-
-		-
-			message: '#^Method App\\Model\\Categories\:\:insertRelationArticle\(\) should return int but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: ../Model/Categories.php
-
-		-
 			message: '#^Method App\\Model\\Categories\:\:insertRelationFile\(\) should return int but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: ../Model/Categories.php
-
-		-
-			message: '#^Method App\\Model\\Categories\:\:recalculateLeftRightPositions\(\) is unused\.$#'
-			identifier: method.unused
-			count: 1
-			path: ../Model/Categories.php
-
-		-
-			message: '#^Method App\\Model\\Categories\:\:setRelationArticleAsMain\(\) should return int but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
 			path: ../Model/Categories.php
@@ -1035,30 +873,6 @@ parameters:
 		-
 			message: '#^PHPDoc tag @param references unknown parameter\: \$id$#'
 			identifier: parameter.notFound
-			count: 1
-			path: ../Model/Categories.php
-
-		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$language$#'
-			identifier: parameter.notFound
-			count: 1
-			path: ../Model/Categories.php
-
-		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$name$#'
-			identifier: parameter.notFound
-			count: 1
-			path: ../Model/Categories.php
-
-		-
-			message: '#^Undefined variable\: \$language$#'
-			identifier: variable.undefined
-			count: 2
-			path: ../Model/Categories.php
-
-		-
-			message: '#^Undefined variable\: \$name$#'
-			identifier: variable.undefined
 			count: 1
 			path: ../Model/Categories.php
 
@@ -1117,7 +931,7 @@ parameters:
 			path: ../Modules/CommentsModule/Comment.php
 
 		-
-			message: '#^Cannot access property \$comment_id on array\.$#'
+			message: '#^Cannot access property \$id on array\.$#'
 			identifier: property.nonObject
 			count: 1
 			path: ../Modules/CommentsModule/Comment.php
@@ -1147,18 +961,6 @@ parameters:
 			path: ../Modules/CommentsModule/Comment.php
 
 		-
-			message: '#^Parameter \$language of method App\\Modules\\CommentsModule\\Comment\:\:getAllCommentsWithChilds\(\) has invalid type App\\Modules\\CommentsModule\\v\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Modules/CommentsModule/Comment.php
-
-		-
-			message: '#^Parameter \$language of method App\\Modules\\CommentsModule\\Comment\:\:recalculateTree\(\) has invalid type App\\Modules\\CommentsModule\\v\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Modules/CommentsModule/Comment.php
-
-		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
@@ -1167,12 +969,6 @@ parameters:
 		-
 			message: '#^Method App\\Modules\\CommentsModule\\Components\\Comments\\Comments\:\:loadSubComments\(\) should return AlesWita\\Components\\VisualPaginator but return statement is missing\.$#'
 			identifier: return.missing
-			count: 1
-			path: ../Modules/CommentsModule/Components/Comments/Comments.php
-
-		-
-			message: '#^Parameter \#1 \$language of method App\\Modules\\CommentsModule\\Comment\:\:getAllCommentsWithChilds\(\) expects App\\Modules\\CommentsModule\\v, string given\.$#'
-			identifier: argument.type
 			count: 1
 			path: ../Modules/CommentsModule/Components/Comments/Comments.php
 
@@ -1195,19 +991,13 @@ parameters:
 			path: ../Modules/CommentsModule/Components/Comments/Comments.php
 
 		-
-			message: '#^Method App\\Modules\\CommentsModule\\Model\\Comments\:\:getDatabase\(\) should return Nette\\Database\\Context but returns Nette\\Database\\Explorer\.$#'
-			identifier: return.type
-			count: 1
-			path: ../Modules/CommentsModule/Model/Comments.php
-
-		-
 			message: '#^Method App\\Modules\\UrlModule\\UrlManager\:\:existUrlByTypeAndKey\(\) should return Nette\\Database\\Table\\ActiveRow\|false but returns true\.$#'
 			identifier: return.type
 			count: 1
 			path: ../Modules/UrlModule/UrlManager.php
 
 		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$category_id$#'
+			message: '#^PHPDoc tag @param references unknown parameter\: \$categoryId$#'
 			identifier: parameter.notFound
 			count: 1
 			path: ../Modules/UrlModule/UrlManager.php
@@ -1215,12 +1005,6 @@ parameters:
 		-
 			message: '#^PHPDoc tag @param references unknown parameter\: \$languageId$#'
 			identifier: parameter.notFound
-			count: 1
-			path: ../Modules/UrlModule/UrlManager.php
-
-		-
-			message: '#^Parameter \#1 \$data of method App\\Model\\BaseModel\:\:insert\(\) expects Nette\\Utils\\ArrayHash, array\<string, mixed\> given\.$#'
-			identifier: argument.type
 			count: 1
 			path: ../Modules/UrlModule/UrlManager.php
 

@@ -19,7 +19,7 @@ class FileFolders extends BaseModel
 		parent::__construct($database);
 
 		$this->setTableName('firecms_fileFolders');
-		$this->setColumnId('file_folder_id');
+		$this->setForeignKeyColumn('fileFolderId');
 	}
 
 
@@ -42,8 +42,8 @@ class FileFolders extends BaseModel
 		$info = $this->getById($id);
 		if($info) {
 			$this->findAll()
-				->where("parent_id", $id)
-				->update(["parent_id" => $info->parent_id]);
+				->where("parentId", $id)
+				->update(["parentId" => $info->parentId]);
 		}
 
 		//finally delete

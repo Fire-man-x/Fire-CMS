@@ -28,7 +28,7 @@
 			{$article->content|shortcodes|noescape}
 		</div>
 
-		<p class="post-meta">{_"Posted by <a href='%s'>%s</a> on %s", "#",$article->author['author'], $article->publishing_date->format(\DATETIME_FORMAT) |noescape} {_'viewed'} {$article->view_count}</p>
+		<p class="post-meta">{_"Posted by <a href='%s'>%s</a> on %s", "#",$article->author['author'], $article->publishingDate->format(\DATETIME_FORMAT) |noescape} {_'viewed'} {$article->viewCount}</p>
 	</article>
 
 	{control comments}

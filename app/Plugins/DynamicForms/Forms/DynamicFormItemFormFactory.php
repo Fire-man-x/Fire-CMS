@@ -55,7 +55,7 @@ class DynamicFormItemFormFactory extends BaseFormFactory
 		$moreLanguages = count($this->languages->getActiveLanguages())>1;
 		foreach($this->languages->getActiveLanguages() as $activeLanguage)
 		{
-			$languageContainer = $translationContainer->addContainer($activeLanguage['language_id']);
+			$languageContainer = $translationContainer->addContainer($activeLanguage['languageId']);
 
 			$label = 'Label';
 			if($moreLanguages)
@@ -88,7 +88,7 @@ class DynamicFormItemFormFactory extends BaseFormFactory
 			$defaults = $this->metasService->getStructureByColumnId($this->type, $language, $this->getEditId(), true);
 			$values = array();
 			foreach ($defaults as $default){
-				$values[$default["meta_id"]] = $default["value"];
+				$values[$default["id"]] = $default["value"];
 			}
 
 			$form->setValues($values);
@@ -103,7 +103,7 @@ class DynamicFormItemFormFactory extends BaseFormFactory
 
 	public function formValidate(Form $form, $values): void
 	{
-		$duplicityExist = $this->dynamicFormsModel->testIfItemNameExist($this->dynamicFormId, $values["name"], $this->getEditId());
+		$duplicityExist = $this->dynamicFormsModel->testIfItemNameExist($this->dynamicFormId, $values["name"], $this->isEditMode() ? (string) $this->getEditId() : null);
 		if($duplicityExist)
 		{
 			$form->addError($form->getTranslator()->translate("Cannot insert duplicate input name '%s'", $values["name"]), false);
@@ -121,7 +121,8 @@ class DynamicFormItemFormFactory extends BaseFormFactory
 		unset($values->translation);
 
 		if ($this->isEditMode()) {
-			$this->dynamicFormsModel->updateItem($this->dynamicFormId, $this->getEditId(), (array) $values);
+			//editId je u položky její název (string) - BaseFormFactory::setEditId() by číselný název převedl na int
+			$this->dynamicFormsModel->updateItem($this->dynamicFormId, (string) $this->getEditId(), (array) $values);
 			$this->dynamicFormsModel->updateItemTranslation($this->dynamicFormId, $values->name, (array) $translation); //cannot use editId (because can be changed in form)
 		} else {
 			$this->dynamicFormsModel->insertItem($this->dynamicFormId, (array) $values);

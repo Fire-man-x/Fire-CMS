@@ -46,9 +46,9 @@ class GalleryFormPart implements ICategoryFormType
 			->getControlPrototype()->addClass(WYSIWYG_CLASS);
 
 		//SEO
-		$translationContainer->addText('seo_title', 'SEO title');
-		$translationContainer->addText('seo_description', 'SEO description');
-		$translationContainer->addText('seo_keywords', 'SEO keywords');
+		$translationContainer->addText('seoTitle', 'SEO title');
+		$translationContainer->addText('seoDescription', 'SEO description');
+		$translationContainer->addText('seoKeywords', 'SEO keywords');
 
 		//Files
 		$form->addHidden('images');

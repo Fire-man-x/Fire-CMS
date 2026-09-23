@@ -1,4 +1,4 @@
-<div class="owl-carousel owl-theme" id="slider_{$slider->slider_id}">
+<div class="owl-carousel owl-theme" id="slider_{$slider->id}">
 	<div n:foreach="$sliderItems as $item" title="{if $item->text}{$item->text}{else}{$item->file->getName()}{/if}">
 		<a href="{if $item->url}{$item->url}{else}{image $item->file}{/if}" {*title=""*}>
 			<img n:src="$item->file, '945x'" alt="{$item->file->getName()}" class="">
@@ -11,7 +11,7 @@
 {var $timeout = $slider->duration + $slider->speed}
 <script type="text/javascript">
 
-	$('.owl-carousel#slider_'+{$slider->slider_id}).owlCarousel({
+	$('.owl-carousel#slider_'+{$slider->id}).owlCarousel({
 		loop: true,
 		margin: 10,
 		/*responsiveClass:true,*/

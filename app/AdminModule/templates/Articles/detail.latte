@@ -24,9 +24,9 @@
 
 			<fieldset>
 				<legend>{_"SEO"}</legend>
-				{$form->getRenderer()->renderPair($form['translation']['seo_title']) |noescape}
-				{$form->getRenderer()->renderPair($form['translation']['seo_description']) |noescape}
-				{$form->getRenderer()->renderPair($form['translation']['seo_keywords']) |noescape}
+				{$form->getRenderer()->renderPair($form['translation']['seoTitle']) |noescape}
+				{$form->getRenderer()->renderPair($form['translation']['seoDescription']) |noescape}
+				{$form->getRenderer()->renderPair($form['translation']['seoKeywords']) |noescape}
 			</fieldset>
 		</div>
 
@@ -54,7 +54,7 @@
 						{var $revisionParamName = \App\AdminModule\Presenters\ArticlesPresenter::$revisionParameter}
 						{capture $revisionsContainer}
 							<ul class="list-unstyled">
-								<li n:foreach="$revisionsList as $revision"><strong n:tag-if="$revision->article_id == $presenter->getParameter($revisionParamName)"><a n:href="this $revisionParamName=>$revision->article_id" title="{_'View'}">{$revision->create_date|date:\DATETIME_FORMAT}</a></strong></li>
+								<li n:foreach="$revisionsList as $revision"><strong n:tag-if="$revision->id == $presenter->getParameter($revisionParamName)"><a n:href="this $revisionParamName=>$revision->id" title="{_'View'}">{$revision->createDate|date:\DATETIME_FORMAT}</a></strong></li>
 							</ul>
 						{/capture}
 						<a tabindex="0" class="btn btn-outline-dark" role="button" data-bs-toggle="popover" data-bs-placement="bottom" title="&lt;i class=&quot;fa fa-history&quot;&gt;&lt;/i&gt; {_'Older versions'}" data-content="{$revisionsContainer}">
@@ -66,9 +66,9 @@
 					</div>
 				</div>
 
-				{$form->getRenderer()->renderPair($form['publishing_date']) |noescape}
+				{$form->getRenderer()->renderPair($form['publishingDate']) |noescape}
 
-				{$form->getRenderer()->renderPair($form['expiring_date']) |noescape}
+				{$form->getRenderer()->renderPair($form['expiringDate']) |noescape}
 
 				<div class="row mb-3">
 					<div class="col-sm-3 col-lg-12x col-form-label">
@@ -101,7 +101,7 @@
 				{snippet files}
 					{ifset $files}
 						<div n:foreach="$files as $file" class="img-thumbnail d-inline-block" data-file-id="{$file->getId()}">
-							<a n:tag-if="!$isWindowMode" nx:href="fileInfo! hash=>$file->getHash()" data-bs-toggle="popover" titlex="{_'Actions'}" data-content="<a href='{link removeImage! file_id=>$file->getId()}' class='ajax'><i class='fa fa-times'></i></a>" data-bs-placement="bottom" titlex="{$file->getName()}">
+							<a n:tag-if="!$isWindowMode" nx:href="fileInfo! hash=>$file->getHash()" data-bs-toggle="popover" titlex="{_'Actions'}" data-content="<a href='{link removeImage! fileId=>$file->getId()}' class='ajax'><i class='fa fa-times'></i></a>" data-bs-placement="bottom" titlex="{$file->getName()}">
 								<img n:src="$file, '100x100'" alt="{$file->getName()}" class="">
 								<small class="d-block text-xs-center">{$file->getName()}</small>
 							</a>

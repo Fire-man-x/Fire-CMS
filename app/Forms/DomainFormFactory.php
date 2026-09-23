@@ -37,7 +37,7 @@ class DomainFormFactory extends BaseFormFactory
 		$form->addCheckbox('default', 'Default')
 			->setOption('description', $this->translator->translate('Used for generated links if a language has more than one domain.'));
 
-		$form->addSelect('language_id', $this->translator->translate('Language'), $this->languages->getLanguages())
+		$form->addSelect('languageId', $this->translator->translate('Language'), $this->languages->getLanguages())
 			->setRequired(VALIDATE_REQUIRED);
 
 		$this->domainControl = $form->addText('domain', 'Domain')

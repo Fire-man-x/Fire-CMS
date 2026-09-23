@@ -80,7 +80,7 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	{
 		if(!isset($this->themePath))
 		{
-			$themePathOption = $this->options->getByKey('themePath', $this->language);
+			$themePathOption = $this->options->getByKey('themePath');
 			$this->themePath = $this->projectFolders->getWwwThemeDir().'/'.$themePathOption."/templates";
 		}
 		return $this->themePath;

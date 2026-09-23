@@ -256,6 +256,50 @@ Klíčové věci, které je potřeba vědět, než se s tímhle kódem/DB dál p
   `PetHotel`).
 - `SDHGallery` do DB vůbec nesahá (souborové úložiště), přejmenování se ho netýká.
 
+## PK sloupce se jmenují `id`, FK `<entita>Id` — `getColumnId()` vs. `getForeignKeyColumn()`
+
+Od 2026-09-23 jsou sloupce jádra v camelCase a každý `AUTO_INCREMENT` PK se jmenuje `id`
+(`firecms_articles.id`, `firecms_users.id`, …). Cizí klíče na něj se jmenují `<entita>Id` (`articleId`, `userId`).
+Výjimka: `firecms_languages.languageId` (`char(2)`, ne AUTO_INCREMENT). Na co si dát pozor:
+
+- `BaseModel::getColumnId()` vrací vlastní PK (`id`). Pro dotaz do překladové nebo vazební tabulky
+  (`firecms_articleDescriptions`, `firecms_articleTags`, …) použijte `getForeignKeyColumn()` (`articleId`).
+  `->where($this->getColumnId(), …)` nad `getTranslationTable()` tiše nic nenajde.
+- Joinované selecty typu `getAllWithTranslation()` / `getRelationFile()` (`překlad.*` + `article.*`) mají v řádku
+  oba sloupce: `id` (z hlavní tabulky) i `articleId` (z překladu/vazby). Na alias hlavní tabulky se odkazuje
+  `"article.id"`, ne `"article.articleId"`.
+- Datagrid akce: `array($paramKey => $primaryKey)` s `$paramKey = $model->getForeignKeyColumn()`. Nikdy
+  `array('id' => …)` na signálu (`delete!`, `addCategory!`, …) v presenteru, který má vlastní `$id`,
+  protože parametr signálu je parametr presenteru a přepsal by ho. `array('id' => $primaryKey)` je v pořádku
+  jen u odkazů na jinou akci (`detail`).
+- `Settings` má záměrně veřejné snake_case klíče (`main_title`, `seo_title`, …), které převádí na
+  camelCase sloupce. Nejde o zapomenutý převod.
+- Hlavní tabulky (`firecms_articles`, `firecms_categories`, `firecms_tags`) nemají od 2026-09-23 žádný sloupec
+  s názvem (`gridName` byl zrušen). Název pro grid nebo řazení se bere z `*Descriptions` přes
+  `TranslatedTitleTrait::selectTitle($selection, "`tabulka`.`id`", $this->language)`, který přidá alias `title`.
+  `$language` je jazyk administrace (persistentní parametr presenteru), `null` znamená výchozí jazyk webu.
+  Do gridů nepřidávejte `JOIN` na `*Descriptions` s `GROUP BY`, protože MySQL/MariaDB pak vrací náhodný překlad.
+- Model s překladovou tabulkou `*Descriptions` implementuje `App\Model\Translatable` (`getTranslationTable()`,
+  `getForeignKeyColumn()`) a definuje konstantu `TRANSLATION_TABLE_NAME`. Nový takový model má implementovat
+  totéž, a pokud se jeho název zobrazuje v gridu, i `TranslatedTitleTrait`.
+- ID ze signálu datagridu (closure `onChange` u `addColumnStatus`) a ze skrytého pole `editId` přichází jako
+  **řetězec**. Modely mají `getById(int)`/`update(int, array)` a soubory `strict_types`, takže netypovaný parametr
+  handleru předaný dál spadne na `TypeError`. Parametry handlerů typujte (`handleDelete(int $articleId)`), v
+  closure přetypujte (`(int) $id`). `BaseFormFactory::setEditId()` číselné ID převádí sám. Hodnoty formuláře
+  jsou `ArrayHash`, do `update()` je předávejte jako `(array) $values`.
+- Raw SQL fragment v `select()`/`where()` Nette Exploreru: identifikátory pište v backtickách
+  (`` `t`.`sloupec` ``). Jinak je `SqlBuilder` vykládá jako odkazy na navázané tabulky (`t.sloupec` → hledá
+  referenci `t`). Řetězcové literály do fragmentu nevkládejte: `tryDelimite()` obalí backtickami i slova uvnitř
+  `'cs'`. Hodnoty předávejte jako parametr `?` (`select($sql, $param)`, `where($sql, ...$params)`).
+
+## Po resetu DB nebo změně schématu smazat cache struktury Nette Database
+
+Nette Explorer si ukládá strukturu DB (sloupce, primární klíče, cizí klíče) do `temp/_Nette.Database.Structure.*`
+a použité sloupce do `temp/_Nette.Database.*`. Po resetu DB s přejmenovanými sloupci se cache sama neobnoví.
+Dotazy pak skládají SQL se starými názvy (např. `COUNT(firecms_plugin_dynamicForms.dynamic_form_id)` v gridu,
+přestože v kódu ani v DB takový sloupec není). Po každé změně schématu smažte `temp/_Nette.Database*`
+(adresáře patří `www-data`, takže je potřeba `sudo`, nebo je přesuňte stranou, protože `temp/` je zapisovatelné).
+
 ## `SDHBase` — sdílené schéma legacy SDH tabulek, MIMO `nextras/migrations`
 
 SDH pluginy (viz sekce výše) sdílí tabulky napříč sebou navzájem — např. `SDHAttendance` přímo

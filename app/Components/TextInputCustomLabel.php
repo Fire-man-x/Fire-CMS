@@ -1,13 +1,11 @@
 <?php
 declare(strict_types=1);
 
-/**
- * @package     App\Controls
- */
-
-namespace App\Controls\Controls;
+namespace App\Components;
 
 use Nette;
+use Nette\Utils\Html;
+use Stringable;
 
 class TextInputCustomLabel extends Nette\Forms\Controls\TextInput
 {
@@ -30,10 +28,9 @@ class TextInputCustomLabel extends Nette\Forms\Controls\TextInput
 
 	/**
 	 * Generates label's HTML element.
-	 * @param  string
-	 * @return Html|string
+	 * @return Html|string|null
 	 */
-	public function getLabel($caption = null)
+	public function getLabel(string|Stringable|null $caption = null)
 	{
 		$label = clone $this->label;
 		$label->for = $this->getHtmlId();

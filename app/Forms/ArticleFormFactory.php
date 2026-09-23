@@ -56,12 +56,12 @@ class ArticleFormFactory extends BaseFormFactory
 			->setRequired(VALIDATE_REQUIRED)
 			->setDefaultValue("draft");
 
-		$form->addText('publishing_date', 'Publishing date')
+		$form->addText('publishingDate', 'Publishing date')
 			->setRequired(VALIDATE_REQUIRED)
 			->setDefaultValue(date(DATETIME_FORMAT))
 			->getControlPrototype()->addClass(DATETIMEPICKER_CLASS);
 
-		$form->addText('expiring_date', 'Expiration date')
+		$form->addText('expiringDate', 'Expiration date')
 			->getControlPrototype()->addClass(DATETIMEPICKER_CLASS)->placeholder("Never");
 
 		$translationContainer = $form->addContainer('translation');
@@ -80,9 +80,9 @@ class ArticleFormFactory extends BaseFormFactory
 			->getControlPrototype()->addClass(WYSIWYG_CLASS);
 
 		//SEO
-		$translationContainer->addText('seo_title', 'SEO title');
-		$translationContainer->addText('seo_description', 'SEO description');
-		$translationContainer->addText('seo_keywords', 'SEO keywords');
+		$translationContainer->addText('seoTitle', 'SEO title');
+		$translationContainer->addText('seoDescription', 'SEO description');
+		$translationContainer->addText('seoKeywords', 'SEO keywords');
 
 		//Tags
 		$dataSourceDescriptor = new \Achse\TagInput\DataSourceDescriptor($tagInputDataLoadUrl);
@@ -100,7 +100,7 @@ class ArticleFormFactory extends BaseFormFactory
 		//defaults
 		if($this->isEditMode()){
 			if($revision){ //category revision
-				$data = $this->model->findById($revision)->where("history_id", $this->getEditId())->fetch();
+				$data = $this->model->findById($revision)->where("historyId", $this->getEditId())->fetch();
 				$dataTranslation = $this->model->findTranslationBy($revision, $this->language)->fetch();
 			}else{ //normal category
 				$data = $this->model->getById($this->getEditId());
@@ -113,9 +113,9 @@ class ArticleFormFactory extends BaseFormFactory
 
 			/* @var $values ActiveRow */
 			$values = $data->toArray();
-			$values["publishing_date"] = $data->publishing_date->format(DATETIME_FORMAT);
-			if($data->expiring_date){
-				$values["expiring_date"] = $data->expiring_date->format(DATETIME_FORMAT);
+			$values["publishingDate"] = $data->publishingDate->format(DATETIME_FORMAT);
+			if($data->expiringDate){
+				$values["expiringDate"] = $data->expiringDate->format(DATETIME_FORMAT);
 			}
 			$values['translation'] = $dataTranslation == false ? array() : $dataTranslation->toArray();
 			//url
@@ -149,12 +149,12 @@ class ArticleFormFactory extends BaseFormFactory
 		//images
 		unset($values->images);
 
-		//publishing_date
-		$values->publishing_date = $this->checkDateTimeFormat($values->publishing_date);
-		if($values->publishing_date == null){
-			$values->publishing_date = new \DateTime();
+		//publishingDate
+		$values->publishingDate = $this->checkDateTimeFormat($values->publishingDate);
+		if($values->publishingDate == null){
+			$values->publishingDate = new \DateTime();
 		}
-		$values->expiring_date = $this->checkDateTimeFormat($values->expiring_date);
+		$values->expiringDate = $this->checkDateTimeFormat($values->expiringDate);
 
 		//url
 		$url = empty($translationContainer->url) ? $translationContainer->title : $translationContainer->url;
@@ -178,7 +178,7 @@ class ArticleFormFactory extends BaseFormFactory
 			$form->getPresenter()->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 			$form->getPresenter()->redirect('this');
 		} else {
-			$values->created_by = $this->user->getId();
+			$values->createdBy = $this->user->getId();
 			$id = $this->model->insert($values);
 			$this->model->insertTranslation($id, $this->language, $translationContainer);
 

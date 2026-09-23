@@ -88,9 +88,9 @@ class UsersPresenter extends BasePresenter
 		};
 
 		$grid->addColumnText("username", "Username");
-		$grid->addColumnLink("role_title", "Role", "Roles:default", "role_title", array("id" => "role_id"));
+		$grid->addColumnLink("role_title", "Role", "Roles:default", "role_title", array("id" => "roleId"));
 
-		$grid->addColumnText("first_name", "First name");
+		$grid->addColumnText("firstName", "First name");
 		$grid->addColumnText("surname", "Surname");
 
 
@@ -190,9 +190,9 @@ class UsersPresenter extends BasePresenter
 	#[Secured]
 	#[Resource('Users')]
 	#[Privilege('edit')]
-	public function handleActivateUser(int $user_id, bool $status=false): void
+	public function handleActivateUser(int $userId, bool $status=false): void
 	{
-		$this->users->update($user_id, ["active"=>$status]);
+		$this->users->update($userId, ["active"=>$status]);
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 		$this->redirect('this');
 	}

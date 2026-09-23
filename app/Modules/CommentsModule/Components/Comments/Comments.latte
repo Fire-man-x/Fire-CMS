@@ -17,7 +17,7 @@
 							<strong class="post-title">{$comment->title}</strong>
 							{*[{$comment->left} - {$comment->right}]*}
 						</div>
-						<div class=" col-xs-5 post-meta text-right small">{$comment->author} on {$comment->create_date|date:\DATETIME_FORMAT}</div>
+						<div class=" col-xs-5 post-meta text-right small">{$comment->author} on {$comment->createDate|date:\DATETIME_FORMAT}</div>
 					</div>
 				</header>
 				<div class="post-subtitle media-body text-justify">{$comment->text}</div>

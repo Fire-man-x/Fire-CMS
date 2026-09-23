@@ -18,11 +18,11 @@ class RedirectionsModel extends BaseModel
 		parent::__construct($database);
 
 		$this->setTableName('firecms_urlRedirections');
-		$this->setColumnId('url_redirection_id');
+		$this->setForeignKeyColumn('urlRedirectionId');
 	}
 
 	public function getAllForGrid(): \Nette\Database\Table\Selection
 	{
-		return $this->findAll()->order("old_url ASC")->order($this->getColumnId());
+		return $this->findAll()->order("oldUrl ASC")->order($this->getColumnId());
 	}
 }

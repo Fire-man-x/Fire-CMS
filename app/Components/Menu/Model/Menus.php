@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Components\Menu\Model;
 
 use App\Model\BaseModel;
+use App\Model\Categories;
 use App\Service\LanguageService;
 use Nette\Database\Explorer;
 use Nette\Database\SqlLiteral;
@@ -24,7 +25,7 @@ class Menus extends BaseModel
 		parent::__construct($database);
 
 		$this->setTableName('firecms_menus');
-		$this->setColumnId('menu_id');
+		$this->setForeignKeyColumn('menuId');
 	}
 
 
@@ -74,8 +75,8 @@ class Menus extends BaseModel
 			->select(self::MENU_ITEM_TABLE_NAME.".*")
 			->select("category.*")
 			->select(self::MENU_ITEM_TABLE_NAME.".position")
-			->where("menu_id", $menuId)
-			->where("category.history_id", null)
+			->where("menuId", $menuId)
+			->where("category.historyId", null)
 			->where("category.status IN (?)", array('publish','pending','draft'))
 			->order(self::MENU_ITEM_TABLE_NAME.".position");
 	}
@@ -90,12 +91,12 @@ class Menus extends BaseModel
 	 */
 	public function insertRelationMenuItem($menuId, $categoryId, $data = array())
 	{
-		$data["menu_id"] = $menuId;
-		$data["category_id"] = $categoryId;
+		$data["menuId"] = $menuId;
+		$data["categoryId"] = $categoryId;
 		if(!isset($data["position"])){
 			$position = $this->database->table(self::MENU_ITEM_TABLE_NAME)
 				->select("IFNULL(MAX(position),0)+1")
-				->where("menu_id",$menuId)
+				->where("menuId",$menuId)
 				->fetchField();
 			$data["position"] = $position;
 		}
@@ -113,10 +114,10 @@ class Menus extends BaseModel
 	public function deleteRelationMenuItem($menuId, $categoryId)
 	{
 		$item = $this->database->table(self::MENU_ITEM_TABLE_NAME)
-			->where("menu_id", $menuId)
-			->where("category_id", $categoryId);
+			->where("menuId", $menuId)
+			->where("categoryId", $categoryId);
 		$this->database->table(self::MENU_ITEM_TABLE_NAME)
-			->where("menu_id", $menuId)
+			->where("menuId", $menuId)
 			->where("position > ?", $item->fetch()->position)
 			->update(array("position" => new SqlLiteral("position - 1")));
 		$item->delete();
@@ -132,11 +133,11 @@ class Menus extends BaseModel
 	 */
 	public function updatePositionOfMenuItem($menuId, $categoryId, $previousCategoryId, $nextCategoryId)
 	{
-		$menuItems = $this->getRelationMenuItems($menuId)->fetchPairs("category_id", "position");
+		$menuItems = $this->getRelationMenuItems($menuId)->fetchPairs("categoryId", "position");
 
 		// Find all items that have to be moved one position up
 		$this->database->table(self::MENU_ITEM_TABLE_NAME)
-			->where("menu_id", $menuId)
+			->where("menuId", $menuId)
 			->where("position <= ?", isset($menuItems[$previousCategoryId]) ? $menuItems[$previousCategoryId] : $menuItems[$categoryId])
 			->where("position > ?", $menuItems[$categoryId])
 			->update(array("position" => new SqlLiteral("position - 1")));
@@ -144,14 +145,14 @@ class Menus extends BaseModel
 
 		// Find all items that have to be moved one position down
 		$this->database->table(self::MENU_ITEM_TABLE_NAME)
-			->where("menu_id", $menuId)
+			->where("menuId", $menuId)
 			->where("position >= ?", isset($menuItems[$nextCategoryId]) ? $menuItems[$nextCategoryId] : $menuItems[$categoryId])
 			->where("position < ?", $menuItems[$categoryId])
 			->update(array("position" => new SqlLiteral("position + 1")));
 
 		// Update current item order
 		//reload menu items
-		$menuItems = $this->getRelationMenuItems($menuId)->fetchPairs("category_id", "position");
+		$menuItems = $this->getRelationMenuItems($menuId)->fetchPairs("categoryId", "position");
 		if (isset($menuItems[$previousCategoryId])) {
 			$newPosition = $menuItems[$previousCategoryId] + 1;
 		} else if (isset($menuItems[$nextCategoryId])) {
@@ -160,8 +161,8 @@ class Menus extends BaseModel
 			$newPosition = 1;
 		}
 		$this->database->table(self::MENU_ITEM_TABLE_NAME)
-			->where("menu_id", $menuId)
-			->where("category_id", $categoryId)
+			->where("menuId", $menuId)
+			->where("categoryId", $categoryId)
 			->update(array("position" => $newPosition));
 	}
 
@@ -176,9 +177,8 @@ class Menus extends BaseModel
 		return $this->database->table(Categories::RELATION_ARTICLE_TABLE_NAME)
 			->select(Categories::RELATION_ARTICLE_TABLE_NAME.".*")
 			->select("category.*")
-			->where("menu.menu_id", $menuId)
-			->order("is_main DESC")
-			->order("category.grid_name");
+			->where("menu.id", $menuId)
+			->order("isMain DESC");
 	}
 
 
@@ -191,15 +191,15 @@ class Menus extends BaseModel
 	{
 		return $this->database->table(self::MENU_ITEM_TABLE_NAME)
 			->select(self::MENU_ITEM_TABLE_NAME.".*")
-			->select("category:category_descriptions.*")
+			->select("category:" . Categories::TRANSLATION_TABLE_NAME . ".*")
 			->select("category.*")
 			->where("menu.location", $menuLocation)
-			->where("category:category_descriptions.language_id", $language)
+			->where("category:" . Categories::TRANSLATION_TABLE_NAME . ".languageId", $language)
 			->where("category.status IN ?", array("publish"))
-			->where("category.history_id", null)
+			->where("category.historyId", null)
 			->where("menu.active", true)
 			->where("category.active", true)
-			->where("category.show_in_menu", true)
+			->where("category.showInMenu", true)
 			->order(self::MENU_ITEM_TABLE_NAME.".position");
 	}
 

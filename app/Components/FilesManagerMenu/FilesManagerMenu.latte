@@ -1,14 +1,14 @@
 {snippet folders}
 	{var $level = 0}
 	<ol class="{if $level==0}nav flex-column nav-pills nav-stacked menu-sortable{else}nav-sublevel{/if}" n:block="fileFolders-menu">
-		<li n:foreach="$fileFolders as $fileFolder" class="nav-item {if $fileFolder->file_folder_id==1}mjs-nestedSortable-no-nesting{/if} file-item-droppable" data-id="cat_{$fileFolder->file_folder_id}">
-			<span class="nav-link {if $fileFolder->file_folder_id == $activeItem}active{/if}">
-				<a class="inverse" href="{plink this id=>$fileFolder->file_folder_id, parentFolder=>null}">{if $fileFolder->default==true}<i class="far fa-times-circle"></i> {/if}{$fileFolder->name} <small>({$fileFolder->itemCount})</small></a>
+		<li n:foreach="$fileFolders as $fileFolder" class="nav-item {if $fileFolder->id==1}mjs-nestedSortable-no-nesting{/if} file-item-droppable" data-id="cat_{$fileFolder->id}">
+			<span class="nav-link {if $fileFolder->id == $activeItem}active{/if}">
+				<a class="inverse" href="{plink this id=>$fileFolder->id, parentFolder=>null}">{if $fileFolder->default==true}<i class="far fa-times-circle"></i> {/if}{$fileFolder->name} <small>({$fileFolder->itemCount})</small></a>
 				<span class="buttons float-right text-right fade">
 					<span n:if="$fileFolder->default == false" class="handler" title="{_'Move'}"><i class="fa fa-arrows-alt"></i></span>
-					<a href="{link addFolder! folder_id=>null, parentFolder=>$fileFolder->file_folder_id}" class="ajax" title="{_'Add'}"><i class="fa fa-plus"></i></a>
-					<a n:if="$fileFolder->default == false" href="{link editFolder! folder_id=>$fileFolder->file_folder_id, parentFolder=>null}" class="ajax" title="{_'Edit'}"><i class="fas fa-pencil-alt"></i></a>
-					<a n:if="$fileFolder->default == false" href="{link removeFolder folder_id=>$fileFolder->file_folder_id}" class="small" title="{_'Delete'}"><i class="fa fa-trash"></i></a>
+					<a href="{link addFolder! folder_id=>null, parentFolder=>$fileFolder->id}" class="ajax" title="{_'Add'}"><i class="fa fa-plus"></i></a>
+					<a n:if="$fileFolder->default == false" href="{link editFolder! folder_id=>$fileFolder->id, parentFolder=>null}" class="ajax" title="{_'Edit'}"><i class="fas fa-pencil-alt"></i></a>
+					<a n:if="$fileFolder->default == false" href="{link removeFolder folder_id=>$fileFolder->id}" class="small" title="{_'Delete'}"><i class="fa fa-trash"></i></a>
 				</span>
 			</span>
 

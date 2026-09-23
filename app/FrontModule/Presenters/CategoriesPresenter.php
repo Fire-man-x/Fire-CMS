@@ -59,7 +59,7 @@ class CategoriesPresenter extends BasePresenter
 	{
 		$category = $this->categoriesModel->getAllWithTranslation($this->language)
 			->where("active", true)
-			->where("category.category_id", $this->id)->fetch();
+			->where("category.id", $this->id)->fetch();
 		if(!$category || !$this->id){
 			throw new Nette\Application\BadRequestException("Category with url '$this->id' doesn't exist.");
 		}
@@ -70,10 +70,10 @@ class CategoriesPresenter extends BasePresenter
 		}
 
 		//parent breadcrumb
-		$parentTree = $this->categoriesModel->getAllParents($category->parent_id, $this->language);
+		$parentTree = $this->categoriesModel->getAllParents($category->parentId, $this->language);
 		foreach (array_reverse($parentTree) as $parent) {
 			//breadcrumb
-			$this->addBreadCrumbLink($parent->title, $this->link(":Front:Categories:detail", array("id" => $parent->category_id)), null, false );
+			$this->addBreadCrumbLink($parent->title, $this->link(":Front:Categories:detail", array("id" => $parent->categoryId)), null, false );
 		}
 		//breadcrumb
 		$this->addBreadCrumbLink($category->title, $this->link(":Front:Categories:detail", array("id" => $this->id)), null, false );
@@ -89,44 +89,44 @@ class CategoriesPresenter extends BasePresenter
 		}*/
 
 		//author
-		$user = $this->usersModel->getById($categoryInfo->created_by)?->toArray();
+		$user = $this->usersModel->getById($categoryInfo->createdBy)?->toArray();
 		$user['author'] = $this->userManager->makeName($user);
 		$categoryInfo->author = $user;
 
 		//meta
-		$meta = $this->metaService->getStructureByColumnId(Meta::TYPE_CATEGORY, $this->language, $category->category_id);
+		$meta = $this->metaService->getStructureByColumnId(Meta::TYPE_CATEGORY, $this->language, $category->categoryId);
 		$categoryInfo->metas = $meta;
 
 		//tags
-		$tags = $this->tagService->getRelationTags(Tag::TYPE_CATEGORY, $this->language, $category->category_id);
+		$tags = $this->tagService->getRelationTags(Tag::TYPE_CATEGORY, $this->language, $category->categoryId);
 		$categoryInfo->tags = $tags;
 
 		$this->template->category = $categoryInfo;
-		$files = $this->categoriesModel->getRelationFile($category->category_id);
+		$files = $this->categoriesModel->getRelationFile($category->categoryId);
 		$this->template->files = array();
 		foreach ($files as $file){
 			$this->template->files[] = $this->filesModel->toFileEntity($file);
 		}
 
 		//set SEO
-		$this->setSEO($categoryInfo["seo_title"], $categoryInfo["seo_description"], $categoryInfo["seo_keywords"]);
+		$this->setSEO($categoryInfo["seoTitle"], $categoryInfo["seoDescription"], $categoryInfo["seoKeywords"]);
 
 		//set menu item
-		$this->menu->setActiveMenuItem($category->category_id);
+		$this->menu->setActiveMenuItem($category->categoryId);
 
 		//set links to languageChanger
-		$lanuageItems = $this->categoriesModel->getAllWithTranslation()->where("category.".$this->categoriesModel->getColumnId(), $category->category_id)->fetchAll();
+		$lanuageItems = $this->categoriesModel->getAllWithTranslation()->where("category.".$this->categoriesModel->getColumnId(), $category->categoryId)->fetchAll();
 		foreach ($lanuageItems as $lanuageItem) {
-			$this->languageChanger->setLinkForLanguage($lanuageItem->language_id, $this->link("this", array(
-				"id"=>$lanuageItem->category_id,
-				"locale"=>$lanuageItem->language_id
+			$this->languageChanger->setLinkForLanguage($lanuageItem->languageId, $this->link("this", array(
+				"id"=>$lanuageItem->categoryId,
+				"locale"=>$lanuageItem->languageId
 				)));
 		}
 
 		//viewCounter
-		$this->viewCounter->itemViewed(ViewCounter::TYPE_CATEGORY, $category->category_id, $this->language);
+		$this->viewCounter->itemViewed(ViewCounter::TYPE_CATEGORY, $category->categoryId, $this->language);
 
 		//comments restriction
-		$this->comments->whereCategory($category->category_id);
+		$this->comments->whereCategory($category->categoryId);
 	}
 }

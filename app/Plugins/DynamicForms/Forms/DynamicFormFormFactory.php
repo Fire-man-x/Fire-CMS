@@ -44,7 +44,7 @@ class DynamicFormFormFactory extends BaseFormFactory
 	{
 		$form = parent::create($editId);
 
-		$templateNameControl = $form->addText('template_name', 'Name in template')
+		$templateNameControl = $form->addText('templateName', 'Name in template')
 			->setRequired(VALIDATE_REQUIRED);
 		$templateNameControl->addRule(Form::PATTERN, '\'%label\' can contains only this chars "a-z" or "_".', '[a-z_]+');
 		$templateNameControl->addRule(function ($item) use ($form)
@@ -68,7 +68,7 @@ class DynamicFormFormFactory extends BaseFormFactory
 		$moreLanguages = count($this->languages->getActiveLanguages())>1;
 		foreach($this->languages->getActiveLanguages() as $activeLanguage)
 		{
-			$languageContainer = $translationContainer->addContainer($activeLanguage['language_id']);
+			$languageContainer = $translationContainer->addContainer($activeLanguage['languageId']);
 			//title
 			$label = 'Title';
 			if($moreLanguages)
@@ -82,24 +82,24 @@ class DynamicFormFormFactory extends BaseFormFactory
 				$labelControl->setTranslator(null);
 			}
 
-			//submit_message
+			//submitMessage
 			$label = 'Form submit message';
 			if($moreLanguages)
 			{
 				$label = $this->translator->translate($label).' ('.$activeLanguage['shortcut'].')';
 			}
-			$labelControl = $languageContainer->addText("submit_message", $label);
+			$labelControl = $languageContainer->addText("submitMessage", $label);
 			if($moreLanguages)
 			{
 				$labelControl->setTranslator(null);
 			}
 		}
 
-		//where_to_send
-		$controlWhereToSend = $form->addSelect('where_to_send', 'Where to send', array('email' => 'Email'))
+		//whereToSend
+		$controlWhereToSend = $form->addSelect('whereToSend', 'Where to send', array('email' => 'Email'))
 			->setPrompt(PROMPT_VALUE);
-		//after_send_informations
-		$controlAfterSendInformation = $form->addText('after_send_informations_email', 'Email')
+		//afterSendInformations
+		$controlAfterSendInformation = $form->addText('afterSendInformationsEmail', 'Email')
 			->setType('email');
 		$controlAfterSendInformation->addConditionOn($controlWhereToSend, Form::EQUAL, 'email')
 				->addRule(Form::FILLED, VALIDATE_REQUIRED)
@@ -129,10 +129,10 @@ class DynamicFormFormFactory extends BaseFormFactory
 	public function formValidate(Form $form, array $values): void
 	{
 		//condition is used on control
-		/*$exist = $this->model->findByTemplateName($values->template_name, $this->isEditMode() ? $this->getEditId() : null)->fetch();
+		/*$exist = $this->model->findByTemplateName($values->templateName, $this->isEditMode() ? $this->getEditId() : null)->fetch();
 
 		if ($exist) {
-			$form['template_name']->addError($form->getTranslator()->translate(VALIDATE_EXIST), false);
+			$form['templateName']->addError($form->getTranslator()->translate(VALIDATE_EXIST), false);
 
 			$form->getPresenter()->flashMessage(FAIL_SAVE, FLASH_FAILED);
 		}*/
@@ -146,18 +146,20 @@ class DynamicFormFormFactory extends BaseFormFactory
 		$translations = $values->translation;
 		unset($values->translation);
 
-		$values->after_send_informations = serialize(array(
-			"send_to" => $values->after_send_informations_email
+		$values->afterSendInformations = serialize(array(
+			"send_to" => $values->afterSendInformationsEmail
 		));
-		unset($values->after_send_informations_email);
+		unset($values->afterSendInformationsEmail);
 
 		if ($this->isEditMode()) {
-			$this->model->update($this->getEditId(), $values);
+			$this->model->update($this->getEditId(), (array) $values);
 			foreach($translations as $language => $translation)
 			{
 				$this->model->updateTranslation((int) $this->getEditId(), $language, $translation);
 			}
 		} else {
+			//autor formuláře - DynamicFormsPresenter podle něj hlídá oprávnění "edit" u vlastních záznamů
+			$values->createdBy = $form->getPresenter()->getUser()->getId();
 			$insertId = $this->model->insert($values);
 
 			foreach($translations as $language => $translation)
@@ -176,15 +178,15 @@ class DynamicFormFormFactory extends BaseFormFactory
 		parent::setDefaultValues($form, $editId);
 
 		$defaults = $this->model->getById($editId);
-		$translations = $this->model->getAllWithTranslation()->where('dynamic_form_id', $editId);
+		$translations = $this->model->getAllWithTranslation()->where($this->model->getForeignKeyColumn(), $editId);
 
 		if($defaults)
 		{
 			$defaults = $defaults->toArray();
 			//todo: sjednotit na jedno misto
-			$afterSendInformations = @unserialize($defaults['after_send_informations']);
-			$defaults['after_send_informations_email'] = isset($afterSendInformations['send_to']) ? $afterSendInformations['send_to'] : null;
-			$defaults['translation'] = $translations->fetchAssoc('language_id');
+			$afterSendInformations = @unserialize($defaults['afterSendInformations']);
+			$defaults['afterSendInformationsEmail'] = isset($afterSendInformations['send_to']) ? $afterSendInformations['send_to'] : null;
+			$defaults['translation'] = $translations->fetchAssoc('languageId');
 		}
 
 		$form->setDefaults($defaults);

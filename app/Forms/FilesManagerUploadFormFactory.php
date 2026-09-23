@@ -61,13 +61,13 @@ class FilesManagerUploadFormFactory extends BaseFormFactory
 				}*/
 
 				$this->filesModel->insert(ArrayHash::from(array(
-						"original_name" => $file->getName(),
-						"file_folder_id" => $form->getPresenter()->id,
-						"disk_name" => $file->getHash(),
+						"originalName" => $file->getName(),
+						"fileFolderId" => $form->getPresenter()->id,
+						"diskName" => $file->getHash(),
 						"extension" => $file->getExtension(),
-						"mime_type" => $file->getMimeType(),
+						"mimeType" => $file->getMimeType(),
 						"size" => $file->getSize(),
-						"is_image" => $file instanceof HashImageEntity,
+						"isImage" => $file instanceof HashImageEntity,
 				)));
 			}
 			\Tracy\Debugger::log("cas:".\Tracy\Debugger::timer("p"));

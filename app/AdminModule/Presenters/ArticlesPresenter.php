@@ -6,20 +6,22 @@ namespace App\AdminModule\Presenters;
 use App\Attributes\Privilege;
 use App\Attributes\Resource;
 use App\Attributes\Secured;
+use App\Forms\ArticleFormFactory;
+use App\Forms\MetaValueFormFactory;
 use App\Model\Articles;
 use App\Model\Categories;
 use App\Model\Files;
 use App\Modules\CommentsModule;
+use App\Modules\UrlModule\UrlManager;
 use App\Service\Article;
 use App\Service\LanguageService;
-use App\Forms\ArticleFormFactory;
-use App\Forms\MetaValueFormFactory;
-use App\Modules\UrlModule\UrlManager;
-use App\Plugins\Sliders\Model;
+use App\Service\Meta;
 use App\Service\Tag;
 use Contributte\Datagrid\Datagrid;
-use Nette;
 use Nette\Application\Attributes\Persistent;
+use Nette\Application\ForbiddenRequestException;
+use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 
 /**
  * Article Presenter
@@ -113,19 +115,19 @@ class ArticlesPresenter extends BasePresenter
 			"all"=>$this->articlesModel->findAll()
 				->select("COUNT(*) AS count")
 				->where($this->articlesModel->getTableName().".status != ?","trash")
-				->where($this->articlesModel->getTableName().".history_id", null)->fetch()?->count,
+				->where($this->articlesModel->getTableName().".historyId", null)->fetch()?->count,
 			"personal"=>$this->articlesModel->findAll()
 				->select("COUNT(*) AS count")
-				->where($this->articlesModel->getTableName().".created_by = ?", $this->user->getId())
-				->where($this->articlesModel->getTableName().".history_id", null)->fetch()?->count,
+				->where($this->articlesModel->getTableName().".createdBy = ?", $this->user->getId())
+				->where($this->articlesModel->getTableName().".historyId", null)->fetch()?->count,
 			"pending"=>$this->articlesModel->findAll()
 				->select("COUNT(*) AS count")
 				->where($this->articlesModel->getTableName().".status = ?","pending")
-				->where($this->articlesModel->getTableName().".history_id", null)->fetch()?->count,
+				->where($this->articlesModel->getTableName().".historyId", null)->fetch()?->count,
 			"trash"=>$this->articlesModel->findAll()
 				->select("COUNT(*) AS count")
 				->where($this->articlesModel->getTableName().".status = ?","trash")
-				->where($this->articlesModel->getTableName().".history_id", null)->fetch()?->count
+				->where($this->articlesModel->getTableName().".historyId", null)->fetch()?->count
 			);
 		$this->template->counts = $counts;
 	}
@@ -149,8 +151,8 @@ class ArticlesPresenter extends BasePresenter
 		//edit own
 		if($this->id) {
 			$articleInfo = $this->articlesModel->getById($this->id);
-			if(!$this->user->isAllowed(new \App\Security\Resource("Articles", $articleInfo ? $articleInfo->created_by : $this->getUser()->getId()), "edit")) {
-				throw new \Nette\Application\ForbiddenRequestException("You have not access to 'Articles' with priviledge 'edit'.");
+			if(!$this->user->isAllowed(new \App\Security\Resource("Articles", $articleInfo ? $articleInfo->createdBy : $this->getUser()->getId()), "edit")) {
+				throw new ForbiddenRequestException("You have not access to 'Articles' with priviledge 'edit'.");
 			}
 		}
 
@@ -201,13 +203,16 @@ class ArticlesPresenter extends BasePresenter
 	{
 		$source = $this->articlesModel->findAll()
 			->select($this->articlesModel->getTableName().".*")
-			->select(":".$this->categoriesModel::RELATION_ARTICLE_TABLE_NAME.".category.grid_name AS category_grid_name")
-			->where($this->articlesModel->getTableName().".history_id", null)
-			->order($this->articlesModel->getTableName().".create_date DESC")
+			->where($this->articlesModel->getTableName().".historyId", null)
+			->order($this->articlesModel->getTableName().".createDate DESC")
 			->order($this->articlesModel->getTableName().".".$this->articlesModel->getColumnId());
+		$this->articlesModel->selectTitle($source, "`" . $this->articlesModel->getTableName() . "`.`id`", $this->language);
+		//název hlavní kategorie článku
+		$this->categoriesModel->selectTitle($source, "(SELECT `relation`.`categoryId` FROM `" . Categories::RELATION_ARTICLE_TABLE_NAME . "` `relation`"
+			. " WHERE `relation`.`articleId` = `" . $this->articlesModel->getTableName() . "`.`id` ORDER BY `relation`.`isMain` DESC LIMIT 1)", $this->language, "categoryTitle");
 		switch ($this->show) {
 			case "personal":
-				$source->where($this->articlesModel->getTableName().".created_by = ?", $this->user->getId());
+				$source->where($this->articlesModel->getTableName().".createdBy = ?", $this->user->getId());
 				break;
 			case "pending":
 				$source->where($this->articlesModel->getTableName().".status = ?","pending");
@@ -223,6 +228,7 @@ class ArticlesPresenter extends BasePresenter
 		}
 
 		$primaryKey = $this->articlesModel->getColumnId();
+		$paramKey = $this->articlesModel->getForeignKeyColumn();
 
 		$grid = new Datagrid();
 		$grid->setPrimaryKey($primaryKey);
@@ -241,14 +247,14 @@ class ArticlesPresenter extends BasePresenter
 			->setIcon('check-circle')
 			->setTitle('Set as unactive');
 		$active_column->onChange[] = function($id, $value) {
-			$this->handleActivate($id, $value);
+			$this->handleActivate((int) $id, (bool) $value);
 		};
 
 		/*$activateButton
 			->setCallbackArguments(array($activateButton))
 			->setCallback(function ($row, $selfButton) {
 				/* @var $selfButton \Mesour\Datagrid\Components\StatusButton * /
-				if (!$this->user->isAllowed(new \App\Security\Resource("Articles", $row["created_by"]), "edit")) {
+				if (!$this->user->isAllowed(new \App\Security\Resource("Articles", $row["createdBy"]), "edit")) {
 					$selfButton->setDisabled();
 				} else {
 					$selfButton->setDisabled(false);
@@ -264,14 +270,14 @@ class ArticlesPresenter extends BasePresenter
 			->setIcon('fa fa-check-circle')
 			->setTitle('Set as unactive (active)')
 			->setAttribute('href', new Link('activate!', array(
-				$primaryKey => '{' . $primaryKey . '}',
+				$paramKey => '{' . $primaryKey . '}',
 				'status' => 0
 			)));
 		$deactivateButton
 			->setCallbackArguments(array($deactivateButton))
 			->setCallback(function ($row, $selfButton) {
 				/* @var $selfButton \Mesour\Datagrid\Components\StatusButton * /
-				if (!$this->user->isAllowed(new \App\Security\Resource("Articles", $row["created_by"]), "edit")) {
+				if (!$this->user->isAllowed(new \App\Security\Resource("Articles", $row["createdBy"]), "edit")) {
 					$selfButton->setDisabled();
 				} else {
 					$selfButton->setDisabled(false);
@@ -281,16 +287,16 @@ class ArticlesPresenter extends BasePresenter
 				}
 			});*/
 
-		$grid->addColumnText("grid_name", "Name");
+		$grid->addColumnText("title", "Name");
 
-		$grid->addColumnText("category_grid_name", "Category");
+		$grid->addColumnText("categoryTitle", "Category");
 
-		$grid->addColumnDateTime("create_date", "Create date")
+		$grid->addColumnDateTime("createDate", "Create date")
 			->setFormat(DATETIME_FORMAT);
 
 		//Actions
 		if($this->show == "pending"){
-			$grid->addAction('approve', 'Approve', 'approve!', array($primaryKey => $primaryKey))
+			$grid->addAction('approve', 'Approve', 'approve!', array($paramKey => $primaryKey))
 				->setClass(function($item) {
 					return 'btn btn-success btn-sm ajax'.(!$this->user->isAllowed("Articles", "approve_article") ? ' disabled' : '');
 				})
@@ -304,14 +310,14 @@ class ArticlesPresenter extends BasePresenter
 		}
 		$grid->addAction('edit', 'Edit', 'detail', array('id' => $primaryKey))
 			->setClass(function($item) {
-				return 'btn btn-primary btn-sm'.(!$this->user->isAllowed(new \App\Security\Resource("Articles", $item["created_by"]), "edit") ? ' disabled' : '');
+				return 'btn btn-primary btn-sm'.(!$this->user->isAllowed(new \App\Security\Resource("Articles", $item["createdBy"]), "edit") ? ' disabled' : '');
 			})
 			->setIcon(ICON_EDIT)
 			->setTitle('Edit');
 
-		$grid->addAction('delete', 'Delete', 'delete!', array($primaryKey => $primaryKey))
+		$grid->addAction('delete', 'Delete', 'delete!', array($paramKey => $primaryKey))
 			->setClass(function($item) {
-				return 'btn btn-danger btn-sm ajax'.(!$this->user->isAllowed(new \App\Security\Resource("Articles", $item["created_by"]), "edit") ? ' disabled' : '');
+				return 'btn btn-danger btn-sm ajax'.(!$this->user->isAllowed(new \App\Security\Resource("Articles", $item["createdBy"]), "edit") ? ' disabled' : '');
 			})
 			->setIcon(ICON_DELETE)
 			->setTitle('Delete')
@@ -336,15 +342,17 @@ class ArticlesPresenter extends BasePresenter
 	protected function createComponentCategoriesGrid($name)
 	{
 		$source = $this->articlesModel->getRelationCategory($this->id);
-		$primaryKey = "category_id";
+		$this->categoriesModel->selectTitle($source, "`" . Categories::RELATION_ARTICLE_TABLE_NAME . "`.`categoryId`", $this->language)
+			->order("title");
+		$primaryKey = "categoryId";
 
 		$grid = new Datagrid($this, $name);
 		$grid->setPrimaryKey($primaryKey);
 		$grid->setDataSource($source);
 		$grid->setTranslator($this->translator);
 
-		//is_main
-		$mainColumn = $grid->addColumnStatus('is_main', 'M.');
+		//isMain
+		$mainColumn = $grid->addColumnStatus('isMain', 'M.');
 		$mainColumn->getElementPrototype("th")->setTitle($this->translator->translate("Main"));
 		$mainColumn->addOption(0, 'Not main') // show if status == 0
 			->setClass('btn-danger ajax')
@@ -355,10 +363,10 @@ class ArticlesPresenter extends BasePresenter
 			->setIcon('check-circle')
 			->setTitle('Set as unactive');
 		$mainColumn->onChange[] = function($id, $value) {
-			$this->handleSetCategoryAsMain($id);
+			$this->handleSetCategoryAsMain((int) $id);
 		};
 
-		$grid->addColumnText("grid_name", "Name");
+		$grid->addColumnText("title", "Name");
 
 		//Actions
 		$grid->addAction('delete', 'Delete', 'removeCategory!', array($primaryKey => $primaryKey))
@@ -385,18 +393,22 @@ class ArticlesPresenter extends BasePresenter
 	 */
 	protected function createComponentCategorySelectionGrid($name)
 	{
-		$source = $this->categoriesModel->getAllForMenu()->order("grid_name");
+		$source = $this->categoriesModel->getAllForMenu()
+			->select($this->categoriesModel->getTableName() . ".*");
+		$this->categoriesModel->selectTitle($source, "`" . $this->categoriesModel->getTableName() . "`.`id`", $this->language)
+			->order("title");
 		$primaryKey = $this->categoriesModel->getColumnId();
+		$paramKey = $this->categoriesModel->getForeignKeyColumn();
 
 		$grid = new Datagrid($this, $name);
 		$grid->setPrimaryKey($primaryKey);
 		$grid->setDataSource($source);
 		$grid->setTranslator($this->translator);
 
-		$grid->addColumnText("grid_name", "Name");
+		$grid->addColumnText("title", "Name");
 
 		//Actions
-		$grid->addAction('edit', 'Add', 'addCategory!', array($primaryKey => $primaryKey))
+		$grid->addAction('edit', 'Add', 'addCategory!', array($paramKey => $primaryKey))
 			->setClass('btn btn-primary btn-sm ajax float-right')
 			->setIcon('plus')
 			->setTitle('Add')
@@ -411,9 +423,8 @@ class ArticlesPresenter extends BasePresenter
 
 	/**
 	 * Sign-up form factory.
-	 * @return Nette\Application\UI\Form
 	 */
-	protected function createComponentArticleForm()
+	protected function createComponentArticleForm(): Form
 	{
 		$form = $this->articleFactory->create(
 			$this->id,
@@ -429,11 +440,10 @@ class ArticlesPresenter extends BasePresenter
 
 	/**
 	 * Sign-up form factory.
-	 * @return Nette\Application\UI\Form
 	 */
-	protected function createComponentMetaValueForm()
+	protected function createComponentMetaValueForm(): Form
 	{
-		$this->metaValueFactory->setType(CommentsModule\Meta::TYPE_ARTICLE);
+		$this->metaValueFactory->setType(Meta::TYPE_ARTICLE);
 		$form = $this->metaValueFactory->create($this->id, array($this, "link"), $this->actualLanguage);
 		$form->setTranslator($this->translator);
 
@@ -449,21 +459,21 @@ class ArticlesPresenter extends BasePresenter
 
 	/**
 	 * Activate
-	 * @param int $article_id
+	 * @param int $articleId
 	 * @param boolean $status
 	 * @SecuredInside
 	 * @Resource(Articles)
 	 * @Privilege(edit)
 	 */
-	public function handleActivate($article_id, $status = 0): void
+	public function handleActivate(int $articleId, $status = 0): void
 	{
 		//edit own
-		$createdBy = $this->articlesModel->getById($article_id)?->created_by;
+		$createdBy = $this->articlesModel->getById($articleId)?->createdBy;
 		if(!$this->user->isAllowed(new \App\Security\Resource("Articles", $createdBy),"edit")){
-			throw new \Nette\Application\ForbiddenRequestException("You have not access to 'Articles' with priviledge 'edit'.");
+			throw new ForbiddenRequestException("You have not access to 'Articles' with priviledge 'edit'.");
 		}
-		$this->articleService->makeBackup($article_id);
-		$this->articlesModel->update($article_id, array("active" => (boolean) $status));
+		$this->articleService->makeBackup($articleId);
+		$this->articlesModel->update($articleId, array("active" => (boolean) $status));
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 		$this->redirect('this');
 	}
@@ -471,15 +481,15 @@ class ArticlesPresenter extends BasePresenter
 
 	/**
 	 * Approve
-	 * @param int $article_id
+	 * @param int $articleId
 	 */
 	#[Secured]
 	#[Resource('Articles')]
 	#[Privilege('approve_article')]
-	public function handleApprove($article_id): void
+	public function handleApprove(int $articleId): void
 	{
-		$this->articleService->makeBackup($article_id);
-		$this->articlesModel->statusPublish($article_id);
+		$this->articleService->makeBackup($articleId);
+		$this->articlesModel->statusPublish($articleId);
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 		$this->redirect('this');
 	}
@@ -487,14 +497,14 @@ class ArticlesPresenter extends BasePresenter
 
 	/**
 	 * Delete handler
-	 * @param int $article_id
+	 * @param int $articleId
 	 */
 	#[Secured]
 	#[Resource('Articles')]
 	#[Privilege('delete')]
-	public function handleDelete($article_id): void
+	public function handleDelete(int $articleId): void
 	{
-		$this->articlesModel->delete($article_id);
+		$this->articlesModel->delete($articleId);
 		$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
 
 		$this->flashMessage(FAIL_DELETE, FLASH_FAILED);
@@ -536,9 +546,9 @@ class ArticlesPresenter extends BasePresenter
 	#[Secured]
 	#[Resource('Articles')]
 	#[Privilege('delete')]
-	public function handleRemoveImage($file_id): void
+	public function handleRemoveImage(int $fileId): void
 	{
-		$this->articlesModel->deleteRelationFile($this->id, $file_id);
+		$this->articlesModel->deleteRelationFile($this->id, $fileId);
 
 		if($this->isAjax()){
 			$this->redrawControl("files");
@@ -554,9 +564,9 @@ class ArticlesPresenter extends BasePresenter
 	#[Secured]
 	#[Resource('Articles')]
 	#[Privilege('add')]
-	public function handleAddCategory($category_id): void
+	public function handleAddCategory(int $categoryId): void
 	{
-		$this->categoriesModel->insertRelationArticle($category_id, $this->id);
+		$this->categoriesModel->insertRelationArticle($categoryId, $this->id, new ArrayHash());
 
 		$this->redrawControl("categories");
 	}
@@ -568,9 +578,9 @@ class ArticlesPresenter extends BasePresenter
 	#[Secured]
 	#[Resource('Articles')]
 	#[Privilege('delete')]
-	public function handleRemoveCategory($category_id): void
+	public function handleRemoveCategory(int $categoryId): void
 	{
-		$this->categoriesModel->deleteRelationArticle($category_id, $this->id);
+		$this->categoriesModel->deleteRelationArticle($categoryId, $this->id);
 
 		if($this->isAjax()){
 			$this->redrawControl("categories");
@@ -582,14 +592,14 @@ class ArticlesPresenter extends BasePresenter
 
 	/**
 	 * SetCategoryAsMain
-	 * @param int $category_id
+	 * @param int $categoryId
 	 */
 	#[Secured]
 	#[Resource('Articles')]
 	#[Privilege('edit')]
-	public function handleSetCategoryAsMain($category_id): void
+	public function handleSetCategoryAsMain(int $categoryId): void
 	{
-		$this->categoriesModel->setRelationArticleAsMain($category_id, $this->id);
+		$this->categoriesModel->setRelationArticleAsMain($categoryId, $this->id);
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 
 		if($this->isAjax()){
@@ -612,7 +622,7 @@ class ArticlesPresenter extends BasePresenter
 		$items = $this->tagService->findByName($this->actualLanguage, $query);
 		foreach ($items as &$item){
 			$item = array(
-				\Achse\TagInput\DataSourceDescriptor::DEFAULT_VALUE_PROPERTY => null, //$item["name"] == null ? $item["grid_name"] : null,
+				\Achse\TagInput\DataSourceDescriptor::DEFAULT_VALUE_PROPERTY => null,
 				\Achse\TagInput\DataSourceDescriptor::DEFAULT_LABEL_PROPERTY => $item["label"]
 			);
 		}

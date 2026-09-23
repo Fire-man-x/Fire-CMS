@@ -90,7 +90,7 @@ class ContactFormControl extends BaseControl
 			echo $this->translator->translate("Dynamic form with name '%s' not exist.", $formNameFromTemplate);
 			return;
 		}
-		$dynamicFormTranslation = $this->dynamicFormsModel->findTranslationBy($dynamicForm->dynamic_form_id, $this->language)->fetch();
+		$dynamicFormTranslation = $this->dynamicFormsModel->findTranslationBy($dynamicForm->id, $this->language)->fetch();
 
 		//to template
 		$this->template->formTitle = $dynamicFormTranslation->title;

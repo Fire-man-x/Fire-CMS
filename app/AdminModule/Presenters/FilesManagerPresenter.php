@@ -111,14 +111,14 @@ class FilesManagerPresenter extends BasePresenter
 	public function actionDefault(): void
 	{
 		//datasource for images
-		$source = $this->filesModel->findAll()->where("file_folder_id", $this->id);
+		$source = $this->filesModel->findAll()->where("fileFolderId", $this->id);
 		switch($this->orderBy)
 		{
 			case 'nameAsc':
-				$source->order('original_name ASC');
+				$source->order('originalName ASC');
 				break;
 			case 'nameDesc':
-				$source->order('original_name DESC');
+				$source->order('originalName DESC');
 				break;
 			case 'sizeAsc':
 				$source->order('size ASC');
@@ -127,11 +127,11 @@ class FilesManagerPresenter extends BasePresenter
 				$source->order('size DESC');
 				break;
 			case 'dateDesc':
-				$source->order('create_date DESC');
+				$source->order('createDate DESC');
 				break;
 			case 'dateAsc':
 			default:
-				$source->order('create_date ASC');
+				$source->order('createDate ASC');
 				break;
 		}
 		$itemsCount = $source->count();
@@ -217,11 +217,11 @@ class FilesManagerPresenter extends BasePresenter
 	 */
 	public function handleFileInfo($hash): void
 	{
-		$fileInfo = $this->filesModel->findAll()->where("disk_name", $hash)->fetch();
+		$fileInfo = $this->filesModel->findAll()->where("diskName", $hash)->fetch();
 		if ($fileInfo) {
 			$this->template->fileInfo = $fileInfo;
-			$this->filesManagerFileNameFormFactory->setEditId($fileInfo->file_id);
-			$this->filesManagerFileNameFormFactory->setDefaultValues($this['fileNameForm'], $fileInfo->file_id);
+			$this->filesManagerFileNameFormFactory->setEditId($fileInfo->id);
+			$this->filesManagerFileNameFormFactory->setDefaultValues($this['fileNameForm'], $fileInfo->id);
 			$this->redrawControl("fileInfo");
 		}
 	}
@@ -247,7 +247,7 @@ class FilesManagerPresenter extends BasePresenter
 			throw new \InvalidArgumentException("File with hash '$hash' not found.");
 		}
 		$file = new HashFileEntity();
-		$file->setHash($fileInfo->disk_name);
+		$file->setHash($fileInfo->diskName);
 		$file->setExtension($fileInfo->extension);
 
 		$this->fileManager->remove($file);
@@ -274,7 +274,7 @@ class FilesManagerPresenter extends BasePresenter
 		}
 		foreach ($filesInfo as $fileInfo){
 			$file = new HashFileEntity();
-			$file->setHash($fileInfo->disk_name);
+			$file->setHash($fileInfo->diskName);
 			$file->setExtension($fileInfo->extension);
 
 			$this->fileManager->remove($file);
@@ -336,11 +336,11 @@ class FilesManagerPresenter extends BasePresenter
 		}
 
 		$imageEntity = new HashImageEntity();
-		$imageEntity->setId($fileRow->file_id);
-		$imageEntity->setName($fileRow->disk_name);
+		$imageEntity->setId($fileRow->id);
+		$imageEntity->setName($fileRow->diskName);
 		$imageEntity->setExtension($fileRow->extension);
 		$imageEntity->setSize($fileRow->size);
-		$imageEntity->setHash($fileRow->disk_name);
+		$imageEntity->setHash($fileRow->diskName);
 
 		$configParameter = $this->context->getParameters();
 		//todo: nejak upravit - presunout do storage
@@ -403,11 +403,11 @@ class FilesManagerPresenter extends BasePresenter
 		}
 
 		$imageEntity = new HashImageEntity();
-		$imageEntity->setId($fileRow->file_id);
-		$imageEntity->setName($fileRow->disk_name);
+		$imageEntity->setId($fileRow->id);
+		$imageEntity->setName($fileRow->diskName);
 		$imageEntity->setExtension($fileRow->extension);
 		$imageEntity->setSize($fileRow->size);
-		$imageEntity->setHash($fileRow->disk_name);
+		$imageEntity->setHash($fileRow->diskName);
 
 		$configParameter = $this->context->getParameters();
 		$imageRequest = new ImageRequest($imageEntity);

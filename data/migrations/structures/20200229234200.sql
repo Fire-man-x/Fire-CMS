@@ -1,5 +1,5 @@
 ALTER TABLE `firecms_languages`
-ADD INDEX `active_default` (`active`, `default`);
+ADD INDEX `activeDefault` (`active`, `default`);
 
 ALTER TABLE `firecms_modules`
-ADD INDEX `name_privilege` (`name`, `privilege`);
+ADD INDEX `namePrivilege` (`name`, `privilege`);

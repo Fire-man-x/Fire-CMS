@@ -48,7 +48,7 @@ class MenuFormFactory extends BaseFormFactory
 		$values->location = $this->model->getLocation(empty($values->location) ? $values->title : $values->location, $this->getEditId());
 
 		if ($this->isEditMode()) {
-			$this->model->update($this->getEditId(), $values);
+			$this->model->update($this->getEditId(), (array) $values);
 		} else {
 			$this->model->insert($values);
 		}

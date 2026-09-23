@@ -1,12 +1,12 @@
 {var $level = 0}
 <ol class="{if $level==0}nav flex-column nav-pills nav-stacked menu-sortable{else}nav-sublevel{/if}" n:block="categories-menu">
-	<li n:foreach="$categories as $category" class="nav-item {if $category->category_id==1}mjs-nestedSortable-no-nesting{/if}" data-id="cat_{$category->category_id}">
-		<span class="nav-link {if $category->category_id == $activeCategory}active{/if} {if !$category->active}font-italic{/if}">
-			<a class="{*inverse*}" href="{plink this id=>$category->category_id, parent=>null}">{if $category->category_id==1}<i class="fas fa-chalkboard"></i> {/if}{$category->grid_name} {* [{$category->category_left}-{$category->category_right}]*}</a>
+	<li n:foreach="$categories as $category" class="nav-item {if $category->id==1}mjs-nestedSortable-no-nesting{/if}" data-id="cat_{$category->id}">
+		<span class="nav-link {if $category->id == $activeCategory}active{/if} {if !$category->active}font-italic{/if}">
+			<a class="{*inverse*}" href="{plink this id=>$category->id, parent=>null}">{if $category->id==1}<i class="fas fa-chalkboard"></i> {/if}{$category->title} {* [{$category->categoryLeft}-{$category->categoryRight}]*}</a>
 			<span class="buttons float-right text-right">
 				<span n:if="$category->type != 'homepage'" class="handler" title="{_'Move'}"><i class="fas fa-arrows-alt"></i></span>
-				<a href="{plink this id=>null, parent=>$category->category_id}" title="{_'Add'}"><i class="fa fa-plus"></i></a>
-				<a n:if="$category->type != 'homepage'" href="{link removeCategory category_id=>$category->category_id, parent=>null}" class="small" title="{_'Delete'}" data-confirm="modal" data-confirm-text="{_"Delete"}?"><i class="fa fa-trash"></i></a>
+				<a href="{plink this id=>null, parent=>$category->id}" title="{_'Add'}"><i class="fa fa-plus"></i></a>
+				<a n:if="$category->type != 'homepage'" href="{link removeCategory categoryId=>$category->id, parent=>null}" class="small" title="{_'Delete'}" data-confirm="modal" data-confirm-text="{_"Delete"}?"><i class="fa fa-trash"></i></a>
 			</span>
 			<div class="clearfix"></div>
 		</span>

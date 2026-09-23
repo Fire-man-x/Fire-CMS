@@ -6,6 +6,7 @@ namespace App\Forms;
 use App\Service\LanguageService;
 use App\Model;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Nette\Localization\Translator;
 
 
@@ -42,7 +43,7 @@ class MetaFormFactory extends BaseFormFactory
 	{
 		$form = parent::create($editId);
 
-		$form->addSelect('language_id', $this->translator->translate('Language'), $this->languages->getLanguages())
+		$form->addSelect('languageId', $this->translator->translate('Language'), $this->languages->getLanguages())
 			->setTranslator(null)
 			->setPrompt($this->translator->translate(self::$allLanguages));
 
@@ -63,7 +64,7 @@ class MetaFormFactory extends BaseFormFactory
 	}
 
 
-	public function formValidate(Form $form, array $values)
+	public function formValidate(Form $form, ArrayHash $values)
 	{
 		$query = $this->model->findAll()
 			->where("type", $values->type)
@@ -76,7 +77,7 @@ class MetaFormFactory extends BaseFormFactory
 		$exist = $query->fetchAll();
 
 		if ($exist) {
-			if (!$values->language_id) {
+			if (!$values->languageId) {
 				//every item must be without language
 				//- can be only once
 				$error = true;
@@ -84,10 +85,10 @@ class MetaFormFactory extends BaseFormFactory
 				//every item must be with language
 				$error = false;
 				foreach ($exist as $item) {
-					if ($item->language_id == null) {
+					if ($item->languageId == null) {
 						//cannot be twice
 						$error = true;
-					} elseif ($item->language_id == $values->language_id) {
+					} elseif ($item->languageId == $values->languageId) {
 						//already exist
 						$error = true;
 					}
@@ -107,7 +108,7 @@ class MetaFormFactory extends BaseFormFactory
 		unset($values->editId);
 
 		if ($this->isEditMode()) {
-			$this->model->update($this->getEditId(), $values);
+			$this->model->update($this->getEditId(), (array) $values);
 		} else {
 			$this->model->insert($values);
 		}

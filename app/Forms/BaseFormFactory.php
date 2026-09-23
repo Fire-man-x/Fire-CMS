@@ -37,7 +37,9 @@ abstract class BaseFormFactory
 	 */
 	public function setEditId(int|string $editId)
 	{
-		$this->editId = $editId;
+		//hodnota ze skrytého pole formuláře přichází jako řetězec - číselné ID převedeme na int (modely mají
+		//getById(int)/update(int)), nečíselné ID (např. kód jazyka "en") zůstává řetězcem
+		$this->editId = is_string($editId) && ctype_digit($editId) ? (int) $editId : $editId;
 	}
 
 

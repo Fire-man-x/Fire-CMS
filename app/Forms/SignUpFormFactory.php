@@ -49,7 +49,7 @@ class SignUpFormFactory
 			try {
 				$this->userManager->add($values->username, $values->email, $values->password, \Nette\Utils\ArrayHash::from(array(
 					"active" => false,
-					"first_name" => "",
+					"firstName" => "",
 					"surname" => ""
 				)));
 			} catch (Model\DuplicateNameException $e) {

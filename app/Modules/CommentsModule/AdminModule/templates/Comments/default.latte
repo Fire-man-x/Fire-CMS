@@ -14,8 +14,8 @@
 		{snippet commentReplyForm}
 			<div n:ifset="$commentInfo">
 				<div class="row">
-					<div class="col-sm-3"><strong>{$commentInfo->author}</strong><br><a href="mailto:{$commentInfo->author_email}">{$commentInfo->author_email}</a></div>
-					<div class="col-sm-9 text-right">{$commentInfo->create_date|date:\DATETIME_FORMAT}</div>
+					<div class="col-sm-3"><strong>{$commentInfo->author}</strong><br><a href="mailto:{$commentInfo->authorEmail}">{$commentInfo->authorEmail}</a></div>
+					<div class="col-sm-9 text-right">{$commentInfo->createDate|date:\DATETIME_FORMAT}</div>
 				</div>
 				<div class="">
 					<div class=""><strong>{$commentInfo->title}</strong></div>

@@ -6,6 +6,7 @@ namespace App\Modules\CommentsModule\Model;
 use App\Model\BaseModel;
 use App\Service\LanguageService;
 use Nette\Database\Explorer;
+use Nette\Database\Table\Selection;
 use Nette\Utils\ArrayHash;
 
 /**
@@ -22,15 +23,14 @@ class Comments extends BaseModel
 		parent::__construct($database);
 
 		$this->setTableName('firecms_comments');
-		$this->setColumnId('comment_id');
+		$this->setForeignKeyColumn('commentId');
 	}
 
 
 	/**
 	 * Get database
-	 * @return \Nette\Database\Context
 	 */
-	public function getDatabase()
+	public function getDatabase(): Explorer
 	{
 		return $this->database;
 	}
@@ -46,11 +46,10 @@ class Comments extends BaseModel
 
 	/**
 	 * Get all rows
-	 * @return \Nette\Database\Table\Selection
 	 */
-	public function getAllInLanguage($language)
+	public function getAllInLanguage($language): Selection
 	{
-		return $this->findAll()->where("language_id", $language);
+		return $this->findAll()->where("languageId", $language);
 	}
 
 }

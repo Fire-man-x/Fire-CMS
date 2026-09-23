@@ -83,16 +83,16 @@ class CommentFormFactory extends BaseFormFactory
 			throw new \InvalidArgumentException("Type is not defined, use setType() method.");
 		}
 
-		$values->language_id = $this->languageId;
-		$values->user_ip = "";
-		$values->user_agent = "";
+		$values->languageId = $this->languageId;
+		$values->userIp = "";
+		$values->userAgent = "";
 
 		//@todo: vkladani do tabulky - column id
 		$model = $this->service->insert($this->type, $this->columnId, $values );
 
 		/*if ($this->isEditMode()) {
 			//if default - dont update name
-			$model->update($this->getEditId(), $values);
+			$model->update($this->getEditId(), (array) $values);
 		} else {
 			$model->insert($values);
 		}*/
@@ -155,16 +155,16 @@ class CommentFormFactory extends BaseFormFactory
 		$replyTo = $values["reply_to"];
 		unset($values["reply_to"]);
 
-		$values->language_id = $this->languageId;
-		$values->user_ip = "";
-		$values->user_agent = "";
+		$values->languageId = $this->languageId;
+		$values->userIp = "";
+		$values->userAgent = "";
 
 		//@todo: vkladani do tabulky - column id
 		$this->service->insertReply($replyTo, $values );
 
 		/*if ($this->isEditMode()) {
 			//if default - dont update name
-			$model->update($this->getEditId(), $values);
+			$model->update($this->getEditId(), (array) $values);
 		} else {
 			$model->insert($values);
 		}*/

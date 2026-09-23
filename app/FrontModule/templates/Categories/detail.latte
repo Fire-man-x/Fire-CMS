@@ -13,9 +13,9 @@
 		{* Tags *}
 		{include '../../Components/Tags.latte' tags=>$category->tags}
 
-		<p class="post-meta">{_"Posted by <a href='%s'>%s</a> on %s", "#",$category->author['author'], $category->publishing_date->format(\DATETIME_FORMAT) |noescape} {_'viewed'} {$category->view_count}</p>
+		<p class="post-meta">{_"Posted by <a href='%s'>%s</a> on %s", "#",$category->author['author'], $category->publishingDate->format(\DATETIME_FORMAT) |noescape} {_'viewed'} {$category->viewCount}</p>
 	</article>
 
-	{control categories $category->category_id}
+	{control categories $category->categoryId}
 
-	{control articles $category->category_id}
+	{control articles $category->categoryId}

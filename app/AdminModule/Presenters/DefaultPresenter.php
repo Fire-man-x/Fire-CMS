@@ -24,7 +24,7 @@ class DefaultPresenter extends BasePresenter
 	{
 		$this->template->counts = array(
 			"users" => $this->usersModel->findAll()->select("COUNT(*) AS count")->fetch()['count'],
-			"articles" => $this->articlesModel->findAll()->select("COUNT(*) AS count")->where("history_id", null)->fetch()['count'],
+			"articles" => $this->articlesModel->findAll()->select("COUNT(*) AS count")->where("historyId", null)->fetch()['count'],
 			"statistics" => 0, //$this->statisticsModel->getAvgPerDay()
 		);
 	}

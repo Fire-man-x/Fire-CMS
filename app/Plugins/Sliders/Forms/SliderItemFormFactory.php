@@ -75,7 +75,7 @@ class SliderItemFormFactory extends BaseFormFactory
 
 		$form->addText('text', 'Text');
 
-		$form->addHidden("language_id");
+		$form->addHidden("languageId");
 
 		$form->addSubmit('send', 'Save');
 
@@ -91,11 +91,11 @@ class SliderItemFormFactory extends BaseFormFactory
 
 		if ($this->isEditMode()) {
 			$this->model->findById($this->getSliderId())
-				->where("language_id", $values->language_id)
+				->where("languageId", $values->languageId)
 				->where("position", $this->getEditId())
 				->update($values);
 		} else {
-			$values->slider_id = $this->getSliderId();
+			$values->sliderId = $this->getSliderId();
 
 			$this->model->insert($values);
 		}
@@ -109,7 +109,7 @@ class SliderItemFormFactory extends BaseFormFactory
 	{
 		$defaults = $this->model
 			->findById($this->getSliderId())
-			->where("language_id", $this->getLanguage())
+			->where("languageId", $this->getLanguage())
 			->where("position", $editId)
 			->fetch();
 

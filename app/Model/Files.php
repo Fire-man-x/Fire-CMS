@@ -22,7 +22,7 @@ class Files extends BaseModel implements IViewCounter
 		parent::__construct($database);
 
 		$this->setTableName('firecms_files');
-		$this->setColumnId('file_id');
+		$this->setForeignKeyColumn('fileId');
 	}
 
 
@@ -31,7 +31,7 @@ class Files extends BaseModel implements IViewCounter
 	 */
 	public function insert(ArrayHash $data): int
 	{
-		$data->create_date = new SqlLiteral("NOW()");
+		$data->createDate = new SqlLiteral("NOW()");
 		return parent::insert($data);
 	}
 
@@ -41,7 +41,7 @@ class Files extends BaseModel implements IViewCounter
 	 */
 	public function findByHash(string $hash): \Nette\Database\Table\Selection
 	{
-		return $this->getTable()->where("disk_name", $hash);
+		return $this->getTable()->where("diskName", $hash);
 	}
 
 
@@ -61,7 +61,7 @@ class Files extends BaseModel implements IViewCounter
 	 */
 	public function changeFilesFolder(int $toFolder, array $files): void
 	{
-		$this->findByIds($files)->update(array("file_folder_id"=>$toFolder));
+		$this->findByIds($files)->update(array("fileFolderId"=>$toFolder));
 	}
 
 
@@ -70,16 +70,16 @@ class Files extends BaseModel implements IViewCounter
 	 */
 	public function toFileEntity(ActiveRow $file): HashFileEntity|HashImageEntity
 	{
-		if($file["is_image"]){
+		if($file["isImage"]){
 			$fileEntity = new HashImageEntity();
 		} else {
 			$fileEntity = new HashFileEntity();
 		}
-		$fileEntity->setId($file["file_id"]);
-		$fileEntity->setName($file["new_name"] ? $file["new_name"] : $file["original_name"]);
-		$fileEntity->setHash($file["disk_name"]);
+		$fileEntity->setId($file["id"]);
+		$fileEntity->setName($file["newName"] ? $file["newName"] : $file["originalName"]);
+		$fileEntity->setHash($file["diskName"]);
 		$fileEntity->setExtension($file["extension"]);
-		$fileEntity->setMimeType($file["mime_type"]);
+		$fileEntity->setMimeType($file["mimeType"]);
 		$fileEntity->setSize($file["size"]);
 
 		return $fileEntity;
@@ -92,7 +92,7 @@ class Files extends BaseModel implements IViewCounter
 	public function addViewCount(int|string $fileHash, string $language): void
 	{
 		$data = array(
-			"view_count" => new SqlLiteral("view_count+1")
+			"viewCount" => new SqlLiteral("viewCount+1")
 		);
 		$this->findByHash($fileHash)
 			->update($data);

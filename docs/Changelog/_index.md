@@ -2,6 +2,24 @@
 
 Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na detailní záznam v `Changelog/`.
 
+## 2026-09-23
+
+- **Plugin DynamicForms převeden na camelCase sloupce a PK `id`.** Viz
+  [2026-09-23-dynamicforms-camelcase-id.md](2026-09-23-dynamicforms-camelcase-id.md). Migrace pluginu přepsána
+  (nutný reset jeho tabulek), model implementuje `Translatable`.
+- **Proklikání administrace po přejmenování sloupců + rozhraní `App\Model\Translatable`.** Viz
+  [2026-09-23-admin-smoke-test-fixes.md](2026-09-23-admin-smoke-test-fixes.md). Opraveny zbytky přejmenování
+  a starší chyby, které blokovaly ukládání, aktivaci a mazání (ID z datagridu jako řetězec, `makeBackup()`,
+  staré názvy tabulek v joinech). Modely s `*Descriptions` implementují `Translatable`.
+- **Zrušen duplicitní sloupec `gridName` (articles/categories/tags/dynamicForms).** Viz
+  [2026-09-23-remove-gridname.md](2026-09-23-remove-gridname.md). Gridy a výpisy berou název z `*Descriptions`
+  v jazyce nastaveném v administraci (fallback výchozí jazyk) přes nový
+  `App\Model\TranslatedTitleTrait\TranslatedTitleTrait`. Grid tagů už nepoužívá `GROUP BY` s náhodným překladem.
+- **DB sloupce jádra převedené na camelCase, AUTO_INCREMENT PK přejmenované na `id`.** Viz
+  [2026-09-23-db-columns-camelcase-id.md](2026-09-23-db-columns-camelcase-id.md). Migrace přepsané přímo
+  (DB se resetuje), FK sloupce se jmenují `<entita>Id`. `BaseModel` má nový `getForeignKeyColumn()`,
+  datagrid akce posílají FK název místo `id`. Kód pod `theme/` (klientské pluginy) převedený jen v migracích.
+
 ## 2026-09-22
 
 - **`firecms_options` převedeno na `firecms_settings` + `firecms_settingDescriptions` (per-jazyk).** Viz

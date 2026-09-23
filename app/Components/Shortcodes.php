@@ -8,6 +8,7 @@ use App\Components\FileManager\Request\ImageRequest;
 use App\Model\Files;
 use App\Model\RecordNotFoundException;
 use BadFunctionCallException;
+use Latte\Essential\Filters;
 use Nette\Application\LinkGenerator;
 use Nette\Application\UI\ITemplate;
 use Nette\InvalidArgumentException;
@@ -112,8 +113,8 @@ class Shortcodes
 	 */
 	private function shortcodeImage(array $params): string
 	{
-		$file_id = $params[0];
-		$file = $this->filesModel->getById($file_id);
+		$fileId = $params[0];
+		$file = $this->filesModel->getById($fileId);
 		if(!$file){
 			throw new RecordNotFoundException();
 		}
@@ -133,7 +134,7 @@ class Shortcodes
 	 */
 	private function shortcodeFile($params)
 	{
-		$file_id = $params[0];
+		$fileId = $params[0];
 		$overrideName = null;
 		$showSize = false;
 		for ($i = 1; $i < count($params); $i ++) {
@@ -146,15 +147,15 @@ class Shortcodes
 			}
 		}
 
-		$file = $this->filesModel->getById($file_id);
+		$file = $this->filesModel->getById($fileId);
 		if($file){
 
-			$name = $file["new_name"] ? $file["new_name"] : $file["original_name"];
-			$file_hash = $file["disk_name"];
+			$name = $file["newName"] ? $file["newName"] : $file["originalName"];
+			$file_hash = $file["diskName"];
 
 			//link to counter
 			return '<a href="' . $this->linkGenerator->link("Front:Files:default", array("hash" => $file_hash, "locale"=>"jn")) . '" alt="' . ($overrideName ? $overrideName : $name) . '">'
-				. ($overrideName ? $overrideName : $name) . ($showSize ? " <span class=\"file-info\">(" . \Latte\Runtime\Filters::bytes($file["size"]) . ")</span>" : "")
+				. ($overrideName ? $overrideName : $name) . ($showSize ? " <span class=\"file-info\">(" . (new Filters())->bytes($file["size"]) . ")</span>" : "")
 				. '</a>';
 		}else{
 			return '<b>'.$this->translator->translate("File doesn't exist.").'</b>';

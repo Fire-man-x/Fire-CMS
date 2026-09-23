@@ -26,7 +26,7 @@ class Metas extends BaseModel
 		$this->languages = $languages;
 
 		$this->setTableName('firecms_metas');
-		$this->setColumnId('meta_id');
+		$this->setForeignKeyColumn('metaId');
 	}
 
 

@@ -95,11 +95,11 @@ class Categories extends Control
 
 		$categories = $this->categoriesModel->getAllWithTranslation($this->language)
 			->where("active", true)
-			->where("history_id", null)
+			->where("historyId", null)
 			->order("title ASC");
 		if($fromCategory){
-			//$categories->where("category:category_category.category_id", $fromCategory == null ? 1 : $fromCategory);
-			$categories->where("category.parent_id", $fromCategory);
+			//$categories->where("category:category_category.categoryId", $fromCategory == null ? 1 : $fromCategory);
+			$categories->where("category.parentId", $fromCategory);
 		}
 		if($this->query){
 			$categories->whereOr(array(
@@ -109,7 +109,7 @@ class Categories extends Control
 				));
 		}
 		if($this->tagId){
-			$categories->where("category:category_tags.tag_id", $this->tagId);
+			$categories->where("category:" . Model\Categories::RELATION_TAG_TABLE_NAME . ".tagId", $this->tagId);
 		}
 		$itemsCount = $categories->count();
 		$this["paginator"]->setItemCount($itemsCount);

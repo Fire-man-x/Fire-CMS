@@ -23,10 +23,10 @@ class RedirectionFormFactory extends BaseFormFactory
 	{
 		$form = parent::create($editId);
 
-		$form->addText('old_url', 'Old url')
+		$form->addText('oldUrl', 'Old url')
 			->setRequired(VALIDATE_REQUIRED);
 
-		$form->addText('new_url', 'New url')
+		$form->addText('newUrl', 'New url')
 			->setRequired(VALIDATE_REQUIRED);
 
 		$form->addSubmit('send', 'Save');
@@ -51,10 +51,10 @@ class RedirectionFormFactory extends BaseFormFactory
 		unset($values->editId);
 
 		if ($this->isEditMode()) {
-			$this->model->update($this->getEditId(), $values);
+			$this->model->update($this->getEditId(), (array) $values);
 		} else {
 			//todo zmenit jazyk
-			$values["language_id"] = $this->languages->getDefaultLanguage();
+			$values["languageId"] = $this->languages->getDefaultLanguage();
 			$this->model->insert($values);
 		}
 	}

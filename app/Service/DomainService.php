@@ -18,10 +18,10 @@ class DomainService
 {
 	use SmartObject;
 
-	/** @var array<string,string> domain (lowercase) => language_id */
+	/** @var array<string,string> domain (lowercase) => languageId */
 	private array $domainToLanguage;
 
-	/** @var array<string,string> language_id => canonical domain (lowercase) */
+	/** @var array<string,string> languageId => canonical domain (lowercase) */
 	private array $languageToDomain;
 
 
@@ -45,7 +45,7 @@ class DomainService
 			->order($this->model->getColumnId());
 
 		foreach ($rows as $row) {
-			$languageId = $row->language_id;
+			$languageId = $row->languageId;
 			$domain = Strings::lower($row->domain);
 
 			$this->domainToLanguage[$domain] = $languageId;

@@ -56,7 +56,7 @@ class UrlFormFactory extends BaseFormFactory
 		unset($values->editId);
 
 		if ($this->isEditMode()) {
-			$this->model->update($this->getEditId(), $values);
+			$this->model->update($this->getEditId(), (array) $values);
 		} else {
 			$this->model->insert($values);
 		}

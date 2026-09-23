@@ -22,7 +22,7 @@ class FilesManagerFileNameFormFactory extends BaseFormFactory
 	{
 		$form = parent::create((int) $editId);
 
-		$form->addText("new_name", $this->translator->translate("Name"))
+		$form->addText("newName", $this->translator->translate("Name"))
 			//->setRequired()
 			->setTranslator(null);
 
@@ -68,10 +68,10 @@ class FilesManagerFileNameFormFactory extends BaseFormFactory
 		$defaults = $this->model->getById($editId);
 		if ($defaults) {
 			$defaults = $defaults->toArray();
-			/*if(!$defaults["new_name"]){
-				$defaults["new_name"] = $defaults["original_name"];
+			/*if(!$defaults["newName"]){
+				$defaults["newName"] = $defaults["originalName"];
 			}*/
-			$form["new_name"]->getControlPrototype()->placeholder($defaults["original_name"]);
+			$form["newName"]->getControlPrototype()->placeholder($defaults["originalName"]);
 
 			$form->setDefaults($defaults);
 		}

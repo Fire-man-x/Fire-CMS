@@ -80,15 +80,15 @@ class CustomRouter implements Router
 			try
 			{
 				$redirectionInfo = $this->urlManager->getRedirectionInfoByUrl($url, $locale);
-				$redirectionInfo->update(array("last_usage_date" => new Nette\Database\SqlLiteral("NOW()")));
-				$row = $this->urlManager->getUrlInfoByUrl($redirectionInfo->new_url, $locale);
+				$redirectionInfo->update(array("lastUsageDate" => new Nette\Database\SqlLiteral("NOW()")));
+				$row = $this->urlManager->getUrlInfoByUrl($redirectionInfo->newUrl, $locale);
 			} catch(\InvalidArgumentException $e) {
 				//try find redirection by relativeUrl
 				try
 				{
 					$redirectionInfo = $this->urlManager->getRedirectionInfoByUrl($httpRequest->getUrl()->getRelativeUrl(), $locale);
-					$redirectionInfo->update(array("last_usage_date" => new Nette\Database\SqlLiteral("NOW()")));
-					$row = $this->urlManager->getUrlInfoByUrl($redirectionInfo->new_url, $locale);
+					$redirectionInfo->update(array("lastUsageDate" => new Nette\Database\SqlLiteral("NOW()")));
+					$row = $this->urlManager->getUrlInfoByUrl($redirectionInfo->newUrl, $locale);
 					$params = array();
 				} catch(\InvalidArgumentException $e) {
 					return null;
@@ -108,7 +108,7 @@ class CustomRouter implements Router
 		}
 
 		$params['presenter'] = $this->presenters[$row->type];
-		$params['locale'] = $row->language_id;
+		$params['locale'] = $row->languageId;
 		$params['id'] = $row->key;
 
 		return $params;

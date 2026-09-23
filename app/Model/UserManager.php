@@ -138,7 +138,7 @@ class UserManager implements Authenticator
 		if (!empty($data["nickname"])) {
 			return $data["nickname"];
 		} else {
-			return trim($data["first_name"] . " " . $data["surname"]);
+			return trim($data["firstName"] . " " . $data["surname"]);
 		}
 	}
 

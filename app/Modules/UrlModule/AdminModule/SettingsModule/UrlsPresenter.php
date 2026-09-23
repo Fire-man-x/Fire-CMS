@@ -55,6 +55,7 @@ class UrlsPresenter extends BasePresenter
 	{
 		$source = $this->model->getAllForGrid();
 		$primaryKey = $this->model->getColumnId();
+		$paramKey = $this->model->getForeignKeyColumn();
 
 		$grid = new Datagrid($this, $name);
 		$grid->setPrimaryKey($primaryKey);
@@ -69,7 +70,7 @@ class UrlsPresenter extends BasePresenter
 			->setFilterText();
 
 		//Actions
-		$grid->addAction('edit', 'Edit', 'edit!', array($primaryKey => $primaryKey))
+		$grid->addAction('edit', 'Edit', 'edit!', array($paramKey => $primaryKey))
 			->setClass('btn btn-primary btn-sm ajax')
 			->setIcon(ICON_EDIT)
 			->setTitle('Edit')
@@ -78,7 +79,7 @@ class UrlsPresenter extends BasePresenter
 				"data-bs-target" => "#modal"
 			));
 
-		$grid->addAction('delete', 'Delete', 'delete!', array($primaryKey => $primaryKey))
+		$grid->addAction('delete', 'Delete', 'delete!', array($paramKey => $primaryKey))
 			->setClass('btn btn-danger btn-sm ajax')
 			->setIcon(ICON_DELETE)
 			->setTitle('Delete')
@@ -102,6 +103,7 @@ class UrlsPresenter extends BasePresenter
 	{
 		$source = $this->redirectionsModel->getAllForGrid();
 		$primaryKey = $this->redirectionsModel->getColumnId();
+		$paramKey = $this->redirectionsModel->getForeignKeyColumn();
 
 		$grid = new Datagrid($this, $name);
 		$grid->setPrimaryKey($primaryKey);
@@ -112,14 +114,14 @@ class UrlsPresenter extends BasePresenter
 
 
 		//columns
-		$grid->addColumnText("old_url", "Old url")
+		$grid->addColumnText("oldUrl", "Old url")
 			->setFilterText();
-		$grid->addColumnText("new_url", "New url")
+		$grid->addColumnText("newUrl", "New url")
 			->setFilterText();
-		$grid->addColumnDateTime("last_usage_date", "Last usage date");
+		$grid->addColumnDateTime("lastUsageDate", "Last usage date");
 
 		//Actions
-		$grid->addAction('edit', 'Edit', 'editRedirection!', array($primaryKey => $primaryKey))
+		$grid->addAction('edit', 'Edit', 'editRedirection!', array($paramKey => $primaryKey))
 			->setClass('btn btn-primary btn-sm ajax')
 			->setIcon(ICON_EDIT)
 			->setTitle('Edit')
@@ -128,7 +130,7 @@ class UrlsPresenter extends BasePresenter
 				"data-bs-target" => "#modal"
 			));
 
-		$grid->addAction('delete', 'Delete', 'deleteRedirection!', array($primaryKey => $primaryKey))
+		$grid->addAction('delete', 'Delete', 'deleteRedirection!', array($paramKey => $primaryKey))
 			->setClass('btn btn-danger btn-sm ajax')
 			->setIcon(ICON_DELETE)
 			->setTitle('Delete')
@@ -187,7 +189,7 @@ class UrlsPresenter extends BasePresenter
 	/**
 	 * Add handler
 	 */
-	public function handleAdd()
+	public function handleAdd(): void
 	{
 		$this->factory->resetEditMode();
 		$this->redrawControl("urlForm");
@@ -197,10 +199,10 @@ class UrlsPresenter extends BasePresenter
 	/**
 	 * Edit handler
 	 */
-	public function handleEdit(int $url_id)
+	public function handleEdit(int $urlId): void
 	{
-		$this->factory->setEditId($url_id);
-		$this->factory->setDefaultValues($this["urlForm"], $url_id);
+		$this->factory->setEditId($urlId);
+		$this->factory->setDefaultValues($this["urlForm"], $urlId);
 		$this->redrawControl("urlForm");
 	}
 
@@ -208,14 +210,11 @@ class UrlsPresenter extends BasePresenter
 	/**
 	 * Delete handler
 	 */
-	public function handleDelete(int $url_id)
+	public function handleDelete(int $urlId): void
 	{
-		if(!$this->model->getById($url_id)?->default){
-			$this->model->delete($url_id);
-			$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
-		}  else {
-			$this->flashMessage(FAIL_DELETE, FLASH_FAILED);
-		}
+		//tabulka nemá sloupec `default` (dřívější kontrola `->default` vždy spadla) - URL lze smazat vždy
+		$this->model->delete($urlId);
+		$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
 		$this->redirect('this');
 	}
 
@@ -223,10 +222,10 @@ class UrlsPresenter extends BasePresenter
 	/**
 	 * Edit handler
 	 */
-	public function handleEditRedirection(int $url_redirection_id)
+	public function handleEditRedirection(int $urlRedirectionId): void
 	{
-		$this->redirectionFormFactory->setEditId($url_redirection_id);
-		$this->redirectionFormFactory->setDefaultValues($this["urlRedirectionForm"], $url_redirection_id);
+		$this->redirectionFormFactory->setEditId($urlRedirectionId);
+		$this->redirectionFormFactory->setDefaultValues($this["urlRedirectionForm"], $urlRedirectionId);
 		$this->redrawControl("urlRedirectionForm");
 	}
 
@@ -235,9 +234,9 @@ class UrlsPresenter extends BasePresenter
 	 * Delete handler
 	 * @throws Nette\Application\AbortException
 	 */
-	public function handleDeleteRedirection(int $url_redirection_id)
+	public function handleDeleteRedirection(int $urlRedirectionId): void
 	{
-		$this->redirectionsModel->delete($url_redirection_id);
+		$this->redirectionsModel->delete($urlRedirectionId);
 		$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
 
 		$this->redirect('this');

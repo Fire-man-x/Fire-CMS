@@ -20,7 +20,7 @@ class Domains extends BaseModel
 		parent::__construct($database);
 
 		$this->setTableName('firecms_domains');
-		$this->setColumnId('domain_id');
+		$this->setForeignKeyColumn('domainId');
 	}
 
 
@@ -29,7 +29,7 @@ class Domains extends BaseModel
 	 */
 	public function findByLanguage(string $languageId): Selection
 	{
-		return $this->findAll()->where('language_id', $languageId);
+		return $this->findAll()->where('languageId', $languageId);
 	}
 
 

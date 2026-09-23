@@ -7,6 +7,7 @@ use App\Model;
 use App\Modules\CommentsModule\Model\Comments;
 use App\Modules\CommentsModule\Model\ISubComments;
 use Nette\Security\User;
+use Nette\Utils\ArrayHash;
 
 /**
  * Comment Service
@@ -52,12 +53,12 @@ class Comment
 	 */
 	public function getTypeByStoredItem(int $commentId): string
 	{
-		$articles = $this->articlesModel->getRelationCommentsTable()->where("comment_id", $commentId);
+		$articles = $this->articlesModel->getRelationCommentsTable()->where("commentId", $commentId);
 		if($articles){
 			return self::TYPE_ARTICLE;
 		}
 
-		$categories = $this->categoriesModel->getRelationCommentsTable()->where("comment_id", $commentId);
+		$categories = $this->categoriesModel->getRelationCommentsTable()->where("commentId", $commentId);
 		if($categories){
 			return self::TYPE_CATEGORY;
 		}
@@ -75,14 +76,14 @@ class Comment
 		$model = $this->getModelByType($type);
 
 		if ($this->user->isLoggedIn() && $this->user->getId() != null) {
-			$data["created_by"] = $this->user->getId();
+			$data["createdBy"] = $this->user->getId();
 			$data["author"] = null;
-			$data["author_email"] = null;
+			$data["authorEmail"] = null;
 		} else {
-			if(empty($data["author"]) || empty($data["author_email"])){
+			if(empty($data["author"]) || empty($data["authorEmail"])){
 				throw new \InvalidArgumentException("Author or email is empty.");
 			}
-			$data["created_by"] = null;
+			$data["createdBy"] = null;
 		}
 
 		//begin
@@ -115,17 +116,17 @@ class Comment
 		$type = $this->getTypeByStoredItem($replyToId);
 		$model = $this->getModelByType($type);
 
-		$data["parent_id"] = $replyToId;
+		$data["parentId"] = $replyToId;
 
 		if ($this->user->isLoggedIn() && $this->user->getId() != null) {
-			$data["created_by"] = $this->user->getId();
+			$data["createdBy"] = $this->user->getId();
 			$data["author"] = null;
-			$data["author_email"] = null;
+			$data["authorEmail"] = null;
 		} else {
-			if(empty($data["author"]) || empty($data["author_email"])){
+			if(empty($data["author"]) || empty($data["authorEmail"])){
 				throw new \InvalidArgumentException("Author or email is empty.");
 			}
-			$data["created_by"] = null;
+			$data["createdBy"] = null;
 		}
 
 		//begin
@@ -133,27 +134,27 @@ class Comment
 
 		//right
 		$parentComment = $model->getRelationCommentsTable()
-			->select("article_id")
+			->select("articleId")
 			->select("comment.right")
-			->where("comment.comment_id", $replyToId)
+			->where("comment.id", $replyToId)
 			->fetch();
 
-		$articleId = $parentComment["article_id"];
+		$articleId = $parentComment["articleId"];
 		$right = $parentComment["right"];
 
 		$data["left"] = $right;
 		$data["right"] = $right+1;
 
-		$allComments = $model->getRelationComments($articleId)->fetchPairs("comment_id", "article_id");
+		$allComments = $model->getRelationComments($articleId)->fetchPairs("commentId", "articleId");
 		$allCommentsIds = array_keys($allComments);
 
 		$this->commentsModel->findAll()
-			->where("comment_id", $allCommentsIds)
+			->where("id", $allCommentsIds)
 			->where("right >= ?", $right)
 			->update(array("right"=> new \Nette\Database\SqlLiteral("`right` + 2")));
 
 		$this->commentsModel->findAll()
-			->where("comment_id", $allCommentsIds)
+			->where("id", $allCommentsIds)
 			->where("left >= ?", $right)
 			->update(array("left"=> new \Nette\Database\SqlLiteral("`left` + 2")));
 
@@ -187,11 +188,11 @@ class Comment
 		$model = $this->getModelByType($type);
 
 		$articleId = $model->getRelationCommentsTable()
-			->select("article_id")
-			->where("comment_id", $commentId)
-			->fetchField("article_id");
+			->select("articleId")
+			->where("commentId", $commentId)
+			->fetchField("articleId");
 
-		$allComments = $model->getRelationComments($articleId)->fetchPairs("comment_id", "article_id");
+		$allComments = $model->getRelationComments($articleId)->fetchPairs("commentId", "articleId");
 		$allCommentsIds = array_keys($allComments);
 
 		$comment = $this->commentsModel->getById($commentId);
@@ -205,12 +206,12 @@ class Comment
 			->delete();
 
 		$this->commentsModel->findAll()
-			->where("comment_id", $allCommentsIds)
+			->where("id", $allCommentsIds)
 			->where("right >= ?", $right)
 			->update(array("right"=> new \Nette\Database\SqlLiteral("`right` - ".$width)));
 
 		$this->commentsModel->findAll()
-			->where("comment_id", $allCommentsIds)
+			->where("id", $allCommentsIds)
 			->where("left >= ?", $left)
 			->update(array("left"=> new \Nette\Database\SqlLiteral("`left` - ".$width)));
 	}
@@ -218,20 +219,19 @@ class Comment
 
 	/**
 	 * Create tree from list
-	 * @param v $language
 	 */
-	public function recalculateTree($language, string $type, int $columnId)
+	public function recalculateTree(string $language, string $type, int $columnId): void
 	{
 		$comments = $this->commentsModel->getAllInLanguage($language)
-			->order("create_date ASC");
+			->order("createDate ASC");
 		if($type == self::TYPE_CATEGORY){
-			$comments->where(":category_comments.category_id", $columnId);
+			$comments->where(":" . Model\Categories::RELATION_COMMENT_CATEGORY_TABLE_NAME . ".categoryId", $columnId);
 		}
 		if($type == self::TYPE_ARTICLE){
-			$comments->where(":article_comments.article_id", $columnId);
+			$comments->where(":" . Model\Articles::RELATION_COMMENT_TABLE_NAME . ".articleId", $columnId);
 		}
 		//list
-		$commentsList = $comments->select("comments.comment_id, comments.parent_id")->fetchAssoc("parent_id|comment_id");
+		$commentsList = $comments->select("comments.id, comments.parentId")->fetchAssoc("parentId|id");
 
 		\Tracy\Debugger::$maxDepth=6;
 		//dump($commentsList);
@@ -262,7 +262,7 @@ class Comment
 
 		//save to DB
 		$this->commentsModel->findAll()
-			->where("comment_id", $node->comment_id)
+			->where("id", $node->id)
 			->update(array(
 				"left"=> $node->left,
 				"right"=> $node->right
@@ -275,31 +275,30 @@ class Comment
 
 	/**
 	 * Get all comments with all childs
-	 * @param v $language
 	 */
-	public function getAllCommentsWithChilds($language, string $type, int $columnId, \Nette\Utils\Paginator $paginator): array
+	public function getAllCommentsWithChilds(string $language, string $type, int $columnId, \Nette\Utils\Paginator $paginator): array
 	{
 
 		$comments = $this->commentsModel->getAllInLanguage($language);
 		if($type == self::TYPE_CATEGORY){
-			$comments->where(":category_comments.category_id", $columnId);
+			$comments->where(":" . Model\Categories::RELATION_COMMENT_CATEGORY_TABLE_NAME . ".categoryId", $columnId);
 		}
 		if($type == self::TYPE_ARTICLE){
-			$comments->where(":article_comments.article_id", $columnId);
+			$comments->where(":" . Model\Articles::RELATION_COMMENT_TABLE_NAME . ".articleId", $columnId);
 		}
 
 		$commentsChilds = clone $comments;
 
-		$comments->where("parent_id", null)
-			->order("create_date DESC");
+		$comments->where("parentId", null)
+			->order("createDate DESC");
 		//item count
 		$itemsCount = $comments->count();
 		$paginator->setItemCount($itemsCount);
 		//normal list
-		$commentsList = $comments->limit($paginator->getItemsPerPage(), $paginator->getOffset())->fetchAssoc("comment_id");
+		$commentsList = $comments->limit($paginator->getItemsPerPage(), $paginator->getOffset())->fetchAssoc("id");
 
 		//child list
-		$childList = $commentsChilds->where("parent_id IS NOT NULL")->order("left ASC")->fetchAssoc("parent_id|comment_id");
+		$childList = $commentsChilds->where("parentId IS NOT NULL")->order("left ASC")->fetchAssoc("parentId|id");
 
 		foreach ($commentsList as $commentId => $comment) {
 			$commentsList[$commentId] = $this->createTree($comment, $childList);
@@ -312,10 +311,10 @@ class Comment
 	/**
 	 * Create tree from list
 	 */
-	protected function createTree(array $parent, array $childList)
+	protected function createTree(array $parent, array $childList): ArrayHash
 	{
 		$parentComment = \Nette\Utils\ArrayHash::from($parent);
-		$parentCommentId = $parentComment->comment_id;
+		$parentCommentId = $parentComment->id;
 		if (in_array($parentCommentId, array_keys($childList))) {
 			$parentComment->childs = $childList[$parentCommentId];
 			//walk over all childs

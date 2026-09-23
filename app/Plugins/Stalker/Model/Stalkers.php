@@ -21,7 +21,7 @@ class Stalkers extends BaseModel
 		parent::__construct($database);
 
 		$this->setTableName('firecms_plugin_stalkers');
-		$this->setColumnId('stalker_id');
+		$this->setForeignKeyColumn('stalkerId');
 	}
 
 
@@ -31,7 +31,7 @@ class Stalkers extends BaseModel
 	public function insert(ArrayHash $data): int
 	{
 		//@note: cannot be used user - is "guest" with id null
-		//$data->created_by = $this->user->getId();
+		//$data->createdBy = $this->user->getId();
 		return parent::insert($data);
 	}
 

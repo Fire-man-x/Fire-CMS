@@ -18,7 +18,7 @@ class Modules extends BaseModel implements IList
 		parent::__construct($database);
 
 		$this->setTableName('firecms_modules');
-		$this->setColumnId('module_id');
+		$this->setForeignKeyColumn('moduleId');
 	}
 
 
@@ -66,13 +66,13 @@ class Modules extends BaseModel implements IList
 	 */
 	public function getList()
 	{
-		return $this->getAllModules()->fetchPairs("module_id", "title");
+		return $this->getAllModules()->fetchPairs("id", "title");
 	}
 
 
 	public function getListWithName(): array|\Nette\Database\Table\Selection
 	{
-		return $this->getAllModules()->fetchPairs("module_id", "name");
+		return $this->getAllModules()->fetchPairs("id", "name");
 	}
 
 

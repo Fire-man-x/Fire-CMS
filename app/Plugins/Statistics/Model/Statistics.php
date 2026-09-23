@@ -23,7 +23,7 @@ class Statistics extends BaseModel
 		parent::__construct($database);
 
 		$this->setTableName('firecms_plugin_statistics');
-		$this->setColumnId('statistics_id');
+		$this->setForeignKeyColumn('statisticsId');
 	}
 
 
@@ -46,7 +46,7 @@ class Statistics extends BaseModel
 	public function getAvgPerDay(): int
 	{
 		return $this->database->query("SELECT ROUND( AVG(sub.sub_count), 2) FROM "
-			. "(SELECT COUNT(*) sub_count FROM `" . $this->getTableName() . "` GROUP BY DATE(`create_date`)) AS sub")->fetchField();
+			. "(SELECT COUNT(*) sub_count FROM `" . $this->getTableName() . "` GROUP BY DATE(`createDate`)) AS sub")->fetchField();
 	}
 
 }

@@ -35,7 +35,7 @@ class Stalker
 		return;
 		if($user->getId()){
 			$this->model->insert(ArrayHash::from(array(
-				"created_by" => $user->getId(),
+				"createdBy" => $user->getId(),
 				"ip" => $this->request->getRemoteAddress(),
 				"url" => $this->request->getUrl()->getRelativeUrl(),
 				"data"=> $this->request->isMethod('POST') ? serialize($this->request->getPost()) : null

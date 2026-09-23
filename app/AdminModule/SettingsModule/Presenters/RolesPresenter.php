@@ -42,6 +42,7 @@ class RolesPresenter extends BasePresenter
 	{
 		$source = $this->model->findAll()->order("position");
 		$primaryKey = $this->model->getColumnId();
+		$paramKey = $this->model->getForeignKeyColumn();
 
 		$grid = new Datagrid($this, $name);
 		$grid->setPrimaryKey($primaryKey);
@@ -56,7 +57,7 @@ class RolesPresenter extends BasePresenter
 			->setFilterText();
 
 		//Actions
-		$grid->addAction('edit', 'Edit', 'edit!', array($primaryKey => $primaryKey))
+		$grid->addAction('edit', 'Edit', 'edit!', array($paramKey => $primaryKey))
 			->setClass('btn btn-primary btn-sm ajax')
 			->setIcon(ICON_EDIT)
 			->setTitle('Edit')
@@ -65,7 +66,7 @@ class RolesPresenter extends BasePresenter
 				"data-bs-target" => "#modal"
 			));
 
-		$grid->addAction('editSettings', 'Settings', 'editRolePermission!', array($primaryKey => $primaryKey))
+		$grid->addAction('editSettings', 'Settings', 'editRolePermission!', array($paramKey => $primaryKey))
 			->setClass('btn btn-primary btn-sm ajax')
 			->setIcon('list')
 			->setTitle('Settings')
@@ -73,7 +74,7 @@ class RolesPresenter extends BasePresenter
 				"data-bs-toggle" => "modal",
 				"data-bs-target" => "#modal-role-permission"
 			));
-		$grid->addAction('actionDelete', 'Delete', 'delete!', array($primaryKey => $primaryKey))
+		$grid->addAction('actionDelete', 'Delete', 'delete!', array($paramKey => $primaryKey))
 			->setClass(function($item) {
 				return 'btn btn-danger btn-sm ajax'.($item->default || $item->name == "admin" ? ' disabled' : '');
 			})
@@ -168,13 +169,13 @@ class RolesPresenter extends BasePresenter
 	/**
 	 * Edit handler
 	 */
-	public function handleEdit(int $role_id): void
+	public function handleEdit(int $roleId): void
 	{
-		$this->factory->setEditId($role_id);
+		$this->factory->setEditId($roleId);
 		/** @see self::createComponentRoleForm() */
 		/** @var Nette\Application\UI\Form $form */
 		$form = $this["roleForm"];
-		$this->factory->setDefaultValues($form, $role_id);
+		$this->factory->setDefaultValues($form, $roleId);
 		$this->redrawControl("roleForm");
 	}
 
@@ -182,10 +183,10 @@ class RolesPresenter extends BasePresenter
 	/**
 	 * Delete handler
 	 */
-	public function handleDelete(int $role_id): void
+	public function handleDelete(int $roleId): void
 	{
-		if(!$this->model->getById($role_id)?->default){
-			$this->model->delete($role_id);
+		if(!$this->model->getById($roleId)?->default){
+			$this->model->delete($roleId);
 			$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
 		}  else {
 			$this->flashMessage(FAIL_DELETE, FLASH_FAILED);
@@ -197,13 +198,13 @@ class RolesPresenter extends BasePresenter
 	/**
 	 * Edit handler
 	 */
-	public function handleEditRolePermission(int $role_id): void
+	public function handleEditRolePermission(int $roleId): void
 	{
-		$this->factory->setEditId($role_id);
+		$this->factory->setEditId($roleId);
 		/** @see self::createComponentRoleModulesForm() */
 		/** @var Nette\Application\UI\Form $form */
 		$form = $this["roleModulesForm"];
-		$this->factory->setModuleFormDefaultValues($form, $role_id);
+		$this->factory->setModuleFormDefaultValues($form, $roleId);
 		$this->redrawControl("roleModulesForm");
 	}
 

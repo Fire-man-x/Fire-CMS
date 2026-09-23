@@ -1,14 +1,14 @@
 {var $level = 0}
 <ul class="{if $level==0}nav {$menuClass}{else}nav-sublevel{/if} {if $level>0}dropdown-menu{/if}" n:block="menu">
-	<li n:foreach="$categories as $category" class="nav-item {if $category->category_id == $activeCategory}active{/if} {if !empty($category->childs) && ((isset($maxSublevel) && ($level) < $maxSublevel) || !isset($maxSublevel))}dropdown{/if} {*if $level>0}dropdown-item{/if*}" data-id="cat_{$category->category_id}">
+	<li n:foreach="$categories as $category" class="nav-item {if $category->categoryId == $activeCategory}active{/if} {if !empty($category->childs) && ((isset($maxSublevel) && ($level) < $maxSublevel) || !isset($maxSublevel))}dropdown{/if} {*if $level>0}dropdown-item{/if*}" data-id="cat_{$category->categoryId}">
 		{var $showChilds = !empty($category->childs) && ((isset($maxSublevel) && ($level) < $maxSublevel) || !isset($maxSublevel))}
-		<span n:tag-if="$showChilds" class="{if $category->category_id == $activeCategory}active{/if} {if !$category->active}font-italic{/if} {if $showChilds}btn-group{/if}">
+		<span n:tag-if="$showChilds" class="{if $category->categoryId == $activeCategory}active{/if} {if !$category->active}font-italic{/if} {if $showChilds}btn-group{/if}">
 
 			{if $category->type == 'textBox'}
 				<h3>{$category->title}</h3>
 				{$category->content|shortcodes|noescape}
 			{else}
-				<a href="{$category->link}" n:class="nav-link, $itemClass, $category->category_id == $activeCategory ? active, $showChilds ? dropdown-toggle" {if $showChilds}data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"{/if}>{if $category->type == 'homepage'}<i class="fa fa-fw fa-home"></i> {/if}{$category->title}</a>
+				<a href="{$category->link}" n:class="nav-link, $itemClass, $category->categoryId == $activeCategory ? active, $showChilds ? dropdown-toggle" {if $showChilds}data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"{/if}>{if $category->type == 'homepage'}<i class="fa fa-fw fa-home"></i> {/if}{$category->title}</a>
 			{/if}
 			{*<button n:if="$showChilds" class="btn btn-outline-dark dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<span class="caret"></span>

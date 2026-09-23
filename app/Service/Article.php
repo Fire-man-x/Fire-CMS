@@ -30,7 +30,7 @@ class Article
 		if($id == null){
 			return 0;
 		}
-		return $this->articlesModel->findAll()->where("history_id", $id)->count();
+		return $this->articlesModel->findAll()->where("historyId", $id)->count();
 	}
 
 
@@ -39,10 +39,10 @@ class Article
 	 */
 	public function makeBackup(int $id): void
 	{
-		//$this->db->query("INSERT INTO ".$this->articlesModel->getTableName()." SELECT *, null AS article_id FROM ".$this->articlesModel->getTableName()." WHERE article_id = 10");
+		//$this->db->query("INSERT INTO ".$this->articlesModel->getTableName()." SELECT *, null AS articleId FROM ".$this->articlesModel->getTableName()." WHERE articleId = 10");
 		$articleToDuplicate = ArrayHash::from($this->articlesModel->getById($id)?->toArray());
-		$articleToDuplicate->history_id = $articleToDuplicate->article_id;
-		$articleToDuplicate->article_id = null;
+		$articleToDuplicate->historyId = $articleToDuplicate->id;
+		$articleToDuplicate->id = null;
 
 		//article
 		$newId = $this->articlesModel->insert($articleToDuplicate);
@@ -50,56 +50,56 @@ class Article
 		//description
 		$allWithTranslations = $this->articlesModel->getTranslationTable()
 			->select(Model\Articles::TRANSLATION_TABLE_NAME.".*")
-			->where(Model\Articles::TRANSLATION_TABLE_NAME.".article_id", $id)
+			->where(Model\Articles::TRANSLATION_TABLE_NAME.".articleId", $id)
 			->fetchAll();
 		foreach ($allWithTranslations as $allWithTranslation){
 			$translation = ArrayHash::from($allWithTranslation->toArray());
-			unset($translation->article_id);
-			unset($translation->update_date);
-			$this->articlesModel->insertTranslation($newId, $allWithTranslation->language_id, $translation);
+			unset($translation->articleId);
+			unset($translation->updateDate);
+			$this->articlesModel->insertTranslation($newId, $allWithTranslation->languageId, $translation);
 		}
 
 		//article_file
 		$allFiles = $this->articlesModel->getRelationFile($id)->fetchAll();
 		foreach ($allFiles as $allFile){
 			$file = ArrayHash::from(array(
-				"file_id" => $allFile->file_id,
-				"is_main" => $allFile->is_main,
+				"fileId" => $allFile->fileId,
+				"isMain" => $allFile->isMain,
 				"position" => $allFile->position,
 			));
-			$this->articlesModel->insertRelationFile($newId, $file->file_id, $file);
+			$this->articlesModel->insertRelationFile($newId, $file->fileId, $file);
 		}
 
 		//article_category
 		$allCategories = $this->db->table(Model\Categories::RELATION_ARTICLE_TABLE_NAME)
 			->select(Model\Categories::RELATION_ARTICLE_TABLE_NAME.".*")
-			->where("article_id", $id)
+			->where("articleId", $id)
 			->fetchAll();
-		/** @var array $allCategory */
+		/** @var \Nette\Database\Table\ActiveRow $allCategory */
 		foreach ($allCategories as $allCategory){
-			$category = ArrayHash::from($allCategory);
-			unset($category->article_id);
-			$this->categoriesModel->insertRelationArticle($category->category_id, $newId, $category);
+			$category = ArrayHash::from($allCategory->toArray());
+			unset($category->articleId);
+			$this->categoriesModel->insertRelationArticle($category->categoryId, $newId, $category);
 		}
 
 		//article_meta
 		/*$allMetas = $this->articlesModel->getRelationCategory($id)->fetchAll();
 		foreach ($allMetas as $allMeta){
 			$meta = ArrayHash::from($allMeta);
-			unset($meta->article_id);
-			$this->categoriesModel->insertRelationArticle($meta->category_id, $newId, $meta);
+			unset($meta->articleId);
+			$this->categoriesModel->insertRelationArticle($meta->categoryId, $newId, $meta);
 		}*/
 
 		//article_tag
 		$allTags = $this->articlesModel->getRelationTagsTable()
 			->select($this->articlesModel->getRelationTagsTable()->getName().".*")
-			->where("article_id", $id)
+			->where("articleId", $id)
 			->fetchAll();
-		/** @var array $allTag */
+		/** @var \Nette\Database\Table\ActiveRow $allTag */
 		foreach ($allTags as $allTag){
-			$tag = ArrayHash::from($allTag);
-			unset($tag->article_id);
-			$this->articlesModel->insertRelationTags($newId, $tag->tag_id);
+			$tag = ArrayHash::from($allTag->toArray());
+			unset($tag->articleId);
+			$this->articlesModel->insertRelationTags($newId, $tag->tagId);
 		}
 
 	}
@@ -114,7 +114,7 @@ class Article
 		if($id == null){
 			return null;
 		}
-		return $this->articlesModel->findAll()->where("history_id", $id)->order("create_date")->fetchAll();
+		return $this->articlesModel->findAll()->where("historyId", $id)->order("createDate")->fetchAll();
 	}
 
 }

@@ -76,7 +76,7 @@ class FacebookLogin
 					'',
 					\Nette\Utils\ArrayHash::from(array(
 						"active" => false,
-						"first_name" => $oauthUser->getFirstName(),
+						"firstName" => $oauthUser->getFirstName(),
 						"surname" => $oauthUser->getLastName(),
 						Users::COLUMN_OAUTH_SERVICE => self::OAUTH_SERVICE,
 						Users::COLUMN_OAUTH_ID => $oauthUser->getId(),

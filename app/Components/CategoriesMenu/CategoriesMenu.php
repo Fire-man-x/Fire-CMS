@@ -24,6 +24,9 @@ class CategoriesMenu extends Control
 
 	private ?int $activeCategory;
 
+	/** Jazyk administrace, ve kterém se zobrazují názvy kategorií (null = výchozí jazyk webu) */
+	private ?string $language = null;
+
 
 	/**
 	 * CategoriesMenu
@@ -33,13 +36,19 @@ class CategoriesMenu extends Control
 		private Category $categoriesService,
 		private \Nette\Localization\Translator $translator)
 	{
-		$this->categories = $this->createTree($this->categoriesModel->getAllForMenu()->fetchAll());
 	}
 
 
 	public function setActiveCategory($activeCategory): self
 	{
 		$this->activeCategory = $activeCategory;
+		return $this;
+	}
+
+
+	public function setLanguage(?string $language): self
+	{
+		$this->language = $language;
 		return $this;
 	}
 
@@ -60,6 +69,11 @@ class CategoriesMenu extends Control
 
 		$this->template->setFile($this->templateFile);
 
+		$categories = $this->categoriesModel->getAllForMenu()
+			->select($this->categoriesModel->getTableName() . ".*");
+		$this->categoriesModel->selectTitle($categories, "`" . $this->categoriesModel->getTableName() . "`.`id`", $this->language);
+		$this->categories = $this->createTree($categories->fetchAll());
+
 		$this->template->categories = $this->categories;
 		$this->template->activeCategory = $this->activeCategory;
 
@@ -75,10 +89,10 @@ class CategoriesMenu extends Control
 	{
 		$tree = array();
 		foreach ($items as $itemId => $item){
-			if($item->parent_id == $parent){
+			if($item->parentId == $parent){
 				$category = $item->toArray();
 				unset($items[$itemId]);
-				$category['childs'] = $this->createTree($items, $category['category_id'], $level+1);
+				$category['childs'] = $this->createTree($items, $category['id'], $level+1);
 				$tree[] = \Nette\Utils\ArrayHash::from($category, false);
 			}
 		}
@@ -93,8 +107,8 @@ class CategoriesMenu extends Control
 	{
 		foreach ($items as $position => $item){
 			$toArray[] = array(
-				"category_id"=>$item["id"],
-				"parent_id"=>$parent,
+				"id"=>$item["id"],
+				"parentId"=>$parent,
 				"position"=>$position,
 				"level"=>$level
 			);
@@ -142,12 +156,12 @@ class CategoriesMenu extends Control
 	#[Secured]
 	#[Resource('Categories')]
 	#[Privilege('delete')]
-	public function handleRemoveCategory(int $category_id): void
+	public function handleRemoveCategory(int $categoryId): void
 	{
 		//delete
 		try
 		{
-			$redirectToCategoryId = $this->categoriesService->delete($category_id);
+			$redirectToCategoryId = $this->categoriesService->delete($categoryId);
 		}catch(ForbiddenRequestException $e){
 			$this->getPresenter()->flashMessage($e->getMessage(), FLASH_FAILED);
 			$this->redirect('this');
@@ -155,7 +169,7 @@ class CategoriesMenu extends Control
 
 		//redirect
 		$redirectToId = null;
-		if($this->getPresenter()->id == $category_id){
+		if($this->getPresenter()->id == $categoryId){
 			$redirectToId = $redirectToCategoryId;
 		}
 

@@ -16,8 +16,11 @@ use App\Service\Category;
 use App\Service\LanguageService;
 use App\Service\Meta;
 use App\Service\Tag;
-use Nette;
 use Nette\Application\Attributes\Persistent;
+use Nette\Application\BadRequestException;
+use Nette\Application\UI\Form;
+use Nette\InvalidArgumentException;
+use Nette\Utils\ArrayHash;
 
 /**
  * Category Presenter
@@ -105,7 +108,7 @@ class CategoriesPresenter extends BasePresenter
 		if($this->id){
 			$itemExist = $this->categoriesModel->getById($this->id);
 			if(!$itemExist){
-				throw new \Nette\Application\BadRequestException("Item with id '$this->id' doesn't exist.");
+				throw new BadRequestException("Item with id '$this->id' doesn't exist.");
 			}
 		}
 		if($this->type == null){
@@ -116,7 +119,7 @@ class CategoriesPresenter extends BasePresenter
 			}
 		}
 		if(!array_key_exists($this->type, CategoryFormFactory::$types)){
-			throw new \Nette\Application\BadRequestException("Type '$this->type' doesn't exist.");
+			throw new BadRequestException("Type '$this->type' doesn't exist.");
 		}
 		$this->template->type = $this->type;
 
@@ -161,7 +164,7 @@ class CategoriesPresenter extends BasePresenter
 			$files = $this->categoriesModel->getRelationFile($this->id);
 			$this->template->files = array();
 			foreach ($files as $file){
-				$tmpFile = \Nette\Utils\ArrayHash::from($file->toArray());
+				$tmpFile = ArrayHash::from($file->toArray());
 				$tmpFile->file = $this->filesModel->toFileEntity($file);
 				$this->template->files[] = $tmpFile;
 
@@ -176,7 +179,7 @@ class CategoriesPresenter extends BasePresenter
 	/**
 	 * Sign-up form factory.
 	 */
-	protected function createComponentCategoryForm(): Nette\Application\UI\Form
+	protected function createComponentCategoryForm(): Form
 	{
 		$this->categoryFactory->setParent($this->parent);
 		$form = $this->categoryFactory->create(
@@ -196,7 +199,7 @@ class CategoriesPresenter extends BasePresenter
 	/**
 	 * Sign-up form factory.
 	 */
-	protected function createComponentMetaValueForm(): Nette\Application\UI\Form
+	protected function createComponentMetaValueForm(): Form
 	{
 		$this->metaValueFactory->setType(Meta::TYPE_CATEGORY);
 		$form = $this->metaValueFactory->create($this->id, array($this, "link"), $this->actualLanguage);
@@ -218,7 +221,8 @@ class CategoriesPresenter extends BasePresenter
 	protected function createComponentCategoriesMenu(): CategoriesMenu
 	{
 		$control =  $this->categoriesMenu;
-		$control->setActiveCategory($this->parent ?: $this->id);
+		$control->setActiveCategory($this->parent ?: $this->id)
+			->setLanguage($this->language);
 
 		return $control;
 	}
@@ -261,9 +265,9 @@ class CategoriesPresenter extends BasePresenter
 	#[Secured]
 	#[Resource('Categories')]
 	#[Privilege('delete')]
-	public function handleRemoveImage($file_id): void
+	public function handleRemoveImage(int $fileId): void
 	{
-		$this->categoriesModel->deleteRelationFile($this->id, $file_id);
+		$this->categoriesModel->deleteRelationFile($this->id, $fileId);
 
 		if($this->isAjax()){
 			$this->redrawControl("files");
@@ -300,7 +304,7 @@ class CategoriesPresenter extends BasePresenter
 		$items = $this->tagService->findByName($this->actualLanguage, $query);
 		foreach ($items as &$item){
 			$item = array(
-				\Achse\TagInput\DataSourceDescriptor::DEFAULT_VALUE_PROPERTY => null, //$item["name"] == null ? $item["grid_name"] : null,
+				\Achse\TagInput\DataSourceDescriptor::DEFAULT_VALUE_PROPERTY => null,
 				\Achse\TagInput\DataSourceDescriptor::DEFAULT_LABEL_PROPERTY => $item["label"]
 			);
 		}

@@ -1,4 +1,4 @@
-INSERT INTO `firecms_languages` (`language_id`, `active`, `default`, `position`, `name`, `shortcut`) VALUES
+INSERT INTO `firecms_languages` (`languageId`, `active`, `default`, `position`, `name`, `shortcut`) VALUES
 	('en',	1,	1,	1,	'Angličitina',	'EN'),
 	('jn',	0,	0,	3,	'Jablka',	'JN');
 
@@ -12,7 +12,7 @@ INSERT INTO `firecms_options` (`key`, `value`) VALUES
 	('main_email',	'info@example.com'),
 	('themePath',	'sdh');
 
-INSERT INTO `firecms_modules` (`parent_id`, `name`, `privilege`, `title`) VALUES
+INSERT INTO `firecms_modules` (`parentId`, `name`, `privilege`, `title`) VALUES
 	(NULL,	'Settings',	NULL,	'Settings'),
 	(NULL,	'Users',	NULL,	'Users'),
 	(NULL,	'Roles',	NULL,	'Roles'),
@@ -29,14 +29,14 @@ INSERT INTO `firecms_modules` (`parent_id`, `name`, `privilege`, `title`) VALUES
 	(NULL,	'Tags',	NULL,	'Tags'),
 	(NULL,	'Comments',	NULL,	'Comments');
 
-INSERT INTO `firecms_roles` (`role_id`, `parent_id`, `default`, `position`, `name`, `title`) VALUES
+INSERT INTO `firecms_roles` (`id`, `parentId`, `default`, `position`, `name`, `title`) VALUES
 	(1,	NULL,	1,	1,	'admin',	'Administrátor'),
 	(2,	NULL,	1,	2,	'editor',	'Redaktor'),
 	(3,	NULL,	1,	3,	'author',	'Editor'),
 	(4,	NULL,	1,	4,	'subscriber',	'Návštěvník');
 
 
-INSERT INTO `firecms_roleModule` (`role_id`, `module_id`, `privilege`) VALUES
+INSERT INTO `firecms_roleModule` (`roleId`, `moduleId`, `privilege`) VALUES
 	(2,	4,	'edit'),
 	(2,	5,	'edit'),
 	(2,	6,	'approve_article'),
@@ -51,14 +51,14 @@ INSERT INTO `firecms_roleModule` (`role_id`, `module_id`, `privilege`) VALUES
 	(4,	5,	'view');
 
 
-INSERT INTO `firecms_users` (`user_id`, `username`, `password`, `email`, `active`, `nickname`, `first_name`, `surname`, `role_id`, `recovery_password_time`, `recovery_password_token`) VALUES
+INSERT INTO `firecms_users` (`id`, `username`, `password`, `email`, `active`, `nickname`, `firstName`, `surname`, `roleId`, `recoveryPasswordTime`, `recoveryPasswordToken`) VALUES
 	(1,	'admin',	'$2y$10$xJ4UKIKHweoiIikx9Fv2tuFc.bq7cQqKYdYnRnX.0Ca6IbdDhinTO',	'admin@firecms.test',	1,	NULL,	'Administrator',	'',	1,	NULL,	NULL),
 	(2,	'editor',	'$2y$10$rQ/ab7dMFHmpf5u8SOmnyuMuRNgxJrZX2nmXDEEtiYp/AL8YuMZmq',	'editor@firecms.test',	1,	NULL,	'Editor',	'',	2,	NULL,	NULL),
 	(3,	'author',	'$2y$10$9mYTRqXK15PZNqOt3Av.TOlB1xa9Wae7h23Phm9BN.xI8DVyJQmsm',	'author@firecms.test',	0,	NULL,	'',	'',	4,	NULL,	NULL),
 	(4,	'subscriber1',	'$2y$10$mYWEI00EarBV25qDxs5zRuYxhk/RlNfhXMDySbMeXThql3JeqZXV2',	'subscriber1@firecms.test',	0,	NULL,	'',	'',	4,	NULL,	NULL),
 	(5,	'subscriber2',	'$2y$10$sqj0wlr5WS1ss1PaEbTsQezx8ed/ct6T.l0a9gJFNu5Z0g.lpQ6AG',	'subscriber2@firecms.test',	0,	NULL,	'',	'',	4,	NULL,	NULL);
 
-INSERT INTO `firecms_fileFolders` (`file_folder_id`, `parent_id`, `name`, `default`, `position`, `level`) VALUES
+INSERT INTO `firecms_fileFolders` (`id`, `parentId`, `name`, `default`, `position`, `level`) VALUES
 	(1,	NULL,	'Nezařazené',	1,	0,	0),
 	(2,	NULL,	'Download',	0,	1,	0),
 	(3,	NULL,	'Upload',	0,	2,	0),

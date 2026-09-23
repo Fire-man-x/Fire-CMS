@@ -22,7 +22,7 @@ class TagsPresenter extends BasePresenter
 	public function renderDefault(): void
 	{
 		$tag = $this->tagsModel->getTranslationTable()
-			->where("language_id", $this->language)
+			->where("languageId", $this->language)
 			->where("name", $this->url)
 			->fetch();
 		if(!$tag || !$this->url){
@@ -40,15 +40,15 @@ class TagsPresenter extends BasePresenter
 		$this->template->tag = $tag;
 
 		//set query to control
-		$this->articles->whereTag($tag->tag_id);
-		$this->categories->whereTag($tag->tag_id);
+		$this->articles->whereTag($tag->tagId);
+		$this->categories->whereTag($tag->tagId);
 
 		//set links to languageChanger
-		$lanuageItems = $this->tagsModel->getTranslationTable()->where($this->tagsModel->getColumnId(), $tag->tag_id)->fetchAll();
+		$lanuageItems = $this->tagsModel->getTranslationTable()->where($this->tagsModel->getForeignKeyColumn(), $tag->tagId)->fetchAll();
 		foreach ($lanuageItems as $lanuageItem) {
-			$this->languageChanger->setLinkForLanguage($lanuageItem->language_id, $this->link("this", array(
+			$this->languageChanger->setLinkForLanguage($lanuageItem->languageId, $this->link("this", array(
 					"id" => $lanuageItem->name,
-					"locale" => $lanuageItem->language_id
+					"locale" => $lanuageItem->languageId
 			)));
 		}
 	}

@@ -122,6 +122,7 @@ class MenusPresenter extends BasePresenter
 			->order("name")
 			->order("location");
 		$primaryKey = $this->menusModel->getColumnId();
+		$paramKey = $this->menusModel->getForeignKeyColumn();
 
 		$grid = new Datagrid($this, $name);
 		$grid->setPrimaryKey($primaryKey);
@@ -148,7 +149,7 @@ class MenusPresenter extends BasePresenter
 		$grid->addColumnText("location", "Template location");
 
 		//Actions
-		$grid->addAction('edit', 'Edit', 'edit!', array($primaryKey => $primaryKey))
+		$grid->addAction('edit', 'Edit', 'edit!', array($paramKey => $primaryKey))
 			->setClass('btn btn-primary btn-sm ajax')
 			->setIcon(ICON_EDIT)
 			->setTitle('Edit')
@@ -162,7 +163,7 @@ class MenusPresenter extends BasePresenter
 			->setIcon('list')
 			->setTitle('Items');
 
-		$grid->addAction('delete', 'Delete', 'delete!', array($primaryKey => $primaryKey))
+		$grid->addAction('delete', 'Delete', 'delete!', array($paramKey => $primaryKey))
 			->setClass('btn btn-danger btn-sm ajax')
 			->setIcon(ICON_DELETE)
 			->setTitle('Delete')
@@ -184,7 +185,8 @@ class MenusPresenter extends BasePresenter
 	protected function createComponentMenuItemsGrid(string $name): Datagrid
 	{
 		$source = $this->menusModel->getRelationMenuItems($this->id);
-		$primaryKey = "category_id";
+		$this->categoriesModel->selectTitle($source, "`" . Menus::MENU_ITEM_TABLE_NAME . "`.`categoryId`", $this->language);
+		$primaryKey = "categoryId";
 		$self = $this;
 
 		$grid = new Datagrid($this, $name);
@@ -193,15 +195,14 @@ class MenusPresenter extends BasePresenter
 		$grid->setTranslator($this->translator);
 		$grid->setSortable();
 
-		$grid->addColumnText("grid_name", "Name")
+		$grid->addColumnText("title", "Name")
 			->setRenderer(function ($row) {
 				if (!$row['active']) {
-					return '<span class="font-italic">' . $row['grid_name'] . '</span>';
+					return Nette\Utils\Html::el('span', ['class' => 'font-italic'])->setText((string) $row['title']);
 				} else {
-					return $row["grid_name"];
+					return $row["title"];
 				}
-			})
-			->setTemplateEscaping(false);
+			});
 
 		//Actions
 		$grid->addAction('delete', 'Delete', 'removeCategory!', array($primaryKey => $primaryKey))
@@ -224,8 +225,9 @@ class MenusPresenter extends BasePresenter
 	protected function createComponentModalMenuItemsGrid(string $name): Datagrid
 	{
 		$source = $this->getMenuItemChildrens(null);
-		//$source->setParentKey("parent_id");
+		//$source->setParentKey("parentId");
 		$primaryKey = $this->categoriesModel->getColumnId();
+		$paramKey = $this->categoriesModel->getForeignKeyColumn();
 
 		$grid = new Datagrid($this, $name);
 		$grid->setPrimaryKey($primaryKey);
@@ -233,12 +235,12 @@ class MenusPresenter extends BasePresenter
 		$grid->setTranslator($this->translator);
 
 		//tree
-		$grid->setTreeView([$this, 'getMenuItemChildrens'], 'parent_id');
+		$grid->setTreeView([$this, 'getMenuItemChildrens'], 'parentId');
 
-		$grid->addColumnText("grid_name", "Name");
+		$grid->addColumnText("title", "Name");
 
 		//Actions
-		$grid->addAction('add', 'Add', 'addCategory!', array($primaryKey => $primaryKey))
+		$grid->addAction('add', 'Add', 'addCategory!', array($paramKey => $primaryKey))
 			->setClass('btn btn-primary btn-sm ajax float-right')
 			->setIcon('plus')
 			->setTitle('Add');
@@ -271,12 +273,13 @@ class MenusPresenter extends BasePresenter
 		$this->payload->parr = $parentId;
 		$query = $this->categoriesModel->findAll()
 			->select("*")
-			->select("IFNULL(parent_id,0) AS parent_id")
-			->where("history_id", null)
+			->select("IFNULL(parentId,0) AS parentId")
+			->where("historyId", null)
 			->where("status IN (?)", array('publish','pending','draft'));
+		$this->categoriesModel->selectTitle($query, "`" . $this->categoriesModel->getTableName() . "`.`id`", $this->language);
 		if(isset($parentId))
 		{
-			$query->where("parent_id", $parentId);
+			$query->where("parentId", $parentId);
 		}
 
 		return $query;
@@ -314,9 +317,9 @@ class MenusPresenter extends BasePresenter
 	#[Secured]
 	#[Resource('Menus')]
 	#[Privilege('edit')]
-	public function handleActivate(int $menu_id, bool $status): void
+	public function handleActivate(int $menuId, bool $status): void
 	{
-		$this->menusModel->update($menu_id, array("active" => (boolean) $status));
+		$this->menusModel->update($menuId, array("active" => (boolean) $status));
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 		$this->redirect('this');
 	}
@@ -328,10 +331,10 @@ class MenusPresenter extends BasePresenter
 	#[Secured]
 	#[Resource('Menus')]
 	#[Privilege('edit')]
-	public function handleEdit(int $menu_id): void
+	public function handleEdit(int $menuId): void
 	{
-		$this->menuFactory->setEditId($menu_id);
-		$this->menuFactory->setDefaultValues($this["menuForm"], $menu_id);
+		$this->menuFactory->setEditId($menuId);
+		$this->menuFactory->setDefaultValues($this["menuForm"], $menuId);
 		$this->redrawControl("menuForm");
 	}
 
@@ -343,9 +346,9 @@ class MenusPresenter extends BasePresenter
 	#[Secured]
 	#[Resource('Menus')]
 	#[Privilege('delete')]
-	public function handleDelete(int $menu_id): void
+	public function handleDelete(int $menuId): void
 	{
-		$this->menusModel->delete($menu_id);
+		$this->menusModel->delete($menuId);
 		$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
 
 		$this->flashMessage(FAIL_DELETE, FLASH_FAILED);
@@ -387,9 +390,9 @@ class MenusPresenter extends BasePresenter
 	#[Secured]
 	#[Resource('Menus')]
 	#[Privilege('edit')]
-	public function handleRemoveImage($file_id): void
+	public function handleRemoveImage(int $fileId): void
 	{
-		$this->menusModel->deleteRelationFile($this->id, $file_id);
+		$this->menusModel->deleteRelationFile($this->id, $fileId);
 
 		if($this->isAjax()){
 			$this->redrawControl("files");
@@ -401,14 +404,14 @@ class MenusPresenter extends BasePresenter
 
 	/**
 	 * Add Category handler
-	 * @param $category_id
+	 * @param $categoryId
 	 */
 	#[Secured]
 	#[Resource('Menus')]
 	#[Privilege('add')]
-	public function handleAddCategory($category_id): void
+	public function handleAddCategory(int $categoryId): void
 	{
-		$this->menusModel->insertRelationMenuItem($this->id, $category_id);
+		$this->menusModel->insertRelationMenuItem($this->id, $categoryId);
 
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 		$this->redrawControl("modalMenuItemsGrid");
@@ -422,9 +425,9 @@ class MenusPresenter extends BasePresenter
 	#[Secured]
 	#[Resource('Menus')]
 	#[Privilege('delete')]
-	public function handleRemoveCategory(int $category_id): void
+	public function handleRemoveCategory(int $categoryId): void
 	{
-		$this->menusModel->deleteRelationMenuItem($this->id, $category_id);
+		$this->menusModel->deleteRelationMenuItem($this->id, $categoryId);
 
 		$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
 
@@ -444,9 +447,9 @@ class MenusPresenter extends BasePresenter
 	#[Secured]
 	#[Resource('Menus')]
 	#[Privilege('edit')]
-	public function handleSetCategoryAsMain(int $category_id): void
+	public function handleSetCategoryAsMain(int $categoryId): void
 	{
-		$this->categoriesModel->setRelationMenuAsMain($category_id, $this->id);
+		$this->categoriesModel->setRelationMenuAsMain($categoryId, $this->id);
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 
 		if($this->isAjax()){

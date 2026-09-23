@@ -12,7 +12,7 @@
 					{ifset $items[$language]}
 						<div n:foreach="$items[$language] as $item" class="img-thumbnail d-inline-block" data-file-id="{$item['file']->getId()}" data-position="{$item['position']}">
 							<img n:src="$item['file'], '100x100'" alt="{$item['file']->getName()}" class="">
-							{var $prompt = PROMPT_VALUE}
+							{var $prompt = \PROMPT_VALUE}
 							<small class="d-block text-xs-center">{$item['file']->getName()}<br>URL: {if $item['url']}{$item['url']}{else}{$prompt}{/if}<br>Text: {if $item['text']}{$item['text']}{else}{$prompt}{/if}</small>
 							<div class="text-xs-center">
 							<a href='{link editItem! language=>$language, position=>$item['position']}' class='ajax'><i class='fas fa-pencil-alt'></i></a>

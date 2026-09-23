@@ -50,8 +50,9 @@ class DomainsPresenter extends BasePresenter
 	 */
 	protected function createComponentDomainsGrid(): Datagrid
 	{
-		$source = $this->model->findAll()->order('language_id')->order('default DESC')->order('domain');
+		$source = $this->model->findAll()->order('languageId')->order('default DESC')->order('domain');
 		$primaryKey = $this->model->getColumnId();
+		$paramKey = $this->model->getForeignKeyColumn();
 
 		$grid = new Datagrid();
 		$grid->setPrimaryKey($primaryKey);
@@ -69,11 +70,11 @@ class DomainsPresenter extends BasePresenter
 			->setIcon('check-circle')
 			->setTitle('Set as unactive');
 		$activeColumn->onChange[] = function ($id, $value) {
-			$this->handleActivate($id, $value);
+			$this->handleActivate((int) $id, (bool) $value);
 		};
 
 		//default (canonical domain per language)
-		$grid->addColumnLink('default', 'D.', 'setDefault!', 'default', array($primaryKey => $primaryKey))
+		$grid->addColumnLink('default', 'D.', 'setDefault!', 'default', array($paramKey => $primaryKey))
 			->setClass('btn btn-outline-primary btn-sm')
 			->setIcon('ban')
 			->setTitle($this->translator->translate('Set as default'))
@@ -91,11 +92,11 @@ class DomainsPresenter extends BasePresenter
 
 		//columns
 		$grid->addColumnText("domain", "Domain");
-		$grid->addColumnText("language_id", "Language")
-			->setReplacement($this->languagesModel->findAll()->fetchPairs('language_id', 'name'));
+		$grid->addColumnText("languageId", "Language")
+			->setReplacement($this->languagesModel->findAll()->fetchPairs('languageId', 'name'));
 
 		//Actions
-		$grid->addAction('edit', 'Edit', 'edit!', array($primaryKey => $primaryKey))
+		$grid->addAction('edit', 'Edit', 'edit!', array($paramKey => $primaryKey))
 			->setClass('btn btn-primary btn-sm ajax')
 			->setIcon(ICON_EDIT)
 			->setTitle('Edit')
@@ -104,7 +105,7 @@ class DomainsPresenter extends BasePresenter
 				"data-bs-target" => "#modal"
 			));
 
-		$grid->addAction('delete', 'Delete', 'delete!', array($primaryKey => $primaryKey))
+		$grid->addAction('delete', 'Delete', 'delete!', array($paramKey => $primaryKey))
 			->setClass('btn btn-danger btn-sm ajax')
 			->setIcon(ICON_DELETE)
 			->setTitle('Delete')
@@ -152,12 +153,12 @@ class DomainsPresenter extends BasePresenter
 	/**
 	 * Edit handler
 	 */
-	public function handleEdit(int $domain_id): void
+	public function handleEdit(int $domainId): void
 	{
-		$this->factory->setEditId($domain_id);
+		$this->factory->setEditId($domainId);
 		/** @var Nette\Application\UI\Form $form */
 		$form = $this["domainForm"];
-		$this->factory->setDefaultValues($form, $domain_id);
+		$this->factory->setDefaultValues($form, $domainId);
 		$this->redrawControl("domainForm");
 	}
 
@@ -165,9 +166,9 @@ class DomainsPresenter extends BasePresenter
 	/**
 	 * Delete handler
 	 */
-	public function handleDelete(int $domain_id): void
+	public function handleDelete(int $domainId): void
 	{
-		$this->model->delete($domain_id);
+		$this->model->delete($domainId);
 		$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
 		$this->redirect('this');
 	}
@@ -176,14 +177,14 @@ class DomainsPresenter extends BasePresenter
 	/**
 	 * Activate
 	 */
-	public function handleActivate(int $domain_id, bool $status = false): void
+	public function handleActivate(int $domainId, bool $status = false): void
 	{
-		$this->model->update($domain_id, array("active" => $status));
+		$this->model->update($domainId, array("active" => $status));
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 
 		if ($this->isAjax()) {
 			$this->redrawControl('flashes');
-			$this['domainsGrid']->redrawItem($domain_id, 'domain_id');
+			$this['domainsGrid']->redrawItem($domainId, 'id');
 		} else {
 			$this->redirect('this');
 		}
@@ -193,12 +194,12 @@ class DomainsPresenter extends BasePresenter
 	/**
 	 * Set as default (canonical) domain within its language
 	 */
-	public function handleSetDefault(int $domain_id): void
+	public function handleSetDefault(int $domainId): void
 	{
-		$domain = $this->model->getById($domain_id);
+		$domain = $this->model->getById($domainId);
 		if ($domain) {
-			$this->model->findAll()->where('language_id', $domain->language_id)->update(array("default" => false));
-			$this->model->update($domain_id, array("default" => true));
+			$this->model->findAll()->where('languageId', $domain->languageId)->update(array("default" => false));
+			$this->model->update($domainId, array("default" => true));
 			$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 		}
 		$this->redirect('this');

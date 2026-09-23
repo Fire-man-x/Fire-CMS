@@ -61,14 +61,14 @@
 				{snippet files}
 					{if $files}
 						{foreach $files as $file}
-							{var $is_image = $file instanceof App\Components\FileManager\Files\HashImageEntity}
+							{var $isImage = $file instanceof App\Components\FileManager\Files\HashImageEntity}
 							{var $fileId = $file->getId()}
-							<div n:snippet="file-{$fileId}" class="img-thumbnail galery-thumbnail d-inline-block float-left" data-file-id="{$file->getId()}" data-is-image="{if $is_image}1{else}0{/if}">
+							<div n:snippet="file-{$fileId}" class="img-thumbnail galery-thumbnail d-inline-block float-left" data-file-id="{$file->getId()}" data-is-image="{if $isImage}1{else}0{/if}">
 								<input type="checkbox" id="checkbox{$file->getId()}"  class="btn-primary"/>
 								<label for="checkbox{$file->getId()}">
 									<a {*nx:tag-if="!$isWindowMode"*} n:href="fileInfo! hash=>$file->getHash()" class="ajax" {*data-ajax-pass=""*}>
 										<div class="galery-thumbnail-centered">
-											{if $is_image}
+											{if $isImage}
 												<img n:src="$file, '130x130'" alt="{$file->getName()}">
 											{else}
 												<span class="btn fa fa-file-{$presenter->getIconOfFile($file->getExtension())}-o d-block"></span>
@@ -103,24 +103,24 @@
 				{ifset $fileInfo}
 					{form fileNameForm}
 					<div class="row mb-3 required">
-						<div class="col-sm-3 col-form-label">{label new_name /} {*_"Name"*}</div>
+						<div class="col-sm-3 col-form-label">{label newName /} {*_"Name"*}</div>
 
 						<div class="col-sm-9">
 							<div class="input-group">
-								{input new_name class=>'form-control'}
+								{input newName class=>'form-control'}
 								<span class="input-group-btn">
 									{input send class=>'btn btn-primary button'}
 								</span>
 							</div>
 						</div>
 
-						<div class="col-sm-12">({$fileInfo->disk_name})</div>
+						<div class="col-sm-12">({$fileInfo->diskName})</div>
 					</div>
 					{input editId}
 					{/form}
 					<div class="row mb-3 required">
 						<div class="col-sm-3 col-form-label">{_"Date"}</div>
-						<div class="col-sm-9">{$fileInfo->create_date|date:\DATETIME_FORMAT}</div>
+						<div class="col-sm-9">{$fileInfo->createDate|date:\DATETIME_FORMAT}</div>
 					</div>
 					<div class="row mb-3 required">
 						<div class="col-sm-3 col-form-label">{_"Size"}</div>
@@ -129,15 +129,15 @@
 					<div class="row mb-3 required">
 						<div class="col-sm-3 col-form-label">{_"Repair rotation"}</div>
 						<div class="col-sm-9">
-							<a href="{link repairImageOrientation! fileId => $fileInfo->file_id}" class="ajax btn btn-sm btn-outline-dark"><i class="fa fa-hammer"></i></a>
-							<a href="{link rotateImage! fileId => $fileInfo->file_id, rotateDirection => 'left'}" class="ajax btn btn-sm btn-outline-dark"><i class="fa fa-undo"></i></a>
-							<a href="{link rotateImage! fileId => $fileInfo->file_id, rotateDirection => 'right'}" class="ajax btn btn-sm btn-outline-dark"><i class="fa fa-redo"></i></a>
+							<a href="{link repairImageOrientation! fileId => $fileInfo->id}" class="ajax btn btn-sm btn-outline-dark"><i class="fa fa-hammer"></i></a>
+							<a href="{link rotateImage! fileId => $fileInfo->id, rotateDirection => 'left'}" class="ajax btn btn-sm btn-outline-dark"><i class="fa fa-undo"></i></a>
+							<a href="{link rotateImage! fileId => $fileInfo->id, rotateDirection => 'right'}" class="ajax btn btn-sm btn-outline-dark"><i class="fa fa-redo"></i></a>
 						</div>
 					</div>
 					<div class="row mb-3 required">
 						<div class="col-sm-3"></div>
 
-						<div class="col-sm-9"><a n:href="delete! hash=>$fileInfo->disk_name" class="btn btn-danger"><i class="fa fa-trash"></i> {_"Delete"}</a></div>
+						<div class="col-sm-9"><a n:href="delete! hash=>$fileInfo->diskName" class="btn btn-danger"><i class="fa fa-trash"></i> {_"Delete"}</a></div>
 					</div>
 				{else}
 					<div>

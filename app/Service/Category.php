@@ -33,31 +33,31 @@ class Category
 		//begin
 		$this->categoriesModel->getDatabase()->beginTransaction();
 
-		$hasParent = isset($values["parent_id"]);
+		$hasParent = isset($values["parentId"]);
 		
 		//last right
 		$rightQuery = $this->categoriesModel->getAllForMenu();
 		if($hasParent){
-			$rightQuery->select($this->categoriesModel->getTableName().".category_right AS max_right");
-			$rightQuery->where("category_id", $values["parent_id"]);
+			$rightQuery->select($this->categoriesModel->getTableName().".categoryRight AS max_right");
+			$rightQuery->where("id", $values["parentId"]);
 		}else{
-			$rightQuery->select("IFNULL(MAX(".$this->categoriesModel->getTableName().".category_right), 0) AS max_right");
+			$rightQuery->select("IFNULL(MAX(".$this->categoriesModel->getTableName().".categoryRight), 0) AS max_right");
 		}
 		$right = $rightQuery->fetchField();
 		if ($hasParent) {
-			$values["category_left"] = $right;
-			$values["category_right"] = $right + 1;
+			$values["categoryLeft"] = $right;
+			$values["categoryRight"] = $right + 1;
 
 			$this->categoriesModel->getAllForMenu()
-				->where("category_right >= ?", $right)
-				->update(array("category_right" => new \Nette\Database\SqlLiteral("`category_right` + 2")));
+				->where("categoryRight >= ?", $right)
+				->update(array("categoryRight" => new \Nette\Database\SqlLiteral("`categoryRight` + 2")));
 
 			$this->categoriesModel->getAllForMenu()
-				->where("category_left >= ?", $right)
-				->update(array("category_left" => new \Nette\Database\SqlLiteral("`category_left` + 2")));
+				->where("categoryLeft >= ?", $right)
+				->update(array("categoryLeft" => new \Nette\Database\SqlLiteral("`categoryLeft` + 2")));
 		} else {
-			$values["category_left"] = $right + 1;
-			$values["category_right"] = $right + 2;
+			$values["categoryLeft"] = $right + 1;
+			$values["categoryRight"] = $right + 2;
 		}
 
 		$id = $this->categoriesModel->insert($values);
@@ -99,23 +99,23 @@ class Category
 
 		//repair parent
 		$this->categoriesModel->getAllForMenu()
-			->where("parent_id", $categoryId)
-			->update(array("parent_id" => $categoryInfo->parent_id));
+			->where("parentId", $categoryId)
+			->update(array("parentId" => $categoryInfo->parentId));
 
 		//repair left-right
-		$left = $categoryInfo->category_left;
-		$right = $categoryInfo->category_right;
+		$left = $categoryInfo->categoryLeft;
+		$right = $categoryInfo->categoryRight;
 		$width = $right - $left + 1;
 
 		$this->categoriesModel->findAll()
-			->where("category_right >= ?", $right)
-			->update(array("category_right"=> new \Nette\Database\SqlLiteral("`category_right` - ".$width)));
+			->where("categoryRight >= ?", $right)
+			->update(array("categoryRight"=> new \Nette\Database\SqlLiteral("`categoryRight` - ".$width)));
 
 		$this->categoriesModel->findAll()
-			->where("category_left >= ?", $left)
-			->update(array("category_left"=> new \Nette\Database\SqlLiteral("`category_left` - ".$width)));
+			->where("categoryLeft >= ?", $left)
+			->update(array("categoryLeft"=> new \Nette\Database\SqlLiteral("`categoryLeft` - ".$width)));
 
-		return $categoryInfo->parent_id;
+		return $categoryInfo->parentId;
 	}
 
 
@@ -139,7 +139,7 @@ class Category
 		if ($id == null) {
 			return 0;
 		}
-		return $this->categoriesModel->findAll()->where("history_id", $id)->count();
+		return $this->categoriesModel->findAll()->where("historyId", $id)->count();
 	}
 
 
@@ -148,10 +148,10 @@ class Category
 	 */
 	public function makeBackup(int $id): void
 	{
-		//$this->categorysModel->getDatabase()->query("INSERT INTO ".$this->categorysModel->getTableName()." SELECT *, null AS category_id FROM ".$this->categorysModel->getTableName()." WHERE category_id = 10");
+		//$this->categorysModel->getDatabase()->query("INSERT INTO ".$this->categorysModel->getTableName()." SELECT *, null AS categoryId FROM ".$this->categorysModel->getTableName()." WHERE categoryId = 10");
 		$categoryToDuplicate = ArrayHash::from($this->categoriesModel->getById($id)?->toArray());
-		$categoryToDuplicate->history_id = $categoryToDuplicate->category_id;
-		$categoryToDuplicate->category_id = null;
+		$categoryToDuplicate->historyId = $categoryToDuplicate->id;
+		$categoryToDuplicate->id = null;
 
 		//category
 		$newId = $this->categoriesModel->insert($categoryToDuplicate);
@@ -159,12 +159,12 @@ class Category
 		//description
 		$allWithTranslations = $this->categoriesModel->getTranslationTable()
 			->select(Model\Categories::TRANSLATION_TABLE_NAME.".*")
-			->where(Model\Categories::TRANSLATION_TABLE_NAME.".category_id", $id)
+			->where(Model\Categories::TRANSLATION_TABLE_NAME.".categoryId", $id)
 			->fetchAll();
 		foreach ($allWithTranslations as $allWithTranslation){
 			$translation = ArrayHash::from($allWithTranslation->toArray());
-			unset($translation->category_id);
-			unset($translation->update_date);
+			unset($translation->categoryId);
+			unset($translation->updateDate);
 			$this->categoriesModel->insertTranslation($newId, $allWithTranslation->language, $translation);
 		}
 
@@ -172,43 +172,43 @@ class Category
 		$allFiles = $this->categoriesModel->getRelationFile($id)->fetchAll();
 		foreach ($allFiles as $allFile){
 			$file = ArrayHash::from(array(
-				"file_id" => $allFile->file_id,
-				"is_main" => $allFile->is_main,
+				"fileId" => $allFile->fileId,
+				"isMain" => $allFile->isMain,
 				"position" => $allFile->position,
 			));
-			$this->categoriesModel->insertRelationFile($newId, $file->file_id, $file);
+			$this->categoriesModel->insertRelationFile($newId, $file->fileId, $file);
 		}
 
 		//category_article
 		$allArticles = $this->categoriesModel->getDatabase()->table(Model\Categories::RELATION_ARTICLE_TABLE_NAME)
 			->select(Model\Categories::RELATION_ARTICLE_TABLE_NAME.".*")
-			->where("category_id", $id)
+			->where("categoryId", $id)
 			->fetchAll();
-		/** @var array $allArticle */
+		/** @var \Nette\Database\Table\ActiveRow $allArticle */
 		foreach ($allArticles as $allArticle){
-			$article = ArrayHash::from($allArticle);
-			unset($article->category_id);
-			$this->categoriesModel->insertRelationArticle($newId, $article->article_id, $article);
+			$article = ArrayHash::from($allArticle->toArray());
+			unset($article->categoryId);
+			$this->categoriesModel->insertRelationArticle($newId, $article->articleId, $article);
 		}
 
 		//category_meta
 		/*$allMetas = $this->categorysModel->getRelationCategory($id)->fetchAll();
 		foreach ($allMetas as $allMeta){
 			$meta = ArrayHash::from($allMeta);
-			unset($meta->category_id);
-			$this->categoriesModel->insertRelationCategory($meta->category_id, $newId, $meta);
+			unset($meta->categoryId);
+			$this->categoriesModel->insertRelationCategory($meta->categoryId, $newId, $meta);
 		}*/
 
 		//category_tag
 		$allTags = $this->categoriesModel->getRelationTagsTable()
 			->select($this->categoriesModel->getRelationTagsTable()->getName().".*")
-			->where("category_id", $id)
+			->where("categoryId", $id)
 			->fetchAll();
-		/** @var array $allTag */
+		/** @var \Nette\Database\Table\ActiveRow $allTag */
 		foreach ($allTags as $allTag){
-			$tag = ArrayHash::from($allTag);
-			unset($tag->category_id);
-			$this->categoriesModel->insertRelationTags($newId, $tag->tag_id);
+			$tag = ArrayHash::from($allTag->toArray());
+			unset($tag->categoryId);
+			$this->categoriesModel->insertRelationTags($newId, $tag->tagId);
 		}
 
 	}
@@ -222,7 +222,7 @@ class Category
 		if($id == null){
 			return null;
 		}
-		return $this->categoriesModel->findAll()->where("history_id", $id)->order("create_date")->fetchAll();
+		return $this->categoriesModel->findAll()->where("historyId", $id)->order("createDate")->fetchAll();
 	}
 
 
@@ -233,9 +233,9 @@ class Category
 	{
 		//list
 		$categoriesList = $this->categoriesModel->getAllForMenu()
-			->select("categories.category_id, categories.parent_id")
+			->select("categories.id, categories.parentId")
 			->order("position ASC")
-			->fetchAssoc("parent_id|category_id");
+			->fetchAssoc("parentId|id");
 
 		$parents = $categoriesList[null];
 		unset($categoriesList[null]);
@@ -268,10 +268,10 @@ class Category
 
 		//save to DB
 		$this->categoriesModel->findAll()
-			->where("category_id", $node['category_id'])
+			->where("id", $node['id'])
 			->update(array(
-				"category_left"=> $node['left'],
-				"category_right"=> $node['right'],
+				"categoryLeft"=> $node['left'],
+				"categoryRight"=> $node['right'],
 			));
 
 		return $left;
@@ -289,16 +289,16 @@ class Category
 
 		$commentsChilds = clone $comments;
 
-		$comments->where("parent_id", null)
-			->order("create_date DESC");
+		$comments->where("parentId", null)
+			->order("createDate DESC");
 		//item count
 		$itemsCount = $comments->count();
 		$paginator->setItemCount($itemsCount);
 		//normal list
-		$commentsList = $comments->limit($paginator->getItemsPerPage(), $paginator->getOffset())->fetchAssoc("comment_id");
+		$commentsList = $comments->limit($paginator->getItemsPerPage(), $paginator->getOffset())->fetchAssoc("id");
 
 		//child list
-		$childList = $commentsChilds->where("parent_id IS NOT NULL")->order("left ASC")->fetchAssoc("parent_id|comment_id");
+		$childList = $commentsChilds->where("parentId IS NOT NULL")->order("left ASC")->fetchAssoc("parentId|id");
 
 		foreach ($commentsList as $commentId => $comment) {
 			$commentsList[$commentId] = $this->createTree($comment, $childList);
@@ -314,7 +314,7 @@ class Category
 	protected function createTree(array $parent, array $childList)
 	{
 		$parentComment = \Nette\Utils\ArrayHash::from($parent);
-		$parentCommentId = $parentComment->category_id;
+		$parentCommentId = $parentComment->id;
 		if (in_array($parentCommentId, array_keys($childList))) {
 			$parentComment->childs = $childList[$parentCommentId];
 			//walk over all childs

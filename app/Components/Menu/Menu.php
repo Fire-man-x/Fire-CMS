@@ -78,7 +78,7 @@ class Menu extends Control
 			echo $this->translator->translate("Menu doesn't exist.");
 			return;
 		}
-		$this->firstLevelCategories = $this->menusModel->getAllMenuItemsWithTranslation($this->language, $location)->fetchAssoc("category_id");
+		$this->firstLevelCategories = $this->menusModel->getAllMenuItemsWithTranslation($this->language, $location)->fetchAssoc("categoryId");
 		if(!$this->firstLevelCategories){
 			echo $this->translator->translate("No item.");
 			return;
@@ -87,17 +87,17 @@ class Menu extends Control
 		//all categories
 		$this->subCategories = $this->categoriesModel->getAllWithTranslation($this->language)
 			->where("category.active", true)
-			->where("category.show_in_menu", true)
+			->where("category.showInMenu", true)
 			->where("category.status IN ?", array("publish"))
-			->where("category.history_id", null)
-			->fetchAssoc("category_id");
+			->where("category.historyId", null)
+			->fetchAssoc("categoryId");
 		$subCategoriesTree = $this->createTree($this->subCategories, null, 0);
 
 		//walk all categories in first level
 		foreach ($this->firstLevelCategories as $categoryId => &$firstLevelCategory){
 			$items = $this->arrayRecursiveSearch($subCategoriesTree, $categoryId, 0, $maxSublevel); //set only maxSublevel
 
-			$firstLevelCategory['link'] = $this->linkByType($firstLevelCategory["type"], $firstLevelCategory["category_id"], $this->language);
+			$firstLevelCategory['link'] = $this->linkByType($firstLevelCategory["type"], $firstLevelCategory["categoryId"], $this->language);
 			$firstLevelCategory = \Nette\Utils\ArrayHash::from($firstLevelCategory);
 			$firstLevelCategory['childs'] = $items;
 		}
@@ -121,10 +121,10 @@ class Menu extends Control
 	{
 		$tree = array();
 		foreach ($items as $itemId => $category) {
-			if ($category['parent_id'] == $parent) {
+			if ($category['parentId'] == $parent) {
 				unset($items[$itemId]);
-				$category['link'] = $this->linkByType($category["type"], $category["category_id"], $this->language);
-				$category['childs'] = $this->createTree($items, $category['category_id'], $level + 1);
+				$category['link'] = $this->linkByType($category["type"], $category["categoryId"], $this->language);
+				$category['childs'] = $this->createTree($items, $category['categoryId'], $level + 1);
 				$tree[] = \Nette\Utils\ArrayHash::from($category, false);
 			}
 		}
@@ -141,12 +141,12 @@ class Menu extends Control
 	{
 		foreach ($inItems as $itemId => $item) {
 
-			/*if($searchValue == 10 && $item['category_id'] == $searchValue){
+			/*if($searchValue == 10 && $item['categoryId'] == $searchValue){
 				\Tracy\Debugger::barDump($item['childs']);
 			}*/
 
 			//this item has childs
-			if ($item['category_id'] == $searchValue) {
+			if ($item['categoryId'] == $searchValue) {
 				/*	\Tracy\Debugger::barDump($item);
 				$this->arrayCutMaxLevel($item, $level, $maxSublevel);
 					\Tracy\Debugger::barDump($item);
@@ -214,8 +214,8 @@ class Menu extends Control
 	{
 		foreach ($items as $position => $item) {
 			$toArray[] = array(
-				"category_id" => $item["id"],
-				"parent_id" => $parent,
+				"id" => $item["id"],
+				"parentId" => $parent,
 				"position" => $position,
 				"level" => $level
 			);

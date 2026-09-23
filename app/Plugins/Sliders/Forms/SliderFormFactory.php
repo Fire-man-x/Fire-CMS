@@ -52,7 +52,7 @@ class SliderFormFactory extends BaseFormFactory
 		$values->location = str_replace("-", "_", \Nette\Utils\Strings::webalize($values->location));
 
 		if ($this->isEditMode()) {
-			$this->model->update($this->getEditId(), $values);
+			$this->model->update($this->getEditId(), (array) $values);
 		} else {
 			$this->model->insert($values);
 		}

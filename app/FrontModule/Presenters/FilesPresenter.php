@@ -3,11 +3,12 @@ declare(strict_types=1);
 
 namespace App\FrontModule\Presenters;
 
+use App\Components\FileManager\Request\FileRequest;
 use App\Components\FileManager\Request\ImageRequest;
 use App\Components\ViewCounter;
 use App\Model;
-use Nette;
 use Nette\Application\Attributes\Persistent;
+use Nette\Application\BadRequestException;
 
 class FilesPresenter extends BasePresenter
 {
@@ -33,14 +34,14 @@ class FilesPresenter extends BasePresenter
 	{
 		$fileInfo = $this->filesModel->findByHash($this->hash)->fetch();
 		if (!$fileInfo) {
-			throw new Nette\Application\BadRequestException("File with hash '$this->hash' doesn't exist.");
+			throw new BadRequestException("File with hash '$this->hash' doesn't exist.");
 		}
 
 		//viewCounter
 		$this->viewCounter->itemViewed(ViewCounter::TYPE_FILE, $this->hash, $this->language);
 
 		$fileEntity = $this->filesModel->toFileEntity($fileInfo);
-		$fileRequest = \App\Components\FileManager\Requests\FileRequest::fromFile($fileEntity);
+		$fileRequest = FileRequest::fromFile($fileEntity);
 		$response = $this->fileManager->download($fileRequest);
 		$this->sendResponse($response);
 	}
@@ -55,7 +56,7 @@ class FilesPresenter extends BasePresenter
 		$imageDimensions = substr($imageDimensionsToExtension,0, strpos($imageDimensionsToExtension, '.'));
 		$fileInfo = $this->filesModel->findByHash($imageHash)->fetch();
 		if (!$fileInfo) {
-			throw new Nette\Application\BadRequestException("File with hash '$this->hash' doesn't exist.");
+			throw new BadRequestException("File with hash '$this->hash' doesn't exist.");
 		}
 
 		$fileEntity = $this->filesModel->toFileEntity($fileInfo);

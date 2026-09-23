@@ -3,17 +3,20 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Model\TranslatedTitleTrait\TranslatedTitleTrait;
 use App\Components\IViewCounter;
 use App\Modules\CommentsModule\Model\ISubComments;
 use App\Service\LanguageService;
 use Nette\Database\SqlLiteral;
+use Nette\Database\Table\Selection;
 use Nette\Utils\ArrayHash;
 
 /**
  * Categories Model
  */
-class Categories extends BaseModel implements IViewCounter, ISubTags, ISubComments
+class Categories extends BaseModel implements Translatable, IViewCounter, ISubTags, ISubComments
 {
+	use TranslatedTitleTrait;
 
 	const string
 		TRANSLATION_TABLE_NAME = 'firecms_categoryDescriptions';
@@ -32,7 +35,7 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 		$this->languages = $languages;
 
 		$this->setTableName('firecms_categories');
-		$this->setColumnId('category_id');
+		$this->setForeignKeyColumn('categoryId');
 	}
 
 
@@ -49,7 +52,7 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 	 */
 	public function insert(ArrayHash $data): int
 	{
-		$data->create_date = new SqlLiteral("NOW()");
+		$data->createDate = new SqlLiteral("NOW()");
 		$data->position = $this->getNextPosition();
 		return parent::insert($data);
 	}
@@ -74,32 +77,11 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 
 
 	/**
-	 * Update grid name
-	 * @param int $categoryId
-	 * @param string $language
-	 * @param string $name
+	 * Sloupec překladové tabulky s názvem položky (viz TranslatedTitleTrait)
 	 */
-	public function updateGridName($categoryId, $language, $name)
+	protected function getTitleColumn(): string
 	{
-		if($language == $this->languages->getDefaultLanguage() ||
-			($language != $this->languages->getDefaultLanguage() && $this->getById($categoryId)?->grid_name == null)){
-			$this->update($categoryId, array("grid_name"=>$name));
-		}
-	}
-
-
-	/**
-	 * Update grid name
-	 * @param int $categoryId
-	 * @param string $language
-	 * @param string $name
-	 */
-	private function recalculateLeftRightPositions(int $categoryId)
-	{
-		if($language == $this->languages->getDefaultLanguage() ||
-			($language != $this->languages->getDefaultLanguage() && $this->getById($categoryId)?->grid_name == null)){
-			$this->update($categoryId, array("grid_name"=>$name));
-		}
+		return 'title';
 	}
 
 
@@ -107,7 +89,7 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 	 * Get table
 	 * @return \Nette\Database\Table\Selection
 	 */
-	public function getTranslationTable()
+	public function getTranslationTable(): \Nette\Database\Table\Selection
 	{
 		return $this->database->table(self::TRANSLATION_TABLE_NAME);
 	}
@@ -123,10 +105,10 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 		$query = $this->getTranslationTable()
 			->select(self::TRANSLATION_TABLE_NAME.".*")
 			->select("category.*")
-			->where(self::TRANSLATION_TABLE_NAME.".language_id", array_keys($this->languages->getActiveLanguages())) //only active languages
+			->where(self::TRANSLATION_TABLE_NAME.".languageId", array_keys($this->languages->getActiveLanguages())) //only active languages
 			->where("status NOT IN ?", array("auto-draft", "trash"));
 		if($language){
-			$query->where(self::TRANSLATION_TABLE_NAME.".language_id", $language);
+			$query->where(self::TRANSLATION_TABLE_NAME.".languageId", $language);
 		}
 
 		return $query;
@@ -140,9 +122,9 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 	public function getAllForMenu()
 	{
 		$query = $this->findAll()
-			->where("history_id", null)
+			->where("historyId", null)
 			->where("status NOT IN ?", array("auto-draft", "trash"))
-			->order("category_left");
+			->order("categoryLeft");
 
 		return $query;
 	}
@@ -157,9 +139,8 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 	 */
 	public function insertTranslation($categoryId, $language, $data)
 	{
-		$data->{$this->getColumnId()} = $categoryId;
-		$data->language_id = $language;
-		$this->updateGridName($categoryId, $language, $data->title);
+		$data->{$this->getForeignKeyColumn()} = $categoryId;
+		$data->languageId = $language;
 		return $this->getTranslationTable()->insert($data);
 	}
 
@@ -173,7 +154,6 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 	 */
 	public function updateTranslation($categoryId, $language, $data)
 	{
-		$this->updateGridName($categoryId, $language, $data->title);
 		$finded = $this->findTranslationBy($categoryId, $language);
 		if($finded->fetch()){
 			$finded->update($data);
@@ -192,8 +172,8 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 	public function findTranslationBy($categoryId, $language)
 	{
 		return $this->getTranslationTable()
-			->where($this->getColumnId(), $categoryId)
-			->where("language_id", $language);
+			->where($this->getForeignKeyColumn(), $categoryId)
+			->where("languageId", $language);
 	}
 
 
@@ -203,11 +183,11 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 	public function addViewCount(int $categoryId, string $language): void
 	{
 		$data = array(
-			"view_count" => new SqlLiteral("view_count+1")
+			"viewCount" => new SqlLiteral("viewCount+1")
 		);
 		$this->getTranslationTable()
-			->where($this->getColumnId(), $categoryId)
-			->where("language_id", $language)
+			->where($this->getForeignKeyColumn(), $categoryId)
+			->where("languageId", $language)
 			->update($data);
 	}
 
@@ -238,7 +218,7 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 		}
 
 		foreach ($treePositions as &$treePosition){
-			$treePosition["create_date"] =  new SqlLiteral("NOW()");
+			$treePosition["createDate"] =  new SqlLiteral("NOW()");
 		}
 
 		$this->database->query("INSERT INTO `" . $this->getTableName() . "` ? ON DUPLICATE KEY UPDATE ? ", $treePositions, $updateStatement);
@@ -255,8 +235,8 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 		return $this->database->table(self::RELATION_FILE_TABLE_NAME)
 			->select(self::RELATION_FILE_TABLE_NAME.".*")
 			->select("file.*")
-			->where("category_id", $categoryId)
-			//->order("is_main DESC")
+			->where("categoryId", $categoryId)
+			//->order("isMain DESC")
 			->order("position");
 	}
 
@@ -270,20 +250,20 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 	 */
 	public function insertRelationFile($categoryId, $fileId, $data = array())
 	{
-		$data["category_id"] = $categoryId;
-		$data["file_id"] = $fileId;
-		if(!isset($data["is_main"])){
-			$is_main = $this->database->table(self::RELATION_FILE_TABLE_NAME)
-				->select("IF(COUNT(is_main)=0, 1, 0)")
-				->where("is_main", true)
-				->where("category_id", $categoryId)
+		$data["categoryId"] = $categoryId;
+		$data["fileId"] = $fileId;
+		if(!isset($data["isMain"])){
+			$isMain = $this->database->table(self::RELATION_FILE_TABLE_NAME)
+				->select("IF(COUNT(isMain)=0, 1, 0)")
+				->where("isMain", true)
+				->where("categoryId", $categoryId)
 				->fetchField();
-			$data["is_main"] = $is_main;
+			$data["isMain"] = $isMain;
 		}
 		if(!isset($data["position"])){
 			$position = $this->database->table(self::RELATION_FILE_TABLE_NAME)
 				->select("IFNULL(MAX(position),0)+1")
-				->where("category_id",$categoryId)
+				->where("categoryId",$categoryId)
 				->fetchField();
 			$data["position"] = $position;
 		}
@@ -294,30 +274,25 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 
 	/**
 	 * Delete relation with file
-	 * @param int $categoryId
-	 * @param int $fileId
-	 * @return int Row id
 	 */
-	public function deleteRelationFile($categoryId, $fileId)
+	public function deleteRelationFile(int $categoryId, int $fileId): void
 	{
 		$this->database->table(self::RELATION_FILE_TABLE_NAME)
-			->where("category_id", $categoryId)
-			->where("file_id", $fileId)
+			->where("categoryId", $categoryId)
+			->where("fileId", $fileId)
 			->delete();
 	}
 
 
 	/**
 	 * Change positions of items
-	 * @param int $categoryId Id of slider
-	 * @param array $positions Array with sorted files
 	 */
-	public function changeFilePositions($categoryId, $positions)
+	public function changeFilePositions(int $categoryId, array $positions): void
 	{
-		foreach ($positions as $position => $file_id){
+		foreach ($positions as $position => $fileId){
 			$this->database->table(self::RELATION_FILE_TABLE_NAME)
-				->where("category_id", $categoryId)
-				->where("file_id", $file_id)
+				->where("categoryId", $categoryId)
+				->where("fileId", $fileId)
 				->update(array(
 					"position"=>$position+1
 				));
@@ -327,38 +302,32 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 
 	/**
 	 * Inserts relation with article
-	 * @param int $categoryId
-	 * @return \Nette\Database\Table\Selection All articles relation
 	 */
-	public function getRelationArticle($categoryId)
+	public function getRelationArticle(int $categoryId): Selection
 	{
 		return $this->database->table(self::RELATION_ARTICLE_TABLE_NAME)
 			->select(self::RELATION_ARTICLE_TABLE_NAME.".*")
 			->select("article.*")
-			->where("category_id", $categoryId)
-			->order("is_main DESC")
+			->where("categoryId", $categoryId)
+			->order("isMain DESC")
 			->order("position");
 	}
 
 
 	/**
 	 * Inserts relation with article
-	 * @param int $categoryId
-	 * @param int $articleId
-	 * @param ArrayHash $data
-	 * @return int Row id
 	 */
-	public function insertRelationArticle($categoryId, $articleId, $data = array())
+	public function insertRelationArticle(int $categoryId, int $articleId, ArrayHash $data): void
 	{
-		$data["category_id"] = $categoryId;
-		$data["article_id"] = $articleId;
-		if(!isset($data["is_main"])){
-			$is_main = $this->database->table(self::RELATION_ARTICLE_TABLE_NAME)
-				->select("IF(COUNT(is_main)=0, 1, 0)")
-				->where("is_main", true)
-				->where("article_id", $articleId)
+		$data["categoryId"] = $categoryId;
+		$data["articleId"] = $articleId;
+		if(!isset($data["isMain"])){
+			$isMain = $this->database->table(self::RELATION_ARTICLE_TABLE_NAME)
+				->select("IF(COUNT(isMain)=0, 1, 0)")
+				->where("isMain", true)
+				->where("articleId", $articleId)
 				->fetchField();
-			$data["is_main"] = $is_main;
+			$data["isMain"] = $isMain;
 		}
 
 		$this->database->query('INSERT IGNORE INTO '.self::RELATION_ARTICLE_TABLE_NAME.' ?', $data);
@@ -367,53 +336,45 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 
 	/**
 	 * Delete relation with article
-	 * @param int $categoryId
-	 * @param int $articleId
-	 * @return int Row id
 	 */
-	public function deleteRelationArticle($categoryId, $articleId)
+	public function deleteRelationArticle(int $categoryId, int $articleId): void
 	{
 		$this->database->table(self::RELATION_ARTICLE_TABLE_NAME)
-			->where("category_id", $categoryId)
-			->where("article_id", $articleId)
+			->where("categoryId", $categoryId)
+			->where("articleId", $articleId)
 			->delete();
 	}
 
 
 	/**
 	 * Delete relation with article
-	 * @param int $categoryId
-	 * @param int $articleId
-	 * @return int Row id
 	 */
-	public function setRelationArticleAsMain($categoryId, $articleId)
+	public function setRelationArticleAsMain(int $categoryId, int $articleId): void
 	{
 		$this->database->table(self::RELATION_ARTICLE_TABLE_NAME)
-			->where("article_id", $articleId)
-			->update(array("is_main" => false));
+			->where("articleId", $articleId)
+			->update(array("isMain" => false));
 
 		$this->database->table(self::RELATION_ARTICLE_TABLE_NAME)
-			->where("category_id", $categoryId)
-			->where("article_id", $articleId)
-			->update(array("is_main" => true));
+			->where("categoryId", $categoryId)
+			->where("articleId", $articleId)
+			->update(array("isMain" => true));
 	}
 
 
 	/**
 	 * Get all parent categories
-	 * @param int $initialCategoryId
-	 * @param string $language
 	 * @return array With items of parent from the closest to the farest
 	 */
-	public function getAllParents($initialCategoryId, $language)
+	public function getAllParents(int $initialCategoryId, string $language): array
 	{
 		$parentTree = array();
 		$parent = $initialCategoryId;
 		while ($parent != null) {
 			$parentCategory = $this->getAllWithTranslation($language)
-					->where("category.category_id", $parent)->fetch();
+					->where("category.id", $parent)->fetch();
 			if ($parentCategory) {
-				$parent = $parentCategory->parent_id;
+				$parent = $parentCategory->parentId;
 				if ($parentCategory->active) {
 					$parentTree[] = $parentCategory;
 				}
@@ -428,7 +389,6 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 
 	/**
 	 * Relation tags table
-	 * @return \Nette\Database\Table\Selection
 	 */
 	public function getRelationTagsTable(): \Nette\Database\Table\Selection
 	{
@@ -442,8 +402,8 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 	public function insertRelationTags(int $categoryId, int $tagId): void
 	{
 		$data = array();
-		$data[$this->getColumnId()] = $categoryId;
-		$data["tag_id"] = $tagId;
+		$data[$this->getForeignKeyColumn()] = $categoryId;
+		$data["tagId"] = $tagId;
 
 		$this->database->query('INSERT IGNORE INTO ' . self::RELATION_TAG_TABLE_NAME . ' ?', $data);
 	}
@@ -451,26 +411,23 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 
 	/**
 	 * Delete all relation with tags
-	 * @param int $categoryId
 	 */
-	public function deleteAllRelationTags($categoryId)
+	public function deleteAllRelationTags(int $categoryId): void
 	{
 		$this->getRelationTagsTable()
-			->where($this->getColumnId(), $categoryId)
+			->where($this->getForeignKeyColumn(), $categoryId)
 			->delete();
 	}
 
 
 	/**
 	 * Delete relation with tag
-	 * @param int $categoryId
-	 * @param int $tagId
 	 */
-	public function deleteRelationTag($categoryId, $tagId)
+	public function deleteRelationTag(int $categoryId, int $tagId): void
 	{
-		$this->deleteAllRelationTags()
-			->where($this->getColumnId(), $categoryId)
-			->where("tag_id", $tagId)
+		$this->getRelationTagsTable()
+			->where($this->getForeignKeyColumn(), $categoryId)
+			->where("tagId", $tagId)
 			->delete();
 	}
 
@@ -491,7 +448,7 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 	public function getRelationComments(int $id): \Nette\Database\Table\Selection
 	{
 		return $this->getRelationCommentsTable()
-			->where($this->getColumnId(), $id);
+			->where($this->getForeignKeyColumn(), $id);
 	}
 
 
@@ -501,8 +458,8 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 	public function insertRelationComments(int $categoryId, int $commentId): void
 	{
 		$data = array();
-		$data[$this->getColumnId()] = $categoryId;
-		$data["comment_id"] = $commentId;
+		$data[$this->getForeignKeyColumn()] = $categoryId;
+		$data["commentId"] = $commentId;
 
 		$this->database->query('INSERT IGNORE INTO ' . self::RELATION_COMMENT_ARTICLE_TABLE_NAME . ' ?', $data);
 	}
@@ -510,13 +467,11 @@ class Categories extends BaseModel implements IViewCounter, ISubTags, ISubCommen
 
 	/**
 	 * Delete relation with comment
-	 * @param int $categoryId
-	 * @param int $commentId
 	 */
-	public function deleteRelationComment($categoryId, $commentId)
+	public function deleteRelationComment(int $categoryId, int $commentId): void
 	{
 		$this->getRelationComments($categoryId)
-			->where("comment_id", $commentId)
+			->where("commentId", $commentId)
 			->delete();
 	}
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Plugins\DynamicForms\Model;
 
 use App\Model\BaseModel;
+use App\Model\Translatable;
 use App\Model\RecordNotFoundException;
 use App\Service\LanguageService;
 use Nette\Database\Explorer;
@@ -14,7 +15,7 @@ use Nette\Utils\ArrayHash;
 /**
  * DynamicForms Model
  */
-class DynamicForms extends BaseModel
+class DynamicForms extends BaseModel implements Translatable
 {
 
 	const
@@ -35,7 +36,7 @@ class DynamicForms extends BaseModel
 		$this->languages = $languages;
 
 		$this->setTableName('firecms_plugin_dynamicForms');
-		$this->setColumnId('dynamic_form_id');
+		$this->setForeignKeyColumn('dynamicFormId');
 	}
 
 
@@ -44,7 +45,6 @@ class DynamicForms extends BaseModel
 	 */
 	public function insert(ArrayHash $data): int
 	{
-		$data["grid_name"] = $data["template_name"];
 		return parent::insert($data);
 	}
 
@@ -58,7 +58,7 @@ class DynamicForms extends BaseModel
 		if(!$dynamicForm){
 			throw new RecordNotFoundException();
 		}
-		$items = @unserialize($dynamicForm->items_specifications);
+		$items = @unserialize($dynamicForm->itemsSpecifications);
 		return $items !== false ? $items : array();
 	}
 
@@ -69,7 +69,7 @@ class DynamicForms extends BaseModel
 	private function saveItems(int $dynamicFormId, array $items): void
 	{
 		$this->update($dynamicFormId, array(
-			"items_specifications" => serialize($items),
+			"itemsSpecifications" => serialize($items),
 		));
 	}
 
@@ -77,7 +77,7 @@ class DynamicForms extends BaseModel
 	/**
 	 * Test if item exist
 	 */
-	public function testIfItemNameExist(int $dynamicFormId, string $itemName, string $notIn): bool
+	public function testIfItemNameExist(int $dynamicFormId, string $itemName, ?string $notIn = null): bool
 	{
 		$items = $this->getItems($dynamicFormId);
 
@@ -183,27 +183,12 @@ class DynamicForms extends BaseModel
 	 */
 	public function findByTemplateName($templateName, $notInId = null): \Nette\Database\Table\Selection
 	{
-		$query = $this->findAll()->where("template_name", $templateName);
+		$query = $this->findAll()->where("templateName", $templateName);
 		if(isset($notInId))
 		{
 			$query->where($this->getColumnId()." != ?", $notInId);
 		}
 		return $query;
-	}
-
-
-	/**
-	 * Update grid name
-	 * @param int $articleId
-	 * @param string $language
-	 * @param string $name
-	 */
-	public function updateGridName($articleId, $language, $name): void
-	{
-		if($language == $this->languages->getDefaultLanguage() ||
-			($language != $this->languages->getDefaultLanguage() && $this->getById($articleId)?->grid_name == null)){
-			$this->update($articleId, array("grid_name"=>$name));
-		}
 	}
 
 
@@ -225,9 +210,8 @@ class DynamicForms extends BaseModel
 	 */
 	public function insertTranslation($dynamicFormId, $language, $data): int
 	{
-		$data->{$this->getColumnId()} = $dynamicFormId;
-		$data->language_id = $language;
-		$this->updateGridName($dynamicFormId, $language, $data->title);
+		$data->{$this->getForeignKeyColumn()} = $dynamicFormId;
+		$data->languageId = $language;
 		$this->getTranslationTable()->insert($data);
 		return 1;
 	}
@@ -238,12 +222,6 @@ class DynamicForms extends BaseModel
 	 */
 	public function updateTranslation(int $dynamicFormId, string $language, ArrayHash $data): void
 	{
-		//todo
-		if(isset($data->name))
-		{
-			$this->updateGridName($dynamicFormId, $language, $data->name);
-		}
-
 		$finded = $this->findTranslationBy($dynamicFormId, $language);
 		if($finded->fetch()){
 			$finded->update($data);
@@ -262,8 +240,8 @@ class DynamicForms extends BaseModel
 	public function findTranslationBy($dynamicFormId, $language): \Nette\Database\Table\Selection
 	{
 		return $this->getTranslationTable()
-			->where($this->getColumnId(), $dynamicFormId)
-			->where("language_id", $language);
+			->where($this->getForeignKeyColumn(), $dynamicFormId)
+			->where("languageId", $language);
 	}
 
 
@@ -276,9 +254,9 @@ class DynamicForms extends BaseModel
 	{
 		$query = $this->getTranslationTable()
 			->select(self::TRANSLATION_TABLE_NAME.".*")
-			->where(self::TRANSLATION_TABLE_NAME.".language_id", array_keys($this->languages->getActiveLanguages())); //only active languages
+			->where(self::TRANSLATION_TABLE_NAME.".languageId", array_keys($this->languages->getActiveLanguages())); //only active languages
 		if($language){
-			$query->where(self::TRANSLATION_TABLE_NAME.".language_id", $language);
+			$query->where(self::TRANSLATION_TABLE_NAME.".languageId", $language);
 		}
 
 		return $query;
@@ -320,16 +298,17 @@ class DynamicForms extends BaseModel
 	 */
 	public function getItemTranslation(int $dynamicFormId, int|string $itemName, string $languageId = null): ?array
 	{
-		$query = $this->getTranslationTable()->where('dynamic_form_id', $dynamicFormId);
+		$query = $this->getTranslationTable()->where($this->getForeignKeyColumn(), $dynamicFormId);
 		if($languageId)
 		{
-			$query->where('language_id', $languageId);
+			$query->where('languageId', $languageId);
 		}
-		$dynamicFormTranslations = $query->fetchAssoc('language_id');
+		$dynamicFormTranslations = $query->fetchAssoc('languageId');
 
 		foreach($dynamicFormTranslations as &$dynamicFormTranslation)
 		{
-			$dynamicFormTranslation['items'] = @unserialize($dynamicFormTranslation['items']);
+			$items = @unserialize($dynamicFormTranslation['items']);
+			$dynamicFormTranslation['items'] = is_array($items) ? $items : array();
 		}
 		return $dynamicFormTranslations;
 	}
@@ -386,7 +365,7 @@ class DynamicForms extends BaseModel
 			//remove
 			unset($itemData['items'][$itemName]);
 
-			$this->saveItemTranslations($dynamicFormId, $languageId, $itemData);
+			$this->saveItemTranslations($dynamicFormId, $languageId, $itemData['items']);
 		}
 	}
 }

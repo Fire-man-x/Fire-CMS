@@ -36,7 +36,7 @@ class FilesManagerFolderFormFactory extends BaseFormFactory
 			->setRequired();
 
 		if($this->parentFolder){
-			$form->addHidden("parent_id", $this->parentFolder);
+			$form->addHidden("parentId", $this->parentFolder);
 		}
 
 		$form->addSubmit('send', 'Save');
@@ -52,12 +52,12 @@ class FilesManagerFolderFormFactory extends BaseFormFactory
 		unset($values->editId);
 
 		/*if($this->parentFolder){
-			$values->parent_id = $this->parentFolder;
+			$values->parentId = $this->parentFolder;
 		}*/
 
 
 		if ($this->isEditMode()) {
-			$this->model->update($this->getEditId(), $values);
+			$this->model->update($this->getEditId(), (array) $values);
 		} else {
 			$id = $this->model->insert($values);
 			$form->getPresenter()->id = $id;

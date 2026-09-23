@@ -71,7 +71,7 @@ class FilesManagerMenu extends Control
 		$self = $this;
 		$form->onSuccess[] = function($form) use ($self){
 
-			if($self->presenter->isAjax()){
+			if($self->getPresenter()->isAjax()){
 				$self->redrawControl("folders");
 			} else {
 				$self->redirect('this');
@@ -106,7 +106,7 @@ class FilesManagerMenu extends Control
 
 		//remover parent folder from url
 		/* nefunguje
-		if(!$this->presenter->isAjax()){
+		if(!$this->getPresenter()->isAjax()){
 			$this->parentFolder = null;
 		}*/
 
@@ -126,12 +126,12 @@ class FilesManagerMenu extends Control
 	{
 		$tree = array();
 		foreach ($items as $itemId => $item){
-			if($item->parent_id == $parent){
+			if($item->parentId == $parent){
 				$fileFolder = $item->toArray();
 				unset($items[$itemId]);
-				$fileFolder['childs'] = $this->createTree($items, $fileFolder['file_folder_id'], $level+1);
+				$fileFolder['childs'] = $this->createTree($items, $fileFolder['id'], $level+1);
 				//@todo: moznost zrychlit jednim dotazem
-				$fileFolder['itemCount'] = $this->filesModel->findAll()->where("file_folder_id", $fileFolder['file_folder_id'])->count();
+				$fileFolder['itemCount'] = $this->filesModel->findAll()->where("fileFolderId", $fileFolder['id'])->count();
 				$tree[] = ArrayHash::from($fileFolder, false);
 			}
 		}
@@ -146,8 +146,8 @@ class FilesManagerMenu extends Control
 	{
 		foreach ($items as $position => $item){
 			$toArray[] = array(
-				"file_folder_id"=>$item["id"],
-				"parent_id"=>$parent,
+				"id"=>$item["id"],
+				"parentId"=>$parent,
 				"position"=>$position,
 				"level"=>$level
 			);
@@ -169,7 +169,7 @@ class FilesManagerMenu extends Control
 
 		$this->fileFoldersModel->updateTreePositions($updateItems);
 
-		$this->presenter->terminate();
+		$this->getPresenter()->terminate();
 	}
 
 
@@ -194,7 +194,7 @@ class FilesManagerMenu extends Control
 	#[Secured]
 	#[Resource('Files')]
 	#[Privilege('edit')]
-	public function handleEditFolder($folder_id)
+	public function handleEditFolder(int $folder_id): void
 	{
 		$this->filesManagerFolderFormFactory->setEditId($folder_id);
 		$this->filesManagerFolderFormFactory->setDefaultValues($this["folderNameForm"], $folder_id);
@@ -209,7 +209,7 @@ class FilesManagerMenu extends Control
 	#[Secured]
 	#[Resource('Files')]
 	#[Privilege('delete')]
-	public function handleRemoveFolder($folder_id)
+	public function handleRemoveFolder(int $folder_id): void
 	{
 		$folderInfo = $this->fileFoldersModel->getById($folder_id);
 		if($folderInfo && $folderInfo->default){
@@ -218,13 +218,13 @@ class FilesManagerMenu extends Control
 		$defaultId = 1;
 		$redirectToId = null;
 		if($this->getPresenter()->id == $folder_id){
-			$redirectToId = $folderInfo->parent_id != null ? $folderInfo->parent_id : $defaultId;
+			$redirectToId = $folderInfo->parentId != null ? $folderInfo->parentId : $defaultId;
 		}
 
 		$this->filesModel->findAll()
-			->where("file_folder_id", $folder_id)
+			->where("fileFolderId", $folder_id)
 			->update(array(
-			"file_folder_id" => $folderInfo->parent_id != null ? $folderInfo->parent_id : $defaultId
+			"fileFolderId" => $folderInfo->parentId != null ? $folderInfo->parentId : $defaultId
 		));
 
 		$this->fileFoldersModel->delete($folder_id);

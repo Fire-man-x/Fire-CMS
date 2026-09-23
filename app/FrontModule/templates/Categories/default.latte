@@ -14,7 +14,7 @@
 			<p class="post-subtitle">
 				{$article->excerpt|noescape}
 			</p>
-			<p class="post-meta">{_"Posted by <a href='%s'>%s</a> on %s", "#",$article->author['author'], $article->publishing_date->format(\DATETIME_FORMAT) |noescape}</p>
+			<p class="post-meta">{_"Posted by <a href='%s'>%s</a> on %s", "#",$article->author['author'], $article->publishingDate->format(\DATETIME_FORMAT) |noescape}</p>
 		</div>
 		<hr>
 	{/foreach}

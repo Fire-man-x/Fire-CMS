@@ -107,11 +107,11 @@ class Articles extends Control
 		$this->template->setTranslator($this->translator);
 
 		$articles = $this->articlesModel->getAllWithTranslation($this->language)
-			->where("history_id", null)
-			->order("create_date DESC");
+			->where("historyId", null)
+			->order("createDate DESC");
 		if($fromCategory){
-			//$articles->where("article:category_article.category_id", $fromCategory == null ? 1 : $fromCategory);
-			$articles->where("article:".Model\Categories::RELATION_ARTICLE_TABLE_NAME.".category_id", $fromCategory);
+			//$articles->where("article:category_article.categoryId", $fromCategory == null ? 1 : $fromCategory);
+			$articles->where("article:".Model\Categories::RELATION_ARTICLE_TABLE_NAME.".categoryId", $fromCategory);
 		}
 		if($this->query){
 			$articles->whereOr(array(
@@ -121,7 +121,7 @@ class Articles extends Control
 				));
 		}
 		if($this->tagId){
-			$articles->where("article:article_tags.tag_id", $this->tagId);
+			$articles->where("article:" . Model\Articles::RELATION_TAG_TABLE_NAME . ".tagId", $this->tagId);
 		}
 		$itemsCount = $articles->count();
 		$this["paginator"]->setItemCount($itemsCount);
@@ -130,14 +130,14 @@ class Articles extends Control
 		$articlesArray = $articles->fetchAll();
 		foreach ($articlesArray as &$article){
 			$article = \Nette\Utils\ArrayHash::from($article->toArray());
-			$files = $this->articlesModel->getRelationFile($article->article_id)->where("is_main", true);
+			$files = $this->articlesModel->getRelationFile($article->articleId)->where("isMain", true);
 			$article->mainFile = null;
 			foreach ($files as $file){
 				$article->mainFile = $this->filesModel->toFileEntity($file);
 			}
 
 			//author
-			$user = $this->usersModel->getById($article->created_by)?->toArray();
+			$user = $this->usersModel->getById($article->createdBy)?->toArray();
 			$user['author'] = $this->userManager->makeName($user);
 			$article->author = $user;
 		}

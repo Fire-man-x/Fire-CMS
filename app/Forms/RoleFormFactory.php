@@ -72,7 +72,7 @@ class RoleFormFactory extends BaseFormFactory
 				unset($values->name);
 			}
 
-			$this->model->update($this->getEditId(), $values);
+			$this->model->update($this->getEditId(), (array) $values);
 		} else {
 			$this->model->insert($values);
 		}
@@ -99,7 +99,7 @@ class RoleFormFactory extends BaseFormFactory
 
 		$moduleContainer = $form->addContainer("modules");
 		$modules = $this->modelModules->getList();
-		$otherPrivileges = $this->modelModules->getAllOtherPrivileges()->fetchAssoc("parent_id|module_id");
+		$otherPrivileges = $this->modelModules->getAllOtherPrivileges()->fetchAssoc("parentId|id");
 		foreach ($modules as $moduleId => $title) {
 			$radioControl = $moduleContainer->addRadioList((string) $moduleId, $title, array("any" => "any") + Acl::$privileges)
 				->setDefaultValue("any");
@@ -128,7 +128,7 @@ class RoleFormFactory extends BaseFormFactory
 	public function formModuleSucceeded($form, $values): void
 	{
 		unset($values->editId);
-		$otherPrivileges = $this->modelModules->getAllOtherPrivileges()->fetchAssoc("parent_id|module_id");
+		$otherPrivileges = $this->modelModules->getAllOtherPrivileges()->fetchAssoc("parentId|id");
 		$otherPrivilegesValues = array();
 		foreach ($otherPrivileges as $moduleId => $otherPrivilege){
 			$otherPrivilegesValues[$moduleId] = $values->modules["otherPrivileges_".$moduleId];
@@ -151,7 +151,7 @@ class RoleFormFactory extends BaseFormFactory
 		}
 
 		/* if($this->isEditMode()){
-		  $this->model->update($this->getEditId(), $values);
+		  $this->model->update($this->getEditId(), (array) $values);
 		  }else{
 		  $this->model->insert($values);
 		  } */
@@ -169,12 +169,12 @@ class RoleFormFactory extends BaseFormFactory
 			//value not exist between Acl::$privileges
 		});
 
-		$otherPrivileges = $this->modelModules->getAllOtherPrivileges()->fetchAssoc("module_id");
+		$otherPrivileges = $this->modelModules->getAllOtherPrivileges()->fetchAssoc("id");
 		$newDefaults = array();
-		foreach ($defaults as $module_id => $value){
+		foreach ($defaults as $defaultModuleId => $value){
 			if($value === false){
-				$subModuleId = $otherPrivileges[$module_id]["module_id"];
-				$moduleId = $otherPrivileges[$module_id]["parent_id"];
+				$subModuleId = $otherPrivileges[$defaultModuleId]["id"];
+				$moduleId = $otherPrivileges[$defaultModuleId]["parentId"];
 				//create if not exist
 				if(!isset($newDefaults["otherPrivileges_".$moduleId])){
 					$newDefaults["otherPrivileges_".$moduleId] = array();
@@ -182,7 +182,7 @@ class RoleFormFactory extends BaseFormFactory
 
 				$newDefaults["otherPrivileges_".$moduleId][$subModuleId] = "allow";
 			} else {
-				$newDefaults[$module_id] = $value;;
+				$newDefaults[$defaultModuleId] = $value;;
 			}
 		}
 

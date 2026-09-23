@@ -46,13 +46,13 @@ class MetaValueFormFactory extends BaseFormFactory
 
 		$items = $this->metasModel->findAll()
 			->where("type", $this->type)
-			->where("language_id = ? OR language_id IS NULL", $language)
+			->where("languageId = ? OR languageId IS NULL", $language)
 			->fetchAll();
 
 		if ($items) {
 			foreach ($items as $item) {
-				$langDesc = $item->language_id ? " (".$this->languages->getLanguage($item->language_id).")" : "";
-				$form->addText($item->meta_id, $item->key.$langDesc)
+				$langDesc = $item->languageId ? " (".$this->languages->getLanguage($item->languageId).")" : "";
+				$form->addText($item->id, $item->key.$langDesc)
 					->setTranslator(null)
 					->getControlPrototype()
 						->placeholder($item->value);
@@ -67,7 +67,7 @@ class MetaValueFormFactory extends BaseFormFactory
 			$defaults = $this->metasService->getStructureByColumnId($this->type, $language, $this->getEditId(), true);
 			$values = array();
 			foreach ($defaults as $default){
-				$values[$default["meta_id"]] = $default["value"];
+				$values[$default["id"]] = $default["value"];
 			}
 
 			$form->setValues($values);
@@ -88,7 +88,7 @@ class MetaValueFormFactory extends BaseFormFactory
 
 		/*
 		if ($this->isEditMode()) {
-			$model->update($this->getEditId(), $values);
+			$model->update($this->getEditId(), (array) $values);
 		} else {
 			$model->insert($values);
 		}

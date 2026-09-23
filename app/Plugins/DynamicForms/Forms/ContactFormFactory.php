@@ -80,10 +80,10 @@ class ContactFormFactory extends BaseFormFactory
 			$form->addHidden('formName', $formName);
 
 			//dynamic form items
-			$items = $this->model->getItems($dynamicForm->dynamic_form_id);
+			$items = $this->model->getItems($dynamicForm->id);
 			foreach($items as $item)
 			{
-				$itemTranslation = $this->model->getItemTranslation($dynamicForm->dynamic_form_id, $item['name'], $this->language);
+				$itemTranslation = $this->model->getItemTranslation($dynamicForm->id, $item['name'], $this->language);
 
 				$control = null;
 				$caption = null;
@@ -138,7 +138,7 @@ class ContactFormFactory extends BaseFormFactory
 		$dynamicForm = $this->model->findByTemplateName($values->formName)->select("*")->fetch();
 
 		//todo: sjednotit na jedno misto
-		$afterSendInformations = @unserialize($dynamicForm['after_send_informations']);
+		$afterSendInformations = @unserialize($dynamicForm['afterSendInformations']);
 		$afterSendInformations = isset($afterSendInformations['send_to']) ? $afterSendInformations['send_to'] : null;
 
 		//create mail body
@@ -150,7 +150,7 @@ class ContactFormFactory extends BaseFormFactory
 				continue;
 			}
 
-			$itemTranslation = $this->model->getItemTranslation($dynamicForm->dynamic_form_id, $inputName, $this->language);
+			$itemTranslation = $this->model->getItemTranslation($dynamicForm->id, $inputName, $this->language);
 			if(isset($itemTranslation[$this->language]['items'][$inputName]['label']))
 			{
 				$caption = $itemTranslation[$this->language]['items'][$inputName]['label'];
@@ -158,8 +158,8 @@ class ContactFormFactory extends BaseFormFactory
 			}
 		}
 
-		$translation = $this->model->findTranslationBy($dynamicForm->dynamic_form_id, $this->language)->fetch();
-		if(isset($dynamicForm->where_to_send) && $dynamicForm->where_to_send == 'email')
+		$translation = $this->model->findTranslationBy($dynamicForm->id, $this->language)->fetch();
+		if(isset($dynamicForm->whereToSend) && $dynamicForm->whereToSend == 'email')
 		{
 			$mainEmail = $this->modelOptions->getByKey('main_email', $this->language);
 
@@ -173,14 +173,14 @@ class ContactFormFactory extends BaseFormFactory
 			$this->mailer->send($message);
 		}
 
-		if($translation->submit_message)
+		if($translation->submitMessage)
 		{
-			$form->getPresenter()->flashMessage($translation->submit_message, FLASH_SUCCESS);
+			$form->getPresenter()->flashMessage($translation->submitMessage, FLASH_SUCCESS);
 		}
 
 
 		//todo: dodelat ukladani do komentaru
-		//$this->commentService->insert('contact_form', $dynamicForm->dynamic_form_id, $values);
+		//$this->commentService->insert('contact_form', $dynamicForm->id, $values);
 	}
 
 

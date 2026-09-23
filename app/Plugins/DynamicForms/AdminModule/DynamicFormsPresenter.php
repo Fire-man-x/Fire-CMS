@@ -124,7 +124,7 @@ class DynamicFormsPresenter extends BasePresenter
 
 		//edit own
 		$dynamicFormInfo = $this->dynamicFormsModel->getById($this->id);
-		if(!$this->user->isAllowed(new \App\Security\Resource("DynamicForms", $dynamicFormInfo ? $dynamicFormInfo->created_by : $this->getUser()->getId()),"edit")){
+		if(!$this->user->isAllowed(new \App\Security\Resource("DynamicForms", $dynamicFormInfo ? $dynamicFormInfo->createdBy : $this->getUser()->getId()),"edit")){
 			throw new \Nette\Application\ForbiddenRequestException("You have not access to 'DynamicForms' with priviledge 'edit'.");
 		}
 
@@ -132,7 +132,7 @@ class DynamicFormsPresenter extends BasePresenter
 		if($this->id)
 		{
 			if($dynamicFormInfo) {
-				$this->addBreadCrumbLink($this->translator->translate("Dynamic form items"). ' - '.$dynamicFormInfo->template_name, $this->link(":Admin:DynamicForms:detail", array("id" => $this->id)), null, false);
+				$this->addBreadCrumbLink($this->translator->translate("Dynamic form items"). ' - '.$dynamicFormInfo->templateName, $this->link(":Admin:DynamicForms:detail", array("id" => $this->id)), null, false);
 			} else {
 				$this->addBreadCrumbLink("Dynamic form items", $this->link(":Admin:DynamicForms:detail", array("id" => $this->id)));
 			}
@@ -159,23 +159,23 @@ class DynamicFormsPresenter extends BasePresenter
 	protected function createComponentDynamicFormsGrid(string $name): Datagrid
 	{
 		$source = $this->dynamicFormsModel->findAll()
-			->select("dynamic_forms.*")
-			->order("dynamic_forms.grid_name DESC")
-			->order("dynamic_forms.".$this->dynamicFormsModel->getColumnId());
+			->select($this->dynamicFormsModel->getTableName() . ".*")
+			->order($this->dynamicFormsModel->getTableName() . ".templateName")
+			->order($this->dynamicFormsModel->getTableName() . ".".$this->dynamicFormsModel->getColumnId());
 		/*switch ($this->show) {
 			case "personal":
-				$source->where("dynamic_forms.created_by = ?", $this->user->getId());
+				$source->where($this->dynamicFormsModel->getTableName() . ".createdBy = ?", $this->user->getId());
 				break;
 			case "pending":
-				$source->where("dynamic_forms.status = ?","pending");
+				$source->where($this->dynamicFormsModel->getTableName() . ".status = ?","pending");
 				break;
 			case "trash":
-				$source->where("dynamic_forms.status = ?","trash");
+				$source->where($this->dynamicFormsModel->getTableName() . ".status = ?","trash");
 				break;
 
 			case null:
 			default:
-			$source->where("dynamic_forms.status != ?","trash");
+			$source->where($this->dynamicFormsModel->getTableName() . ".status != ?","trash");
 				break;
 		}*/
 
@@ -205,7 +205,7 @@ class DynamicFormsPresenter extends BasePresenter
 			->setCallbackArguments(array($activateButton))
 			->setCallback(function ($row, $selfButton) {
 				/* @var $selfButton \Mesour\DataGrid\Components\StatusButton * /
-				if (!$this->user->isAllowed(new \App\Security\Resource("DynamicForms", $row["created_by"]), "edit")) {
+				if (!$this->user->isAllowed(new \App\Security\Resource("DynamicForms", $row["createdBy"]), "edit")) {
 					$selfButton->setDisabled();
 				} else {
 					$selfButton->setDisabled(false);
@@ -228,7 +228,7 @@ class DynamicFormsPresenter extends BasePresenter
 			->setCallbackArguments(array($deactivateButton))
 			->setCallback(function ($row, $selfButton) {
 				/* @var $selfButton \Mesour\DataGrid\Components\StatusButton * /
-				if (!$this->user->isAllowed(new \App\Security\Resource("DynamicForms", $row["created_by"]), "edit")) {
+				if (!$this->user->isAllowed(new \App\Security\Resource("DynamicForms", $row["createdBy"]), "edit")) {
 					$selfButton->setDisabled();
 				} else {
 					$selfButton->setDisabled(false);
@@ -238,12 +238,12 @@ class DynamicFormsPresenter extends BasePresenter
 				}
 			});*/
 
-		$grid->addColumnText("template_name", "Name");
+		$grid->addColumnText("templateName", "Name");
 
 		//Actions
 		$grid->addAction('edit', 'Edit', 'edit!', array('dynamicFormId' => $primaryKey))
 			->setClass(function($item) {
-				return 'btn btn-primary btn-sm ajax '.(!$this->user->isAllowed(new \App\Security\Resource("DynamicForms", $item["created_by"]), "edit") ? ' disabled' : '');
+				return 'btn btn-primary btn-sm ajax '.(!$this->user->isAllowed(new \App\Security\Resource("DynamicForms", $item["createdBy"]), "edit") ? ' disabled' : '');
 			})
 			->setIcon(ICON_EDIT)
 			->setTitle('Edit')
@@ -254,14 +254,14 @@ class DynamicFormsPresenter extends BasePresenter
 
 		$grid->addAction('items', 'Items', 'detail', array('id' => $primaryKey))
 			->setClass(function($item) {
-				return 'btn btn-primary btn-sm'.(!$this->user->isAllowed(new \App\Security\Resource("DynamicForms", $item["created_by"]), "edit") ? ' disabled' : '');
+				return 'btn btn-primary btn-sm'.(!$this->user->isAllowed(new \App\Security\Resource("DynamicForms", $item["createdBy"]), "edit") ? ' disabled' : '');
 			})
 			->setIcon(ICON_ITEMS)
 			->setTitle('Items');
 
 		$grid->addAction('delete', 'Delete', 'delete!', array('dynamicFormId' => $primaryKey))
 			->setClass(function($item) {
-				return 'btn btn-danger btn-sm '.(!$this->user->isAllowed(new \App\Security\Resource("DynamicForms", $item["created_by"]), "edit") ? ' disabled' : '');
+				return 'btn btn-danger btn-sm '.(!$this->user->isAllowed(new \App\Security\Resource("DynamicForms", $item["createdBy"]), "edit") ? ' disabled' : '');
 			})
 			->setIcon(ICON_DELETE)
 			->setTitle('Delete')

@@ -80,15 +80,16 @@ class TagsPresenter extends BasePresenter
 			->order("title");
 		if ($this->actualLanguage != null) {
 			$source->select(":" . $this->model->getTranslationTable()->getName() . ".name AS title");
-			$source->where(":" . $this->model->getTranslationTable()->getName() . ".language_id", $this->actualLanguage);
+			$source->where(":" . $this->model->getTranslationTable()->getName() . ".languageId", $this->actualLanguage);
 		} else {
-			$source->select("grid_name AS title");
-			$source->select(":" . $this->model->getTranslationTable()->getName() . ".name");
-			$source->select("COUNT(:" . $this->model->getTranslationTable()->getName() . ".language_id) AS language_count");
-			$source->group($this->model->getTableName().".tag_id");
+			//záložka "všechny jazyky" - název ve výchozím jazyce webu, počet překladů poddotazem (bez GROUP BY)
+			$this->model->selectTitle($source, "`" . $this->model->getTableName() . "`.`id`");
+			$source->select("(SELECT COUNT(*) FROM `" . Tags::TRANSLATION_TABLE_NAME . "` `translation`"
+				. " WHERE `translation`.`" . $this->model->getForeignKeyColumn() . "` = `" . $this->model->getTableName() . "`.`id`) AS `language_count`");
 		}
 
 		$primaryKey = $this->model->getColumnId();
+		$paramKey = $this->model->getForeignKeyColumn();
 
 		$grid = new Datagrid($this, $name);
 		$grid->setPrimaryKey($primaryKey);
@@ -96,7 +97,7 @@ class TagsPresenter extends BasePresenter
 		$grid->setTranslator($this->translator);
 		$grid->setRememberState(false);
 
-		$grid->addColumnText("title", "Tag", ":tag_descriptions.name")
+		$grid->addColumnText("title", "Tag")
 			->setSortable();
 			//->setFilterText('title');
 
@@ -139,7 +140,7 @@ class TagsPresenter extends BasePresenter
 		}
 
 		//Actions
-		$grid->addAction('edit', 'Edit', 'edit!', array($primaryKey => $primaryKey))
+		$grid->addAction('edit', 'Edit', 'edit!', array($paramKey => $primaryKey))
 			->setClass('btn btn-primary btn-sm ajax')
 			->setIcon(ICON_EDIT)
 			->setTitle('Edit')
@@ -148,7 +149,7 @@ class TagsPresenter extends BasePresenter
 				"data-bs-target" => "#modal"
 			));
 
-		$grid->addAction('delete', 'Delete', 'delete!', array($primaryKey => $primaryKey))
+		$grid->addAction('delete', 'Delete', 'delete!', array($paramKey => $primaryKey))
 			->setClass('btn btn-danger btn-sm ajax')
 			->setIcon(ICON_DELETE)
 			->setTitle('Delete')
@@ -207,10 +208,10 @@ class TagsPresenter extends BasePresenter
 	/**
 	 * Edit handler
 	 */
-	public function handleEdit(int $tag_id): void
+	public function handleEdit(int $tagId): void
 	{
-		$this->factory->setEditId($tag_id);
-		$this->factory->setDefaultValues($this["tagForm"], $tag_id);
+		$this->factory->setEditId($tagId);
+		$this->factory->setDefaultValues($this["tagForm"], $tagId);
 		$this->redrawControl("tagForm");
 	}
 
@@ -218,9 +219,9 @@ class TagsPresenter extends BasePresenter
 	/**
 	 * Delete handler
 	 */
-	public function handleDelete(int $tag_id): void
+	public function handleDelete(int $tagId): void
 	{
-		$this->model->delete($tag_id);
+		$this->model->delete($tagId);
 		$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
 		$this->redirect('this');
 	}

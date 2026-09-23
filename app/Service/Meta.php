@@ -68,26 +68,26 @@ class Meta
 		$metaTable = "meta";
 		$items = $model->findByColumnId($id)
 			//->select("article_metas.*")
-			->select($metaTable.".language_id")
+			->select($metaTable.".languageId")
 			->select($metaTable.".key")
 			->select("IF(".$model->getTableName().".value = '', ".$metaTable.".value, ".$model->getTableName().".value) AS value")
 			->select($metaTable.".value AS default_value")
-			->where("language_id = ? OR language_id IS NULL", $language);*/
+			->where("languageId = ? OR languageId IS NULL", $language);*/
 
 		$metaTable = "firecms_metas";
 		$items = $this->metasModel->findAll()
-			->select($metaTable . ".language_id")
+			->select($metaTable . ".languageId")
 			->select($metaTable . ".key")
 			->select($metaTable . ".value AS default_value")
 			->where("type = ?", $type)
-			->where("language_id = ? OR language_id IS NULL", $language)
+			->where("languageId = ? OR languageId IS NULL", $language)
 			->joinWhere(":" . $model->getTableName(), $model->getReferenceColumn() . " = ?", $id);
 
 		if ($allValuesForAdmin) {
-			$items->select($metaTable . ".meta_id");
+			$items->select($metaTable . ".id");
 			$items->select(":" . $model->getTableName() . ".value");
 		} else {
-			$items->select("IF(:" . $model->getTableName() . ".value = '' OR :" . $model->getTableName() . ".value IS NULL, IF(" . $metaTable . ".value = '', null, " . $metaTable . ".value), :" . $model->getTableName() . ".value) AS value");
+			$items->select("IF(:" . $model->getTableName() . ".value = '' OR :" . $model->getTableName() . ".value IS NULL, IF(" . $metaTable . ".value = '', NULL, " . $metaTable . ".value), :" . $model->getTableName() . ".value) AS value");
 		}
 
 		$rows = array_map(iterator_to_array(...), $items->fetchAll());

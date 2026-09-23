@@ -45,17 +45,17 @@ class AuthorizatorFactory
 			if (isset(Acl::$privileges[$rule->privilege])) {
 				//insert all lower permissions
 				foreach (Acl::$privileges as $permission) {
-					$acl->allow($rule->role_name, $rule->module_name, $permission);
+					$acl->allow($rule->roleName, $rule->moduleName, $permission);
 
 					if ($permission == $rule->privilege) {
 						break;
 					}
 				}
 			} else { //is other privilege
-				$acl->allow($rule->role_name, $rule->module_name, $rule->privilege);
+				$acl->allow($rule->roleName, $rule->moduleName, $rule->privilege);
 			}
 
-			$roleHasSomePermission[$rule->role_name] = $rule->role_name;
+			$roleHasSomePermission[$rule->roleName] = $rule->roleName;
 		}
 
 		//has access to Admin
