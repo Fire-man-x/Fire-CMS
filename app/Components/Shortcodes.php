@@ -5,12 +5,12 @@ namespace App\Components;
 
 use App\Components\FileManager\Files\HashImageEntity;
 use App\Components\FileManager\Request\ImageRequest;
+use App\Model\Exceptions\RecordNotFoundException;
 use App\Model\Files;
-use App\Model\RecordNotFoundException;
 use BadFunctionCallException;
 use Latte\Essential\Filters;
 use Nette\Application\LinkGenerator;
-use Nette\Application\UI\ITemplate;
+use Nette\Bridges\ApplicationLatte\Template;
 use Nette\InvalidArgumentException;
 use Nette\Localization\Translator;
 use Nette\SmartObject;
@@ -43,7 +43,7 @@ class Shortcodes
 	 * Register to template
 	 * @deprecated Use register in config.neon
 	 */
-	public function register(ITemplate $template)
+	public function register(Template $template)
 	{
 		$template->addFilter("shortcodes", array($this, "transform"));
 		$this->registerDefault();
@@ -65,8 +65,12 @@ class Shortcodes
 	/**
 	 * Transform
 	 */
-	public function transform(string $text): string
+	public function transform(?string $text): string
 	{
+		// nevyplněný obsah (NULL z DB, např. kategorie bez textu) = prázdný výstup
+		if ($text === null) {
+			return '';
+		}
 		//dump($this->shortcodes);
 		foreach ($this->shortcodes as $shortcode => $function) {
 

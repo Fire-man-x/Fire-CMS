@@ -315,3 +315,39 @@ a:2:{i:0;s:32:"contributte_datagrid.show_filter";i:1;s:14:"Zobrazit filtr";}
 a:2:{i:0;s:36:"contributte_datagrid.per_page_submit";i:1;s:7:"Změnit";}
 a:2:{i:0;s:78:"The default language cannot be unset. Set another language as default instead.";i:1;s:67:"Výchozí jazyk nelze zrušit. Nastavte jako výchozí jiný jazyk.";}
 a:2:{i:0;s:43:"The default language cannot be deactivated.";i:1;s:34:"Výchozí jazyk nelze deaktivovat.";}
+a:2:{i:0;s:9:"Link type";i:1;s:10:"Typ odkazu";}
+a:2:{i:0;s:26:"Page of the system (route)";i:1;s:25:"Stránka systému (route)";}
+a:2:{i:0;s:5:"Route";i:1;s:5:"Route";}
+a:2:{i:0;s:59:"Presenter:action of the system, optionally with ?parameters";i:1;s:48:"Presenter:akce systému, volitelně s ?parametry";}
+a:2:{i:0;s:18:"Select a category.";i:1;s:18:"Vyberte kategorii.";}
+a:2:{i:0;s:18:"Select an article.";i:1;s:17:"Vyberte článek.";}
+a:2:{i:0;s:14:"Enter the URL.";i:1;s:12:"Zadejte URL.";}
+a:2:{i:0;s:16:"Enter the route.";i:1;s:14:"Zadejte route.";}
+a:2:{i:0;s:78:"The route must look like :Front:Presenter:action, optionally with ?parameters.";i:1;s:69:"Route musí mít tvar :Front:Presenter:akce, volitelně s ?parametry.";}
+a:2:{i:0;s:66:"Empty = title of the category/article. Required for URL and route.";i:1;s:62:"Prázdné = název kategorie/článku. U URL a route povinné.";}
+a:2:{i:0;s:11:"Parent item";i:1;s:20:"Nadřazená položka";}
+a:2:{i:0;s:17:"— top level —";i:1;s:28:"— nejvyšší úroveň —";}
+a:2:{i:0;s:18:"Open in new window";i:1;s:24:"Otevřít v novém okně";}
+a:2:{i:0;s:65:"Enter the label - URL and route items have no title of their own.";i:1;s:63:"Zadejte popisek - položky URL a route nemají vlastní název.";}
+a:2:{i:0;s:55:"The item cannot be placed under itself or its sub-item.";i:1;s:58:"Položku nelze zařadit pod sebe ani pod svou podpoložku.";}
+a:2:{i:0;s:6:"Target";i:1;s:4:"Cíl";}
+a:2:{i:0;s:40:"Delete the item including its sub-items?";i:1;s:37:"Smazat položku včetně podpoložek?";}
+a:2:{i:0;s:9:"(deleted)";i:1;s:10:"(smazáno)";}
+a:2:{i:0;s:9:"Menu item";i:1;s:13:"Položka menu";}
+a:2:{i:0;s:62:"Name of the menu in administration and its heading on the web.";i:1;s:49:"Název menu v administraci a jeho nadpis na webu.";}
+a:2:{i:0;s:41:"Heading of the menu on the web, optional.";i:1;s:32:"Nadpis menu na webu, nepovinný.";}
+a:2:{i:0;s:5:"Pages";i:1;s:8:"Stránky";}
+a:2:{i:0;s:4:"Page";i:1;s:8:"Stránka";}
+a:2:{i:0;s:45:"Unchecked = visible only for signed in users.";i:1;s:51:"Nezaškrtnuté = jen pro přihlášené uživatele.";}
+a:2:{i:0;s:49:"Delete the page including its URL and menu items?";i:1;s:51:"Smazat stránku včetně její URL a položek menu?";}
+a:2:{i:0;s:14:"Select a page.";i:1;s:17:"Vyberte stránku.";}
+a:2:{i:0;s:107:"Names in the list are shown in the selected language. Labels for all languages are edited in the item form.";i:1;s:103:"Názvy v seznamu jsou ve vybraném jazyce. Popisky všech jazyků se upravují ve formuláři položky.";}
+a:2:{i:0;s:11:"Parent page";i:1;s:20:"Nadřazená stránka";}
+a:2:{i:0;s:60:"The first image is the main image. Drag to change the order.";i:1;s:61:"První obrázek je hlavní. Pořadí změníte přetažením.";}
+a:2:{i:0;s:44:"Images can be added after the page is saved.";i:1;s:46:"Obrázky půjde přidat po uložení stránky.";}
+a:2:{i:0;s:8:"Sections";i:1;s:5:"Sekce";}
+a:2:{i:0;s:7:"Section";i:1;s:5:"Sekce";}
+a:2:{i:0;s:23:"Categories and articles";i:1;s:20:"Kategorie a články";}
+a:2:{i:0;s:113:"A section groups article categories and articles (e.g. Blog, News). The order is used in the administration menu.";i:1;s:112:"Sekce seskupuje kategorie článků a články (např. Blog, Novinky). Pořadí se použije v menu administrace.";}
+a:2:{i:0;s:72:"The section contains categories or articles - move or delete them first.";i:1;s:78:"Sekce obsahuje kategorie nebo články - nejdřív je přesuňte nebo smažte.";}
+a:2:{i:0;s:17:"Select a section.";i:1;s:14:"Vyberte sekci.";}

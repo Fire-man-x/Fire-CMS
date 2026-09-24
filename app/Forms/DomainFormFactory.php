@@ -19,12 +19,11 @@ class DomainFormFactory extends BaseFormFactory
 
 
 	public function __construct(
-		FormFactory $factory,
 		private readonly Translator $translator,
 		private readonly LanguageService $languages,
 		private readonly Model\Domains $model,
 	) {
-		parent::__construct($factory);
+		parent::__construct();
 	}
 
 

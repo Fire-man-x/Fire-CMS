@@ -165,9 +165,11 @@ klíč + základní CRUD, bez ORM). Modely pro výpisy běžně implementují `A
 mohou presentery administrace naplnit `ublaboo/datagrid` přímo z `Nette\Database\Table\Selection`.
 
 ### Obsahový model
-Základní entity: Articles (články), Categories (kategorie) se zásuvnými „subtypy" přes
-`app/Forms/CategorySubtype/*FormPart` — Default/Homepage/CategoryLink/Url/Gallery — implementujícími
-`ICategoryFormType`, Files/FileFolders (správce souborů v administraci), Menus (menu), Tags (štítky), Metas
+Základní entity: Articles (články), Pages (stránky - samostatný typ obsahu s vlastním SEO, obrázky a vnořováním
+(`parentId`), bez revizí a kategorií, URL typu `page`, do menu přes `MenuLinkType::Page`), Sections (sekce - Blog, Novinky, ...;
+kategorie článků i články mají povinné `sectionId`, administrace je po sekcích přes `SectionAwareTrait`),
+Categories (kategorie článků, bez typů - formulář je `CategorySubtype\DefaultFormPart`; odkazy řeší položky
+menu, galerie/obsahové stránky jsou Pages, úvodní stránka je `Front:Homepage`), Files/FileFolders (správce souborů v administraci), Menus (menu), Tags (štítky), Metas
 (SEO meta na úrovni článku/kategorie), Users/Roles (uživatelé/role), Languages (vícejazyčnost přes
 `LiveTranslator` plus vlastní model `Languages`/`LanguageService`), `UrlModule` (vlastní hezká URL +
 přesměrování, se kterými pracuje `CustomRouter`), `CommentsModule` (komentáře).

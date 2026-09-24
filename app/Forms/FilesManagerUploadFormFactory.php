@@ -17,9 +17,9 @@ class FilesManagerUploadFormFactory extends BaseFormFactory
 	private Model\MultiFileUploadModel $multiFileUploadModel;
 
 
-	public function __construct(FormFactory $factory, Model\Files $filesModel, Model\MultiFileUploadModel $multiFileUploadModel)
+	public function __construct(Model\Files $filesModel, Model\MultiFileUploadModel $multiFileUploadModel)
 	{
-		parent::__construct($factory);
+		parent::__construct();
 		$this->filesModel = $filesModel;
 		$this->multiFileUploadModel = $multiFileUploadModel;
 	}

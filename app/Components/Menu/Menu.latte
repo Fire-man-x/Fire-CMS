@@ -1,15 +1,14 @@
+{* Položky: viz App\Components\Menu\Menu::buildItems() - podpoložky kategorií (auto) nemají id ani newWindow.
+   $menuTitle = nadpis menu v aktuálním jazyce (firecms_menuDescriptions), tady se záměrně nevykresluje -
+   použijte ho ve vlastní šabloně (např. nadpis sloupce v patičce). Stejně tak obrázky položky:
+   $category->image (hlavní, první) a $category->files (všechny), např. <img n:src="$category->image, '64x64'">. *}
 {var $level = 0}
 <ul class="{if $level==0}nav {$menuClass}{else}nav-sublevel{/if} {if $level>0}dropdown-menu{/if}" n:block="menu">
-	<li n:foreach="$categories as $category" class="nav-item {if $category->categoryId == $activeCategory}active{/if} {if !empty($category->childs) && ((isset($maxSublevel) && ($level) < $maxSublevel) || !isset($maxSublevel))}dropdown{/if} {*if $level>0}dropdown-item{/if*}" data-id="cat_{$category->categoryId}">
+	<li n:foreach="$categories as $category" class="nav-item {if $category->categoryId && $category->categoryId == $activeCategory}active{/if} {if !empty($category->childs) && ((isset($maxSublevel) && ($level) < $maxSublevel) || !isset($maxSublevel))}dropdown{/if} {*if $level>0}dropdown-item{/if*}" data-id="{if $category->categoryId}cat_{$category->categoryId}{else}item_{$category->id}{/if}">
 		{var $showChilds = !empty($category->childs) && ((isset($maxSublevel) && ($level) < $maxSublevel) || !isset($maxSublevel))}
 		<span n:tag-if="$showChilds" class="{if $category->categoryId == $activeCategory}active{/if} {if !$category->active}font-italic{/if} {if $showChilds}btn-group{/if}">
 
-			{if $category->type == 'textBox'}
-				<h3>{$category->title}</h3>
-				{$category->content|shortcodes|noescape}
-			{else}
-				<a href="{$category->link}" n:class="nav-link, $itemClass, $category->categoryId == $activeCategory ? active, $showChilds ? dropdown-toggle" {if $showChilds}data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"{/if}>{if $category->type == 'homepage'}<i class="fa fa-fw fa-home"></i> {/if}{$category->title}</a>
-			{/if}
+			<a href="{$category->link}" n:class="nav-link, $itemClass, $category->categoryId && $category->categoryId == $activeCategory ? active, $showChilds ? dropdown-toggle" {if $category->newWindow ?? false}target="_blank" rel="noopener"{/if} {if $showChilds}data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"{/if}>{$category->title}</a>
 			{*<button n:if="$showChilds" class="btn btn-outline-dark dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<span class="caret"></span>
 				<span class="sr-only">{_"Toggle navigation"}</span>

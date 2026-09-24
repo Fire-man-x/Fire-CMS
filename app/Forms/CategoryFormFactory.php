@@ -3,13 +3,8 @@ declare(strict_types=1);
 
 namespace App\Forms;
 
-use App\Forms\CategorySubtype\CategoryLinkFormPart;
 use App\Forms\CategorySubtype\DefaultFormPart;
-use App\Forms\CategorySubtype\GalleryFormPart;
-use App\Forms\CategorySubtype\HomepageFormPart;
 use App\Forms\CategorySubtype\ICategoryFormType;
-use App\Forms\CategorySubtype\TextBoxFormPart;
-use App\Forms\CategorySubtype\UrlFormPart;
 use App\Modules\CommentsModule;
 use App\Service\Category;
 use App\Service\LanguageService;
@@ -19,70 +14,30 @@ use App\Service\Tag;
 use Nette\Application\UI\Form;
 use Nette\Database\Table\ActiveRow;
 use Nette\InvalidArgumentException;
-use Nette\Localization\Translator;
 use Nette\Security\User;
 use Nette\Utils\ArrayHash;
 
 
 class CategoryFormFactory extends BaseFormFactory
 {
-	/**
-	 * Types of form
-	 */
-	public static array $types = array(
-		'site' => 'Site',
-		'homepage' => 'Homepage',
-		'gallery' => 'Gallery',
-		'url' => 'URL',
-		'categoryLink' => 'Link to category',
-		'textBox' => 'Text box',
-	);
-
-	private string $type;
-
 	private ICategoryFormType $categoryFormType;
-
-	private Model\Categories $model;
-
-	private Category $categoryService;
-
-	private Tag $tagService;
-
-	private UrlManager $urlManager;
-
-	private LanguageService $languages;
-
-	private Translator $translator;
-
-	private User $user;
 
 	private string $language;
 
 	private ?int $parent;
 
+	private ?int $sectionId = null;
 
-	public function __construct(\Nette\DI\Container $container, FormFactory $factory, Model\Categories $model, LanguageService $languages,
-		Translator $translator, User $user, Category $categoryService, Tag $tagService, UrlManager $urlManager)
+
+	public function __construct(
+		private Model\Categories $model,
+		private User $user,
+		private Category $categoryService,
+		private Tag $tagService,
+		private UrlManager $urlManager
+	)
 	{
-		parent::__construct($factory);
-		$this->model = $model;
-		$this->languages = $languages;
-		$this->translator = $translator;
-		$this->user = $user;
-		$this->categoryService = $categoryService;
-		$this->tagService = $tagService;
-		$this->urlManager = $urlManager;
-
-
-		//childs of ICategoryFormType
-		/*$sites = array_filter(get_declared_classes(), function ($className) {
-			return in_array(ICategoryFormType::class, class_implements($className));
-		});
-
-		foreach ($sites as $site){
-			/* @var $byType ICategoryFormType * /
-			$byType = $container->getByType($site);
-		}*/
+		parent::__construct();
 	}
 
 
@@ -95,7 +50,16 @@ class CategoryFormFactory extends BaseFormFactory
 	}
 
 
-	public function create(int|string $editId = null, $language = null, $type = "site", $linkCallback = array(), $revision = null, $tagInputDataLoadUrl = ""): Form
+	/**
+	 * Sekce nové kategorie (App\Model\Sections), existující kategorie sekci nemění
+	 */
+	public function setSectionId(int $sectionId): void
+	{
+		$this->sectionId = $sectionId;
+	}
+
+
+	public function create(int|string $editId = null, $language = null, $linkCallback = array(), $revision = null, $tagInputDataLoadUrl = ""): Form
 	{
 		$form = parent::create($editId);
 
@@ -103,7 +67,6 @@ class CategoryFormFactory extends BaseFormFactory
 			throw new \InvalidArgumentException("Language cannot be null");
 		}
 		$this->language = $language;
-		$this->type = $type;
 
 		/*$this->edited_by_user_id = $edited_by_user_id;
 		if(!$this->model->isRelationTableValid($relationWithTable)){
@@ -117,9 +80,6 @@ class CategoryFormFactory extends BaseFormFactory
 		/* @var $dtm \Vodacek\Forms\Controls\DateInput */
 		/*$dtm = $form->addDate("datum", "datum");
 		$dtm->setRequired();*/
-
-		//add type, because "type" cannot be persistent
-		$form->setAction($linkCallback("this", array("type" => $this->type)));
 
 
 		$form->addCheckbox('active', 'Active');
@@ -139,31 +99,8 @@ class CategoryFormFactory extends BaseFormFactory
 		$form->addText('expiringDate', 'Expiration date')
 			->getControlPrototype()->addClass(DATETIMEPICKER_CLASS)->placeholder("Never");
 
-		$types = array();
-		foreach (self::$types as $typeId => $typeName) {
-			$typeName = $this->translator->translate($typeName);
-			$types[$typeId] = \Nette\Utils\Html::el(null, array(
-					"data-link" => $linkCallback("this", array("type" => $typeId))))->setValue($typeId)->setText($typeName);
-		}
-		$typeControl = $form->addSelect('type', 'Type', $types)
-			->setDefaultValue($this->type)
-			->setRequired();
-		$typeControl->addCondition(Form::EQUAL, "url");
-
-		//categoryFormType
-		if ($this->type == "homepage") {
-			$this->categoryFormType = new HomepageFormPart($this->model);
-		} elseif ($this->type == "gallery") {
-			$this->categoryFormType = new GalleryFormPart($this->model, $this->urlManager);
-		} elseif ($this->type == "url") {
-			$this->categoryFormType = new UrlFormPart();
-		} elseif ($this->type == "categoryLink") {
-			$this->categoryFormType = new CategoryLinkFormPart($this->model, $this->translator, $this->language);
-		} elseif ($this->type == "textBox") {
-			$this->categoryFormType = new TextBoxFormPart($this->model, $this->translator);
-		} else {
-			$this->categoryFormType = new DefaultFormPart($this->urlManager);
-		}
+		// kategorie článků nemají typ (odkazy řeší položky menu, obsahové stránky App\Model\Pages)
+		$this->categoryFormType = new DefaultFormPart($this->urlManager);
 		$this->categoryFormType->createFormPart($form);
 
 		//Tags
@@ -203,11 +140,6 @@ class CategoryFormFactory extends BaseFormFactory
 			} catch(InvalidArgumentException $e) {}
 
 
-			//force set type
-			if ($this->type) {
-				$values['type'] = $this->type;
-			}
-
 			//categoryFormType
 			$values = $this->categoryFormType->setDefaultValuesToFormPart($form, $values);
 
@@ -246,11 +178,7 @@ class CategoryFormFactory extends BaseFormFactory
 		$values = $this->categoryFormType->onSuccessFormPart($form, $values, (int) $this->getEditId());
 
 		//url
-		$url = null;
-		if($values->type != "homepage")
-		{
-			$url = $values->translation->url;
-		}
+		$url = $values->translation->url;
 		unset($values->translation->url);
 
 		//translation container
@@ -278,7 +206,11 @@ class CategoryFormFactory extends BaseFormFactory
 			if(isset($this->parent)){
 				$values->parentId = $this->parent;
 			}
+			if ($this->sectionId === null) {
+				throw new \LogicException('Section of a new category is not set (CategoryFormFactory::setSectionId()).');
+			}
 			$values->createdBy = $this->user->getId();
+			$values->sectionId = $this->sectionId;
 
 			//insert
 			$id = $this->categoryService->insert($values, $this->language, $translationContainer);

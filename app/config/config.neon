@@ -4,6 +4,9 @@
 #
 parameters:
 	themePath: "%rootDir%/www/theme"
+	# ukázková data (data/migrations/dummy-data) - zapnout jen lokálně v config.local.neon (`dummyData: true`),
+	# bin/console běží v produkčním režimu, takže %debugMode% tu nepomůže
+	dummyData: false
 
 application:
 	errorPresenter: Error
@@ -92,7 +95,7 @@ migrations:
 			directory: %appDir%/../data/migrations/basic-data
 			dependencies: [structures]
 		dummy-data:
-			enabled: %debugMode%
+			enabled: %dummyData%
 			directory: %appDir%/../data/migrations/dummy-data
 			dependencies: [structures, basic-data]
 
@@ -162,17 +165,17 @@ services:
 	- App\Service\Category
 	- App\Forms\CategoryFormFactory
 	- App\Forms\CategorySubtype\DefaultFormPart
-	- App\Forms\CategorySubtype\HomepageFormPart
-	- App\Forms\CategorySubtype\CategoryLinkFormPart
-	- App\Forms\CategorySubtype\UrlFormPart
-	- App\Forms\CategorySubtype\GalleryFormPart
 	- App\Modules\UrlModule\Forms\UrlFormFactory
 	- App\Modules\UrlModule\Forms\RedirectionFormFactory
 
 
 	- App\Model\Articles
+	- App\Model\Pages
+	- App\Model\Sections
 	- App\Service\Article
 	- App\Forms\ArticleFormFactory
+	- App\Forms\PageFormFactory
+	- App\AdminModule\Forms\SectionFormFactory
 
 	- App\Modules\CommentsModule\Model\Comments
 	- App\Modules\CommentsModule\Comment
@@ -188,6 +191,7 @@ services:
 
 	- App\Components\Menu\Model\Menus
 	- App\Forms\MenuFormFactory
+	- App\Forms\MenuItemFormFactory
 
 	#Admin\Settings
 	- App\Model\Settings
@@ -201,7 +205,7 @@ services:
 	- App\Forms\RoleFormFactory
 	- App\Forms\TagFormFactory
 	modules: App\Model\Modules
-	- App\Forms\UserFormFactory
+	- App\AdminModule\Forms\UserFormFactory
 	- App\Model\Tags
 
 	- App\Model\Metas

@@ -1,6 +1,90 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Access to constant Button on an unknown class AdminForm\\TypeContainer\.$#'
+			identifier: class.notFound
+			count: 1
+			path: ../AdminModule/Forms/AdminForm.php
+
+		-
+			message: '#^Access to constant Tab on an unknown class AdminForm\\TypeContainer\.$#'
+			identifier: class.notFound
+			count: 3
+			path: ../AdminModule/Forms/AdminForm.php
+
+		-
+			message: '#^Access to property \$name on an unknown class AdminForm\\AdminContainer\.$#'
+			identifier: class.notFound
+			count: 4
+			path: ../AdminModule/Forms/AdminForm.php
+
+		-
+			message: '#^Access to property \$type on an unknown class AdminForm\\AdminContainer\.$#'
+			identifier: class.notFound
+			count: 4
+			path: ../AdminModule/Forms/AdminForm.php
+
+		-
+			message: '#^Class AdminForm\\AdminContainer not found\.$#'
+			identifier: class.notFound
+			count: 4
+			path: ../AdminModule/Forms/AdminForm.php
+
+		-
+			message: '#^Generator expects value type Nette\\Forms\\Container, AdminForm\\AdminContainer given\.$#'
+			identifier: generator.valueType
+			count: 4
+			path: ../AdminModule/Forms/AdminForm.php
+
+		-
+			message: '#^Access to an undefined property App\\AdminModule\\Forms\\AdminFormFactory\:\:\$factory\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../AdminModule/Forms/AdminFormFactory.php
+
+		-
+			message: '#^Access to private property \$formParts of parent class App\\Forms\\BaseFormFactory\.$#'
+			identifier: property.private
+			count: 1
+			path: ../AdminModule/Forms/AdminFormFactory.php
+
+		-
+			message: '#^Access to an undefined property App\\AdminModule\\Forms\\UserFormFactory\:\:\$sender\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../AdminModule/Forms/UserFormFactory.php
+
+		-
+			message: '#^Access to an undefined property App\\AdminModule\\Forms\\UserFormFactory\:\:\$smtp\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../AdminModule/Forms/UserFormFactory.php
+
+		-
+			message: '#^Access to an undefined property App\\AdminModule\\Forms\\UserFormFactory\:\:\$subject\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../AdminModule/Forms/UserFormFactory.php
+
+		-
+			message: '#^Access to an undefined property App\\AdminModule\\Forms\\UserFormFactory\:\:\$templatePath\.$#'
+			identifier: property.notFound
+			count: 2
+			path: ../AdminModule/Forms/UserFormFactory.php
+
+		-
+			message: '#^Call to an undefined method App\\AdminModule\\Forms\\UserFormFactory\:\:link\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../AdminModule/Forms/UserFormFactory.php
+
+		-
+			message: '#^Class App\\AdminModule\\Forms\\AdminForm constructor invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: ../AdminModule/Forms/UserFormFactory.php
+
+		-
 			message: '#^Default value of the parameter \#2 \$status \(int\) of method App\\AdminModule\\Presenters\\ArticlesPresenter\:\:handleActivate\(\) is incompatible with type bool\.$#'
 			identifier: parameter.defaultValue
 			count: 1
@@ -65,42 +149,6 @@ parameters:
 			identifier: property.unusedType
 			count: 1
 			path: ../AdminModule/Presenters/FilesManagerPresenter.php
-
-		-
-			message: '#^Call to an undefined method App\\Components\\Menu\\Model\\Menus\:\:deleteRelationFile\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../AdminModule/Presenters/MenusPresenter.php
-
-		-
-			message: '#^Call to an undefined method App\\Components\\Menu\\Model\\Menus\:\:getUrl\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../AdminModule/Presenters/MenusPresenter.php
-
-		-
-			message: '#^Call to an undefined method App\\Components\\Menu\\Model\\Menus\:\:insertRelationFile\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../AdminModule/Presenters/MenusPresenter.php
-
-		-
-			message: '#^Call to an undefined method App\\Model\\Categories\:\:setRelationMenuAsMain\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../AdminModule/Presenters/MenusPresenter.php
-
-		-
-			message: '#^Method App\\Forms\\MenuFormFactory\:\:create\(\) invoked with 2 parameters, 0\-1 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: ../AdminModule/Presenters/MenusPresenter.php
-
-		-
-			message: '#^Property App\\AdminModule\\Presenters\\MenusPresenter\:\:\$parent is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../AdminModule/Presenters/MenusPresenter.php
 
 		-
 			message: '#^Parameter \#2 \$link of method Alnux\\NetteBreadCrumb\\BreadCrumb\:\:addLink\(\) expects string\|null, Nette\\Application\\UI\\Link\|null given\.$#'
@@ -227,72 +275,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: ../Components/FilesManagerMenu/FilesManagerMenu.php
-
-		-
-			message: '#^Method App\\Components\\Menu\\Menu\:\:arrayRecursiveSearch\(\) invoked with 4 parameters, 2 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: ../Components/Menu/Menu.php
-
-		-
-			message: '#^Method App\\Components\\Menu\\Menu\:\:treeToArray\(\) is unused\.$#'
-			identifier: method.unused
-			count: 1
-			path: ../Components/Menu/Menu.php
-
-		-
-			message: '#^Negated boolean expression is always false\.$#'
-			identifier: booleanNot.alwaysFalse
-			count: 1
-			path: ../Components/Menu/Menu.php
-
-		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$level$#'
-			identifier: parameter.notFound
-			count: 1
-			path: ../Components/Menu/Menu.php
-
-		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$maxSublevel$#'
-			identifier: parameter.notFound
-			count: 2
-			path: ../Components/Menu/Menu.php
-
-		-
-			message: '#^Parameter \#1 \$template of method App\\Components\\Shortcodes\:\:register\(\) expects Nette\\Application\\UI\\ITemplate, Nette\\Bridges\\ApplicationLatte\\DefaultTemplate given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Components/Menu/Menu.php
-
-		-
-			message: '#^Property App\\Components\\Menu\\Menu\:\:\$firstLevelCategories \(Nette\\Database\\Table\\Selection\) does not accept array\<mixed\>\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../Components/Menu/Menu.php
-
-		-
-			message: '#^Default value of the parameter \#3 \$data \(array\) of method App\\Components\\Menu\\Model\\Menus\:\:insertRelationMenuItem\(\) is incompatible with type Nette\\Utils\\ArrayHash\.$#'
-			identifier: parameter.defaultValue
-			count: 1
-			path: ../Components/Menu/Model/Menus.php
-
-		-
-			message: '#^Method App\\Components\\Menu\\Model\\Menus\:\:deleteRelationMenuItem\(\) should return int but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: ../Components/Menu/Model/Menus.php
-
-		-
-			message: '#^Method App\\Components\\Menu\\Model\\Menus\:\:insertRelationMenuItem\(\) should return int but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: ../Components/Menu/Model/Menus.php
-
-		-
-			message: '#^Call to an undefined method Nette\\Application\\UI\\ITemplate\:\:addFilter\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../Components/Shortcodes.php
 
 		-
 			message: '#^Call to function is_callable\(\) with callable\(\)\: mixed will always evaluate to true\.$#'
@@ -613,54 +595,6 @@ parameters:
 			path: ../Forms/CategoryFormFactory.php
 
 		-
-			message: '#^Class App\\Forms\\CategorySubtype\\TextBoxFormPart constructor invoked with 2 parameters, 1 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: ../Forms/CategoryFormFactory.php
-
-		-
-			message: '#^Constructor of class App\\Forms\\CategoryFormFactory has an unused parameter \$container\.$#'
-			identifier: constructor.unusedParameter
-			count: 1
-			path: ../Forms/CategoryFormFactory.php
-
-		-
-			message: '#^Property App\\Forms\\CategoryFormFactory\:\:\$languages is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../Forms/CategoryFormFactory.php
-
-		-
-			message: '#^Call to an undefined method App\\Model\\Categories\:\:validateUrl\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../Forms/CategorySubtype/GalleryFormPart.php
-
-		-
-			message: '#^Property App\\Forms\\CategorySubtype\\GalleryFormPart\:\:\$categoryModel is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../Forms/CategorySubtype/GalleryFormPart.php
-
-		-
-			message: '#^Property App\\Forms\\CategorySubtype\\GalleryFormPart\:\:\$urlManager \(App\\Model\\Categories\) does not accept App\\Modules\\UrlModule\\UrlManager\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../Forms/CategorySubtype/GalleryFormPart.php
-
-		-
-			message: '#^Property App\\Forms\\CategorySubtype\\HomepageFormPart\:\:\$categoryModel is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../Forms/CategorySubtype/HomepageFormPart.php
-
-		-
-			message: '#^Property App\\Forms\\CategorySubtype\\TextBoxFormPart\:\:\$categoryModel is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../Forms/CategorySubtype/TextBoxFormPart.php
-
-		-
 			message: '#^Call to an undefined method Nette\\ComponentModel\\IComponent\:\:getControlPrototype\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -719,54 +653,6 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: ../Forms/TagFormFactory.php
-
-		-
-			message: '#^Access to an undefined property App\\Forms\\UserFormFactory\:\:\$sender\.$#'
-			identifier: property.notFound
-			count: 1
-			path: ../Forms/UserFormFactory.php
-
-		-
-			message: '#^Access to an undefined property App\\Forms\\UserFormFactory\:\:\$smtp\.$#'
-			identifier: property.notFound
-			count: 1
-			path: ../Forms/UserFormFactory.php
-
-		-
-			message: '#^Access to an undefined property App\\Forms\\UserFormFactory\:\:\$subject\.$#'
-			identifier: property.notFound
-			count: 1
-			path: ../Forms/UserFormFactory.php
-
-		-
-			message: '#^Access to an undefined property App\\Forms\\UserFormFactory\:\:\$templatePath\.$#'
-			identifier: property.notFound
-			count: 2
-			path: ../Forms/UserFormFactory.php
-
-		-
-			message: '#^Access to an undefined property Nette\\Application\\UI\\Presenter\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: ../Forms/UserFormFactory.php
-
-		-
-			message: '#^Access to an undefined property Nette\\Database\\Table\\Selection\<Nette\\Database\\Table\\ActiveRow\>\:\:\$email\.$#'
-			identifier: property.notFound
-			count: 1
-			path: ../Forms/UserFormFactory.php
-
-		-
-			message: '#^Call to an undefined method App\\Forms\\UserFormFactory\:\:link\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../Forms/UserFormFactory.php
-
-		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
-			count: 1
-			path: ../Forms/UserFormFactory.php
 
 		-
 			message: '#^Property App\\FrontModule\\Components\\Articles\\Articles\:\:\$articles is never read, only written\.$#'

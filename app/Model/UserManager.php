@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Model\Exceptions\DuplicateEmailException;
+use App\Model\Exceptions\DuplicateNameException;
+use App\Model\Exceptions\RecordNotFoundException;
 use App\Security\Role;
 use Nette\Database\UniqueConstraintViolationException;
 use Nette\Security\AuthenticationException;
@@ -21,21 +24,11 @@ class UserManager implements Authenticator
 {
 	use SmartObject;
 
-	private Passwords $passwords;
-
-	private Users $usersModel;
-
-	private Roles $rolesModel;
-
-
 	/**
 	 * Constructor of UserManager
 	 */
-	public function __construct(Passwords $passwords, Users $usersModel, Roles $rolesModel)
+	public function __construct(private Passwords $passwords, private Users $usersModel, private Roles $rolesModel)
 	{
-		$this->passwords = $passwords;
-		$this->usersModel = $usersModel;
-		$this->rolesModel = $rolesModel;
 	}
 
 
@@ -112,6 +105,7 @@ class UserManager implements Authenticator
 	/**
 	 * Adds new user.
 	 * @throws DuplicateNameException
+	 * @throws DuplicateEmailException
 	 */
 	public function add(string $username, string $email, string $password, ArrayHash $data): int
 	{
@@ -125,7 +119,22 @@ class UserManager implements Authenticator
 
 			 return $this->usersModel->insert($data);
 		} catch (UniqueConstraintViolationException $e) {
-			throw new DuplicateNameException;
+			throw (str_ends_with($e->getMessage(), "'email'")) ? new DuplicateEmailException() : new DuplicateNameException();
+		}
+	}
+
+
+	/**
+	 * Edit user.
+	 * @throws DuplicateNameException
+	 * @throws DuplicateEmailException
+	 */
+	public function update(int $id, array $data): ?bool
+	{
+		try {
+			return $this->usersModel->update($id, $data);
+		} catch (UniqueConstraintViolationException $e) {
+			throw (str_ends_with($e->getMessage(), "'email'")) ? new DuplicateEmailException() : new DuplicateNameException();
 		}
 	}
 
@@ -140,6 +149,15 @@ class UserManager implements Authenticator
 		} else {
 			return trim($data["firstName"] . " " . $data["surname"]);
 		}
+	}
+
+
+	/**
+	 * Edit user password.
+	 */
+	public function updatePassword(int $id, string $password): ?bool
+	{
+		return $this->usersModel->update($id, [Users::COLUMN_PASSWORD_HASH => $this->passwords->hash($password)]);
 	}
 
 }

@@ -12,9 +12,9 @@ use Nette\Utils\ArrayHash;
 class FilesManagerFileNameFormFactory extends BaseFormFactory
 {
 
-	public function __construct(FormFactory $factory, private Translator $translator, private Model\Files $model)
+	public function __construct(private Translator $translator, private Model\Files $model)
 	{
-		parent::__construct($factory);
+		parent::__construct();
 	}
 
 

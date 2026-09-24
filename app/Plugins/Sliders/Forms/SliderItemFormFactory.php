@@ -16,9 +16,9 @@ class SliderItemFormFactory extends BaseFormFactory
 	private string $language;
 
 
-	public function __construct(FormFactory $factory, private SliderItems $model)
+	public function __construct(private SliderItems $model)
 	{
-		parent::__construct($factory);
+		parent::__construct();
 	}
 
 

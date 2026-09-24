@@ -12,9 +12,9 @@ use Nette\Application\UI\Form;
 class UrlFormFactory extends BaseFormFactory
 {
 
-	public function __construct(FormFactory $factory, private Model $model)
+	public function __construct(private Model $model)
 	{
-		parent::__construct($factory);
+		parent::__construct();
 	}
 
 

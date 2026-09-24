@@ -13,9 +13,9 @@ class SearchFormFactory extends BaseFormFactory
 {
 	private Translator $translator;
 
-	public function __construct(FormFactory $factory, Translator $translator)
+	public function __construct(Translator $translator)
 	{
-		parent::__construct($factory);
+		parent::__construct();
 		$this->translator = $translator;
 	}
 

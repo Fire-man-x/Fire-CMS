@@ -4,11 +4,10 @@ declare(strict_types=1);
 namespace App\Plugins\DynamicForms\Model;
 
 use App\Model\BaseModel;
+use App\Model\Exceptions\RecordNotFoundException;
 use App\Model\Translatable;
-use App\Model\RecordNotFoundException;
 use App\Service\LanguageService;
 use Nette\Database\Explorer;
-use Nette\Database\LockTimeoutException;
 use Nette\InvalidArgumentException;
 use Nette\Utils\ArrayHash;
 

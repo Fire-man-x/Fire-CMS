@@ -15,9 +15,9 @@ class RoleFormFactory extends BaseFormFactory
 	private Model\Modules $modelModules;
 
 
-	public function __construct(FormFactory $factory, Model\Roles $model, Model\Modules $modelModules)
+	public function __construct(Model\Roles $model, Model\Modules $modelModules)
 	{
-		parent::__construct($factory);
+		parent::__construct();
 		$this->model = $model;
 		$this->modelModules = $modelModules;
 	}

@@ -5,6 +5,8 @@ namespace App\Model;
 
 use App\Model\TranslatedTitleTrait\TranslatedTitleTrait;
 use App\Components\IViewCounter;
+use App\Components\Menu\Model\MenuLinkType;
+use App\Components\Menu\Model\Menus;
 use App\Modules\CommentsModule\Model\ISubComments;
 use App\Service\LanguageService;
 use Nette\Database\SqlLiteral;
@@ -29,7 +31,7 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 
 	private LanguageService $languages;
 
-	public function __construct(\Nette\Database\Explorer $database, LanguageService $languages)
+	public function __construct(\Nette\Database\Explorer $database, LanguageService $languages, private Menus $menusModel)
 	{
 		parent::__construct($database);
 		$this->languages = $languages;
@@ -68,6 +70,9 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 		//update all childs
 		$info = $this->findById($id)->fetch();
 		
+
+		// položky menu odkazují na kategorii jen přes `target` (bez cizího klíče), úklid je tedy tady
+		$this->menusModel->deleteItemsByTarget(MenuLinkType::Category, (string) $id);
 
 		//finally delete
 		parent::delete($id);

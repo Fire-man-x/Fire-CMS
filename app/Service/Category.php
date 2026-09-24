@@ -90,9 +90,6 @@ class Category
 	public function delete(int $categoryId): int
 	{
 		$categoryInfo = $this->categoriesModel->getById($categoryId);
-		if($categoryInfo && $categoryInfo->type == "homepage"){
-			throw new ForbiddenRequestException("You can not delete homepage category.");
-		}
 
 		//delete
 		$this->categoriesModel->update($categoryId, array("status"=>"trash"));
@@ -233,7 +230,7 @@ class Category
 	{
 		//list
 		$categoriesList = $this->categoriesModel->getAllForMenu()
-			->select("categories.id, categories.parentId")
+			->select($this->categoriesModel->getTableName() . ".id, " . $this->categoriesModel->getTableName() . ".parentId")
 			->order("position ASC")
 			->fetchAssoc("parentId|id");
 

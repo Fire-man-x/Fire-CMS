@@ -92,8 +92,11 @@ private function findActive(): Selection
 
 ## Content model (jádro)
 
-Články (`Articles`), kategorie (`Categories`) se zásuvnými „subtypy" přes `app/Forms/CategorySubtype/*FormPart`
-(Default/Homepage/CategoryLink/Url/Gallery, implementují `ICategoryFormType`), správce souborů
+Články (`Articles`), stránky (`Pages` - `firecms_pages` + `firecms_pageDescriptions` + obrázky `firecms_pageFiles`, vnořování
+přes `parentId`/`position`, bez revizí/štítků, URL typu `page` - plochý slug i u podstránek), sekce (`Sections` - `firecms_sections` + `firecms_sectionDescriptions`, kategorie i články mají `sectionId`),
+kategorie (`Categories`, bez sloupce `type`) se zásuvnými „subtypy" přes `app/Forms/CategorySubtype/*FormPart`
+(jen `DefaultFormPart`; typy kategorií odstraněny 2026-09-24 - odkazy řeší položky menu, galerie a
+obsahové stránky Pages), správce souborů
 (`Files`/`FileFolders`), menu (`Menus`), štítky (`Tags`), SEO meta (`Metas`), uživatelé/role
 (`Users`/`Roles`), vícejazyčnost (`LiveTranslator` + `Languages`/`LanguageService`), hezká URL a
 přesměrování (`UrlModule`), komentáře (`CommentsModule`).

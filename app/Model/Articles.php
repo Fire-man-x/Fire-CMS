@@ -147,6 +147,22 @@ class Articles extends BaseModel implements Translatable, IViewCounter, ISubTags
 
 
 	/**
+	 * Články zobrazitelné na webu: publikované, aktivní, aktuální verze (ne revize), s datem publikace
+	 * v minulosti a nevypršené
+	 * @return \Nette\Database\Table\Selection<ActiveRow>
+	 */
+	public function findPublished(string $language): \Nette\Database\Table\Selection
+	{
+		return $this->getAllWithTranslation($language)
+			->where("article.historyId", null)
+			->where("article.status", "publish")
+			->where("article.active", true)
+			->where("article.publishingDate <= NOW()")
+			->where("article.expiringDate IS NULL OR article.expiringDate > NOW()");
+	}
+
+
+	/**
 	 * Get all with translation
 	 * @param string|null $language If null then show in all languages
 	 */

@@ -1,6 +1,7 @@
 INSERT INTO `firecms_languages` (`languageId`, `active`, `default`, `position`, `name`, `shortcut`) VALUES
-	('en',	1,	1,	1,	'Angličitina',	'EN'),
-	('jn',	0,	0,	3,	'Jablka',	'JN');
+	('en',	1,	0,	1,	'Angličitina',	'EN'),
+	('jn',	0,	0,	3,	'Jablka',	'JN'),
+	('cs',	1,	1,	2,	'Čeština',	'CS');
 
 INSERT INTO `firecms_options` (`key`, `value`) VALUES
 	('image_resolution',	'1000x1000'),

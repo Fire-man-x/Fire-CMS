@@ -1,10 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Forms;
+namespace App\AdminModule\Forms;
 
+use App\AdminModule\SettingsModule\Presenters\UsersPresenter;
+use App\Forms\BaseFormFactory;
+use App\Model\Exceptions\DuplicateEmailException;
+use App\Model\Exceptions\DuplicateNameException;
 use App\Model;
-use App\Model\Users;
 use Latte\Engine;
 use Nette\Application\UI\Form;
 use Nette\Database\SqlLiteral;
@@ -15,8 +18,6 @@ use Nette\Mail\Message;
 use Nette\Mail\SendmailMailer;
 use Nette\Mail\SmtpMailer;
 use Nette\Security\AuthenticationException;
-use Nette\Security\Passwords;
-use Nette\Utils\ArrayHash;
 use Nette\Utils\Random;
 
 
@@ -24,79 +25,85 @@ class UserFormFactory extends BaseFormFactory
 {
 	private int $userId;
 
-	private Model\Users $users;
 
-	private Model\UserManager $userManager;
-
-	private Model\Roles $roles;
-
-	private Translator $translator;
-
-	private Request $httpRequest;
-
-	private Passwords $passwords;
-
-
-	public function __construct(FormFactory $factory, Model\Users $users, Model\UserManager $userManager, Translator $translator, Model\Roles $roles, Request $httpRequest, Passwords $passwords)
+	public function __construct(
+		private Model\Users $users,
+		private Model\UserManager $userManager,
+		private Translator $translator,
+		private Model\Roles $roles,
+		private Request $httpRequest
+	)
 	{
-		parent::__construct($factory);
-		$this->users = $users;
-		$this->userManager = $userManager;
-		$this->translator = $translator;
-		$this->roles = $roles;
-		$this->httpRequest = $httpRequest;
-		$this->passwords = $passwords;
+		parent::__construct();
 	}
 
-	public function create(int|string $editId = null): Form
+
+	public function create(int|string $editId = null): AdminForm
 	{
-		$form = parent::create($editId);
+		/** @var AdminForm $form */
+		$form = new AdminForm($editId);
 
-		$form->addGroup("Informations");
-		$form->addCheckbox('active', 'Active');
 
-		$form->addText('username', 'Username')
+		/*$group = $form->addGroup('Informations', true);
+		$group->setOption('description', null);
+		$group->add($form->data);*/
+		$form->data->addCheckbox('active', 'Active');
+
+		$form->data->addText('username', 'Username')
 			->setRequired(VALIDATE_REQUIRED);
 
-		$form->addText('email', 'Email')
+		$form->data->addText('email', 'Email')
 			->setRequired(VALIDATE_REQUIRED);
 
-		$form->addSelect('roleId', $this->translator->translate('Role in system'), $this->roles->getListWithName())
+		$form->data->addSelect('roleId', $this->translator->translate('Role in system'), $this->roles->getListWithName())
 			->setTranslator(null);
 
-		$form->addGroup("Personal informations");
-		$form->addText('nickname', 'Nickname');
+		/*$group = $form->addGroup('Personal informations', true);
+		$group->setOption('description', 'Nickname and name shown around the admin - not used to sign in.');
+		$group->add($form->data);*/
+		$form->data->addText('nickname', 'Nickname');
 
-		$form->addText('firstName', 'First name');
+		$form->data->addText('firstName', 'First name');
 
-		$form->addText('surname', 'Surname');
+		$form->data->addText('surname', 'Surname');
 
 		$form->setCurrentGroup();
-		$form->addSubmit('save', 'Save');
+		$form->buttons->addSubmit('save', 'Save');
 
 		if($this->isEditMode()){
-			$values = $this->users->getById($this->getEditId())?->toArray();
-			$form->setDefaults($values);
+			$values = $this->users->getById($this->getEditId());
+			if($values) {
+				$form->setDefaults($values);
+			}
 		}
 
 		$form->onSuccess[] = array($this, 'formSucceeded');
 		return $form;
 	}
 
-	public function formSucceeded(Form $form, ArrayHash $values)
+	public function formSucceeded(AdminForm $form, AdminFormValues $values): void
 	{
 		unset($values->editId);
 
-		$values->nickname = "";
-
 		if($this->isEditMode()){
-			$this->users->update($this->getEditId(), (array) $values);
+			try{
+				$this->userManager->update($this->getEditId(), (array) $values->data);
+			}catch(DuplicateEmailException|DuplicateNameException $e){
+				$form->addError($e->getMessage());
+			}
 		}else{
-			$username = $values->username;
-			$email = $values->email;
+			$username = $values->data->username;
+			$email = $values->data->email;
 			$password = Random::generate();
-			unset($values->username, $values->email);
-			$form->getPresenter()->id = $this->userManager->add($username, $email, $password, $values);
+			unset($values->data->username, $values->data->email);
+			$presenter = $form->getPresenter();
+			if($presenter instanceof UsersPresenter) {
+				try{
+					$presenter->id = $this->userManager->add($username, $email, $password, $values->data);
+				}catch(DuplicateEmailException|DuplicateNameException $e){
+					$form->addError($e->getMessage());
+				}
+			}
 		}
 	}
 
@@ -116,7 +123,7 @@ class UserFormFactory extends BaseFormFactory
 
 		$form->addPassword('new_password_again', 'New password again')
 			->setRequired('Please enter your password.')
-			->addRule(Form::EQUAL, 'Passwords are not same', $form['new_password']);
+			->addRule(Form::Equal, 'Passwords are not same', $form['new_password']);
 
 		$form->addSubmit('send', 'Save');
 
@@ -125,15 +132,10 @@ class UserFormFactory extends BaseFormFactory
 	}
 
 
-	public function formNewPasswordSucceeded($form, $values)
+	public function formNewPasswordSucceeded($form, $values): void
 	{
 		try {
-			$this->users->findAll()
-				->where("id",  $this->userId)
-				->update(array(
-						Users::COLUMN_PASSWORD_HASH => $this->passwords->hash($values->new_password)
-				)
-			);
+			$this->userManager->updatePassword($this->userId, $values->new_password);
 		} catch (AuthenticationException $e) {
 			$form->addError($e->getMessage());
 		}
@@ -160,7 +162,7 @@ class UserFormFactory extends BaseFormFactory
 
 	public function formRecoveryPasswordSucceeded(Form $form, $values)
 	{
-		$findedUser = $this->users->findAll()->where("username", $values->username);
+		$findedUser = $this->users->findByName($values->username)->fetch();
 
 		if ($findedUser) {
 			$email = $findedUser->email;
@@ -210,10 +212,7 @@ class UserFormFactory extends BaseFormFactory
 	}
 
 
-	/**
-	 * @param $userId
-	 */
-	protected function generateResetUrl($userId): string {
+	protected function generateResetUrl(int $userId): string {
 		$baseUrl = $this->httpRequest->getUrl()->getHostUrl();
 		$token = Random::generate(24);
 		$signal = $this->link("this", array('token' => $token));

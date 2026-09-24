@@ -3,30 +3,46 @@ declare(strict_types=1);
 
 namespace App\Components\Menu;
 
+use App\Components\Menu\Model\MenuItem;
+use App\Components\Menu\Model\MenuLinkType;
 use App\Components\Menu\Model\Menus;
 use App\Components\Shortcodes;
 use App\Modules\UrlModule\UrlManager;
 use App\Model;
 use Nette\Application\UI\Control;
+use Nette\Application\UI\InvalidLinkException;
+use Nette\Utils\ArrayHash;
 
 /**
- * Class CategoriesMenu
- *
- * CategoriesMenu Component
+ * Webové menu (`{control menu <location>, maxSublevel, menuClass, itemClass}`) z položek firecms_menuItems.
+ * Položka odkazuje na kategorii, článek, URL nebo presenter (MenuLinkType)
  */
 class Menu extends Control
 {
 	private string $templateFile;
 
-	private \Nette\Database\Table\Selection $firstLevelCategories;
+	private array $firstLevelCategories;
 
 	private array $subCategories;
 
+	private array $subCategoriesTree;
+
+	/** @var array<int, array<string, mixed>> */
+	private array $articles = [];
+
+	/** @var array<int, string> pageId => název */
+	private array $pages = [];
+
+	/** @var array<int, string> sectionId => název */
+	private array $sections = [];
+
+	/** @var array<int, list<\Nette\Database\Table\ActiveRow>> menuItemId => soubory */
+	private array $itemFiles = [];
+
 	private string $language;
 
-	private int $activeMenuItem;
+	private ?int $activeMenuItem = null;
 
-	private array $circularDetector;
 
 
 	/**
@@ -35,6 +51,10 @@ class Menu extends Control
 	public function __construct(
 		private Menus $menusModel,
 		private Model\Categories $categoriesModel,
+		private Model\Articles $articlesModel,
+		private Model\Pages $pagesModel,
+		private Model\Sections $sectionsModel,
+		private Model\Files $filesModel,
 		private \Nette\Localization\Translator $translator,
 		private Shortcodes $shortcodes)
 	{
@@ -78,31 +98,37 @@ class Menu extends Control
 			echo $this->translator->translate("Menu doesn't exist.");
 			return;
 		}
-		$this->firstLevelCategories = $this->menusModel->getAllMenuItemsWithTranslation($this->language, $location)->fetchAssoc("categoryId");
-		if(!$this->firstLevelCategories){
-			echo $this->translator->translate("No item.");
-			return;
-		}
 
-		//all categories
+		//all categories (targets of category items + their subcategories)
 		$this->subCategories = $this->categoriesModel->getAllWithTranslation($this->language)
 			->where("category.active", true)
 			->where("category.showInMenu", true)
 			->where("category.status IN ?", array("publish"))
 			->where("category.historyId", null)
 			->fetchAssoc("categoryId");
-		$subCategoriesTree = $this->createTree($this->subCategories, null, 0);
+		$this->subCategoriesTree = $this->createTree($this->subCategories, null, 0);
 
-		//walk all categories in first level
-		foreach ($this->firstLevelCategories as $categoryId => &$firstLevelCategory){
-			$items = $this->arrayRecursiveSearch($subCategoriesTree, $categoryId, 0, $maxSublevel); //set only maxSublevel
+		$items = $this->menusModel->getActiveItemsByLocation((string) $location, $this->language);
+		$this->articles = $this->loadArticles($items);
+		$this->pages = $this->loadPages($items);
+		$this->sections = $this->loadSections($items);
+		$this->itemFiles = $this->menusModel->getItemFiles(array_map(fn(MenuItem $item): int => $item->id, $items));
 
-			$firstLevelCategory['link'] = $this->linkByType($firstLevelCategory["type"], $firstLevelCategory["categoryId"], $this->language);
-			$firstLevelCategory = \Nette\Utils\ArrayHash::from($firstLevelCategory);
-			$firstLevelCategory['childs'] = $items;
+		$itemsByParent = [];
+		foreach ($items as $item) {
+			$itemsByParent[$item->parentId ?? 0][] = $item;
 		}
 
+		$this->firstLevelCategories = $this->buildItems($itemsByParent, 0, $maxSublevel);
+		if(!$this->firstLevelCategories){
+			echo $this->translator->translate("No item.");
+			return;
+		}
+
+		// `categories`/`activeCategory` - názvy proměnných zůstávají kvůli vlastním šablonám menu v projektech
 		$this->template->categories = $this->firstLevelCategories;
+		// veřejný nadpis menu v aktuálním jazyce (null = nevyplněný); výchozí Menu.latte ho nevykresluje
+		$this->template->menuTitle = $this->menusModel->getTitle((int) $menuExist->id, $this->language);
 		$this->template->activeCategory = $this->activeMenuItem;
 		$this->template->maxSublevel = $maxSublevel;
 		$this->template->menuClass = $menuClass;
@@ -115,6 +141,206 @@ class Menu extends Control
 
 
 	/**
+	 * Položky jedné úrovně pro šablonu. Položka, jejíž cíl se nedá zobrazit (nepublikovaná/skrytá kategorie,
+	 * článek v koši, ...), se vynechá i s potomky.
+	 *
+	 * Každá položka má: id, categoryId (jen u kategorií), type (linkType), title, link, content, active,
+	 * newWindow, files (obrázky, FileEntity), image (první obrázek nebo null), childs. Kategorie má v childs nejdřív vlastní
+	 * podpoložky menu, pak své podkategorie se showInMenu (stejně jako dřív).
+	 *
+	 * @param array<int, list<MenuItem>> $itemsByParent
+	 * @return list<ArrayHash>
+	 */
+	private function buildItems(array $itemsByParent, int $parentId, ?int $maxSublevel): array
+	{
+		$result = [];
+		foreach ($itemsByParent[$parentId] ?? [] as $item) {
+			$linkType = $item->getLinkType();
+			$target = $item->target;
+			$label = $item->label;
+			$childs = $this->buildItems($itemsByParent, $item->id, $maxSublevel);
+
+			$menuItem = [
+				'id' => $item->id,
+				'categoryId' => null,
+				'type' => $linkType?->value,
+				'title' => $label ?? $item->defaultLabel ?? $target,
+				'link' => '#',
+				'content' => null,
+				'active' => true,
+				'newWindow' => $item->newWindow,
+			];
+
+			switch ($linkType) {
+				case MenuLinkType::Category:
+					$category = $this->subCategories[(int) $target] ?? null;
+					if ($category === null) {
+						continue 2;
+					}
+					$menuItem = [
+						'categoryId' => (int) $target,
+						'type' => MenuLinkType::Category->value,
+						'title' => $label ?? $category['title'],
+						'link' => $this->categoryLink((int) $target),
+						'content' => $category['content'] ?? null,
+						'active' => (bool) $category['active'],
+					] + $menuItem;
+					$childs = [...$childs, ...($this->arrayRecursiveSearch($this->subCategoriesTree, (int) $target, 0, $maxSublevel) ?? [])];
+					break;
+
+				case MenuLinkType::Article:
+					$article = $this->articles[(int) $target] ?? null;
+					if ($article === null) {
+						continue 2;
+					}
+					$menuItem['title'] = $label ?? $article['title'];
+					$menuItem['link'] = $this->getPresenter()->link(':Front:Articles:detail', ['id' => (int) $target, 'locale' => $this->language]);
+					break;
+
+				case MenuLinkType::Page:
+					$pageTitle = $this->pages[(int) $target] ?? null;
+					if ($pageTitle === null) {
+						continue 2;
+					}
+					$menuItem['title'] = $label ?? $pageTitle;
+					$menuItem['link'] = $this->getPresenter()->link(':Front:Pages:detail', ['id' => (int) $target, 'locale' => $this->language]);
+					break;
+
+				case MenuLinkType::Section:
+					$sectionTitle = $this->sections[(int) $target] ?? null;
+					if ($sectionTitle === null) {
+						continue 2;
+					}
+					$menuItem['title'] = $label ?? $sectionTitle;
+					$menuItem['link'] = $this->getPresenter()->link(':Front:Sections:detail', ['id' => (int) $target, 'locale' => $this->language]);
+					break;
+
+				case MenuLinkType::Url:
+					$menuItem['link'] = $target;
+					break;
+
+				case MenuLinkType::Route:
+					$menuItem['link'] = $this->linkToRoute($target);
+					break;
+
+				default:
+					continue 2;
+			}
+
+			// obrázky položky (první = hlavní); výchozí Menu.latte je nevykresluje, jsou pro vlastní šablony
+			$menuItem['files'] = array_map(fn($file) => $this->filesModel->toFileEntity($file), $this->itemFiles[$item->id] ?? []);
+			$menuItem['image'] = $menuItem['files'][0] ?? null;
+			$menuItem['childs'] = $childs;
+			$result[] = ArrayHash::from($menuItem, false);
+		}
+
+		return $result;
+	}
+
+
+	/**
+	 * Publikované články, na které odkazují položky menu, s překladem v aktuálním jazyce
+	 * @param list<MenuItem> $items
+	 * @return array<int, array<string, mixed>> articleId => článek
+	 */
+	private function loadArticles(array $items): array
+	{
+		$ids = [];
+		foreach ($items as $item) {
+			if ($item->getLinkType() === MenuLinkType::Article && ctype_digit($item->target)) {
+				$ids[] = (int) $item->target;
+			}
+		}
+		if ($ids === []) {
+			return [];
+		}
+
+		$articles = [];
+		foreach ($this->articlesModel->getAllWithTranslation($this->language)
+			->where('article.id', $ids)
+			->where('article.status', 'publish')
+			->where('article.historyId', null) as $article) {
+			$articles[(int) $article->articleId] = $article->toArray();
+		}
+
+		return $articles;
+	}
+
+
+	/**
+	 * Publikované stránky, na které odkazují položky menu, s názvem v aktuálním jazyce
+	 * @param list<MenuItem> $items
+	 * @return array<int, string> pageId => název
+	 */
+	private function loadPages(array $items): array
+	{
+		$ids = [];
+		foreach ($items as $item) {
+			if ($item->getLinkType() === MenuLinkType::Page && ctype_digit($item->target)) {
+				$ids[] = (int) $item->target;
+			}
+		}
+		if ($ids === []) {
+			return [];
+		}
+
+		$pages = [];
+		foreach ($this->pagesModel->findPublished($this->language)->where('pageId', $ids) as $page) {
+			$pages[(int) $page->pageId] = (string) $page->title;
+		}
+
+		return $pages;
+	}
+
+
+	/**
+	 * Aktivní sekce, na které odkazují položky menu, s názvem v aktuálním jazyce
+	 * @param list<MenuItem> $items
+	 * @return array<int, string> sectionId => název
+	 */
+	private function loadSections(array $items): array
+	{
+		$ids = [];
+		foreach ($items as $item) {
+			if ($item->getLinkType() === MenuLinkType::Section && ctype_digit($item->target)) {
+				$ids[] = (int) $item->target;
+			}
+		}
+		if ($ids === []) {
+			return [];
+		}
+
+		$sections = [];
+		foreach ($this->sectionsModel->findActive($this->language)->where('sectionId', $ids) as $section) {
+			$sections[(int) $section->sectionId] = (string) $section->title;
+		}
+
+		return $sections;
+	}
+
+
+	/**
+	 * Odkaz typu route: `:Front:Properties:default?town=Brno` = cíl presenteru + parametry. Odkazům na frontend
+	 * se doplní aktuální jazyk (`locale`), stejně jako u kategorií.
+	 */
+	private function linkToRoute(string $target): string
+	{
+		[$destination, $query] = array_pad(explode('?', $target, 2), 2, '');
+		parse_str($query, $params);
+
+		if (!isset($params['locale']) && (str_starts_with($destination, ':Front:') || !str_starts_with($destination, ':'))) {
+			$params['locale'] = $this->language;
+		}
+
+		try {
+			return $this->getPresenter()->link($destination, $params);
+		} catch (InvalidLinkException) {
+			return '#error: invalid link';
+		}
+	}
+
+
+	/**
 	 * Create tree
 	 */
 	private function createTree(array $items, ?int $parent = null, int $level = 0): array
@@ -123,7 +349,7 @@ class Menu extends Control
 		foreach ($items as $itemId => $category) {
 			if ($category['parentId'] == $parent) {
 				unset($items[$itemId]);
-				$category['link'] = $this->linkByType($category["type"], $category["categoryId"], $this->language);
+				$category['link'] = $this->categoryLink((int) $category["categoryId"]);
 				$category['childs'] = $this->createTree($items, $category['categoryId'], $level + 1);
 				$tree[] = \Nette\Utils\ArrayHash::from($category, false);
 			}
@@ -134,10 +360,8 @@ class Menu extends Control
 
 	/**
 	 * Search for value recursively in array
-	 * @param int $level
-	 * @param int|null $maxSublevel
 	 */
-	private function arrayRecursiveSearch(array $inItems, string $searchValue): ?array
+	private function arrayRecursiveSearch(array $inItems, int $searchValue, int $level, ?int $maxSublevel): ?array
 	{
 		foreach ($inItems as $itemId => $item) {
 
@@ -158,7 +382,7 @@ class Menu extends Control
 				/*if($searchValue == 10){
 					\Tracy\Debugger::barDump("search in childs");
 				}*/
-				$returnValue = $this->arrayRecursiveSearch($item['childs'], $searchValue);
+				$returnValue = $this->arrayRecursiveSearch($item['childs'], $searchValue, ++$level, $maxSublevel);
 
 				/*if($searchValue == 10 && $returnValue != null){
 					\Tracy\Debugger::barDump("find in childs");
@@ -181,109 +405,11 @@ class Menu extends Control
 
 
 	/**
-	 * Cut to max level
-	 * @param int|null $maxSublevel
-	 * /
-	private function arrayCutMaxLevel(&$items, $level = 0, $maxSublevel = null)
-	{
-		if($maxSublevel === null){
-			return;
-		}
-		if ($level > $maxSublevel) {
-				\Tracy\Debugger::barDump($items['childs'], "more than sublevel");
-			if (!empty($items['childs'])) {
-				$items['childs'] = array();
-			}
-		} else {
-			if(isset($items['childs']) && !empty($items['childs'])){
-				\Tracy\Debugger::barDump($items['childs'], "cut in sub level");
-				foreach ($items['childs'] as $childs){
-				\Tracy\Debugger::barDump($level + 1, "ll - more than sublevel");
-					$this->arrayCutMaxLevel($childs, $level + 1, $maxSublevel);
-				}
-				\Tracy\Debugger::barDump($items['childs'], "cut in sub level-end");
-			}
-		}
-	}
-
-
-	/**
-	 * Decode tree to array
+	 * Odkaz na kategorii článků (kategorie nemají typ, homepage je Front:Homepage)
 	 */
-	private function treeToArray(&$toArray, array $items, $parent = null, int $level = 0): void
+	private function categoryLink(int $categoryId): string
 	{
-		foreach ($items as $position => $item) {
-			$toArray[] = array(
-				"id" => $item["id"],
-				"parentId" => $parent,
-				"position" => $position,
-				"level" => $level
-			);
-
-			if (isset($item["children"])) {
-				$this->treeToArray($toArray, $item["children"], $item["id"], $level + 1);
-			}
-		}
-	}
-
-
-	/**
-	 * Decode tree to array
-	 */
-	private function linkByType(string $type, int $key, string $language)
-	{
-		switch ($type) {
-			case "homepage":
-				return $this->getPresenter()->link(":Front:Homepage:default", array("id" => null));
-
-			case "categoryLink":
-				//find target
-				$targetCategory = $this->subCategories[$key];
-				if($this->detectCirculation($key, $targetCategory['url'])){
-					return "#error: Circulation detected";
-				}
-				return $this->linkByType($targetCategory['type'], $targetCategory['id'], $language);
-
-			case "site":
-			default:
-				return $this->getPresenter()->link(":Front:Categories:detail", array("id" => $key, "locale" => $language));
-		}
-	}
-
-
-	/**
-	 * Detect circulation in links
-	 */
-	private function detectCirculation(string|int $from, string|int $to): bool
-	{
-		$searchFor = $from;
-		$firstRound = true;
-		$searching = true;
-		$findedCirculation = false;
-		//go thru all and find colision
-		while ($searching) {
-			if (!$firstRound) {
-				if ($searchFor == $from) {
-					$searching = false;
-					$findedCirculation = true;
-				}
-			} else {
-				$firstRound = false;
-			}
-
-			if (isset($this->circularDetector[$searchFor])) {
-				$searchFor = $this->circularDetector[$searchFor];
-			} else {
-				$searching = false;
-				$findedCirculation = false;
-			}
-		}
-
-		if (!isset($this->circularDetector[$from])) {
-			$this->circularDetector[$from] = $to;
-		}
-
-		return $findedCirculation;
+		return $this->getPresenter()->link(':Front:Categories:detail', ['id' => $categoryId, 'locale' => $this->language]);
 	}
 
 }

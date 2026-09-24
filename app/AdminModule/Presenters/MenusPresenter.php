@@ -7,7 +7,9 @@ use App\Attributes\Privilege;
 use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Components\Menu\Model\Menus;
+use App\Components\Menu as MenuComponent;
 use App\Forms\MenuFormFactory;
+use App\Forms\MenuItemFormFactory;
 use App\Model;
 use App\Service\LanguageService;
 use Contributte\Datagrid\Datagrid;
@@ -39,11 +41,6 @@ class MenusPresenter extends BasePresenter
 	public ?string $language = null;
 
 	/**
-	 * Menu parent
-	 */
-	private ?int $parent = null;
-
-	/**
 	 * Actual language
 	 */
 	public ?string $actualLanguage = null;
@@ -59,6 +56,18 @@ class MenusPresenter extends BasePresenter
 
 	/** @inject */
 	public Model\Categories $categoriesModel;
+
+	/** @inject */
+	public Model\Articles $articlesModel;
+
+	/** @inject */
+	public Model\Pages $pagesModel;
+
+	/** @inject */
+	public Model\Files $filesModel;
+
+	/** @inject */
+	public MenuItemFormFactory $menuItemFactory;
 
 
 	protected function startup(): void
@@ -88,7 +97,6 @@ class MenusPresenter extends BasePresenter
 	#[Privilege('edit')]
 	public function actionDetail(?int $parent = null): void
 	{
-		$this->parent = $parent;
 
 		if ($this->languages->existLanguage($this->language)) {
 			$this->actualLanguage = $this->language == null ? $this->languages->getDefaultLanguage() : $this->language;
@@ -97,9 +105,13 @@ class MenusPresenter extends BasePresenter
 		}
 
 		$this->template->menuInfo = $this->menusModel->getById($this->id);
+		if (!$this->template->menuInfo) {
+			$this->error("Menu '$this->id' doesn't exist.");
+		}
+		$this->template->menuName = $this->menusModel->getDisplayName((int) $this->id, $this->actualLanguage);
 
 		//breadcrumb
-		$this->addBreadCrumbLink($this->template->menuInfo['name'], $this->link(":Admin:Menus:detail", array("id" => $this->id)), null, false);
+		$this->addBreadCrumbLink($this->template->menuName, $this->link(":Admin:Menus:detail", array("id" => $this->id)), null, false);
 	}
 
 
@@ -118,9 +130,12 @@ class MenusPresenter extends BasePresenter
 	 */
 	protected function createComponentMenusGrid(string $name): Datagrid
 	{
+		// název = nadpis ve výchozím jazyce (firecms_menuDescriptions), menu bez nadpisu se pozná podle location
+		// select() vypíná výchozí `*`, sloupce tabulky je proto nutné vybrat výslovně
 		$source = $this->menusModel->findAll()
-			->order("name")
-			->order("location");
+			->select("`" . $this->menusModel->getTableName() . "`.*");
+		$this->menusModel->selectTitle($source, "`" . $this->menusModel->getTableName() . "`.`id`");
+		$source->order("title")->order("location");
 		$primaryKey = $this->menusModel->getColumnId();
 		$paramKey = $this->menusModel->getForeignKeyColumn();
 
@@ -144,7 +159,8 @@ class MenusPresenter extends BasePresenter
 			$this->handleActivate((int) $id, (bool) $value);
 		};
 
-		$grid->addColumnText("name", "Name");
+		$grid->addColumnText("title", "Name")
+			->setRenderer(fn($row): string => (string) ($row->title ?? $row->location));
 
 		$grid->addColumnText("location", "Template location");
 
@@ -178,74 +194,138 @@ class MenusPresenter extends BasePresenter
 
 
 	/**
-	 * MenuItems grid
-	 * @throws \LiveTranslator\TranslatorException
+	 * Položky menu - plochý seznam ve stromovém pořadí (podpoložky odsazené). Přetažením se mění pořadí
+	 * mezi sourozenci (handleSort), rodič se mění ve formuláři položky.
 	 * @throws DatagridException
 	 */
 	protected function createComponentMenuItemsGrid(string $name): Datagrid
 	{
-		$source = $this->menusModel->getRelationMenuItems($this->id);
-		$this->categoriesModel->selectTitle($source, "`" . Menus::MENU_ITEM_TABLE_NAME . "`.`categoryId`", $this->language);
-		$primaryKey = "categoryId";
-		$self = $this;
-
 		$grid = new Datagrid($this, $name);
-		$grid->setPrimaryKey($primaryKey);
-		$grid->setDataSource($source);
+		$grid->setPrimaryKey('id');
+		$grid->setDataSource($this->getMenuItemsGridRows());
 		$grid->setTranslator($this->translator);
 		$grid->setSortable();
+		$grid->setPagination(false);
 
-		$grid->addColumnText("title", "Name")
-			->setRenderer(function ($row) {
+		$grid->addColumnText('title', 'Name')
+			->setRenderer(function (array $row): Nette\Utils\Html {
+				$title = Nette\Utils\Html::el('span')
+					->setText(str_repeat('— ', $row['level']) . $row['title']);
 				if (!$row['active']) {
-					return Nette\Utils\Html::el('span', ['class' => 'font-italic'])->setText((string) $row['title']);
-				} else {
-					return $row["title"];
+					$title->class('font-italic text-muted');
 				}
+				return $title;
 			});
 
+		$grid->addColumnText('linkType', 'Link type')
+			->setRenderer(fn(array $row): string => $this->translator->translate($row['linkTypeLabel']));
+
+		$grid->addColumnText('target', 'Target');
+
+		// náhledy obrázků položky (první = hlavní), přidání ze správce souborů, odebrání, řazení přetažením
+		$grid->addColumnText('files', 'Images')
+			->setTemplate(__DIR__ . '/../templates/Menus/itemImages.latte');
+
 		//Actions
-		$grid->addAction('delete', 'Delete', 'removeCategory!', array($primaryKey => $primaryKey))
+		$grid->addAction('edit', 'Edit', 'editItem!', ['itemId' => 'id'])
+			->setClass('btn btn-primary btn-sm ajax')
+			->setIcon(ICON_EDIT)
+			->setTitle('Edit')
+			->addAttributes([
+				'data-bs-toggle' => 'modal',
+				'data-bs-target' => '#modal',
+			]);
+
+		$grid->addAction('delete', 'Delete', 'deleteItem!', ['itemId' => 'id'])
 			->setClass('btn btn-danger btn-sm ajax')
 			->setIcon(ICON_DELETE)
 			->setTitle('Delete')
-			->addAttributes(array(
+			->addAttributes([
 				'data-bs-toggle' => 'modal',
-				"data-bs-target" => "#confirm-modal",
-				"data-confirm-text" => $this->translator->translate('Delete?'),
-			));
+				'data-bs-target' => '#confirm-modal',
+				'data-confirm-text' => $this->translator->translate('Delete the item including its sub-items?'),
+			]);
 
 		return $grid;
 	}
 
 
 	/**
-	 * @throws DatagridException
+	 * Řádky gridu položek: název = popisek v editovaném jazyce, jinak název kategorie/článku, jinak cíl
+	 * @return list<array<string, mixed>>
 	 */
-	protected function createComponentModalMenuItemsGrid(string $name): Datagrid
+	private function getMenuItemsGridRows(): array
 	{
-		$source = $this->getMenuItemChildrens(null);
-		//$source->setParentKey("parentId");
-		$primaryKey = $this->categoriesModel->getColumnId();
-		$paramKey = $this->categoriesModel->getForeignKeyColumn();
+		$items = $this->menusModel->getItemsTree((int) $this->id, (string) $this->actualLanguage);
 
-		$grid = new Datagrid($this, $name);
-		$grid->setPrimaryKey($primaryKey);
-		$grid->setDataSource($source);
-		$grid->setTranslator($this->translator);
+		$titles = [
+			MenuComponent\Model\MenuLinkType::Category->value => $this->getContentTitles($this->categoriesModel, $items, MenuComponent\Model\MenuLinkType::Category),
+			MenuComponent\Model\MenuLinkType::Article->value => $this->getContentTitles($this->articlesModel, $items, MenuComponent\Model\MenuLinkType::Article),
+			MenuComponent\Model\MenuLinkType::Page->value => $this->getContentTitles($this->pagesModel, $items, MenuComponent\Model\MenuLinkType::Page),
+			MenuComponent\Model\MenuLinkType::Section->value => $this->getContentTitles($this->sectionsModel, $items, MenuComponent\Model\MenuLinkType::Section),
+		];
 
-		//tree
-		$grid->setTreeView([$this, 'getMenuItemChildrens'], 'parentId');
+		$files = $this->menusModel->getItemFiles(array_map(fn($item): int => $item->id, $items));
 
-		$grid->addColumnText("title", "Name");
+		$rows = [];
+		foreach ($items as $item) {
+			$linkType = $item->getLinkType();
+			$contentTitle = $titles[$item->linkType][(int) $item->target] ?? null;
+			$rows[] = [
+				'id' => $item->id,
+				'level' => $item->level,
+				'active' => $item->active,
+				'title' => $item->label ?? $contentTitle ?? $item->target,
+				'linkTypeLabel' => $linkType?->label() ?? $item->linkType,
+				'target' => $linkType?->targetsContent()
+					? ($contentTitle ?? $this->translator->translate('(deleted)')) . ' [#' . $item->target . ']'
+					: $item->target,
+				'files' => array_map(fn($file) => $this->filesModel->toFileEntity($file), $files[$item->id] ?? []),
+			];
+		}
 
-		//Actions
-		$grid->addAction('add', 'Add', 'addCategory!', array($paramKey => $primaryKey))
-			->setClass('btn btn-primary btn-sm ajax float-right')
-			->setIcon('plus')
-			->setTitle('Add');
+		return $rows;
+	}
 
-		return $grid;
+
+	/**
+	 * Názvy kategorií/článků, na které položky odkazují
+	 * @param list<MenuComponent\Model\MenuItem> $items
+	 * @return array<int, string>
+	 */
+	private function getContentTitles(Model\Categories|Model\Articles|Model\Pages|Model\Sections $model, array $items, MenuComponent\Model\MenuLinkType $linkType): array
+	{
+		$ids = [];
+		foreach ($items as $item) {
+			if ($item->getLinkType() === $linkType) {
+				$ids[] = (int) $item->target;
+			}
+		}
+		if ($ids === []) {
+			return [];
+		}
+
+		$selection = $model->findAll()->select('id')->where('id', $ids);
+		$model->selectTitle($selection, '`' . $model->getTableName() . '`.`id`', $this->actualLanguage);
+
+		return array_map('strval', $selection->fetchPairs('id', 'title'));
+	}
+
+
+	/**
+	 * Formulář položky menu (modal)
+	 */
+	protected function createComponentMenuItemForm(): Nette\Application\UI\Form
+	{
+		$this->menuItemFactory->asModal();
+		$form = $this->menuItemFactory->create(null, (int) $this->id, (string) $this->actualLanguage);
+		$form->setTranslator($this->translator);
+		$form->onSuccess[] = function (Nette\Application\UI\Form $form): void {
+			$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
+			$this->redirect('this');
+		};
+
+		return $form;
 	}
 
 
@@ -259,7 +339,7 @@ class MenusPresenter extends BasePresenter
 		}
 
 		$this->menuFactory->asModal();
-		$form = $this->menuFactory->create($this->id, $this->actualLanguage);
+		$form = $this->menuFactory->create();
 		$form->setTranslator($this->translator);
 		$form->onSuccess[] = function ($form) {
 			$form->getPresenter()->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
@@ -269,43 +349,131 @@ class MenusPresenter extends BasePresenter
 		return $form;
 	}
 
-	public function getMenuItemChildrens(?int $parentId): Nette\Database\Table\Selection {
-		$this->payload->parr = $parentId;
-		$query = $this->categoriesModel->findAll()
-			->select("*")
-			->select("IFNULL(parentId,0) AS parentId")
-			->where("historyId", null)
-			->where("status IN (?)", array('publish','pending','draft'));
-		$this->categoriesModel->selectTitle($query, "`" . $this->categoriesModel->getTableName() . "`.`id`", $this->language);
-		if(isset($parentId))
-		{
-			$query->where("parentId", $parentId);
-		}
-
-		return $query;
-	}
 
 	/**
-	 * Sort handler
+	 * Sort handler (drag & drop v gridu položek) - jen mezi sourozenci, viz Menus::moveItem()
 	 * @throws Nette\Application\AbortException
 	 */
 	#[Secured]
 	#[Resource('Menus')]
 	#[Privilege('edit')]
-	public function handleSort(?int $item_id, ?int $prev_id, ?int $next_id): void
+	public function handleSort(?int $item_id, ?int $prev_id = null, ?int $next_id = null): void
 	{
 		if(!$item_id){
 			throw new Nette\InvalidArgumentException("Missing argumet item_id");
 		}
-		$this->menusModel->updatePositionOfMenuItem($this->id, $item_id, $prev_id, $next_id);
+		$this->assertItemOfThisMenu($item_id);
+		$this->menusModel->moveItem($item_id, $prev_id, $next_id);
 
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 
-		$this->redrawControl('flashes');
-		$this->redrawControl("modalMenuItemsGrid");
-
-		if(!$this->isAjax()){
+		if($this->isAjax()){
+			$this->redrawControl('flashes');
+			$this->redrawControl('menuItemsGrid');
+		} else {
 			$this->redirect('this');
+		}
+	}
+
+
+	/**
+	 * Nová položka - prázdný formulář v modalu
+	 */
+	#[Secured]
+	#[Resource('Menus')]
+	#[Privilege('add')]
+	public function handleAddItem(): void
+	{
+		$this->menuItemFactory->resetEditMode();
+		$this->redrawControl('menuItemForm');
+	}
+
+
+	/**
+	 * Úprava položky - formulář v modalu s hodnotami položky
+	 */
+	#[Secured]
+	#[Resource('Menus')]
+	#[Privilege('edit')]
+	public function handleEditItem(int $itemId): void
+	{
+		$this->assertItemOfThisMenu($itemId);
+		$this->menuItemFactory->setItemDefaults($this['menuItemForm'], $itemId, (string) $this->actualLanguage);
+		$this->redrawControl('menuItemForm');
+	}
+
+
+	/**
+	 * Smazání položky i s podpoložkami
+	 * @throws Nette\Application\AbortException
+	 */
+	#[Secured]
+	#[Resource('Menus')]
+	#[Privilege('delete')]
+	public function handleDeleteItem(int $itemId): void
+	{
+		$this->assertItemOfThisMenu($itemId);
+		$this->menusModel->deleteItem($itemId);
+
+		$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
+		$this->redirect('this');
+	}
+
+
+	/**
+	 * Obrázky vybrané ve správci souborů pro položku (odkaz s data-selected-files-url, viz itemImages.latte)
+	 * @param array<int|string> $files
+	 */
+	#[Secured]
+	#[Resource('Menus')]
+	#[Privilege('edit')]
+	public function handleAddItemImages(int $itemId, array $files = []): void
+	{
+		$this->assertItemOfThisMenu($itemId);
+		$this->menusModel->addItemFiles($itemId, array_values(array_map('intval', $files)));
+		$this->redrawControl('menuItemsGrid');
+	}
+
+
+	#[Secured]
+	#[Resource('Menus')]
+	#[Privilege('edit')]
+	public function handleRemoveItemImage(int $itemId, int $fileId): void
+	{
+		$this->assertItemOfThisMenu($itemId);
+		$this->menusModel->removeItemFile($itemId, $fileId);
+		if ($this->isAjax()) {
+			$this->redrawControl('menuItemsGrid');
+		} else {
+			$this->redirect('this');
+		}
+	}
+
+
+	/**
+	 * Nové pořadí obrázků položky po přetažení (první = hlavní)
+	 * @param array<int|string> $items
+	 */
+	#[Secured]
+	#[Resource('Menus')]
+	#[Privilege('edit')]
+	public function handleSortItemImages(int $itemId, array $items = []): void
+	{
+		$this->assertItemOfThisMenu($itemId);
+		$this->menusModel->sortItemFiles($itemId, array_values(array_map('intval', $items)));
+		$this->redrawControl('menuItemsGrid');
+	}
+
+
+	/**
+	 * Položka z URL musí patřit právě editovanému menu (ne jinému menu přes podvržené itemId)
+	 * @throws Nette\Application\BadRequestException
+	 */
+	private function assertItemOfThisMenu(int $itemId): void
+	{
+		$item = $this->menusModel->getItem($itemId);
+		if (!$item || $item->menuId !== $this->id) {
+			$this->error("Menu item '$itemId' doesn't exist in this menu.");
 		}
 	}
 
@@ -356,107 +524,5 @@ class MenusPresenter extends BasePresenter
 		$this->redirect('this');
 	}
 
-
-	/**
-	 * Validate URL handler
-	 */
-	public function handleValidateUrl($text): void
-	{
-		$this->payload->url = $this->menusModel->getUrl($text, $this->id);
-
-		$this->sendPayload();
-	}
-
-
-	/**
-	 * Add Images handler
-	 */
-	#[Secured]
-	#[Resource('Menus')]
-	#[Privilege('edit')]
-	public function handleAddImage(array $files): void
-	{
-		foreach ($files as $fileId){
-			$this->menusModel->insertRelationFile($this->id, $fileId);
-		}
-
-		$this->redrawControl("files");
-	}
-
-
-	/**
-	 * Delete file handler
-	 */
-	#[Secured]
-	#[Resource('Menus')]
-	#[Privilege('edit')]
-	public function handleRemoveImage(int $fileId): void
-	{
-		$this->menusModel->deleteRelationFile($this->id, $fileId);
-
-		if($this->isAjax()){
-			$this->redrawControl("files");
-		} else {
-			$this->redirect('this');
-		}
-	}
-
-
-	/**
-	 * Add Category handler
-	 * @param $categoryId
-	 */
-	#[Secured]
-	#[Resource('Menus')]
-	#[Privilege('add')]
-	public function handleAddCategory(int $categoryId): void
-	{
-		$this->menusModel->insertRelationMenuItem($this->id, $categoryId);
-
-		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
-		$this->redrawControl("modalMenuItemsGrid");
-	}
-
-
-	/**
-	 * Delete Category handler
-	 * @throws Nette\Application\AbortException
-	 */
-	#[Secured]
-	#[Resource('Menus')]
-	#[Privilege('delete')]
-	public function handleRemoveCategory(int $categoryId): void
-	{
-		$this->menusModel->deleteRelationMenuItem($this->id, $categoryId);
-
-		$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
-
-		$this->redrawControl("flashes");
-		$this->redrawControl("modalMenuItemsGrid");
-
-		if(!$this->isAjax()){
-			$this->redirect("this", array("id" => null));
-		}
-	}
-
-
-	/**
-	 * SetCategoryAsMain
-	 * @throws Nette\Application\AbortException
-	 */
-	#[Secured]
-	#[Resource('Menus')]
-	#[Privilege('edit')]
-	public function handleSetCategoryAsMain(int $categoryId): void
-	{
-		$this->categoriesModel->setRelationMenuAsMain($categoryId, $this->id);
-		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
-
-		if($this->isAjax()){
-			$this->redrawControl("categories");
-		} else {
-			$this->redirect('this');
-		}
-	}
 
 }

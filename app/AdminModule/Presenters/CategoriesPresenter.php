@@ -6,6 +6,7 @@ namespace App\AdminModule\Presenters;
 use App\Attributes\Privilege;
 use App\Attributes\Resource;
 use App\Attributes\Secured;
+use App\AdminModule\Presenters\SectionAwareTrait\SectionAwareTrait;
 use App\Components\CategoriesMenu\CategoriesMenu;
 use App\Forms\CategoryFormFactory;
 use App\Forms\MetaValueFormFactory;
@@ -30,6 +31,8 @@ use Nette\Utils\ArrayHash;
 #[Privilege('view')]
 class CategoriesPresenter extends BasePresenter
 {
+	use SectionAwareTrait;
+
 	/**
 	 * Not persistent revision parameter
 	 */
@@ -46,12 +49,6 @@ class CategoriesPresenter extends BasePresenter
 	 */
 	#[Persistent]
 	public ?string $language = null;
-
-	/**
-	 * Type of form
-	 * @canNotBePersistent Can not be persistent -> is bad in menu
-	 */
-	public ?string $type = "site";
 
 	/**
 	 * Category parent
@@ -102,26 +99,12 @@ class CategoriesPresenter extends BasePresenter
 			$this->redirect("this", array("language" => null));
 		}
 
-		//type
-		$this->type = $this->getParameter("type");
-		$itemExist = null;
-		if($this->id){
-			$itemExist = $this->categoriesModel->getById($this->id);
-			if(!$itemExist){
-				throw new BadRequestException("Item with id '$this->id' doesn't exist.");
-			}
+		$category = $this->id ? $this->categoriesModel->getById($this->id) : null;
+		if($this->id && !$category){
+			throw new BadRequestException("Item with id '$this->id' doesn't exist.");
 		}
-		if($this->type == null){
-			if($itemExist){
-				$this->type = $itemExist->type;
-			}else{
-				$this->type = "site";
-			}
-		}
-		if(!array_key_exists($this->type, CategoryFormFactory::$types)){
-			throw new BadRequestException("Type '$this->type' doesn't exist.");
-		}
-		$this->template->type = $this->type;
+		// sekce: editovaná kategorie má přednost před parametrem `section`
+		$this->resolveSection($category ? (int) $category->sectionId : null);
 
 		//$this->categoryService->recalculateTree();
 	}
@@ -132,6 +115,10 @@ class CategoriesPresenter extends BasePresenter
 	#[Privilege('view')]
 	public function actionDefault(int $parent = null): void
 	{
+		// nadřazená kategorie jen ze stejné sekce
+		if ($parent !== null && (int) $this->categoriesModel->getById($parent)?->sectionId !== $this->getSectionId()) {
+			throw new BadRequestException("Parent category '$parent' is not in this section.");
+		}
 		$this->parent = $parent;
 
 		if ($this->languages->existLanguage($this->language)) {
@@ -182,10 +169,10 @@ class CategoriesPresenter extends BasePresenter
 	protected function createComponentCategoryForm(): Form
 	{
 		$this->categoryFactory->setParent($this->parent);
+		$this->categoryFactory->setSectionId($this->getSectionId());
 		$form = $this->categoryFactory->create(
 			$this->id,
 			$this->actualLanguage,
-			$this->type,
 			array($this, "link"),
 			$this->getParameter(self::$revisionParameter),
 			$this->link("loadTags!", array("query"=>"QUERY"))
@@ -222,7 +209,8 @@ class CategoriesPresenter extends BasePresenter
 	{
 		$control =  $this->categoriesMenu;
 		$control->setActiveCategory($this->parent ?: $this->id)
-			->setLanguage($this->language);
+			->setLanguage($this->language)
+			->setSectionId($this->getSectionId());
 
 		return $control;
 	}

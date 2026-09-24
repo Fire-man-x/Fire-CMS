@@ -6,6 +6,7 @@ namespace App\AdminModule\Presenters;
 use App\Attributes\Privilege;
 use App\Attributes\Resource;
 use App\Attributes\Secured;
+use App\AdminModule\Presenters\SectionAwareTrait\SectionAwareTrait;
 use App\Forms\ArticleFormFactory;
 use App\Forms\MetaValueFormFactory;
 use App\Model\Articles;
@@ -31,6 +32,8 @@ use Nette\Utils\ArrayHash;
 #[Privilege('view')]
 class ArticlesPresenter extends BasePresenter
 {
+	use SectionAwareTrait;
+
 	/**
 	 * Not persistent revision parameter
 	 */
@@ -91,6 +94,10 @@ class ArticlesPresenter extends BasePresenter
 	{
 		parent::startup();
 
+		// sekce: editovaný článek má přednost před parametrem `section`
+		$article = $this->id ? $this->articlesModel->getById($this->id) : null;
+		$this->resolveSection($article ? (int) $article->sectionId : null);
+
 		$this->addBreadCrumbLink("Articles", $this->link(":Admin:Articles:default", array("id" => null)) );
 
 		//default language
@@ -115,19 +122,23 @@ class ArticlesPresenter extends BasePresenter
 			"all"=>$this->articlesModel->findAll()
 				->select("COUNT(*) AS count")
 				->where($this->articlesModel->getTableName().".status != ?","trash")
-				->where($this->articlesModel->getTableName().".historyId", null)->fetch()?->count,
+				->where($this->articlesModel->getTableName().".historyId", null)
+				->where($this->articlesModel->getTableName().".sectionId", $this->getSectionId())->fetch()?->count,
 			"personal"=>$this->articlesModel->findAll()
 				->select("COUNT(*) AS count")
 				->where($this->articlesModel->getTableName().".createdBy = ?", $this->user->getId())
-				->where($this->articlesModel->getTableName().".historyId", null)->fetch()?->count,
+				->where($this->articlesModel->getTableName().".historyId", null)
+				->where($this->articlesModel->getTableName().".sectionId", $this->getSectionId())->fetch()?->count,
 			"pending"=>$this->articlesModel->findAll()
 				->select("COUNT(*) AS count")
 				->where($this->articlesModel->getTableName().".status = ?","pending")
-				->where($this->articlesModel->getTableName().".historyId", null)->fetch()?->count,
+				->where($this->articlesModel->getTableName().".historyId", null)
+				->where($this->articlesModel->getTableName().".sectionId", $this->getSectionId())->fetch()?->count,
 			"trash"=>$this->articlesModel->findAll()
 				->select("COUNT(*) AS count")
 				->where($this->articlesModel->getTableName().".status = ?","trash")
-				->where($this->articlesModel->getTableName().".historyId", null)->fetch()?->count
+				->where($this->articlesModel->getTableName().".historyId", null)
+				->where($this->articlesModel->getTableName().".sectionId", $this->getSectionId())->fetch()?->count
 			);
 		$this->template->counts = $counts;
 	}
@@ -204,6 +215,7 @@ class ArticlesPresenter extends BasePresenter
 		$source = $this->articlesModel->findAll()
 			->select($this->articlesModel->getTableName().".*")
 			->where($this->articlesModel->getTableName().".historyId", null)
+			->where($this->articlesModel->getTableName().".sectionId", $this->getSectionId())
 			->order($this->articlesModel->getTableName().".createDate DESC")
 			->order($this->articlesModel->getTableName().".".$this->articlesModel->getColumnId());
 		$this->articlesModel->selectTitle($source, "`" . $this->articlesModel->getTableName() . "`.`id`", $this->language);
@@ -393,8 +405,10 @@ class ArticlesPresenter extends BasePresenter
 	 */
 	protected function createComponentCategorySelectionGrid($name)
 	{
+		// jen kategorie sekce článku
 		$source = $this->categoriesModel->getAllForMenu()
-			->select($this->categoriesModel->getTableName() . ".*");
+			->select($this->categoriesModel->getTableName() . ".*")
+			->where($this->categoriesModel->getTableName() . ".sectionId", $this->getSectionId());
 		$this->categoriesModel->selectTitle($source, "`" . $this->categoriesModel->getTableName() . "`.`id`", $this->language)
 			->order("title");
 		$primaryKey = $this->categoriesModel->getColumnId();
@@ -426,6 +440,7 @@ class ArticlesPresenter extends BasePresenter
 	 */
 	protected function createComponentArticleForm(): Form
 	{
+		$this->articleFactory->setSectionId($this->getSectionId());
 		$form = $this->articleFactory->create(
 			$this->id,
 			$this->actualLanguage,
@@ -566,6 +581,10 @@ class ArticlesPresenter extends BasePresenter
 	#[Privilege('add')]
 	public function handleAddCategory(int $categoryId): void
 	{
+		// kategorie článku musí být ze stejné sekce
+		if ((int) $this->categoriesModel->getById($categoryId)?->sectionId !== $this->getSectionId()) {
+			$this->error("Category '$categoryId' is not in the article's section.");
+		}
 		$this->categoriesModel->insertRelationArticle($categoryId, $this->id, new ArrayHash());
 
 		$this->redrawControl("categories");

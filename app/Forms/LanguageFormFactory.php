@@ -13,9 +13,9 @@ class LanguageFormFactory extends BaseFormFactory
 	private Model\Languages $model;
 
 
-	public function __construct(FormFactory $factory, Model\Languages $model)
+	public function __construct(Model\Languages $model)
 	{
-		parent::__construct($factory);
+		parent::__construct();
 		$this->model = $model;
 	}
 

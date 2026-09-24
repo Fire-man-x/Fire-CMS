@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace App\AdminModule\SettingsModule\Presenters;
 
+use App\AdminModule\Forms\UserFormFactory;
 use App\Attributes\Privilege;
 use App\Attributes\Resource;
 use App\Attributes\Secured;
-use App\Forms\UserFormFactory;
 use App\Model\Users;
 use Contributte\Datagrid\Datagrid;
 use Nette;
@@ -25,7 +25,7 @@ class UsersPresenter extends BasePresenter
 	public Nette\Database\Explorer $database;
 
 	/** @inject */
-	public UserFormFactory $factory;
+	public UserFormFactory $formFactory;
 
 	/** @inject */
 	public Users $users;
@@ -129,10 +129,10 @@ class UsersPresenter extends BasePresenter
 	protected function createComponentUserForm(): Nette\Application\UI\Form
 	{
 		if($this->id){
-			$this->factory->setEditId($this->id);
+			$this->formFactory->setEditId($this->id);
 		}
 
-		$form = $this->factory->create();
+		$form = $this->formFactory->create();
 		$form->setTranslator($this->translator);
 		$form->onSuccess[] = function ($form) {
 			$form->getPresenter()->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
@@ -148,7 +148,7 @@ class UsersPresenter extends BasePresenter
 	 */
 	protected function createComponentUserNewPasswordForm(): Nette\Application\UI\Form
 	{
-		$form = $this->factory->createNewPassword($this->id);
+		$form = $this->formFactory->createNewPassword($this->id);
 		$form->setTranslator($this->translator);
 		$form->onSuccess[] = function ($form) {
 			$form->getPresenter()->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
@@ -164,7 +164,7 @@ class UsersPresenter extends BasePresenter
 	#[Privilege('add')]
 	public function handleAdd(): void
 	{
-		$this->factory->resetEditMode();
+		$this->formFactory->resetEditMode();
 		$this->redrawControl("streetForm");
 	}
 

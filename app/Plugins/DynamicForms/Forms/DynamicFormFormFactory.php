@@ -31,9 +31,9 @@ class DynamicFormFormFactory extends BaseFormFactory
 	);
 
 
-	public function __construct(FormFactory $factory, Translator $translator, LanguageService $languages, DynamicForms $model)
+	public function __construct(Translator $translator, LanguageService $languages, DynamicForms $model)
 	{
-		parent::__construct($factory);
+		parent::__construct();
 		$this->translator = $translator;
 		$this->languages = $languages;
 		$this->model = $model;

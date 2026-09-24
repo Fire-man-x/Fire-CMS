@@ -26,6 +26,8 @@ class CustomRouter implements Router
 		'user' => 'Users',
 		'article' => 'Front:Articles',
 		'category' => 'Front:Categories',
+		'page' => 'Front:Pages',
+		'section' => 'Front:Sections',
 	);
 
 	public function __construct(UrlManager $urlManager, LanguageService $languages, private readonly DomainService $domains)
@@ -100,7 +102,7 @@ class CustomRouter implements Router
 			return null;
 		}
 
-		if($row->type == 'article' || $row->type == 'category') {
+		if($row->type == 'article' || $row->type == 'category' || $row->type == 'page' || $row->type == 'section') {
 			$params['action'] = 'detail';
 		}
 		else {
@@ -153,17 +155,6 @@ class CustomRouter implements Router
 			$url->setHost($domain);
 		}
 
-		//Homepage
-		if($params['presenter'] == "Front:Categories" && isset($params["id"]) && $params["id"] == 1)
-		{
-
-			unset($params['action'], $params['id'], $params['locale']);
-
-			$url->setPath($locale);
-			$url->setQuery($params);
-			return $url->getAbsoluteUrl();
-		}
-
 		if(!isset($params['id'])) {
 			return null;
 		}
@@ -173,7 +164,9 @@ class CustomRouter implements Router
 		$type = array_search($params['presenter'], $this->presenters);
 		$urlFromDb = $this->urlManager->getUrlByTypeAndKey($type, $params['id'], $localeId);
 
-		unset($params['action'], $params['id'], $params['locale']); // we don't want to have 'action' and 'id' in query parameters
+		// presenter/action/id/locale určuje samotná URL, do query nepatří (jinak `?presenter=Front:Pages` a Nette
+		// při kanonizaci přesměruje každý požadavek na URL s tímto parametrem)
+		unset($params['presenter'], $params['action'], $params['id'], $params['locale']);
 
 		$url->setPath($locale.$urlFromDb);
 		$url->setQuery($params);

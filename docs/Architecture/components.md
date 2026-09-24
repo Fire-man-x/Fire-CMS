@@ -10,6 +10,23 @@ patří.
 
 - `Menu`, `LanguageChanger`, `CategoriesMenu`, `FilesManagerMenu`, `Breadcrumb`, `ViewCounter` — běžné
   Nette komponenty vytvářené přes `createComponentX()`.
+- `Menu` (`app/Components/Menu/`) — webové menu `{control menu <location>, maxSublevel, menuClass, itemClass}`.
+  Položky (`firecms_menuItems`) jsou samostatné entity, **ne vazba na kategorii**: `linkType`
+  (`App\Components\Menu\Model\MenuLinkType`: `category` | `article` | `page` | `section` | `url` | `route`) + jeden sloupec
+  `target` (id kategorie/článku/stránky, URL/kotva, nebo `:Front:Presenter:action?param=x`), `parentId` pro
+  vnořování, popisek po jazycích ve `firecms_menuItemDescriptions` (prázdný = název kategorie/článku).
+  Položka typu `category` k sobě dál automaticky připojí podkategorie se `showInMenu`.
+  - Obrázky položek jsou ve `firecms_menuItemFiles` (první = hlavní) a v šabloně jako `$category->image` / `files`.
+    Spravují se v gridu položek, výchozí `Menu.latte` je nevykresluje.
+  - Menu samo má přeložitelný nadpis `title` (`firecms_menuDescriptions`, `Menus` implementuje `Translatable`
+    + `TranslatedTitleTrait`), v šabloně jako `$menuTitle`. Výchozí `Menu.latte` ho nevykresluje. Sloupec
+    `name` neexistuje: název v administraci je nadpis ve výchozím jazyce, bez něj `location` (klíč pro šablony).
+  - Na kategorii/článek nevede cizí klíč (jeden sloupec `target`). Při hard delete kategorie položky uklízí
+    `Categories::delete()` → `Menus::deleteItemsByTarget()`, u stránek `Pages::delete()` (i s URL). Články se mažou do koše a menu zobrazuje jen
+    publikované.
+  - Model vrací typovaný `MenuItem`, ne `ActiveRow`. Administrace (`MenusPresenter::detail`) je plochý seznam
+    ve stromovém pořadí. Přetažení mění pořadí jen mezi sourozenci (datagrid neumí řadit strom), rodič se
+    mění ve formuláři (`MenuItemFormFactory`).
 - `FileManager` — správa souborů/obrázků (upload, storage, cache, thumbnaily). Vlastní Latte makra
   (`n:image`, `n:src`, `n:crop`, `n:bg` — viz `App\Components\FileManager\Macro\*`), registrovaná přes
   `App\Components\FileManager\DI\Extension` (výchozí makro-extension `Macro\ImageMacro`, dá se přidat

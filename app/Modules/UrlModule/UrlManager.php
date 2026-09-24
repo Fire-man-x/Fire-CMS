@@ -82,6 +82,18 @@ class UrlManager
 
 
 	/**
+	 * Smaže hezká URL položky ve všech jazycích (např. po smazání stránky), aby slug neblokoval nové položky
+	 */
+	public function deleteUrls(string $type, int $key): void
+	{
+		$this->model->findAll()
+			->where('type', $type)
+			->where('key', $key)
+			->delete();
+	}
+
+
+	/**
 	 * Exist url?
 	 * @return false|\Nette\Database\Table\ActiveRow
 	 * @throws InvalidArgumentException

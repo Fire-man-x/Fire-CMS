@@ -34,9 +34,9 @@ class ContactFormFactory extends BaseFormFactory
 	/**
 	 * ContactFormFactory constructor.
 	 */
-	public function __construct(FormFactory $factory, DynamicForms $model, Settings $modelOptions, Comment $commentService, IMailer $mailer)
+	public function __construct(DynamicForms $model, Settings $modelOptions, Comment $commentService, IMailer $mailer)
 	{
-		parent::__construct($factory);
+		parent::__construct();
 		$this->model = $model;
 		$this->modelOptions = $modelOptions;
 		$this->mailer = $mailer;

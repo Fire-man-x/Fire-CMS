@@ -106,9 +106,9 @@ class Articles extends Control
 		$this->template->setFile($this->templateFile);
 		$this->template->setTranslator($this->translator);
 
-		$articles = $this->articlesModel->getAllWithTranslation($this->language)
-			->where("historyId", null)
-			->order("createDate DESC");
+		// jen publikované aktivní články s datem publikace v minulosti (koncepty ani budoucí články na web nepatří)
+		$articles = $this->articlesModel->findPublished($this->language)
+			->order("article.publishingDate DESC");
 		if($fromCategory){
 			//$articles->where("article:category_article.categoryId", $fromCategory == null ? 1 : $fromCategory);
 			$articles->where("article:".Model\Categories::RELATION_ARTICLE_TABLE_NAME.".categoryId", $fromCategory);

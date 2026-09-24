@@ -98,6 +98,40 @@ final class CustomRouterTest extends TestCase
 		], $params);
 	}
 
+	public function testPageUrlMatchesPagesDetail(): void
+	{
+		$this->insertUrl('cs', 'page', 3, 'o-nas');
+
+		$params = $this->router->match(RequestFactory::fromUrl('http://example.com/o-nas'));
+
+		Assert::same(['action' => 'detail', 'presenter' => 'Front:Pages', 'locale' => 'cs', 'id' => 3], $params);
+	}
+
+
+	/**
+	 * Do 2026-09-24 zůstal `presenter` v query (`/o-nas?presenter=Front%3APages`) a Nette kvůli kanonizaci
+	 * přesměrovávalo každou hezkou URL (301)
+	 */
+	public function testConstructUrlKeepsOnlyExtraParamsInQuery(): void
+	{
+		$this->insertUrl('cs', 'page', 3, 'o-nas');
+		$this->insertUrl('en', 'article', 10, 'article-test');
+		$refUrl = new \Nette\Http\UrlScript('http://example.com/', '/');
+
+		Assert::same('http://example.com/o-nas', $this->router->constructUrl(
+			['presenter' => 'Front:Pages', 'action' => 'detail', 'id' => 3, 'locale' => 'cs'],
+			$refUrl,
+		));
+		Assert::same('http://example.com/en/article-test?page=2', $this->router->constructUrl(
+			['presenter' => 'Front:Articles', 'action' => 'detail', 'id' => 10, 'locale' => 'en', 'page' => 2],
+			$refUrl,
+		));
+		// match -> constructUrl je stejná URL (jinak kanonizační redirect)
+		$params = $this->router->match(RequestFactory::fromUrl('http://example.com/o-nas'));
+		Assert::same('http://example.com/o-nas', $this->router->constructUrl((array) $params, $refUrl));
+	}
+
+
 	public function testUnknownUrlReturnsNull(): void
 	{
 		Assert::null($this->router->match(RequestFactory::fromUrl('http://example.com/nic-takoveho')));

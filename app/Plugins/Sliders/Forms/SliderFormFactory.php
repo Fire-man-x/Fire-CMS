@@ -10,9 +10,9 @@ use Nette\Application\UI\Form;
 
 class SliderFormFactory extends BaseFormFactory
 {
-	public function __construct(FormFactory $factory, private Sliders $model)
+	public function __construct(private Sliders $model)
 	{
-		parent::__construct($factory);
+		parent::__construct();
 	}
 
 

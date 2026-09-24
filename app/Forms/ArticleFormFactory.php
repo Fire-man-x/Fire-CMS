@@ -27,16 +27,24 @@ class ArticleFormFactory extends BaseFormFactory
 
 	private string $language;
 
+	/** Sekce nového článku (App\Model\Sections), existující článek sekci nemění */
+	private ?int $sectionId = null;
+
 
 	public function __construct(
-		FormFactory $factory,
 		private Model\Articles $model,
 		private User $user,
 		private Article $articleService,
 		private Tag $tagService,
 		private UrlManager $urlManager)
 	{
-		parent::__construct($factory);
+		parent::__construct();
+	}
+
+
+	public function setSectionId(int $sectionId): void
+	{
+		$this->sectionId = $sectionId;
 	}
 
 
@@ -178,7 +186,11 @@ class ArticleFormFactory extends BaseFormFactory
 			$form->getPresenter()->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 			$form->getPresenter()->redirect('this');
 		} else {
+			if ($this->sectionId === null) {
+				throw new \LogicException('Section of a new article is not set (ArticleFormFactory::setSectionId()).');
+			}
 			$values->createdBy = $this->user->getId();
+			$values->sectionId = $this->sectionId;
 			$id = $this->model->insert($values);
 			$this->model->insertTranslation($id, $this->language, $translationContainer);
 

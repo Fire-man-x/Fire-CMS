@@ -92,16 +92,25 @@
 
 			<div n:if="$user->isLoggedIn() && $user->isAllowed('Admin')" class="collapse navbar-collapse" id="navbarResponsive">
 			<ul class="nav navbar-nav me-auto ">
-				<li n:if="$user->isAllowed('Categories', 'view') || $user->isAllowed('Articles', 'view') || $user->isAllowed('FilesManager', 'view') || $user->isAllowed('Menus', 'view')" class="nav-item dropdown {if
+				<li n:if="$user->isAllowed('Categories', 'view') || $user->isAllowed('Articles', 'view') || $user->isAllowed('Pages', 'view') || $user->isAllowed('Sections', 'view') || $user->isAllowed('FilesManager', 'view') || $user->isAllowed('Menus', 'view')" class="nav-item dropdown {if
 						$presenter->isLinkCurrent(':Admin:Categories:*') ||
 						$presenter->isLinkCurrent(':Admin:Articles:*') ||
+						$presenter->isLinkCurrent(':Admin:Pages:*') ||
+						$presenter->isLinkCurrent(':Admin:Sections:*') ||
 						$presenter->isLinkCurrent(':Admin:FilesManager:*') ||
 						$presenter->isLinkCurrent(':Admin:Menus:*') ||
 						$presenter->isLinkCurrent(':Admin:Plugin:Sliders:*')}active{/if}">
 					<a href="" class="nav-link dropdown-toggle" id="responsiveNavbarDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{_"Content"}</a>
 					<div class="dropdown-menu" aria-labelledby="responsiveNavbarDropdown">
-						<a n:if="$user->isAllowed('Categories', 'view')" n:href=":Admin:Categories:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Categories:default') ? 'active', dropdown-item">{_"Categories"}</a>
-						<a n:if="$user->isAllowed('Articles', 'view')" n:href=":Admin:Articles:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Articles:default') ? 'active', dropdown-item">{_"Articles"}</a>
+						{* články a kategorie po sekcích (App\Model\Sections, viz AdminModule\Presenters\BasePresenter::beforeRender()) *}
+						<a n:if="$user->isAllowed('Sections', 'view')" n:href=":Admin:Sections:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Sections:*') ? 'active', dropdown-item">{_"Sections"}</a>
+						{foreach $adminSections ?? [] as $adminSectionId => $adminSectionTitle}
+							<h6 class="dropdown-header">{$adminSectionTitle}</h6>
+							<a n:if="$user->isAllowed('Articles', 'view')" n:href=":Admin:Articles:default id=>null, section=>$adminSectionId" n:class="$presenter->isLinkCurrent(':Admin:Articles:*', [section=>$adminSectionId]) ? 'active', 'dropdown-item', 'pl-1'">{_"Articles"}</a>
+							<a n:if="$user->isAllowed('Categories', 'view')" n:href=":Admin:Categories:default id=>null, section=>$adminSectionId" n:class="$presenter->isLinkCurrent(':Admin:Categories:*', [section=>$adminSectionId]) ? 'active', 'dropdown-item', 'pl-1'">{_"Categories"}</a>
+						{/foreach}
+						<div class="dropdown-divider"></div>
+						<a n:if="$user->isAllowed('Pages', 'view')" n:href=":Admin:Pages:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Pages:*') ? 'active', dropdown-item">{_"Pages"}</a>
 						<a n:if="$user->isAllowed('Comments', 'view')" n:href=":Admin:Comments:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Comments:default') ? 'active', dropdown-item">{_"Comments"}</a>
 						<a n:if="$user->isAllowed('FilesManager', 'view')" n:href=":Admin:FilesManager:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:FilesManager:default') ? 'active', dropdown-item">{_"Files manager"}</a>
 						<a n:if="$user->isAllowed('Menus', 'view')" n:href=":Admin:Menus:default id=>null" n:class="$presenter->isLinkCurrent(':Admin:Menus:default') ? 'active', dropdown-item">{_"Menu"}</a>

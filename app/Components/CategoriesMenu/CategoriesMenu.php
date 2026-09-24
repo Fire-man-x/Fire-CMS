@@ -27,6 +27,9 @@ class CategoriesMenu extends Control
 	/** Jazyk administrace, ve kterém se zobrazují názvy kategorií (null = výchozí jazyk webu) */
 	private ?string $language = null;
 
+	/** Sekce, jejíž strom kategorií se vykresluje (null = všechny) */
+	private ?int $sectionId = null;
+
 
 	/**
 	 * CategoriesMenu
@@ -42,6 +45,13 @@ class CategoriesMenu extends Control
 	public function setActiveCategory($activeCategory): self
 	{
 		$this->activeCategory = $activeCategory;
+		return $this;
+	}
+
+
+	public function setSectionId(?int $sectionId): self
+	{
+		$this->sectionId = $sectionId;
 		return $this;
 	}
 
@@ -71,6 +81,9 @@ class CategoriesMenu extends Control
 
 		$categories = $this->categoriesModel->getAllForMenu()
 			->select($this->categoriesModel->getTableName() . ".*");
+		if ($this->sectionId !== null) {
+			$categories->where($this->categoriesModel->getTableName() . ".sectionId", $this->sectionId);
+		}
 		$this->categoriesModel->selectTitle($categories, "`" . $this->categoriesModel->getTableName() . "`.`id`", $this->language);
 		$this->categories = $this->createTree($categories->fetchAll());
 

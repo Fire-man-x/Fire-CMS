@@ -1,23 +1,67 @@
+{varType Nette\Database\Table\ActiveRow $menuInfo}
+{varType string $menuName}
+{varType array $languages}
+{varType string $actualLanguage}
+
 {block h1}
-{_"Menu items"} - "{$menuInfo->name}"
+{_"Menu items"} - "{$menuName}"
 {/block}
 
 {block buttons}
-	<a href="#" class="btn btn-primary ajax" data-bs-toggle="modal" data-bs-target="#modal"><i class="fa fa-plus"></i> {_'Add'}</a>
+	<a n:href="addItem!" class="btn btn-primary ajax" data-bs-toggle="modal" data-bs-target="#modal"><i class="fa fa-plus"></i> {_'Add'}</a>
 {/block}
 
 {block content}
 
-	{capture $modalContent}
-		<div class="modalSelection">
-			{control modalMenuItemsGrid}
-		</div>
-	{/capture}
-	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal', label=>$control->translator->translate('Menu items'), modalContent=>$modalContent} {*, size=>'modal-sm'*}
+	{if count($languages)>1}
+		<ul class="nav nav-tabs mb-3">
+			<li n:foreach="$languages as $language => $languageName" class="nav-item">
+				<a class="nav-link {if $language==$actualLanguage}active{/if}" href="{link this language=>$language}">{$languageName}</a>
+			</li>
+		</ul>
+		<p class="text-muted small">{_"Names in the list are shown in the selected language. Labels for all languages are edited in the item form."}</p>
+	{/if}
 
-	{snippet modalMenuItemsGrid}
+	{capture $modalContent}
+		{snippet menuItemForm}
+			{control menuItemForm}
+		{/snippet}
+	{/capture}
+	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal', label=>$control->translator->translate('Menu item'), modalContent=>$modalContent}
+
+	{* správce souborů pro obrázky položek (tlačítko v itemImages.latte nese URL pro výběr, viz main.js) *}
+	{capture $filesModalContent}
+		<iframe />
+	{/capture}
+	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'filesModal', label=>$control->translator->translate('Images'), modalContent=>$filesModalContent, size=>'modal-lg modal-fs'}
+
+	{snippet menuItemsGrid}
 		{define icon-arrows-v}
 			<i class="fas fa-arrows-alt-v"></i>
 		{/define}
 		{control menuItemsGrid}
 	{/snippet}
+
+	<script type="text/javascript">
+		// řazení obrázků položky přetažením (první = hlavní); po překreslení gridu přes AJAX znovu
+		var sortableMenuItemImages = function () {
+			$('.menu-item-images').each(function () {
+				var container = $(this);
+				if (container.data('sortable-ready')) {
+					return;
+				}
+				container.data('sortable-ready', true).sortable({
+					items: '.img-thumbnail',
+					tolerance: 'pointer',
+					update: function () {
+						$.nette.ajax({
+							url: container.data('sort-url'),
+							data: { 'items': container.sortable('toArray', { attribute: 'data-file-id' }) }
+						});
+					}
+				});
+			});
+		};
+		sortableMenuItemImages();
+		$(document).ajaxComplete(sortableMenuItemImages);
+	</script>

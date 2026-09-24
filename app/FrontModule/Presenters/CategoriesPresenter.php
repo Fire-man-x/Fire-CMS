@@ -70,7 +70,7 @@ class CategoriesPresenter extends BasePresenter
 		}
 
 		//parent breadcrumb
-		$parentTree = $this->categoriesModel->getAllParents($category->parentId, $this->language);
+		$parentTree = $category->parentId !== null ? $this->categoriesModel->getAllParents((int) $category->parentId, $this->language) : [];
 		foreach (array_reverse($parentTree) as $parent) {
 			//breadcrumb
 			$this->addBreadCrumbLink($parent->title, $this->link(":Front:Categories:detail", array("id" => $parent->categoryId)), null, false );
@@ -81,12 +81,6 @@ class CategoriesPresenter extends BasePresenter
 		//change to object
 		$categoryInfo = Nette\Utils\ArrayHash::from($category->toArray());
 
-		//change template by type
-		$this->setView("detail." .$categoryInfo->type);
-		/*$templatePath = $this->getThemePath()."/detail." .$categoryInfo->type.".latte";
-		if(file_exists($templatePath)){
-			$this->template->setFile($templatePath);
-		}*/
 
 		//author
 		$user = $this->usersModel->getById($categoryInfo->createdBy)?->toArray();

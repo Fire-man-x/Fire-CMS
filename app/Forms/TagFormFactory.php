@@ -19,9 +19,9 @@ class TagFormFactory extends BaseFormFactory
 	private LanguageService $languages;
 
 
-	public function __construct(FormFactory $factory, Model\Tags $model, Model\Modules $modelModules, LanguageService $languages)
+	public function __construct(Model\Tags $model, Model\Modules $modelModules, LanguageService $languages)
 	{
-		parent::__construct($factory);
+		parent::__construct();
 		$this->model = $model;
 		$this->modelModules = $modelModules;
 		$this->languages = $languages;

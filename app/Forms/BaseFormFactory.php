@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Forms\Rendering\TwitterBootstrapRenderer;
 use Nette\SmartObject;
 use Nette\Utils\DateTime;
 use Vodacek\Forms\Controls\DateInput;
@@ -27,9 +28,15 @@ abstract class BaseFormFactory
 	 */
 	private bool $isModal = false;
 
-	private FormFactory $factory;
-
 	private array $formParts = array();
+
+
+	/**
+	 * Base form factory
+	 */
+	public function __construct()
+	{
+	}
 
 
 	/**
@@ -98,15 +105,6 @@ abstract class BaseFormFactory
 	}
 
 
-	/**
-	 * Base form factory
-	 */
-	public function __construct(FormFactory $factory)
-	{
-		$this->factory = $factory;
-	}
-
-
 	protected function create(int|string|null $editId = null): Form
 	{
 		if ($this->isModal() && !is_null($editId)) {
@@ -117,7 +115,8 @@ abstract class BaseFormFactory
 			$this->setEditId($editId);
 		}
 
-		$form = $this->factory->create();
+		$form = new Form;
+		$form->setRenderer(new TwitterBootstrapRenderer());
 
 		if ($this->isModal()) {
 			$form->addHidden("editId", $this->getEditId());

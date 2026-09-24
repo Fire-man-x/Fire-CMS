@@ -338,6 +338,14 @@ Po každé změně konfigurace (nový plugin, skupina migrací, služba) smažte
 `temp/cache/nette.configurator/` (adresář patří `www-data`, takže přes `sudo`). Adresář nepřesouvejte ani
 nezakládejte pod jiným uživatelem, protože web by do něj pak nemohl zapisovat.
 
+## Ukázková data (`dummy-data`) jen s parametrem `dummyData`
+
+Skupina migrací `dummy-data` má `enabled: %dummyData%` (do 2026-09-24 `%debugMode%`, a to se z `bin/console`
+nikdy nespustilo, protože CLI běží v produkčním režimu). V `config.neon` je `dummyData: false`, lokálně
+ho zapněte v `config.local.neon`. Po změně parametru smažte `temp/cache/nette.configurator/`, protože
+produkční kontejner CLI změny neonu nevidí (viz výše). Ukázková data počítají s prázdnou DB (`migrations:reset`)
+a pevnými id (sekce 1 z `basic-data`).
+
 ## Po resetu DB nebo změně schématu smazat cache struktury Nette Database
 
 Nette Explorer si ukládá strukturu DB (sloupce, primární klíče, cizí klíče) do `temp/_Nette.Database.Structure.*`
@@ -441,6 +449,11 @@ past pro příště, kdyby se to zdálo jako nechtěná chyba.
 - PHPStan (`composer stan -- tests`) defaultně analyzuje jen `*.php`, ne `*.phpt` — pomocné třídy pod
   `tests/Helpers` tedy PHPStan kontroluje, samotné testovací scénáře (`*.phpt`) ne. Jejich "kontrolou" je
   úspěšný běh `composer test`.
+
+- **Od 2026-09-24 `tests/Helpers/SqliteDatabase` používá `DiscoveredConventions`** (stejně jako aplikace). Dřív
+  `Explorer` dostal výchozí `StaticConventions`, takže zápis přes cizí klíč (`page.status`, `article.id`) skončil
+  v testu na „no such table: page“, i když v aplikaci fungoval. Cizí klíče v SQLite DDL proto deklarujte
+  (`REFERENCES tabulka(id)`), aby je `Structure` našla.
 
 ## Vendorovaná legacy knihovna po přesunu do PHP8.3/aktuálního Nette umí spadnout na drobnostech
 

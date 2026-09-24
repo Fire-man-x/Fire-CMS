@@ -320,7 +320,6 @@ CREATE TABLE `firecms_menus` (
   `createDate` datetime NOT NULL DEFAULT current_timestamp(),
   `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `active` tinyint(1) NOT NULL DEFAULT 1,
-  `name` varchar(256) NOT NULL,
   `location` varchar(256) NOT NULL,
   `createdBy` tinyint(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -443,24 +442,27 @@ CREATE TABLE `firecms_tagDescriptions` (
 
 DROP TABLE IF EXISTS `firecms_users`;
 CREATE TABLE `firecms_users` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `roleId` int(11) unsigned NOT NULL,
-  `createDate` datetime NOT NULL DEFAULT current_timestamp(),
-  `updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
-  `username` varchar(60) NOT NULL,
-  `password` varchar(60) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `active` tinyint(1) NOT NULL,
-  `nickname` varchar(50) DEFAULT NULL,
-  `firstName` varchar(50) NOT NULL,
-  `surname` varchar(50) NOT NULL,
-  `recoveryPasswordTime` datetime DEFAULT NULL,
-  `recoveryPasswordToken` varchar(24) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `loginKey` (`username`),
-  KEY `nicknameKey` (`nickname`),
-  KEY `roleId` (`roleId`),
-  CONSTRAINT `users_ibfk_2` FOREIGN KEY (`roleId`) REFERENCES `firecms_roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+	`roleId` int(11) unsigned NOT NULL,
+	`createDate` datetime NOT NULL DEFAULT current_timestamp(),
+	`updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+	`username` varchar(60) NOT NULL,
+	`password` varchar(60) NOT NULL,
+	`email` varchar(100) NOT NULL,
+	`active` tinyint(1) NOT NULL,
+	`nickname` varchar(50) DEFAULT NULL,
+	`firstName` varchar(50) NOT NULL,
+	`surname` varchar(50) NOT NULL,
+	`recoveryPasswordTime` datetime DEFAULT NULL,
+	`recoveryPasswordToken` varchar(24) DEFAULT NULL,
+	`oauthService` varchar(20) DEFAULT NULL,
+	`oauthId` varchar(20) DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	UNIQUE KEY `loginKey` (`username`),
+	UNIQUE KEY `email` (`email`),
+	KEY `nicknameKey` (`nickname`),
+	KEY `roleId` (`roleId`),
+	CONSTRAINT `users_ibfk_2` FOREIGN KEY (`roleId`) REFERENCES `firecms_roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `firecms_urls`;

@@ -13,9 +13,9 @@ class FilesManagerFolderFormFactory extends BaseFormFactory
 	private ?int $parentFolder = null;
 
 
-	public function __construct(FormFactory $factory, private Model\FileFolders $model)
+	public function __construct(private Model\FileFolders $model)
 	{
-		parent::__construct($factory);
+		parent::__construct();
 	}
 
 

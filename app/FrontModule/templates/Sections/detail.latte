@@ -1,0 +1,20 @@
+{varType Nette\Database\Table\ActiveRow $sectionInfo}
+{varType array $categories}
+{varType array $articles}
+
+{block title}{$sectionInfo->title}{/block}
+
+{block content}
+	<div n:if="$sectionInfo->content" class="mb-4">{$sectionInfo->content|shortcodes|noescape}</div>
+
+	<ul n:if="count($categories)" class="nav nav-pills mb-4">
+		<li n:foreach="$categories as $category" class="nav-item"><a n:href="Categories:detail id=>$category->categoryId" class="nav-link">{$category->title}</a></li>
+	</ul>
+
+	<article n:foreach="$articles as $article" class="mb-4">
+		<h2 class="h4"><a n:href="Articles:detail id=>$article->articleId">{$article->title}</a></h2>
+		<p class="text-muted small">{$article->publishingDate|date:'j. n. Y'}</p>
+		<div n:if="$article->excerpt">{$article->excerpt|noescape}</div>
+	</article>
+	<p n:if="!count($articles)" class="text-muted">{_"No item."}</p>
+{/block}

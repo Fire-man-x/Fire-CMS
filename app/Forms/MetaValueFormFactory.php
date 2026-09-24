@@ -23,9 +23,9 @@ class MetaValueFormFactory extends BaseFormFactory
 	public string $type;
 
 
-	public function __construct(FormFactory $factory, Translator $translator, LanguageService $languages, Model\Metas $metasModel, Meta $metaService)
+	public function __construct(Translator $translator, LanguageService $languages, Model\Metas $metasModel, Meta $metaService)
 	{
-		parent::__construct($factory);
+		parent::__construct();
 		$this->translator = $translator;
 		$this->languages = $languages;
 		$this->metasModel = $metasModel;

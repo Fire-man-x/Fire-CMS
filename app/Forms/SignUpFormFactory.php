@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace App\Forms;
 
-use App\Model;
+use App\Model\Exceptions\DuplicateEmailException;
+use App\Model\Exceptions\DuplicateNameException;
+use App\Model\UserManager;
 use Nette;
 use Nette\Application\UI\Form;
 
@@ -14,15 +16,9 @@ class SignUpFormFactory
 
 	const PASSWORD_MIN_LENGTH = 7;
 
-	private FormFactory $factory;
 
-	private Model\UserManager $userManager;
-
-
-	public function __construct(FormFactory $factory, Model\UserManager $userManager)
+	public function __construct(private FormFactory $factory, private UserManager $userManager)
 	{
-		$this->factory = $factory;
-		$this->userManager = $userManager;
 	}
 
 
@@ -52,8 +48,8 @@ class SignUpFormFactory
 					"firstName" => "",
 					"surname" => ""
 				)));
-			} catch (Model\DuplicateNameException $e) {
-				$form->addError('Username is already taken.');
+			} catch (DuplicateEmailException|DuplicateNameException $e) {
+				$form->addError($e->getMessage());
 				return;
 			}
 			$onSuccess();

@@ -4,7 +4,10 @@ declare(strict_types=1);
 namespace App\Forms;
 
 use App\Components\Menu\Model\Menus;
+use App\Service\LanguageService;
 use Nette\Application\UI\Form;
+use Nette\Localization\Translator;
+use Nette\Utils\Html;
 
 
 class MenuFormFactory extends BaseFormFactory
@@ -13,9 +16,12 @@ class MenuFormFactory extends BaseFormFactory
 	private Menus $model;
 
 
-	public function __construct(FormFactory $factory, Menus $model)
-	{
-		parent::__construct($factory);
+	public function __construct(
+		Menus $model,
+		private LanguageService $languages,
+		private Translator $translator,
+	) {
+		parent::__construct();
 		$this->model = $model;
 	}
 
@@ -26,11 +32,24 @@ class MenuFormFactory extends BaseFormFactory
 
 		$form->addCheckbox('active', 'Active');
 
-		$form->addText('name', 'Name')
-			->setRequired(VALIDATE_REQUIRED);
-
 		$form->addText('location', 'Template location')
 			->setRequired(VALIDATE_REQUIRED);
+
+		// název menu = nadpis po jazycích (firecms_menuDescriptions); menu nemá jiný název (`name` odstraněn),
+		// proto je nadpis ve výchozím jazyce povinný - podle něj se menu pozná v administraci
+		$defaultLanguage = $this->languages->getDefaultLanguage();
+		$titles = $form->addContainer('titles');
+		foreach ($this->languages->getLanguages() as $languageId => $shortcut) {
+			$title = $titles->addText((string) $languageId, Html::el()->setText($this->translator->translate('Title') . ' (' . $shortcut . ')'))
+				->setNullable()
+				->setMaxLength(255);
+			if ($languageId === $defaultLanguage) {
+				$title->setRequired(VALIDATE_REQUIRED)
+					->setOption('description', $this->translator->translate('Name of the menu in administration and its heading on the web.'));
+			} else {
+				$title->setOption('description', $this->translator->translate('Heading of the menu on the web, optional.'));
+			}
+		}
 
 		$form->addSubmit('send', 'Save');
 
@@ -44,14 +63,20 @@ class MenuFormFactory extends BaseFormFactory
 	{
 		unset($values->editId);
 
-		//santized location
-		$values->location = $this->model->getLocation(empty($values->location) ? $values->title : $values->location, $this->getEditId());
+		$titles = (array) $values->titles;
+		unset($values->titles);
+
+		//santized location (bez vyplněné location z nadpisu ve výchozím jazyce)
+		$fallback = (string) ($titles[$this->languages->getDefaultLanguage()] ?? '');
+		$values->location = $this->model->getLocation(empty($values->location) ? $fallback : $values->location, $this->getEditId());
 
 		if ($this->isEditMode()) {
-			$this->model->update($this->getEditId(), (array) $values);
+			$menuId = (int) $this->getEditId();
+			$this->model->update($menuId, (array) $values);
 		} else {
-			$this->model->insert($values);
+			$menuId = (int) $this->model->insert($values);
 		}
+		$this->model->saveTitles($menuId, $titles);
 	}
 
 
@@ -69,7 +94,7 @@ class MenuFormFactory extends BaseFormFactory
 			throw new \InvalidArgumentException("Can not edit item with id '".$editId."'");
 		}
 
-		$form->setDefaults($defaults);
+		$form->setDefaults($defaults->toArray() + ['titles' => $this->model->getTitles($editId)]);
 	}
 
 }

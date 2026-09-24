@@ -15,13 +15,12 @@ class SettingFormFactory extends BaseFormFactory
 {
 
 	public function __construct(
-		FormFactory $factory,
 		private Model\Settings $model,
 		private LanguageService $languages,
 		private Translator $translator,
 		private ProjectFolders $projectFolders,
 	) {
-		parent::__construct($factory);
+		parent::__construct();
 	}
 
 

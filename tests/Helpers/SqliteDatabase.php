@@ -7,6 +7,7 @@ namespace Tests\Helpers;
 use Nette\Caching\Storages\MemoryStorage;
 use Nette\Database\Connection;
 use Nette\Database\Explorer;
+use Nette\Database\Conventions\DiscoveredConventions;
 use Nette\Database\Structure;
 
 /**
@@ -27,7 +28,8 @@ final class SqliteDatabase
 	{
 		$connection = new Connection('sqlite::memory:');
 		$structure = new Structure($connection, new MemoryStorage());
-		$explorer = new Explorer($connection, $structure);
+		// stejné konvence jako aplikace (Nette DI výchozí) - joiny přes cizí klíče `tabulka.sloupec`, např. `page.status`
+		$explorer = new Explorer($connection, $structure, new DiscoveredConventions($structure));
 
 		foreach ($ddl as $statement) {
 			$explorer->query($statement);

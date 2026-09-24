@@ -1,0 +1,17 @@
+{block h1}
+{_"Sections"}
+{/block}
+
+{block buttons}
+	<a n:if="$user->isAllowed('Sections', 'edit')" n:href="detail id=>null" class="btn btn-primary"><i class="fa fa-plus"></i> {_'Add'}</a>
+{/block}
+
+{block content}
+	<p class="text-muted small">{_"A section groups article categories and articles (e.g. Blog, News). The order is used in the administration menu."}</p>
+	{snippet sectionsGrid}
+		{define icon-arrows-v}
+			<i class="fas fa-arrows-alt-v"></i>
+		{/define}
+		{control sectionsGrid}
+	{/snippet}
+{/block}

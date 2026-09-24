@@ -1,0 +1,28 @@
+{varType Nette\Database\Table\ActiveRow $page}
+{varType array $files}
+{varType App\Components\FileManager\Files\HashFileEntity|App\Components\FileManager\Files\HashImageEntity|null $mainFile}
+{varType array $children}
+
+{block title}{$page->title}{/block}
+
+{block content}
+	<article>
+		<p n:if="$mainFile">
+			<img n:src="$mainFile, '800x450'" alt="{$mainFile->getName()}" class="img-fluid">
+		</p>
+
+		{$page->content|shortcodes|noescape}
+
+		<div n:if="count($files) > 1" class="row g-2 my-4">
+			<div n:foreach="$files as $file" n:if="!$iterator->first" class="col-6 col-md-3">
+				<a n:image="$file"><img n:src="$file, '300x300'" alt="{$file->getName()}" class="img-fluid"></a>
+			</div>
+		</div>
+	</article>
+
+	<nav n:if="count($children)" class="mt-4">
+		<ul>
+			<li n:foreach="$children as $child"><a n:href="this id=>$child->pageId">{$child->title}</a></li>
+		</ul>
+	</nav>
+{/block}

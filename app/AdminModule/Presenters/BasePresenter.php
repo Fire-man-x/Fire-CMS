@@ -22,6 +22,26 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	#[Persistent]
 	public bool $isWindowMode = false;
 
+	/** Sekce do menu administrace (články a kategorie po sekcích), viz beforeRender() */
+	protected \App\Model\Sections $sectionsModel;
+
+
+	/**
+	 * Inject metoda (ne veřejná @inject vlastnost) - potomci si konstruktor nechávají pro vlastní závislosti
+	 */
+	public function injectSections(\App\Model\Sections $sectionsModel): void
+	{
+		$this->sectionsModel = $sectionsModel;
+	}
+
+
+	protected function beforeRender(): void
+	{
+		parent::beforeRender();
+
+		$this->template->adminSections = $this->getUser()->isLoggedIn() ? $this->sectionsModel->getList() : [];
+	}
+
 
 	/**
 	 * Check requirements to presenter

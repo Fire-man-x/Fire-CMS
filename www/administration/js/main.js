@@ -213,6 +213,11 @@ $(function () {
 	//catch event from iframe
 	var selectedFilesCallback = null;
 	var selectedFilesFromIframeUrl = window.selectedFilesFromIframeUrl || null;
+	// odkaz, který otevírá správce souborů, může nést vlastní URL pro vybrané soubory (např. obrázky jedné
+	// položky menu v gridu) - má přednost před globálním window.selectedFilesFromIframeUrl
+	$(document).on('click', "[data-selected-files-url]", function() {
+		selectedFilesFromIframeUrl = $(this).attr('data-selected-files-url');
+	});
 	$("body").on("selected-images-from-iframe", function(e, items, isFromWysiwyg, toLanguage){
 		if (selectedFilesFromIframeUrl === null) {
 			console.error('URL for "selected files" is not defined');

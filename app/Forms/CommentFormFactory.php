@@ -24,9 +24,9 @@ class CommentFormFactory extends BaseFormFactory
 	private int $columnId;
 
 
-	public function __construct(FormFactory $factory, User $user, CommentsModule\Model\Comments $model, CommentsModule\Comment $service)
+	public function __construct(User $user, CommentsModule\Model\Comments $model, CommentsModule\Comment $service)
 	{
-		parent::__construct($factory);
+		parent::__construct();
 		$this->user = $user;
 		$this->model = $model;
 		$this->service = $service;

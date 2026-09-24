@@ -78,7 +78,7 @@ class ArticlesPresenter extends BasePresenter
 
 		//@todo: udelat jenom jedno nacteni
 		if($this->id){
-			$article = $this->articlesModel->getAllWithTranslation($this->language)->where("article.id", $this->id)->fetch();
+			$article = $this->articlesModel->findPublished($this->language)->where("article.id", $this->id)->fetch();
 			if(!$article){
 				throw new Nette\Application\BadRequestException("Article with url '$this->id' doesn't exist.");
 			}
@@ -92,7 +92,7 @@ class ArticlesPresenter extends BasePresenter
 	public function renderDetail(): void
 	{
 		if($this->id){
-			$article = $this->articlesModel->getAllWithTranslation($this->language)->where("article.id", $this->id)->fetch();
+			$article = $this->articlesModel->findPublished($this->language)->where("article.id", $this->id)->fetch();
 			if(!$article){
 				throw new Nette\Application\BadRequestException("Article with url '$this->id' doesn't exist.");
 			}

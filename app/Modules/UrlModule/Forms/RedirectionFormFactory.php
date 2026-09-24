@@ -13,9 +13,9 @@ use Nette\Application\UI\Form;
 class RedirectionFormFactory extends BaseFormFactory
 {
 
-	public function __construct(FormFactory $factory, private RedirectionsModel $model, private LanguageService $languages)
+	public function __construct(private RedirectionsModel $model, private LanguageService $languages)
 	{
-		parent::__construct($factory);
+		parent::__construct();
 	}
 
 

@@ -1,0 +1,105 @@
+{varType array $languages}
+{varType string $actualLanguage}
+{varType int|null $pageId}
+{varType bool $hasUrl}
+{varType array $files}
+
+{block h1}
+{_"Page"}
+{/block}
+
+{block content}
+	{form pageForm}
+		<div id="content-inside" class="col-lg-9 col-xl-8">
+			{if count($languages)>1}
+				<ul id="tabsJustified" class="nav nav-tabs">
+					<li n:foreach="$languages as $language => $languageName" class="nav-item">
+						<a class="nav-link {if $language==$actualLanguage}active{/if}" href="{link this language=>$language}" aria-expanded="false">{$languageName}</a>
+					</li>
+				</ul>
+				<br>
+			{/if}
+
+			{$form->getRenderer()->renderPair($form['translation']['title']) |noescape}
+			{$form->getRenderer()->renderPair($form['translation']['url']) |noescape}
+			{$form->getRenderer()->renderPair($form['translation']['content']) |noescape}
+
+			<fieldset>
+				<legend>{_"SEO"}</legend>
+				{$form->getRenderer()->renderPair($form['translation']['seoTitle']) |noescape}
+				{$form->getRenderer()->renderPair($form['translation']['seoDescription']) |noescape}
+				{$form->getRenderer()->renderPair($form['translation']['seoKeywords']) |noescape}
+			</fieldset>
+		</div>
+
+		<div id="sidebar-inside" class="col-lg-3 col-xl-4" role="navigation">
+			<fieldset>
+				<legend>{_'Actions'}</legend>
+				<div class="row mb-3">
+					<div class="col-sm-3 col-lg-12x col-form-label">{label active: /}</div>
+					<div class="col-sm-9 col-lg-12x"><div class="form-check">{input active:}</div></div>
+				</div>
+
+				{$form->getRenderer()->renderPair($form['status']) |noescape}
+
+				{$form->getRenderer()->renderPair($form['parentId']) |noescape}
+
+				<div class="row mb-3">
+					<div class="col-sm-3 col-lg-12x col-form-label">{label public: /}</div>
+					<div class="col-sm-9 col-lg-12x"><div class="form-check">{input public:}</div></div>
+				</div>
+
+				<div class="row mb-3">
+					<div class="col-sm-12">
+						{input send class=>'btn btn-primary button'}
+						<a n:if="$pageId && $hasUrl" n:href=":Front:Pages:detail id=>$pageId, locale=>$actualLanguage" class="btn btn-secondary" title="{_'Show on web'}" target="blank"><i class="fa fa-eye"></i></a>
+					</div>
+				</div>
+			</fieldset>
+
+			<fieldset n:if="$pageId" class="images-sortable">
+				<legend>{_'Images'} <a href="#" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#modal" data-src="{link :Admin:FilesManager:default isWindowMode=>true}" title="{_'Add'}"><i class="fa fa-plus"></i></a></legend>
+				<p class="small text-muted">{_'The first image is the main image. Drag to change the order.'}</p>
+				{snippet files}
+					<div n:foreach="$files as $file" class="img-thumbnail d-inline-block {if $iterator->first}selected{/if}" data-file-id="{$file->getId()}">
+						<a href="#" data-bs-toggle="popover" data-content="<a href='{link removeImage! fileId=>$file->getId()}' class='ajax'><i class='fa fa-times'></i> {_'Delete'}</a>" data-bs-placement="bottom">
+							<img n:src="$file, '130x130'" alt="{$file->getName()}">
+							<small class="d-block text-xs-center">{$file->getName()}</small>
+						</a>
+					</div>
+				{/snippet}
+			</fieldset>
+			<p n:if="!$pageId" class="small text-muted">{_'Images can be added after the page is saved.'}</p>
+		</div>
+	{/form}
+
+	<div class="clearfix"></div>
+
+	<script n:if="$pageId" type="text/javascript">
+		var selectedFilesFromIframeUrl = {link addImages!};
+
+		var sortableImages = function () {
+			$('.images-sortable').sortable({
+				forcePlaceholderSize: true,
+				helper: 'clone',
+				opacity: .6,
+				items: '.img-thumbnail',
+				tolerance: 'pointer',
+				revert: true,
+				update: function () {
+					$.nette.ajax({
+						url: {link sortImages!},
+						data: { 'items': $(this).sortable('toArray', { attribute: 'data-file-id' }) },
+						complete: sortableImages
+					});
+				}
+			});
+		};
+		sortableImages();
+	</script>
+
+	{capture $modalContent}
+		<iframe />
+	{/capture}
+	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal', label=>$control->translator->translate('Images'), modalContent=>$modalContent, size=>'modal-lg modal-fs'}
+{/block}

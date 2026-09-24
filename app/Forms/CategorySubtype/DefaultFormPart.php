@@ -10,12 +10,8 @@ use Nette\Utils\ArrayHash;
 class DefaultFormPart implements ICategoryFormType
 {
 
-	private UrlManager $urlManager;
-
-
-	public function __construct(UrlManager $urlManager)
+	public function __construct(private UrlManager $urlManager)
 	{
-		$this->urlManager = $urlManager;
 	}
 
 

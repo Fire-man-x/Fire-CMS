@@ -2,8 +2,25 @@
 
 Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na detailní záznam v `Changelog/`.
 
+## 2026-09-24
+
+- **Obrázky u položek menu** (`firecms_menuItemFiles`, sloupec „Obrázky“ v gridu položek, `$category->image`/`files` v šabloně menu). Vyžaduje migraci. Viz
+  [2026-09-24-menu-item-images.md](2026-09-24-menu-item-images.md).
+- **Sekce (Blog, Novinky, …) pro kategorie a články, kategorie bez typů (`homepage`/`gallery`), ukázková data (`dummyData`).** Bez převodu dat, vyžaduje `migrations:reset`. Viz
+  [2026-09-24-sections.md](2026-09-24-sections.md).
+- **Stránky: obrázky a vnořování; popisky položek menu pro všechny jazyky najednou.** Vyžaduje migraci. Viz
+  [2026-09-24-pages-images-nesting.md](2026-09-24-pages-images-nesting.md).
+- **Nový typ obsahu Stránka (`Pages`)**: vlastní tabulky, SEO, URL typu `page`, administrace, web, odkaz z menu. Opravená PHPStan brána (odkaz na smazaný soubor v baseline). Viz
+  [2026-09-24-pages.md](2026-09-24-pages.md).
+- **Kategorie bez typů `url`, `categoryLink`, `textBox` (odkazy řeší položky menu), sekce přejmenovaná na „Kategorie článků“.** Jádro, vyžaduje migraci. Viz
+  [2026-09-24-category-types-cleanup.md](2026-09-24-category-types-cleanup.md).
+
 ## 2026-09-23
 
+- **Překlady menu: nadpis `title` po jazycích (`firecms_menuDescriptions`), odstraněný `firecms_menus.name`.** Existující DB potřebují ruční krok (upravená původní migrace). Viz
+  [2026-09-23-menu-translations.md](2026-09-23-menu-translations.md).
+- **Položky menu oddělené od kategorií** (`linkType` category/article/url/route + `target`, vnořování, popisky po jazycích). Jádro, vyžaduje migraci. Viz
+  [2026-09-23-menu-items-separated.md](2026-09-23-menu-items-separated.md).
 - **Oprava: formulář jazyka mohl vytvořit dva výchozí jazyky.** Nově `Languages::setDefault()` (jádro). Viz
   [2026-09-23-languages-single-default.md](2026-09-23-languages-single-default.md).
 - **Překlady tématu v `theme/data/localization/` (tag `translator.themeStorage`, přednost před pluginy) + přeložená homepage a layout.** Viz
