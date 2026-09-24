@@ -20,7 +20,7 @@ class ContactFormComponentFactory implements IPluginComponentFactory
 
 	public function createComponent(Presenter $presenter): IComponent
 	{
-		$this->control->setLanguage($presenter->language);
+		$this->control->setLanguage($presenter->editLocale);
 
 		return $this->control;
 	}

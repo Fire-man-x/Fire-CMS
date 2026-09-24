@@ -45,29 +45,15 @@ class CategoriesPresenter extends BasePresenter
 	public ?int $id = null;
 
 	/**
-	 * Language
-	 */
-	#[Persistent]
-	public ?string $language = null;
-
-	/**
 	 * Category parent
 	 */
 	private ?int $parent = null;
-
-	/**
-	 * Actual language
-	 */
-	public string $actualLanguage;
 
 	/** @inject */
 	public CategoryFormFactory $categoryFactory;
 
 	/** @inject */
 	public MetaValueFormFactory $metaValueFactory;
-
-	/** @inject */
-	public LanguageService$languages;
 
 	/** @inject */
 	public Categories $categoriesModel;
@@ -94,11 +80,6 @@ class CategoriesPresenter extends BasePresenter
 
 		$this->addBreadCrumbLink("Categories", $this->link(":Admin:Categories:default", array("id" => null)) );
 
-		//default language
-		if($this->language == $this->languages->getDefaultLanguage()) {
-			$this->redirect("this", array("language" => null));
-		}
-
 		$category = $this->id ? $this->categoriesModel->getById($this->id) : null;
 		if($this->id && !$category){
 			throw new BadRequestException("Item with id '$this->id' doesn't exist.");
@@ -121,12 +102,6 @@ class CategoriesPresenter extends BasePresenter
 		}
 		$this->parent = $parent;
 
-		if ($this->languages->existLanguage($this->language)) {
-			$this->actualLanguage = $this->language == null ? $this->languages->getDefaultLanguage() : $this->language;
-		} else {
-			$this->actualLanguage = $this->languages->getDefaultLanguage();
-		}
-
 		if(!$this->id){
 			$this->addBreadCrumbLink("New", $this->link(":Admin:Categories:default", array("id" => null)) );
 		}
@@ -143,8 +118,6 @@ class CategoriesPresenter extends BasePresenter
 
 	public function renderDefault(): void
 	{
-		$this->template->languages = $this->languages->getLanguages();
-		$this->template->actualLanguage = $this->actualLanguage;
 		$this->template->id = $this->id;
 
 		if($this->id){
@@ -172,7 +145,7 @@ class CategoriesPresenter extends BasePresenter
 		$this->categoryFactory->setSectionId($this->getSectionId());
 		$form = $this->categoryFactory->create(
 			$this->id,
-			$this->actualLanguage,
+			$this->editLocale,
 			array($this, "link"),
 			$this->getParameter(self::$revisionParameter),
 			$this->link("loadTags!", array("query"=>"QUERY"))
@@ -189,7 +162,7 @@ class CategoriesPresenter extends BasePresenter
 	protected function createComponentMetaValueForm(): Form
 	{
 		$this->metaValueFactory->setType(Meta::TYPE_CATEGORY);
-		$form = $this->metaValueFactory->create($this->id, array($this, "link"), $this->actualLanguage);
+		$form = $this->metaValueFactory->create($this->id, array($this, "link"), $this->editLocale);
 		$form->setTranslator($this->translator);
 
 		$form->getElementPrototype()->addClass("ajax");
@@ -209,7 +182,7 @@ class CategoriesPresenter extends BasePresenter
 	{
 		$control =  $this->categoriesMenu;
 		$control->setActiveCategory($this->parent ?: $this->id)
-			->setLanguage($this->language)
+			->setLanguage($this->editLocale)
 			->setSectionId($this->getSectionId());
 
 		return $control;
@@ -289,7 +262,7 @@ class CategoriesPresenter extends BasePresenter
 	#[Privilege('edit')]
 	public function handleLoadTags(string $query): void
 	{
-		$items = $this->tagService->findByName($this->actualLanguage, $query);
+		$items = $this->tagService->findByName($this->editLocale, $query);
 		foreach ($items as &$item){
 			$item = array(
 				\Achse\TagInput\DataSourceDescriptor::DEFAULT_VALUE_PROPERTY => null,

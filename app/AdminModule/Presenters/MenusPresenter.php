@@ -6,12 +6,11 @@ namespace App\AdminModule\Presenters;
 use App\Attributes\Privilege;
 use App\Attributes\Resource;
 use App\Attributes\Secured;
-use App\Components\Menu\Model\Menus;
 use App\Components\Menu as MenuComponent;
+use App\Components\Menu\Model\Menus;
 use App\Forms\MenuFormFactory;
 use App\Forms\MenuItemFormFactory;
 use App\Model;
-use App\Service\LanguageService;
 use Contributte\Datagrid\Datagrid;
 use Contributte\Datagrid\Exception\DatagridColumnStatusException;
 use Contributte\Datagrid\Exception\DatagridException;
@@ -34,22 +33,9 @@ class MenusPresenter extends BasePresenter
 	#[Persistent]
 	public ?int $id = null;
 
-	/**
-	 * Language
-	 */
-	#[Persistent]
-	public ?string $language = null;
-
-	/**
-	 * Actual language
-	 */
-	public ?string $actualLanguage = null;
 
 	/** @inject */
 	public MenuFormFactory $menuFactory;
-
-	/** @inject */
-	public LanguageService $languages;
 
 	/** @inject */
 	public Menus $menusModel;
@@ -58,13 +44,10 @@ class MenusPresenter extends BasePresenter
 	public Model\Categories $categoriesModel;
 
 	/** @inject */
-	public Model\Articles $articlesModel;
-
-	/** @inject */
-	public Model\Pages $pagesModel;
-
-	/** @inject */
 	public Model\Files $filesModel;
+
+	/** @inject */
+	public MenuComponent\Model\MenuItemTitles $menuItemTitles;
 
 	/** @inject */
 	public MenuItemFormFactory $menuItemFactory;
@@ -75,12 +58,6 @@ class MenusPresenter extends BasePresenter
 		parent::startup();
 
 		$this->addBreadCrumbLink("Menus", $this->link(":Admin:Menus:default", array("id" => null)) );
-
-		//default language
-		if($this->language == $this->languages->getDefaultLanguage()) {
-			$this->redirect("this", array("language" => null));
-		}
-
 
 		\Vodacek\Forms\Controls\DateInput::register();
 
@@ -97,18 +74,11 @@ class MenusPresenter extends BasePresenter
 	#[Privilege('edit')]
 	public function actionDetail(?int $parent = null): void
 	{
-
-		if ($this->languages->existLanguage($this->language)) {
-			$this->actualLanguage = $this->language == null ? $this->languages->getDefaultLanguage() : $this->language;
-		} else {
-			$this->actualLanguage = $this->languages->getDefaultLanguage();
-		}
-
 		$this->template->menuInfo = $this->menusModel->getById($this->id);
 		if (!$this->template->menuInfo) {
 			$this->error("Menu '$this->id' doesn't exist.");
 		}
-		$this->template->menuName = $this->menusModel->getDisplayName((int) $this->id, $this->actualLanguage);
+		$this->template->menuName = $this->menusModel->getDisplayName((int) $this->id, $this->editLocale);
 
 		//breadcrumb
 		$this->addBreadCrumbLink($this->template->menuName, $this->link(":Admin:Menus:detail", array("id" => $this->id)), null, false);
@@ -117,8 +87,6 @@ class MenusPresenter extends BasePresenter
 
 	public function renderDetail(): void
 	{
-		$this->template->languages = $this->languages->getLanguages();
-		$this->template->actualLanguage = $this->actualLanguage;
 	}
 
 
@@ -223,8 +191,9 @@ class MenusPresenter extends BasePresenter
 		$grid->addColumnText('target', 'Target');
 
 		// náhledy obrázků položky (první = hlavní), přidání ze správce souborů, odebrání, řazení přetažením
+		// makro n:src potřebuje $__imagestore - šablony presenteru ho mají (startup()), šablona sloupce gridu ne
 		$grid->addColumnText('files', 'Images')
-			->setTemplate(__DIR__ . '/../templates/Menus/itemImages.latte');
+			->setTemplate(__DIR__ . '/../templates/Menus/itemImages.latte', ['__imagestore' => $this->fileManager]);
 
 		//Actions
 		$grid->addAction('edit', 'Edit', 'editItem!', ['itemId' => 'id'])
@@ -256,26 +225,22 @@ class MenusPresenter extends BasePresenter
 	 */
 	private function getMenuItemsGridRows(): array
 	{
-		$items = $this->menusModel->getItemsTree((int) $this->id, (string) $this->actualLanguage);
+		$items = $this->menusModel->getItemsTree((int) $this->id, (string) $this->editLocale);
 
-		$titles = [
-			MenuComponent\Model\MenuLinkType::Category->value => $this->getContentTitles($this->categoriesModel, $items, MenuComponent\Model\MenuLinkType::Category),
-			MenuComponent\Model\MenuLinkType::Article->value => $this->getContentTitles($this->articlesModel, $items, MenuComponent\Model\MenuLinkType::Article),
-			MenuComponent\Model\MenuLinkType::Page->value => $this->getContentTitles($this->pagesModel, $items, MenuComponent\Model\MenuLinkType::Page),
-			MenuComponent\Model\MenuLinkType::Section->value => $this->getContentTitles($this->sectionsModel, $items, MenuComponent\Model\MenuLinkType::Section),
-		];
+		$contentTitles = $this->menuItemTitles->getContentTitles($items, (string) $this->editLocale);
+		$titles = $this->menuItemTitles->getTitles($items, (string) $this->editLocale);
 
 		$files = $this->menusModel->getItemFiles(array_map(fn($item): int => $item->id, $items));
 
 		$rows = [];
 		foreach ($items as $item) {
 			$linkType = $item->getLinkType();
-			$contentTitle = $titles[$item->linkType][(int) $item->target] ?? null;
+			$contentTitle = $contentTitles[$item->linkType][(int) $item->target] ?? null;
 			$rows[] = [
 				'id' => $item->id,
 				'level' => $item->level,
 				'active' => $item->active,
-				'title' => $item->label ?? $contentTitle ?? $item->target,
+				'title' => $titles[$item->id],
 				'linkTypeLabel' => $linkType?->label() ?? $item->linkType,
 				'target' => $linkType?->targetsContent()
 					? ($contentTitle ?? $this->translator->translate('(deleted)')) . ' [#' . $item->target . ']'
@@ -289,36 +254,12 @@ class MenusPresenter extends BasePresenter
 
 
 	/**
-	 * Názvy kategorií/článků, na které položky odkazují
-	 * @param list<MenuComponent\Model\MenuItem> $items
-	 * @return array<int, string>
-	 */
-	private function getContentTitles(Model\Categories|Model\Articles|Model\Pages|Model\Sections $model, array $items, MenuComponent\Model\MenuLinkType $linkType): array
-	{
-		$ids = [];
-		foreach ($items as $item) {
-			if ($item->getLinkType() === $linkType) {
-				$ids[] = (int) $item->target;
-			}
-		}
-		if ($ids === []) {
-			return [];
-		}
-
-		$selection = $model->findAll()->select('id')->where('id', $ids);
-		$model->selectTitle($selection, '`' . $model->getTableName() . '`.`id`', $this->actualLanguage);
-
-		return array_map('strval', $selection->fetchPairs('id', 'title'));
-	}
-
-
-	/**
 	 * Formulář položky menu (modal)
 	 */
 	protected function createComponentMenuItemForm(): Nette\Application\UI\Form
 	{
 		$this->menuItemFactory->asModal();
-		$form = $this->menuItemFactory->create(null, (int) $this->id, (string) $this->actualLanguage);
+		$form = $this->menuItemFactory->create(null, (int) $this->id, (string) $this->editLocale);
 		$form->setTranslator($this->translator);
 		$form->onSuccess[] = function (Nette\Application\UI\Form $form): void {
 			$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
@@ -398,7 +339,7 @@ class MenusPresenter extends BasePresenter
 	public function handleEditItem(int $itemId): void
 	{
 		$this->assertItemOfThisMenu($itemId);
-		$this->menuItemFactory->setItemDefaults($this['menuItemForm'], $itemId, (string) $this->actualLanguage);
+		$this->menuItemFactory->setItemDefaults($this['menuItemForm'], $itemId, (string) $this->editLocale);
 		$this->redrawControl('menuItemForm');
 	}
 

@@ -16,7 +16,7 @@
 	{if count($languages)>1}
 		<ul class="nav nav-tabs mb-3">
 			<li n:foreach="$languages as $language => $languageName" class="nav-item">
-				<a class="nav-link {if $language==$actualLanguage}active{/if}" href="{link this language=>$language}">{$languageName}</a>
+				<a class="nav-link {if $language==$actualLanguage}active{/if}" href="{link this 'editLocale'=>$language}">{$languageName}</a>
 			</li>
 		</ul>
 		<p class="text-muted small">{_"Names in the list are shown in the selected language. Labels for all languages are edited in the item form."}</p>

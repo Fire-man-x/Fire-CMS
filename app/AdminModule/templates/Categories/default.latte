@@ -29,7 +29,7 @@
 					{if count($languages)>1}
 						<ul id="tabsJustified" class="nav nav-tabs">
 							<li n:foreach="$languages as $language => $languageName" class="nav-item">
-								<a class="nav-link {if $language==$actualLanguage}active{/if}" href="{link this language=>$language}" aria-expanded="false">{$languageName}</a>
+								<a class="nav-link {if $language==$actualLanguage}active{/if}" href="{link this 'editLocale'=>$language}" aria-expanded="false">{$languageName}</a>
 							</li>
 						</ul>
 						<br>

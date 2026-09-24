@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Forms;
 
+use App\Components\Menu\Model\MenuItemTitles;
 use App\Components\Menu\Model\MenuLinkType;
 use App\Components\Menu\Model\Menus;
 use App\Model\Articles;
@@ -32,6 +33,7 @@ class MenuItemFormFactory extends BaseFormFactory
 		private readonly Sections $sectionsModel,
 		private readonly Translator $translator,
 		private readonly LanguageService $languages,
+		private readonly MenuItemTitles $menuItemTitles,
 	) {
 		parent::__construct();
 	}
@@ -294,13 +296,16 @@ class MenuItemFormFactory extends BaseFormFactory
 	{
 		$excluded = $editId !== null ? $this->model->getSubtreeIds($editId) : [];
 
+		// stejné názvy jako v gridu položek (popisek, jinak název kategorie/článku/stránky/sekce)
+		$items = $this->model->getItemsTree($menuId, $language);
+		$titles = $this->menuItemTitles->getTitles($items, $language);
+
 		$options = [];
-		foreach ($this->model->getItemsTree($menuId, $language) as $item) {
+		foreach ($items as $item) {
 			if (in_array($item->id, $excluded, true)) {
 				continue;
 			}
-			$options[$item->id] = str_repeat('— ', $item->level)
-				. ($item->label ?? ($item->getLinkType()?->label() ?? $item->linkType) . ': ' . $item->target);
+			$options[$item->id] = str_repeat('— ', $item->level) . $titles[$item->id];
 		}
 
 		return $options;

@@ -7,7 +7,9 @@ use App\Attributes\Privilege;
 use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Security\User;
+use App\Service\LanguageService;
 use Nette\Application\Attributes\Persistent;
+use Nette\Application\BadRequestException;
 use Nette\Application\ForbiddenRequestException;
 
 
@@ -16,11 +18,27 @@ use Nette\Application\ForbiddenRequestException;
  */
 abstract class BasePresenter extends \App\Presenters\BasePresenter
 {
+
+	/**
+	 * Language from url
+	 */
+	#[Persistent]
+	public string $locale;
+
+	/**
+	 * Edit language from url
+	 */
+	#[Persistent]
+	public string $editLocale;
+
 	/**
 	 * Is window mode?
 	 */
 	#[Persistent]
 	public bool $isWindowMode = false;
+
+	/** @inject */
+	public LanguageService $languages;
 
 	/** Sekce do menu administrace (články a kategorie po sekcích), viz beforeRender() */
 	protected \App\Model\Sections $sectionsModel;
@@ -40,6 +58,11 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 		parent::beforeRender();
 
 		$this->template->adminSections = $this->getUser()->isLoggedIn() ? $this->sectionsModel->getList() : [];
+
+		//is window mode
+		$this->template->isWindowMode = $this->isWindowMode;
+		$this->template->languages = $this->languages->getLanguages();
+		$this->template->actualLanguage = $this->editLocale;
 	}
 
 
@@ -58,9 +81,16 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 
 		//setup translator
 		//different translations in backend and frontend
-		$this->translator->setAvailableLanguages(array("en", "cs"));
-		$this->translator->setCurrentLang("cs");
+		$this->translator->setAvailableLanguages($this->languages->getAdminLanguages());
+		$this->translator->setCurrentLang($this->languages->getDefaultAdminLanguage());
 		$this->translator->setNamespace("admin");
+
+		if(!isset($this->editLocale)){
+			throw new BadRequestException("Edit locale is not setted.");
+		}
+		if(!$this->languages->existLanguage($this->editLocale)){
+			throw new BadRequestException("Language '".$this->editLocale."' doesn't exist.");
+		}
 
 		parent::checkRequirements($element);
 
@@ -124,10 +154,6 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 		//BaseGrid global disable css and js
 		//\Mesour\Datagrid\BaseGrid::$css_draw = false;
 		//\Mesour\Datagrid\BaseGrid::$js_draw = false;
-
-
-		//is window mode
-		$this->template->isWindowMode = $this->isWindowMode;
 
 		//appdir
 		//$configParameters = $this->context->getParameters();

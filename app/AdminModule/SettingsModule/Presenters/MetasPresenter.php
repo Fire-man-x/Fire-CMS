@@ -28,9 +28,6 @@ class MetasPresenter extends BasePresenter
 	/** @inject */
 	public Metas $model;
 
-	/** @inject */
-	public LanguageService $languages;
-
 
 	public function startup(): void
 	{

@@ -4,6 +4,8 @@ Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na det
 
 ## 2026-09-24
 
+- **Názvy položek menu v administraci** (výběr nadřazené položky místo „Page: 2“) přes `MenuItemTitles`; `LanguageService::existLanguage(?string)`. Viz
+  [2026-09-24-menu-item-titles.md](2026-09-24-menu-item-titles.md).
 - **Obrázky u položek menu** (`firecms_menuItemFiles`, sloupec „Obrázky“ v gridu položek, `$category->image`/`files` v šabloně menu). Vyžaduje migraci. Viz
   [2026-09-24-menu-item-images.md](2026-09-24-menu-item-images.md).
 - **Sekce (Blog, Novinky, …) pro kategorie a články, kategorie bez typů (`homepage`/`gallery`), ukázková data (`dummyData`).** Bez převodu dat, vyžaduje `migrations:reset`. Viz

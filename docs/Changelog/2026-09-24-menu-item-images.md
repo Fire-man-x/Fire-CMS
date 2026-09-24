@@ -30,6 +30,22 @@ na soubory, žádné UI.
   vnořené modaly Bootstrap nepodporuje.
 - **Automatické podkategorie** (podkategorie položky typu kategorie) obrázky nemají, nejsou to položky menu.
 
+**Ověřeno v Chromiu (2026-09-24, přes MCP):**
+- detail menu → tlačítko obrázku u položky „Domů“ → správce souborů v modalu → nahrání testovacího obrázku →
+  výběr → „Vložit do příspěvku“ → vazba uložená, náhled v gridu → odebrání křížkem (AJAX překreslení);
+- homepage s obrázkem u položky vrací 200;
+- 12 stránek administrace (sekce, články a kategorie po sekcích, stránky, menu, jazyky) 200 bez chyby;
+- testovací obrázek potom smazaný (záznam i soubory).
+- Řazení obrázků přetažením v prohlížeči ověřené není (s jedním obrázkem nejde), pokrývá ho `MenusItemsTest`.
+
+Test odhalil dvě chyby, opravené:
+- **Šablona sloupce gridu neměla `$__imagestore`** (proměnná makra `n:src`, šablony presenteru ji dostávají v
+  `startup()`). Grid s obrázkem padal na „Undefined variable $__imagestore“. Předává se v
+  `setTemplate(..., ['__imagestore' => $this->fileManager])`.
+- **Prohlížeč držel starý `main.js` z cache** (servíroval se bez verze), úprava JS se neprojevila.
+  `@layout.latte` administrace má u `main.js` a `style.css` `?v={filemtime(...)}`. Po každé změně souboru se
+  stáhne nová verze, platí pro všechny budoucí úpravy JS/CSS administrace.
+
 **Návaznost:**
 - Update `docs/Architecture/*.md`? ano — `components.md` (Menu)
 - Update `docs/AI-Context/gotchas.md` nebo `patterns.md`? ne

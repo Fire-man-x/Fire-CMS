@@ -30,7 +30,8 @@
 	<script type="text/javascript" src="{$basePath}/vendors/netteForms.min.js"></script>
 	<script type="text/javascript" src="{$basePath}/vendors/nette.ajax.js"></script>
 	<script type="text/javascript" src="{$basePath}/administration/js/jquery.mjs.nestedSortable.js"></script>
-	<script type="text/javascript" src="{$basePath}/administration/js/main.js"></script>
+	{* ?v= podle času změny souboru - bez toho prohlížeč drží starou verzi i po úpravě JS/CSS *}
+	<script type="text/javascript" src="{$basePath}/administration/js/main.js?v={filemtime(\APP_DIR . '../www/administration/js/main.js')}"></script>
 	{/block}
 
 	<!-- Bootstrap with Pooper without jQuery -->
@@ -42,7 +43,7 @@
 
 
 	<!--link href="{$basePath}/administration/cssistration/theme.litera.css" rel="stylesheet" /-->
-	<link rel="stylesheet" href="{$basePath}/administration/css/style.css">
+	<link rel="stylesheet" href="{$basePath}/administration/css/style.css?v={filemtime(\APP_DIR . '../www/administration/css/style.css')}">
 
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="{$basePath}/vendors/fontawesome-free-5.9.0-web/css/all.min.css">

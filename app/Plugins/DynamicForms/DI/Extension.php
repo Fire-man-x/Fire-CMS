@@ -79,9 +79,9 @@ class Extension extends CompilerExtension
 		self::$contactFormControl->setParent(self::$application->getPresenter(), 'contactFormControl');
 
 		//set language
-		if(isset(self::$application->getPresenter()->language))
+		if(isset(self::$application->getPresenter()->editLocale))
 		{
-			self::$contactFormControl->setLanguage(self::$application->getPresenter()->language);
+			self::$contactFormControl->setLanguage(self::$application->getPresenter()->editLocale);
 		}
 
 		ob_start();

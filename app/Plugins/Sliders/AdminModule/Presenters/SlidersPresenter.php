@@ -49,9 +49,6 @@ class SlidersPresenter extends BasePresenter
 	public SliderItems $modelSliderItems;
 
 	/** @inject */
-	public LanguageService $languages;
-
-	/** @inject */
 	public \App\Components\FileManager\FileManager $fileManager;
 
 

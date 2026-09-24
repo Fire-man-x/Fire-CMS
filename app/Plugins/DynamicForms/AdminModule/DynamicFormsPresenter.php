@@ -74,9 +74,6 @@ class DynamicFormsPresenter extends BasePresenter
 	/** @inject */
 	public UrlManager $urlManager;
 
-	/** @inject */
-	public LanguageService $languages;
-
 
 	protected function startup(): void
 	{
@@ -114,7 +111,7 @@ class DynamicFormsPresenter extends BasePresenter
 	{
 		$this->parent = $parent;
 
-		if ($this->languages->existLanguage($this->language)) {
+		if ($this->language !== null && $this->languages->existLanguage($this->language)) {
 			$this->actualLanguage = $this->language == null ? $this->languages->getDefaultLanguage() : $this->language;
 		} else {
 			$this->actualLanguage = $this->languages->getDefaultLanguage();

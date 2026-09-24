@@ -192,6 +192,7 @@ services:
 	- App\Components\Menu\Model\Menus
 	- App\Forms\MenuFormFactory
 	- App\Forms\MenuItemFormFactory
+	- App\Components\Menu\Model\MenuItemTitles
 
 	#Admin\Settings
 	- App\Model\Settings

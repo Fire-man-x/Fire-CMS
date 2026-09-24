@@ -16,7 +16,7 @@ class SliderComponentFactory implements IPluginComponentFactory
 
 	public function createComponent(Presenter $presenter): IComponent
 	{
-		$this->slider->setLanguage($presenter->language);
+		$this->slider->setLanguage($presenter->editLocale);
 
 		return $this->slider;
 	}

@@ -10,7 +10,6 @@ use App\Forms\PageFormFactory;
 use App\Model\Files;
 use App\Model\Pages;
 use App\Modules\UrlModule\UrlManager;
-use App\Service\LanguageService;
 use Contributte\Datagrid\Datagrid;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Form;
@@ -26,17 +25,10 @@ class PagesPresenter extends BasePresenter
 	#[Persistent]
 	public ?int $id = null;
 
-	#[Persistent]
-	public ?string $language = null;
-
-	/** Jazyk, ve kterém se stránka edituje (language nebo výchozí jazyk webu) */
-	private string $actualLanguage;
-
 
 	public function __construct(
 		private readonly Pages $pagesModel,
 		private readonly PageFormFactory $pageFactory,
-		private readonly LanguageService $languages,
 		private readonly UrlManager $urlManager,
 		private readonly Files $filesModel,
 	) {
@@ -49,14 +41,6 @@ class PagesPresenter extends BasePresenter
 		parent::startup();
 
 		$this->addBreadCrumbLink('Pages', $this->link(':Admin:Pages:default', ['id' => null]));
-
-		// výchozí jazyk bez parametru v URL
-		if ($this->language === $this->languages->getDefaultLanguage()) {
-			$this->redirect('this', ['language' => null]);
-		}
-		$this->actualLanguage = $this->language !== null && $this->languages->existLanguage($this->language)
-			? $this->language
-			: $this->languages->getDefaultLanguage();
 	}
 
 
@@ -69,7 +53,7 @@ class PagesPresenter extends BasePresenter
 			if (!$this->pagesModel->getById($this->id)) {
 				$this->error("Page '$this->id' doesn't exist.");
 			}
-			$translation = $this->pagesModel->getTranslation($this->id, $this->actualLanguage);
+			$translation = $this->pagesModel->getTranslation($this->id, $this->editLocale);
 			$this->addBreadCrumbLink(
 				$translation && is_string($translation->title) ? $translation->title : 'New translation',
 				$this->link(':Admin:Pages:detail', ['id' => $this->id]),
@@ -84,11 +68,9 @@ class PagesPresenter extends BasePresenter
 
 	public function renderDetail(): void
 	{
-		$this->template->languages = $this->languages->getLanguages();
-		$this->template->actualLanguage = $this->actualLanguage;
 		$this->template->pageId = $this->id;
 		$this->template->hasUrl = $this->id !== null
-			&& $this->urlManager->existUrlByTypeAndKey(Pages::URL_TYPE, $this->id, $this->actualLanguage);
+			&& $this->urlManager->existUrlByTypeAndKey(Pages::URL_TYPE, $this->id, $this->editLocale);
 
 		$files = [];
 		if ($this->id !== null) {
@@ -109,7 +91,7 @@ class PagesPresenter extends BasePresenter
 		// ColumnStatus porovnává hodnotu striktně s volbami 0/1 - `active` proto jako int
 		$grid->setDataSource(array_map(
 			fn(array $page): array => ['active' => (int) $page['active']] + $page,
-			$this->pagesModel->getTree($this->actualLanguage),
+			$this->pagesModel->getTree($this->editLocale),
 		));
 		$grid->setTranslator($this->translator);
 		$grid->setSortable();
@@ -155,7 +137,7 @@ class PagesPresenter extends BasePresenter
 
 	protected function createComponentPageForm(): Form
 	{
-		$form = $this->pageFactory->create($this->id, $this->actualLanguage);
+		$form = $this->pageFactory->create($this->id, $this->editLocale);
 		$form->setTranslator($this->translator);
 
 		return $form;

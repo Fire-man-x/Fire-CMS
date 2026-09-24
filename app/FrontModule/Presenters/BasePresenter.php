@@ -143,7 +143,7 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 		parent::startup();
 
 		//languages
-		if ($this->languages->existLanguage($this->locale)) {
+		if ($this->locale !== null && $this->languages->existLanguage($this->locale)) {
 			$this->language = $this->locale == null ? $this->languages->getDefaultLanguage() : $this->locale;
 		} else {
 			$this->language = $this->languages->getDefaultLanguage();

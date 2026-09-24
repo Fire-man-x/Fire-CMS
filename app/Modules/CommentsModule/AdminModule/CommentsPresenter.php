@@ -53,9 +53,6 @@ class CommentsPresenter extends BasePresenter
 	public CommentFormFactory $commentFactory;
 
 	/** @inject */
-	public LanguageService $languages;
-
-	/** @inject */
 	public CommentsModule\Model\Comments $commentsModel;
 
 	/** @inject */
@@ -131,7 +128,7 @@ class CommentsPresenter extends BasePresenter
 	{
 		$this->parent = $parent;
 
-		if ($this->languages->existLanguage($this->language)) {
+		if ($this->language !== null && $this->languages->existLanguage($this->language)) {
 			$this->actualLanguage = $this->language == null ? $this->languages->getDefaultLanguage() : $this->language;
 		} else {
 			$this->actualLanguage = $this->languages->getDefaultLanguage();

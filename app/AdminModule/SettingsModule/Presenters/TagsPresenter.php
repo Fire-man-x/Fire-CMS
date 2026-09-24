@@ -24,24 +24,16 @@ class TagsPresenter extends BasePresenter
 {
 
 	/**
-	 * Language
+	 * Language from url
 	 */
 	#[Persistent]
-	public ?string $language = null;
-
-	/**
-	 * Actual language
-	 */
-	public ?string $actualLanguage = null;
+	public bool $onlyLocale = false;
 
 	/** @inject */
 	public TagFormFactory $factory;
 
 	/** @inject */
 	public Tags $model;
-
-	/** @inject */
-	public LanguageService $languages;
 
 	public function startup(): void
 	{
@@ -61,12 +53,7 @@ class TagsPresenter extends BasePresenter
 	#[Privilege('view')]
 	public function actionDefault(): void
 	{
-		if ($this->languages->existLanguage($this->language)) {
-			$this->actualLanguage = $this->language;
-		}
-
-		$this->template->languages = $this->languages->getLanguages();
-		$this->template->actualLanguage = $this->actualLanguage;
+		$this->template->onlyLocale = $this->onlyLocale;
 	}
 
 
@@ -78,9 +65,9 @@ class TagsPresenter extends BasePresenter
 		$source = $this->model->findAll()
 			->select($this->model->getTableName().".*")
 			->order("title");
-		if ($this->actualLanguage != null) {
+		if ($this->onlyLocale) {
 			$source->select(":" . $this->model->getTranslationTable()->getName() . ".name AS title");
-			$source->where(":" . $this->model->getTranslationTable()->getName() . ".languageId", $this->actualLanguage);
+			$source->where(":" . $this->model->getTranslationTable()->getName() . ".languageId", $this->editLocale);
 		} else {
 			//záložka "všechny jazyky" - název ve výchozím jazyce webu, počet překladů poddotazem (bez GROUP BY)
 			$this->model->selectTitle($source, "`" . $this->model->getTableName() . "`.`id`");
@@ -101,7 +88,7 @@ class TagsPresenter extends BasePresenter
 			->setSortable();
 			//->setFilterText('title');
 
-		if(count($this->languages->getLanguages()) > 1 && $this->actualLanguage ==null){
+		if(count($this->languages->getLanguages()) > 1 && $this->onlyLocale == false){
 			$grid->addColumnText('language_count', 'Translation status')
 				//->setClass('btn btn-outline-primary btn-sm')
 				//->setIcon('ban') //default ban icon

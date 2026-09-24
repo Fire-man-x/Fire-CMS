@@ -58,11 +58,6 @@ class FilesManagerPresenter extends BasePresenter
 	private ?int $parent = null;
 
 	/**
-	 * Actual language
-	 */
-	public ?string $actualLanguage = null;
-
-	/**
 	 * Files model
 	 * @inject
 	 */
@@ -82,9 +77,6 @@ class FilesManagerPresenter extends BasePresenter
 
 	/** @inject */
 	public FilesManagerFileNameFormFactory $filesManagerFileNameFormFactory;
-
-	/** @inject */
-	public LanguageService $languages;
 
 	/** @inject */
 	public FileFolders $fileFoldersModel;
@@ -148,9 +140,6 @@ class FilesManagerPresenter extends BasePresenter
 
 	public function renderDefault(): void
 	{
-		//languages
-		$this->template->languages = $this->languages->getLanguages();
-		$this->template->actualLanguage = $this->actualLanguage;
 	}
 
 

@@ -9,7 +9,6 @@ use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Model\Sections;
 use App\Modules\UrlModule\UrlManager;
-use App\Service\LanguageService;
 use Contributte\Datagrid\Datagrid;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Form;
@@ -26,16 +25,9 @@ class SectionsPresenter extends BasePresenter
 	#[Persistent]
 	public ?int $id = null;
 
-	#[Persistent]
-	public ?string $language = null;
-
-	private string $actualLanguage;
-
-
 	/** model sekcí je `$this->sectionsModel` z BasePresenter (injectSections()) */
 	public function __construct(
 		private readonly SectionFormFactory $sectionFactory,
-		private readonly LanguageService $languages,
 		private readonly UrlManager $urlManager,
 	) {
 		parent::__construct();
@@ -47,13 +39,6 @@ class SectionsPresenter extends BasePresenter
 		parent::startup();
 
 		$this->addBreadCrumbLink('Sections', $this->link(':Admin:Sections:default', ['id' => null]));
-
-		if ($this->language === $this->languages->getDefaultLanguage()) {
-			$this->redirect('this', ['language' => null]);
-		}
-		$this->actualLanguage = $this->language !== null && $this->languages->existLanguage($this->language)
-			? $this->language
-			: $this->languages->getDefaultLanguage();
 	}
 
 
@@ -66,7 +51,7 @@ class SectionsPresenter extends BasePresenter
 			if (!$this->sectionsModel->getById($this->id)) {
 				$this->error("Section '$this->id' doesn't exist.");
 			}
-			$translation = $this->sectionsModel->getTranslation($this->id, $this->actualLanguage);
+			$translation = $this->sectionsModel->getTranslation($this->id, $this->editLocale);
 			$this->addBreadCrumbLink(
 				$translation && is_string($translation->title) ? $translation->title : 'New translation',
 				$this->link(':Admin:Sections:detail', ['id' => $this->id]),
@@ -81,18 +66,16 @@ class SectionsPresenter extends BasePresenter
 
 	public function renderDetail(): void
 	{
-		$this->template->languages = $this->languages->getLanguages();
-		$this->template->actualLanguage = $this->actualLanguage;
 		$this->template->sectionId = $this->id;
 		$this->template->hasUrl = $this->id !== null
-			&& $this->urlManager->existUrlByTypeAndKey(Sections::URL_TYPE, $this->id, $this->actualLanguage);
+			&& $this->urlManager->existUrlByTypeAndKey(Sections::URL_TYPE, $this->id, $this->editLocale);
 	}
 
 
 	protected function createComponentSectionsGrid(string $name): Datagrid
 	{
 		$rows = [];
-		foreach ($this->sectionsModel->getList($this->actualLanguage) as $id => $title) {
+		foreach ($this->sectionsModel->getList($this->editLocale) as $id => $title) {
 			$section = $this->sectionsModel->getById($id);
 			$rows[] = [
 				'id' => $id,
@@ -147,7 +130,7 @@ class SectionsPresenter extends BasePresenter
 
 	protected function createComponentSectionForm(): Form
 	{
-		$form = $this->sectionFactory->create($this->id, $this->actualLanguage);
+		$form = $this->sectionFactory->create($this->id, $this->editLocale);
 		$form->setTranslator($this->translator);
 
 		return $form;

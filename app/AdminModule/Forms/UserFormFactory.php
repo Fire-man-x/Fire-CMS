@@ -21,7 +21,7 @@ use Nette\Security\AuthenticationException;
 use Nette\Utils\Random;
 
 
-class UserFormFactory extends BaseFormFactory
+class UserFormFactory extends AdminFormFactory
 {
 	private int $userId;
 

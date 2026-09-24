@@ -3,19 +3,17 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Presenters;
 
+use App\AdminModule\Presenters\SectionAwareTrait\SectionAwareTrait;
 use App\Attributes\Privilege;
 use App\Attributes\Resource;
 use App\Attributes\Secured;
-use App\AdminModule\Presenters\SectionAwareTrait\SectionAwareTrait;
 use App\Forms\ArticleFormFactory;
 use App\Forms\MetaValueFormFactory;
 use App\Model\Articles;
 use App\Model\Categories;
 use App\Model\Files;
-use App\Modules\CommentsModule;
 use App\Modules\UrlModule\UrlManager;
 use App\Service\Article;
-use App\Service\LanguageService;
 use App\Service\Meta;
 use App\Service\Tag;
 use Contributte\Datagrid\Datagrid;
@@ -46,30 +44,16 @@ class ArticlesPresenter extends BasePresenter
 	public ?int $id = null;
 
 	/**
-	 * Language
-	 */
-	#[Persistent]
-	public ?string $language = null;
-
-	/**
 	 * Show filter
 	 * @persistentInDefault
 	 */
 	public ?string $show;
-
-	/**
-	 * Actual language
-	 */
-	public string $actualLanguage;
 
 	/** @inject */
 	public ArticleFormFactory $articleFactory;
 
 	/** @inject */
 	public MetaValueFormFactory $metaValueFactory;
-
-	/** @inject */
-	public LanguageService $languages;
 
 	/** @inject */
 	public Articles $articlesModel;
@@ -99,11 +83,6 @@ class ArticlesPresenter extends BasePresenter
 		$this->resolveSection($article ? (int) $article->sectionId : null);
 
 		$this->addBreadCrumbLink("Articles", $this->link(":Admin:Articles:default", array("id" => null)) );
-
-		//default language
-		if($this->language == $this->languages->getDefaultLanguage()) {
-			$this->redirect("this", array("language" => null));
-		}
 	}
 
 
@@ -151,12 +130,6 @@ class ArticlesPresenter extends BasePresenter
 	 */
 	public function actionDetail(int $parent = null): void
 	{
-		if ($this->languages->existLanguage($this->language)) {
-			$this->actualLanguage = $this->language == null ? $this->languages->getDefaultLanguage() : $this->language;
-		} else {
-			$this->actualLanguage = $this->languages->getDefaultLanguage();
-		}
-
 		$this->template->articles = $this->articlesModel;
 
 		//edit own
@@ -171,7 +144,7 @@ class ArticlesPresenter extends BasePresenter
 
 		if($this->id)
 		{
-			$articleTranslationInfo = $this->articlesModel->findTranslationBy($this->id, $this->actualLanguage)->fetch();
+			$articleTranslationInfo = $this->articlesModel->findTranslationBy($this->id, $this->editLocale)->fetch();
 			if($articleTranslationInfo) {
 				$this->addBreadCrumbLink($articleTranslationInfo->title, $this->link(":Admin:Articles:detail", array("id" => $this->id)), null, false);
 			} else {
@@ -190,9 +163,6 @@ class ArticlesPresenter extends BasePresenter
 
 	public function renderDetail(): void
 	{
-		$this->template->languages = $this->languages->getLanguages();
-		$this->template->actualLanguage = $this->actualLanguage;
-
 		if($this->id){
 			$files = $this->articlesModel->getRelationFile($this->id);
 			$this->template->files = array();
@@ -218,10 +188,10 @@ class ArticlesPresenter extends BasePresenter
 			->where($this->articlesModel->getTableName().".sectionId", $this->getSectionId())
 			->order($this->articlesModel->getTableName().".createDate DESC")
 			->order($this->articlesModel->getTableName().".".$this->articlesModel->getColumnId());
-		$this->articlesModel->selectTitle($source, "`" . $this->articlesModel->getTableName() . "`.`id`", $this->language);
+		$this->articlesModel->selectTitle($source, "`" . $this->articlesModel->getTableName() . "`.`id`", $this->editLocale);
 		//název hlavní kategorie článku
 		$this->categoriesModel->selectTitle($source, "(SELECT `relation`.`categoryId` FROM `" . Categories::RELATION_ARTICLE_TABLE_NAME . "` `relation`"
-			. " WHERE `relation`.`articleId` = `" . $this->articlesModel->getTableName() . "`.`id` ORDER BY `relation`.`isMain` DESC LIMIT 1)", $this->language, "categoryTitle");
+			. " WHERE `relation`.`articleId` = `" . $this->articlesModel->getTableName() . "`.`id` ORDER BY `relation`.`isMain` DESC LIMIT 1)", $this->editLocale, "categoryTitle");
 		switch ($this->show) {
 			case "personal":
 				$source->where($this->articlesModel->getTableName().".createdBy = ?", $this->user->getId());
@@ -354,7 +324,7 @@ class ArticlesPresenter extends BasePresenter
 	protected function createComponentCategoriesGrid($name)
 	{
 		$source = $this->articlesModel->getRelationCategory($this->id);
-		$this->categoriesModel->selectTitle($source, "`" . Categories::RELATION_ARTICLE_TABLE_NAME . "`.`categoryId`", $this->language)
+		$this->categoriesModel->selectTitle($source, "`" . Categories::RELATION_ARTICLE_TABLE_NAME . "`.`categoryId`", $this->editLocale)
 			->order("title");
 		$primaryKey = "categoryId";
 
@@ -409,7 +379,7 @@ class ArticlesPresenter extends BasePresenter
 		$source = $this->categoriesModel->getAllForMenu()
 			->select($this->categoriesModel->getTableName() . ".*")
 			->where($this->categoriesModel->getTableName() . ".sectionId", $this->getSectionId());
-		$this->categoriesModel->selectTitle($source, "`" . $this->categoriesModel->getTableName() . "`.`id`", $this->language)
+		$this->categoriesModel->selectTitle($source, "`" . $this->categoriesModel->getTableName() . "`.`id`", $this->editLocale)
 			->order("title");
 		$primaryKey = $this->categoriesModel->getColumnId();
 		$paramKey = $this->categoriesModel->getForeignKeyColumn();
@@ -443,7 +413,7 @@ class ArticlesPresenter extends BasePresenter
 		$this->articleFactory->setSectionId($this->getSectionId());
 		$form = $this->articleFactory->create(
 			$this->id,
-			$this->actualLanguage,
+			$this->editLocale,
 			$this->getParameter(self::$revisionParameter),
 			$this->link("loadTags!", array("query"=>"QUERY"))
 			);
@@ -459,7 +429,7 @@ class ArticlesPresenter extends BasePresenter
 	protected function createComponentMetaValueForm(): Form
 	{
 		$this->metaValueFactory->setType(Meta::TYPE_ARTICLE);
-		$form = $this->metaValueFactory->create($this->id, array($this, "link"), $this->actualLanguage);
+		$form = $this->metaValueFactory->create($this->id, array($this, "link"), $this->editLocale);
 		$form->setTranslator($this->translator);
 
 		$form->getElementPrototype()->addClass("ajax");
@@ -638,7 +608,7 @@ class ArticlesPresenter extends BasePresenter
 	#[Privilege('edit')]
 	public function handleLoadTags($query): void
 	{
-		$items = $this->tagService->findByName($this->actualLanguage, $query);
+		$items = $this->tagService->findByName($this->editLocale, $query);
 		foreach ($items as &$item){
 			$item = array(
 				\Achse\TagInput\DataSourceDescriptor::DEFAULT_VALUE_PROPERTY => null,

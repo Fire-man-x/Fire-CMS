@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Forms;
 
-use App\Forms\BaseFormFactory;
 use App\Model\Sections;
 use App\Modules\UrlModule\UrlManager;
 use Nette\Application\UI\Form;
@@ -13,7 +12,7 @@ use Nette\InvalidArgumentException;
  * Formulář sekce (:Admin:Sections:detail) - aktivita + překlad v jazyce $language (název, úvodní text,
  * URL výpisu sekce, SEO). URL se ukládá přes UrlManager s typem `section`.
  */
-class SectionFormFactory extends BaseFormFactory
+class SectionFormFactory extends AdminFormFactory
 {
 	public function __construct(
 		private readonly Sections $model,
@@ -23,7 +22,7 @@ class SectionFormFactory extends BaseFormFactory
 	}
 
 
-	public function create(int|string|null $editId = null, ?string $language = null): Form
+	public function create(int|string|null $editId = null, ?string $language = null): AdminForm
 	{
 		if ($language === null) {
 			throw new \InvalidArgumentException('Language cannot be null');
