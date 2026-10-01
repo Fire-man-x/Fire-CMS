@@ -1,0 +1,25 @@
+#v případě potřeby úpravy DI kontejneru, pište sem
+
+#search:
+#	themePlugins:
+#		in: %rootDir%/theme/Plugins
+#		extends: App\Model\Plugin\Plugin
+#		classes:
+#		 	- *Plugin
+#		files:
+#			- *Plugin.php
+
+#services:
+	#Překlady tématu (theme/data/localization/cs.front) - mají přednost před překlady pluginů,
+	#viz App\Localization\ChainTranslatorStorage. Adresář musí existovat, jinak služba spadne.
+	#-
+	#	factory: App\Localization\ReadOnlyFileStorage(%rootDir%/theme/data/localization)
+	#	autowired: false
+	#	tags: [translator.themeStorage]
+
+	#nette.mailer:
+	#	class: Nette\Mail\IMailer
+	#	factory: Theme\Component\Nextras\src\FileMailer(%tempDir%/mail-panel-mails)
+
+# Presentery balíčků v theme/Plugins/<Name> registruje search: blok v config.plugin.neon daného balíčku
+# (jen když je zapnutý), ne tady - viz docs/Architecture/plugins.md.

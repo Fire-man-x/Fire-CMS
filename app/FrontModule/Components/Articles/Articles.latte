@@ -1,0 +1,32 @@
+{if count($articles)}
+	{foreach $articles as $article}
+		<div class="post-preview">
+			<a href="{plink :Front:Articles:detail id=>$article->articleId}">
+				<h2 class="post-title">
+					{$article->title}
+				</h2>
+			</a>
+			<div class="post-subtitle d-flex">
+				<div n:if="$article->mainFile" class="flex-shrink-0 me-3">
+					<a href="#">
+						<img n:src="$article->mainFile, '100x100'" alt="{$article->mainFile->getName()}">
+					</a>
+				</div>
+				<div class="flex-grow-1 text-justify">
+					{$article->excerpt|noescape}
+				</div>
+			</div>
+			<p class="post-meta text-end">{_"Posted by <a href='%s'>%s</a> on %s", "#",$article->author['author'], $article->publishingDate->format(\DATETIME_FORMAT) |noescape} {_'viewed'} {$article->viewCount}</p>
+		</div>
+		<hr n:if="!$iterator->isLast()" />
+	{/foreach}
+
+	{if $showPaginator}
+		{control paginator}
+	{/if}
+{else}
+	<hr />
+	<div class="p-5 mb-4 bg-body-tertiary rounded-3">
+		<span class="h1" >{_"No item."}</span>
+	</div>
+{/if}

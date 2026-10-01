@@ -1,0 +1,80 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Components;
+
+use App\Model;
+use Nette\InvalidArgumentException;
+use Nette\SmartObject;
+
+/**
+ * Class ViewCounter
+ */
+class ViewCounter
+{
+	use SmartObject;
+
+	const TYPE_ARTICLE = "article";
+	const TYPE_CATEGORY = "category";
+	const TYPE_FILE = "file";
+
+	/**
+	 * Categories model
+	 */
+	private Model\Database\Categories $modelCategory;
+
+	/**
+	 * Articles model
+	 */
+	private Model\Database\Articles $modelArticle;
+
+	/**
+	 * Files model
+	 */
+	private Model\Database\Files $modelFile;
+
+
+	/**
+	 * Constructor
+	 */
+	public function __construct(Model\Database\Categories $modelCategory, Model\Database\Articles $modelArticle, Model\Database\Files $modelFile)
+	{
+		$this->modelCategory = $modelCategory;
+		$this->modelArticle = $modelArticle;
+		$this->modelFile = $modelFile;
+	}
+
+
+	/**
+	 * Model getter
+	 * @throws InvalidArgumentException
+	 */
+	private function getModelByType(string $type): Model\Database\Articles|Model\Database\Files|Model\Database\Categories
+	{
+		switch ($type) {
+			case self::TYPE_ARTICLE:
+				return $this->modelArticle;
+			case self::TYPE_CATEGORY:
+				return $this->modelCategory;
+			case self::TYPE_FILE:
+				return $this->modelFile;
+
+			default:
+				throw new InvalidArgumentException("Type '$type' is not allowed.");
+		}
+	}
+
+
+	/**
+	 * Add view count to counter
+	 */
+	public function itemViewed(string $type, int $itemId, string $language): void
+	{
+		$model = $this->getModelByType($type);
+
+		if($model instanceof IViewCounter){
+			$model->addViewCount($itemId, $language);
+		}
+	}
+
+}

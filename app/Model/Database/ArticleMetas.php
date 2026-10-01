@@ -1,0 +1,40 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Model\Database;
+
+use App\Service\LanguageService;
+
+/**
+ * ArticleMetas Model
+ */
+class ArticleMetas extends BaseSubMetas
+{
+
+
+	/**
+	 * Constructor
+	 * @param \Nette\Database\Explorer $database
+	 * @param LanguageService $languages
+	 */
+	public function __construct(\Nette\Database\Explorer $database, LanguageService $languages, \Nette\Security\User $user)
+	{
+		parent::__construct($database, $languages, $user);
+
+		$this->setTableName('firecms_articleMetas');
+		$this->setForeignKeyColumn('articleMetaId');
+		$this->setReferenceColumn('articleId');
+	}
+
+
+	/**
+	 * Find by article id
+	 * @param int $id
+	 * @return \Nette\Database\Table\Selection
+	 */
+	public function findByArticleId($id)
+	{
+		return $this->findByColumnId($id);
+	}
+
+}

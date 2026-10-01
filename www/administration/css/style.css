@@ -1,0 +1,289 @@
+body {
+	font-size: 15px;
+	line-height: 1.6;
+	color: #333;
+	background: white;
+}
+
+body.wait, body.wait *{
+    cursor: progress !important;
+}
+
+h1 {
+	color: #3484D2;
+}
+
+#ajax-spinner {
+	margin: 15px 0 0 15px;
+	padding: 13px;
+	background: white url('../images/spinner.gif') no-repeat 50% 50%;
+	font-size: 0;
+	z-index: 123456;
+	display: none;
+}
+
+/*div.flash {
+	color: black;
+	background: #FFF9D7;
+	border: 1px solid #E2C822;
+	padding: 1em;
+	margin: 1em 0;
+}*/
+
+a[href^="#error:"] {
+	background: red;
+	color: white;
+}
+
+form th, form td {
+	vertical-align: top;
+	font-weight: normal;
+}
+
+form th {
+	text-align: right;
+}
+
+form .required label {
+	font-weight: bold;
+}
+
+form .error {
+	color: #D00;
+	font-weight: bold;
+}
+
+thead .with-actions {
+	width: 8.5rem;
+}
+
+.message {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: calc(100% - 12px);
+	margin: 3px 6px;
+	z-index: 10000;
+}
+
+.tag a {
+	color: #fff;
+}
+
+
+
+/*.nav.nav-sublevel {
+	margin-left: 1em;
+}*/
+
+.nav-link.active a {
+	color: #fff;
+}
+.nav-item.placeholder {
+	width: 100%;
+	height: 20px;
+	background: rgba(255, 0, 0, 0.2);
+}
+
+.zet-fileupload-file .img-responsive {
+	width: 90px;
+}
+
+.modal-dialog.modal-lg.modal-fs {
+	max-width: 100%;
+	height: 100%;
+	margin: 0;
+}
+
+.modal-dialog.modal-lg.modal-fs .modal-content {
+	height: auto;
+	min-height: 100%;
+}
+
+/*sticky footer */
+/*html,body {
+    min-height: 100%;
+	position: relative;
+}
+
+#main {
+	margin-bottom: 60px;
+}*/
+.footer {
+    background-color: #f5f5f5;
+    bottom: 0;
+    height: 60px;
+    line-height: 60px;
+    /*position: absolute;*/
+    width: 100%;
+	margin-top: 20px;
+}
+.img-thumbnail.selected {
+	/*background-color: #025aa5;*/
+	background-color: rgba(2, 90, 165, 0.2);
+	color: #000000;
+}
+
+.galery-thumbnail {
+	position: relative;
+	width: 150px !important;
+	height: 150px !important;
+	margin: 4px;
+}
+.galery-thumbnail label:before {
+	/*content: url("https://cdn1.iconfinder.com/data/icons/windows8_icons_iconpharm/26/unchecked_checkbox.png");*/
+	content: url("/administration/images/unchecked_checkbox.png");
+	position: absolute;
+	right: -4px;
+	top: -4px;
+	z-index: 100;
+	height: 26px;
+	width: 26px;
+	border-radius: 5px;
+}
+.galery-thumbnail input:checked + label:before {
+	/*content: url("https://cdn1.iconfinder.com/data/icons/windows8_icons_iconpharm/26/checked_checkbox.png");*/
+	content: url("/administration/images/checked_checkbox.png");
+	background-color: #fff;
+}
+.galery-thumbnail input[type=checkbox] {
+	display: none;
+}
+.galery-thumbnail.selected {
+	/*background-color: #025aa5;*/
+	background-color: rgba(2, 90, 165, 0.7);
+	color: #ffffff;
+}
+
+.galery-thumbnail-centered {
+	height: 100%;
+	left: 0;
+	position: absolute;
+	top: 0;
+	transform: translate(50%, 50%);
+	width: 100%;
+}
+.galery-thumbnail-centered img, .galery-thumbnail-centered span {
+	transform: translate(-50%, -50%);
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	/*max-height: 100%;*/
+	/*
+	opacity: 1;
+	overflow: hidden;
+	position: absolute;
+	transition: opacity 0.1s ease 0s;*/
+}
+.galery-thumbnail-centered span {
+	font-size: 5em;
+}
+.galery-thumbnail-description{
+	background: rgba(255, 255, 255, 0.8) none repeat scroll 0 0;
+	bottom: -1px;
+	left: -1px;
+	right: -1px;
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15) inset;
+	font-weight: 600;
+	max-height: 100%;
+	overflow: hidden;
+	overflow-wrap: break-word;
+	position: absolute;
+	text-align: center;
+	padding: 0 3px;
+}
+
+.media-frame-content[data-columns="1"] .attachment {
+    width: 100%;
+}
+.media-frame-content[data-columns="2"] .attachment {
+    width: 50%;
+}
+.media-frame-content[data-columns="3"] .attachment {
+    width: 33.33%;
+}
+.media-frame-content[data-columns="4"] .attachment {
+    width: 25%;
+}
+.media-frame-content[data-columns="5"] .attachment {
+    width: 20%;
+}
+.media-frame-content[data-columns="6"] .attachment {
+    width: 16.66%;
+}
+.media-frame-content[data-columns="7"] .attachment {
+    width: 14.28%;
+}
+.media-frame-content[data-columns="8"] .attachment {
+    width: 12.5%;
+}
+.media-frame-content[data-columns="9"] .attachment {
+    width: 11.11%;
+}
+.media-frame-content[data-columns="10"] .attachment {
+    width: 10%;
+}
+.media-frame-content[data-columns="11"] .attachment {
+    width: 9.09%;
+}
+.media-frame-content[data-columns="12"] .attachment {
+    width: 8.33%;
+}
+
+ol.menu-sortable
+{
+	list-style: none;
+}
+ol.menu-sortable ol,
+.nav-sublevel {
+	list-style: none;
+	padding-left: 2rem;
+}
+.nav-sublevel .nav-link {
+	padding-left: 0;
+	padding-right: 0;
+}
+.nav-sublevel .nav-link.active {
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	margin-left: -0.5em;
+	margin-right: -0.5em;
+}
+
+.dashboard .card-body {
+	color: #fff;
+}
+.dashboard .card-body h2 {
+	z-index: 10;
+}
+.card-body .rotate {
+	z-index: 1;
+	float: right;
+	height: 100%;
+}
+.card-body .rotate i {
+	color: rgba(20, 20, 20, 0.15);
+	position: absolute;
+	left: 0;
+	left: auto;
+	right: 20px;
+	bottom: 20px;
+	display: block;
+	-webkit-transform: rotate(-44deg);
+	-moz-transform: rotate(-44deg);
+	-o-transform: rotate(-44deg);
+	-ms-transform: rotate(-44deg);
+	transform: rotate(-44deg);
+}
+
+@media (min-width: 992px) {
+	#content-inside {
+		float:left;
+	}
+
+	#sidebar-inside {
+		float: right;
+	}
+}

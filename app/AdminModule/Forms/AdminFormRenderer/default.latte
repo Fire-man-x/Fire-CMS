@@ -1,0 +1,37 @@
+{varType Nette\Application\UI\Form $form}
+{varType array $sections}
+{varType array $loose}
+
+<form n:name="$form" class="admin-form">
+
+	<div n:if="$form->hasErrors()" class="alert alert-danger">
+		<div n:foreach="$form->ownErrors as $error">{$error}</div>
+	</div>
+
+	<div class="accordion mb-3" id="{$form->getName()}-accordion" n:if="$sections">
+		<div n:foreach="$sections as $section" class="accordion-item">
+			<h2 class="accordion-header">
+				<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#{$form->getName()}-{$section['id']}">
+					{$section['title']}
+				</button>
+			</h2>
+			<div id="{$form->getName()}-{$section['id']}" class="accordion-collapse collapse show">
+				<div class="accordion-body">
+					<p n:if="$section['description']" class="text-body-secondary small">{$section['description']}</p>
+
+					<div n:foreach="$section['fields'] as $field" class="mb-3">
+						{label $field['control'] /}
+						{input $field['control'], class => $field['class']}
+						<span class="invalid-feedback d-block" n:ifcontent>{$field['control']->error}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div n:foreach="$loose as $field" n:if="$field['control']->getOption('type') !== 'hidden'" class="mb-3">
+		{input $field['control'], class => $field['class']}
+	</div>
+	<span n:foreach="$loose as $field" n:if="$field['control']->getOption('type') === 'hidden'">{input $field['control']}</span>
+
+</form>

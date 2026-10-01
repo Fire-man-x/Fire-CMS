@@ -1,0 +1,33 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Model\Database;
+
+use Nette\Database\Explorer;
+use Nette\Database\SqlLiteral;
+use Nette\Utils\ArrayHash;
+
+/**
+ * Sliders Model
+ */
+class Sliders extends BaseModel
+{
+	public function __construct(Explorer $database)
+	{
+		parent::__construct($database);
+
+		$this->setTableName('firecms_sliders');
+		$this->setForeignKeyColumn('sliderId');
+	}
+
+
+	/**
+	 * Inserts new
+	 */
+	public function insert(ArrayHash $data): int
+	{
+		$data->createDate = new SqlLiteral("NOW()");
+		return parent::insert($data);
+	}
+
+}

@@ -1,0 +1,18 @@
+{block h1}
+	{_"Sliders"}
+{/block}
+
+{block buttons}
+	<a n:href="add!" class="btn btn-primary ajax" data-bs-toggle="modal" data-bs-target="#modal"><i class="fa fa-plus"></i> {_'Add'}</a>
+{/block}
+
+{block content}
+
+	{capture $modalContent}
+		{snippet sliderForm}
+			{control sliderForm}
+		{/snippet}
+	{/capture}
+	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal', label=>$control->translator->translate('Slider'), modalContent=>$modalContent, size=>'modal-sm'}
+
+	{control slidersGrid}

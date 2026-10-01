@@ -1,0 +1,71 @@
+{varType Nette\Database\Table\ActiveRow $page}
+{varType array $options}
+
+{* Šablona stránky "Kontakt" (Pages::Templates, výběr u stránky v administraci). Text stránky = úvod
+   (otevírací doba, pokyny, ...), kontaktní údaje a GPS bod mapy jsou z Nastavení webu. Zoom mapy je
+   pevně v šabloně. Mapa = embed Mapy.com (frame.mapy.cz), bez API klíče. *}
+{var $showSidebar = false}
+{var $mapZoom = 16}
+{var $latitude = $options['map_latitude'] ?? ''}
+{var $longitude = $options['map_longitude'] ?? ''}
+{var $hasMap = $latitude !== '' && $longitude !== ''}
+{var $phone = $options['contact_phone'] ?? ''}
+{var $address = $options['contact_address'] ?? ''}
+{var $email = $options['main_email'] ?? ''}
+
+{* h1, ne title: <h1 n:block=title> v @layout.latte zahrnuje i element, přepsání title by zrušilo <h1> *}
+{block h1}{$page->title}{/block}
+
+{block content}
+	<div class="contact-page">
+		<div n:if="$page->content" class="contact-intro">
+			{$page->content|shortcodes|noescape}
+		</div>
+
+		<div class="row g-4">
+			<div n:class="$hasMap ? 'col-lg-5' : 'col-lg-8 offset-lg-2'">
+				<div class="contact-card h-100">
+					<h2 class="contact-card-title">{_"Contact details"}</h2>
+
+					<ul class="contact-list">
+						<li n:if="$address">
+							<span class="contact-icon"><i class="fa fa-map-marker-alt" aria-hidden="true"></i></span>
+							<div>
+								<span class="contact-label">{_"Address"}</span>
+								<address class="mb-0">{$address|breaklines}</address>
+							</div>
+						</li>
+						<li n:if="$phone">
+							<span class="contact-icon"><i class="fa fa-phone" aria-hidden="true"></i></span>
+							<div>
+								<span class="contact-label">{_"Phone"}</span>
+								<a href="tel:{$phone|replace:' ',''}">{$phone}</a>
+							</div>
+						</li>
+						<li n:if="$email">
+							<span class="contact-icon"><i class="fa fa-envelope" aria-hidden="true"></i></span>
+							<div>
+								<span class="contact-label">{_"E-mail"}</span>
+								<a href="mailto:{$email}">{$email}</a>
+							</div>
+						</li>
+					</ul>
+
+					<div class="contact-actions">
+						<a n:if="$email" href="mailto:{$email}" class="btn btn-dark"><i class="fa fa-paper-plane" aria-hidden="true"></i> {_"Write to us"}</a>
+						<a n:if="$hasMap" href="https://mapy.com/{$presenter->language === 'cs' ? 'cs' : 'en'}/zakladni?x={$longitude}&y={$latitude}&z={$mapZoom}&source=coor&id={$longitude},{$latitude}" target="_blank" rel="noopener" class="btn btn-outline-dark">
+							<i class="fa fa-map" aria-hidden="true"></i> {_"Show on Mapy.com"}
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<div n:if="$hasMap" class="col-lg-7">
+				<div class="contact-map">
+					<iframe src="https://frame.mapy.cz/zakladni?x={$longitude}&y={$latitude}&z={$mapZoom}&source=coor&id={$longitude},{$latitude}"
+						title="{_'Map'}" loading="lazy" allowfullscreen></iframe>
+				</div>
+			</div>
+		</div>
+	</div>
+{/block}

@@ -1,0 +1,13 @@
+!.gitignore
+.idea
+theme/config/config.local.neon
+www/files/*
+!www/files/.htaccess
+www/theme/*/.sass-cache
+vendor/*
+!vendor/.htaccess
+tests/temp
+# nepřeložené řetězce LiveTranslatoru - vznikají za běhu
+data/localization/*.untranslated
+# data lokálního S3 (Garage) z docker/docker-compose.yml
+/docker/garage/

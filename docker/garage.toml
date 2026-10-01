@@ -1,0 +1,19 @@
+# Jedinečný identifikátor uzlu (vygeneruje se automaticky při prvním spuštění)
+metadata_dir = "/var/lib/garage/meta"
+data_dir = "/var/lib/garage/data"
+
+# Vnitřní ID uzlu (vygeneruje se při prvním startu)
+# db_engine = "sqlite" # Volitelné, pro malé laby (výchozí je sled)
+
+# Síťové nastavení pro komunikaci mezi uzly (RPC)
+rpc_bind_addr = "[::]:3901"
+rpc_public_addr = "127.0.0.1:3901" # Změňte na veřejnou IP, pokud propojujete více serverů
+rpc_secret = "xxx"
+
+# Nastavení S3 API portu
+s3_api = { api_bind_addr = "[::]:3900", s3_region = "eu-central-1" }
+
+# Nastavení pro hostování statických webů (volitelné)
+s3_web = { bind_addr = "[::]:3902", root_domain = "localhost" }
+
+replication_factor = 1

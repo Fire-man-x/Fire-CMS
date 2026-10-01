@@ -1,0 +1,907 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined property Nette\\Application\\UI\\Form\:\:\$data\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../AdminModule/Forms/FilesManagerFileNameFormFactory.php
+
+		-
+			message: '#^Access to an undefined property Nette\\Application\\UI\\Presenter\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../AdminModule/Forms/FilesManagerUploadFormFactory.php
+
+		-
+			message: '#^Call to an undefined method Nette\\Application\\UI\\Form\:\:addFileUpload\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../AdminModule/Forms/FilesManagerUploadFormFactory.php
+
+		-
+			message: '#^Call to an undefined method Nette\\ComponentModel\\IComponent\:\:addError\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: ../AdminModule/Forms/LanguageFormFactory.php
+
+		-
+			message: '#^Call to an undefined method Nette\\ComponentModel\\IComponent\:\:setDefaultValue\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../AdminModule/Forms/LanguageFormFactory.php
+
+		-
+			message: '#^Access to an undefined property Nette\\Application\\UI\\Form\:\:\$data\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../AdminModule/Forms/RoleFormFactory.php
+
+		-
+			message: '#^Call to an undefined method Nette\\ComponentModel\\IComponent\:\:addError\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../AdminModule/Forms/RoleFormFactory.php
+
+		-
+			message: '#^Access to an undefined property App\\AdminModule\\Forms\\UserFormFactory\:\:\$sender\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../AdminModule/Forms/UserFormFactory.php
+
+		-
+			message: '#^Access to an undefined property App\\AdminModule\\Forms\\UserFormFactory\:\:\$smtp\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../AdminModule/Forms/UserFormFactory.php
+
+		-
+			message: '#^Access to an undefined property App\\AdminModule\\Forms\\UserFormFactory\:\:\$subject\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../AdminModule/Forms/UserFormFactory.php
+
+		-
+			message: '#^Access to an undefined property App\\AdminModule\\Forms\\UserFormFactory\:\:\$templatePath\.$#'
+			identifier: property.notFound
+			count: 2
+			path: ../AdminModule/Forms/UserFormFactory.php
+
+		-
+			message: '#^Call to an undefined method App\\AdminModule\\Forms\\UserFormFactory\:\:link\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../AdminModule/Forms/UserFormFactory.php
+
+		-
+			message: '#^Class App\\AdminModule\\Forms\\AdminForm constructor invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: ../AdminModule/Forms/UserFormFactory.php
+
+		-
+			message: '#^Default value of the parameter \#2 \$status \(int\) of method App\\AdminModule\\Presenters\\ArticlesPresenter\:\:handleActivate\(\) is incompatible with type bool\.$#'
+			identifier: parameter.defaultValue
+			count: 1
+			path: ../AdminModule/Presenters/ArticlesPresenter.php
+
+		-
+			message: '#^Call to an undefined method Nette\\Security\\UserStorage\:\:setNamespace\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../AdminModule/Presenters/BasePresenter.php
+
+		-
+			message: '#^Parameter \#3 \$icon of method App\\Presenters\\BasePresenter\:\:addBreadCrumbLink\(\) expects null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../AdminModule/Presenters/BasePresenter.php
+
+		-
+			message: '#^Property App\\AdminModule\\Presenters\\FilesManagerPresenter\:\:\$parent \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: ../AdminModule/Presenters/FilesManagerPresenter.php
+
+		-
+			message: '#^Parameter \#2 \$link of method Alnux\\NetteBreadCrumb\\BreadCrumb\:\:addLink\(\) expects string\|null, Nette\\Application\\UI\\Link\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../Components/Breadcrumb/BreadCrumb.php
+
+		-
+			message: '#^Access to an undefined property Nette\\Application\\UI\\Presenter\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../Components/CategoriesMenu/CategoriesMenu.php
+
+		-
+			message: '#^Parameter \#1 \$operation of method Vodacek\\Forms\\Controls\\DateInput\:\:addRule\(\) expects \(callable\(Nette\\Forms\\Control, mixed\)\: bool\)\|string, Closure\(Vodacek\\Forms\\Controls\\DateInput\)\: bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../Components/DateInput/DateInput.php
+
+		-
+			message: '#^Parameter \#2 \$callback of static method Nette\\Forms\\Container\:\:extensionMethod\(\) expects callable\(Nette\\Forms\\Container\)\: mixed, Closure\(Nette\\Forms\\Container, string, string\|null\=, string\=\)\: Vodacek\\Forms\\Controls\\DateInput given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../Components/DateInput/DateInput.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: ../Components/FileManager/Macro/Nodes/BgNode.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: ../Components/FileManager/Macro/Nodes/CropNode.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: ../Components/FileManager/Macro/Nodes/ImageNode.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: ../Components/FileManager/Macro/Nodes/SrcNode.php
+
+		-
+			message: '#^Call to an undefined method App\\Components\\FileManager\\Storages\\FileStorage\:\:createCacheDirectoryPath\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../Components/FileManager/Storages/FileStorage.php
+
+		-
+			message: '#^PHPDoc tag @var above a class has no effect\.$#'
+			identifier: varTag.misplaced
+			count: 1
+			path: ../Components/FileManager/Storages/FileStorage.php
+
+		-
+			message: '#^Parameter \#1 \$filename of function unlink expects string, Nette\\Utils\\FileInfo given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../Components/FileManager/Storages/FileStorage.php
+
+		-
+			message: '#^Parameter \#1 \$filename of function unlink expects string, Nette\\Utils\\FileInfo given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../Components/FileManager/Storages/HashFileStorage.php
+
+		-
+			message: '#^Parameter \#1 \$imageRequest of method App\\Components\\FileManager\\Storages\\HashFileStorage\:\:getCacheFilePath\(\) expects App\\Components\\FileManager\\Request\\ImageRequest, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../Components/FileManager/Storages/HashFileStorage.php
+
+		-
+			message: '#^Call to function is_callable\(\) with callable\(\)\: mixed will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../Components/Shortcodes.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\)\: Unexpected token "\\n\\t ", expected type at offset 12 on line 2$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../Components/TagsInput/DataSourceDescriptor.php
+
+		-
+			message: '#^Parameter \#2 \$callback of static method Nette\\Forms\\Container\:\:extensionMethod\(\) expects callable\(Nette\\Forms\\Container\)\: mixed, Closure\(Nette\\Forms\\Container, mixed, mixed\=, Achse\\TagInput\\DataSourceDescriptor\|null\=, mixed\=\)\: Achse\\TagInput\\TagInput given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../Components/TagsInput/TagInput.php
+
+		-
+			message: '#^Ternary operator condition is always true\.$#'
+			identifier: ternary.alwaysTrue
+			count: 1
+			path: ../Components/TwitterBootstrapRenderer/TwitterBootstrapRenderer.php
+
+		-
+			message: '#^Instanceof between App\\Model\\Articles\|App\\Model\\Categories\|App\\Model\\Files and App\\Components\\IViewCounter will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: ../Components/ViewCounter.php
+
+		-
+			message: '#^Call to an undefined static method Nette\\Utils\\Callback\:\:invoke\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(Nette\\Http\\Session\)\: Unexpected token "\\n\\t \* ", expected variable at offset 33 on line 2$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(Nette\\Localization\\Translator\)\: Unexpected token "\\n\\t ", expected variable at offset 44 on line 2$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(array\)\: Unexpected token "\\n\\t ", expected variable at offset 20 on line 2$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(array\)\: Unexpected token "\\n\\t \* ", expected variable at offset 36 on line 3$#'
+			identifier: phpDoc.parseError
+			count: 2
+			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(bool\)\: Unexpected token "\\n\\t ", expected variable at offset 19 on line 2$#'
+			identifier: phpDoc.parseError
+			count: 2
+			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(int\)\: Unexpected token "\\n\\t \* ", expected variable at offset 18 on line 2$#'
+			identifier: phpDoc.parseError
+			count: 2
+			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(self\)\: Unexpected token "\\n\\t ", expected variable at offset 34 on line 3$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(string\)\: Unexpected token "\\n\\t ", expected variable at offset 37 on line 3$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(string\)\: Unexpected token "\\n\\t ", expected variable at offset 74 on line 4$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(string\|null\)\: Unexpected token "\\n\\t \* ", expected variable at offset 56 on line 3$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between array and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between string and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(Nette\\PhpGenerator\\ClassType\)\: Unexpected token "\\n\\t \* ", expected variable at offset 43 on line 2$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../Components/VisualPaginator-3.0/src/VisualPaginatorExtension.php
+
+		-
+			message: '#^Method AlesWita\\Components\\VisualPaginator\\Tests\\App\\Router\:\:createRouter\(\) has invalid return type Nette\\Application\\IRouter\.$#'
+			identifier: class.notFound
+			count: 1
+			path: ../Components/VisualPaginator-3.0/tests/app/Router.php
+
+		-
+			message: '#^Method AlesWita\\Components\\VisualPaginator\\Tests\\App\\Router\:\:createRouter\(\) should return Nette\\Application\\IRouter but returns Nette\\Application\\Routers\\RouteList\.$#'
+			identifier: return.type
+			count: 1
+			path: ../Components/VisualPaginator-3.0/tests/app/Router.php
+
+		-
+			message: '#^Call to an undefined method AlesWita\\Components\\VisualPaginator\:\:setCanSetItemsPerPage\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: ../Components/VisualPaginator-3.0/tests/app/TestPresenter.php
+
+		-
+			message: '#^Instanceof between string and Zet\\FileUpload\\Model\\IUploadModel will always evaluate to false\.$#'
+			identifier: instanceof.alwaysFalse
+			count: 1
+			path: ../Components/jzechy/jquery-fileupload/src/FileUploadControl.php
+
+		-
+			message: '#^Parameter \#2 \$callback of static method Nette\\Forms\\Container\:\:extensionMethod\(\) expects callable\(Nette\\Forms\\Container\)\: mixed, Closure\(Nette\\Forms\\Container, mixed, mixed\=, mixed\=\)\: Zet\\FileUpload\\FileUploadControl given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../Components/jzechy/jquery-fileupload/src/FileUploadControl.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between string and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: ../Components/jzechy/jquery-fileupload/src/FileUploadControl.php
+
+		-
+			message: '#^PHPDoc tag @var above a method has no effect\.$#'
+			identifier: varTag.misplaced
+			count: 1
+			path: ../Components/jzechy/jquery-fileupload/src/FileUploadExtension.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between int\|null and false will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: ../Components/jzechy/jquery-fileupload/src/Filter/BaseFilter.php
+
+		-
+			message: '#^Instanceof between Zet\\FileUpload\\Template\\Renderer\\BaseRenderer and Zet\\FileUpload\\Template\\Renderer\\BaseRenderer will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: ../Components/jzechy/jquery-fileupload/src/Model/UploadController.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between Zet\\FileUpload\\Filter\\IMimeTypeFilter and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: ../Components/jzechy/jquery-fileupload/src/Model/UploadController.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between Zet\\FileUpload\\Template\\Renderer\\BaseRenderer and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: ../Components/jzechy/jquery-fileupload/src/Model/UploadController.php
+
+		-
+			message: '#^Property Zet\\FileUpload\\Template\\JavascriptBuilder\:\:\$cache is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../Components/jzechy/jquery-fileupload/src/Template/JavascriptBuilder.php
+
+		-
+			message: '#^Property Zet\\FileUpload\\Template\\JavascriptBuilder\:\:\$renameLink is unused\.$#'
+			identifier: property.unused
+			count: 1
+			path: ../Components/jzechy/jquery-fileupload/src/Template/JavascriptBuilder.php
+
+		-
+			message: '#^Property Zet\\FileUpload\\Template\\JavascriptBuilder\:\:\$uploadUrl is unused\.$#'
+			identifier: property.unused
+			count: 1
+			path: ../Components/jzechy/jquery-fileupload/src/Template/JavascriptBuilder.php
+
+		-
+			message: '#^Call to an undefined static method Nette\\Forms\\Controls\\BaseControl\:\:attached\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: ../Components/jzechy/nette-antispam/src/AntiSpamControl.php
+
+		-
+			message: '#^Constructor of class Zet\\AntiSpam\\AntiSpamControl has an unused parameter \$session\.$#'
+			identifier: constructor.unusedParameter
+			count: 1
+			path: ../Components/jzechy/nette-antispam/src/AntiSpamControl.php
+
+		-
+			message: '#^Method Zet\\AntiSpam\\AntiSpamControl\:\:getError\(\) should return string\|null but returns int\.$#'
+			identifier: return.type
+			count: 1
+			path: ../Components/jzechy/nette-antispam/src/AntiSpamControl.php
+
+		-
+			message: '#^Parameter \#2 \$callback of static method Nette\\Forms\\Container\:\:extensionMethod\(\) expects callable\(Nette\\Forms\\Container\)\: mixed, Closure\(Nette\\Forms\\Container, mixed, mixed\=, mixed\=\)\: Zet\\AntiSpam\\AntiSpamControl given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../Components/jzechy/nette-antispam/src/AntiSpamControl.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between string and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: ../Components/jzechy/nette-antispam/src/HiddenFields.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between Nette\\Localization\\Translator and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 2
+			path: ../Components/jzechy/nette-antispam/src/QuestionGenerator.php
+
+		-
+			message: '#^Negated boolean expression is always false\.$#'
+			identifier: booleanNot.alwaysFalse
+			count: 1
+			path: ../Components/jzechy/nette-antispam/src/Validator.php
+
+		-
+			message: '#^Call to an undefined method Nette\\Application\\UI\\Form\:\:addTagInput\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../Forms/ArticleFormFactory.php
+
+		-
+			message: '#^Instanceof between string and DateTime will always evaluate to false\.$#'
+			identifier: instanceof.alwaysFalse
+			count: 1
+			path: ../Forms/BaseFormFactory.php
+
+		-
+			message: '#^Instanceof between string and DateTimeImmutable will always evaluate to false\.$#'
+			identifier: instanceof.alwaysFalse
+			count: 1
+			path: ../Forms/BaseFormFactory.php
+
+		-
+			message: '#^Instanceof between string and Nette\\Utils\\DateTime will always evaluate to false\.$#'
+			identifier: instanceof.alwaysFalse
+			count: 1
+			path: ../Forms/BaseFormFactory.php
+
+		-
+			message: '#^Result of \|\| is always false\.$#'
+			identifier: booleanOr.alwaysFalse
+			count: 2
+			path: ../Forms/BaseFormFactory.php
+
+		-
+			message: '#^Call to an undefined method App\\Forms\\BaseFormPartFactory\:\:getEditId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../Forms/BaseFormPartFactory.php
+
+		-
+			message: '#^Call to an undefined method App\\Forms\\BaseFormPartFactory\:\:isModal\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: ../Forms/BaseFormPartFactory.php
+
+		-
+			message: '#^Call to an undefined method App\\Forms\\BaseFormPartFactory\:\:setEditId\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: ../Forms/BaseFormPartFactory.php
+
+		-
+			message: '#^Property App\\Forms\\BaseFormPartFactory\:\:\$form is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../Forms/BaseFormPartFactory.php
+
+		-
+			message: '#^Call to an undefined method Nette\\Application\\UI\\Form\:\:addTagInput\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../Forms/CategoryFormFactory.php
+
+		-
+			message: '#^PHPDoc tag @var with type SplFileInfo is not subtype of native type Nette\\Utils\\FileInfo\.$#'
+			identifier: varTag.nativeType
+			count: 1
+			path: ../Forms/SettingFormFactory.php
+
+		-
+			message: '#^Method Nette\\Application\\UI\\Control\:\:flashMessage\(\) invoked with 3 parameters, 1\-2 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: ../Forms/TagFormFactory.php
+
+		-
+			message: '#^Property App\\Forms\\TagFormFactory\:\:\$modelModules is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../Forms/TagFormFactory.php
+
+		-
+			message: '#^Property App\\FrontModule\\Components\\Articles\\Articles\:\:\$articles is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../FrontModule/Components/Articles/Articles.php
+
+		-
+			message: '#^Property App\\FrontModule\\Components\\Categories\\Categories\:\:\$categories is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../FrontModule/Components/Categories/Categories.php
+
+		-
+			message: '#^Property App\\FrontModule\\Components\\SearchControl\\SearchControl\:\:\$articles is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../FrontModule/Components/SearchControl/SearchControl.php
+
+		-
+			message: '#^Property App\\FrontModule\\Components\\SearchControl\\SearchControl\:\:\$language is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../FrontModule/Components/SearchControl/SearchControl.php
+
+		-
+			message: '#^Property App\\FrontModule\\Presenters\\ArticlesPresenter\:\:\$parent is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../FrontModule/Presenters/ArticlesPresenter.php
+
+		-
+			message: '#^Call to an undefined method Nette\\Security\\UserStorage\:\:setNamespace\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../FrontModule/Presenters/BasePresenter.php
+
+		-
+			message: '#^Parameter \#3 \$icon of method App\\Presenters\\BasePresenter\:\:addBreadCrumbLink\(\) expects null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../FrontModule/Presenters/BasePresenter.php
+
+		-
+			message: '#^Property App\\FrontModule\\Presenters\\BasePresenter\:\:\$themePath \(string\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: ../FrontModule/Presenters/BasePresenter.php
+
+		-
+			message: '#^Parameter \#2 \$itemId of method App\\Components\\ViewCounter\:\:itemViewed\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../FrontModule/Presenters/FilesPresenter.php
+
+		-
+			message: '#^Parameter \#3 \$icon of method App\\Presenters\\BasePresenter\:\:addBreadCrumbLink\(\) expects null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../FrontModule/Presenters/SearchPresenter.php
+
+		-
+			message: '#^Default value of the parameter \#3 \$data \(array\) of method App\\Model\\Articles\:\:insertRelationFile\(\) is incompatible with type Nette\\Utils\\ArrayHash\.$#'
+			identifier: parameter.defaultValue
+			count: 1
+			path: ../Model/Articles.php
+
+		-
+			message: '#^Method App\\Model\\Articles\:\:deleteRelationFile\(\) should return int but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: ../Model/Articles.php
+
+		-
+			message: '#^Method App\\Model\\Articles\:\:insertRelationFile\(\) should return int but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: ../Model/Articles.php
+
+		-
+			message: '#^Call to function is_null\(\) with int will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: ../Model/BaseSubMetas.php
+
+		-
+			message: '#^Default value of the parameter \#3 \$data \(array\) of method App\\Model\\Categories\:\:insertRelationFile\(\) is incompatible with type Nette\\Utils\\ArrayHash\.$#'
+			identifier: parameter.defaultValue
+			count: 1
+			path: ../Model/Categories.php
+
+		-
+			message: '#^Method App\\Model\\Categories\:\:insertRelationFile\(\) should return int but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: ../Model/Categories.php
+
+		-
+			message: '#^Method App\\Model\\Categories\:\:updateTranslation\(\) should return int but return statement is missing\.$#'
+			identifier: return.missing
+			count: 2
+			path: ../Model/Categories.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$id$#'
+			identifier: parameter.notFound
+			count: 1
+			path: ../Model/Categories.php
+
+		-
+			message: '#^Property App\\Model\\Metas\:\:\$languages is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../Model/Metas.php
+
+		-
+			message: '#^Negated boolean expression is always false\.$#'
+			identifier: booleanNot.alwaysFalse
+			count: 1
+			path: ../Model/UserManager.php
+
+		-
+			message: '#^Parameter \#2 \$roles of class Nette\\Security\\SimpleIdentity constructor expects list\<string\>\|string\|null, array\{App\\Security\\Role\} given\.$#'
+			identifier: argument.type
+			count: 2
+			path: ../Model/UserManager.php
+
+		-
+			message: '#^Access to private property \$parent of parent class Nette\\ComponentModel\\Component\.$#'
+			identifier: property.private
+			count: 1
+			path: ../Modules/CommentsModule/AdminModule/CommentsPresenter.php
+
+		-
+			message: '#^Call to an undefined method App\\Modules\\CommentsModule\\Comment\:\:getRevisionsCount\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../Modules/CommentsModule/AdminModule/CommentsPresenter.php
+
+		-
+			message: '#^Call to an undefined method App\\Modules\\CommentsModule\\Comment\:\:makeBackup\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: ../Modules/CommentsModule/AdminModule/CommentsPresenter.php
+
+		-
+			message: '#^Call to an undefined method App\\Modules\\CommentsModule\\Model\\Comments\:\:statusPublish\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../Modules/CommentsModule/AdminModule/CommentsPresenter.php
+
+		-
+			message: '#^Default value of the parameter \#2 \$status \(int\) of method App\\Modules\\CommentsModule\\AdminModule\\CommentsPresenter\:\:handleActivate\(\) is incompatible with type bool\.$#'
+			identifier: parameter.defaultValue
+			count: 1
+			path: ../Modules/CommentsModule/AdminModule/CommentsPresenter.php
+
+		-
+			message: '#^Cannot access property \$childs on array\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../Modules/CommentsModule/Comment.php
+
+		-
+			message: '#^Cannot access property \$id on array\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../Modules/CommentsModule/Comment.php
+
+		-
+			message: '#^Cannot access property \$left on array\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: ../Modules/CommentsModule/Comment.php
+
+		-
+			message: '#^Cannot access property \$right on array\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: ../Modules/CommentsModule/Comment.php
+
+		-
+			message: '#^If condition is always true\.$#'
+			identifier: if.alwaysTrue
+			count: 1
+			path: ../Modules/CommentsModule/Comment.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(\\Nette\\Utils\\ArrayHash\)\: Unexpected token "\\n\\t ", expected variable at offset 48 on line 3$#'
+			identifier: phpDoc.parseError
+			count: 2
+			path: ../Modules/CommentsModule/Comment.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: ../Modules/CommentsModule/Comment.php
+
+		-
+			message: '#^Method App\\Modules\\CommentsModule\\Components\\Comments\\Comments\:\:loadSubComments\(\) should return AlesWita\\Components\\VisualPaginator but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: ../Modules/CommentsModule/Components/Comments/Comments.php
+
+		-
+			message: '#^Property App\\Modules\\CommentsModule\\Components\\Comments\\Comments\:\:\$comments is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../Modules/CommentsModule/Components/Comments/Comments.php
+
+		-
+			message: '#^Variable \$columnId might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: ../Modules/CommentsModule/Components/Comments/Comments.php
+
+		-
+			message: '#^Variable \$form might not be defined\.$#'
+			identifier: variable.undefined
+			count: 2
+			path: ../Modules/CommentsModule/Components/Comments/Comments.php
+
+		-
+			message: '#^Method App\\Modules\\UrlModule\\UrlManager\:\:existUrlByTypeAndKey\(\) should return Nette\\Database\\Table\\ActiveRow\|false but returns true\.$#'
+			identifier: return.type
+			count: 1
+			path: ../Modules/UrlModule/UrlManager.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$categoryId$#'
+			identifier: parameter.notFound
+			count: 1
+			path: ../Modules/UrlModule/UrlManager.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$languageId$#'
+			identifier: parameter.notFound
+			count: 1
+			path: ../Modules/UrlModule/UrlManager.php
+
+		-
+			message: '#^Property App\\Modules\\UrlModule\\UrlManager\:\:\$urlTypeAndKey is unused\.$#'
+			identifier: property.unused
+			count: 1
+			path: ../Modules/UrlModule/UrlManager.php
+
+		-
+			message: '#^Access to an undefined property App\\Plugins\\DynamicForms\\AdminModule\\DynamicFormsPresenter\:\:\$categoriesModel\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../Plugins/DynamicForms/AdminModule/DynamicFormsPresenter.php
+
+		-
+			message: '#^Class Contributte\\Datagrid\\Datagrid referenced with incorrect case\: Contributte\\Datagrid\\DataGrid\.$#'
+			identifier: class.nameCase
+			count: 1
+			path: ../Plugins/DynamicForms/AdminModule/DynamicFormsPresenter.php
+
+		-
+			message: '#^PHPDoc tag @throws with type LiveTranslator\\TranslatorException\|Ublaboo\\DataGrid\\Exception\\DataGridColumnStatusException\|Ublaboo\\DataGrid\\Exception\\DataGridException is not subtype of Throwable$#'
+			identifier: throws.notThrowable
+			count: 1
+			path: ../Plugins/DynamicForms/AdminModule/DynamicFormsPresenter.php
+
+		-
+			message: '#^PHPDoc tag @throws with type LiveTranslator\\TranslatorException\|Ublaboo\\DataGrid\\Exception\\DataGridException is not subtype of Throwable$#'
+			identifier: throws.notThrowable
+			count: 1
+			path: ../Plugins/DynamicForms/AdminModule/DynamicFormsPresenter.php
+
+		-
+			message: '#^Property App\\Plugins\\DynamicForms\\AdminModule\\DynamicFormsPresenter\:\:\$language \(string\|null\) is never assigned string so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: ../Plugins/DynamicForms/AdminModule/DynamicFormsPresenter.php
+
+		-
+			message: '#^Property App\\Plugins\\DynamicForms\\AdminModule\\DynamicFormsPresenter\:\:\$parent is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../Plugins/DynamicForms/AdminModule/DynamicFormsPresenter.php
+
+		-
+			message: '#^Access to an undefined property Nette\\Application\\UI\\Presenter\:\:\$editLocale\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../Plugins/DynamicForms/Components/ContactFormComponentFactory.php
+
+		-
+			message: '#^Call to an undefined static method Nette\\Utils\\Callback\:\:invokeArgs\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: ../Plugins/DynamicForms/DI/Extension.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$controlNameFromTemplate$#'
+			identifier: parameter.notFound
+			count: 1
+			path: ../Plugins/DynamicForms/DI/Extension.php
+
+		-
+			message: '#^Parameter \#1 \$parent of method Nette\\ComponentModel\\Component\:\:setParent\(\) expects Nette\\ComponentModel\\IContainer\|null, Nette\\Application\\IPresenter\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../Plugins/DynamicForms/DI/Extension.php
+
+		-
+			message: '#^Call to an undefined method Nette\\Application\\UI\\Form\:\:addAntiSpam\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../Plugins/DynamicForms/Forms/ContactFormFactory.php
+
+		-
+			message: '#^Cannot access property \$editId on array\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../Plugins/DynamicForms/Forms/ContactFormFactory.php
+
+		-
+			message: '#^Cannot access property \$formName on array\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../Plugins/DynamicForms/Forms/ContactFormFactory.php
+
+		-
+			message: '#^Property App\\Plugins\\DynamicForms\\Forms\\ContactFormFactory\:\:\$commentService is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../Plugins/DynamicForms/Forms/ContactFormFactory.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: ../Plugins/DynamicForms/Forms/ContactFormFactory.php
+
+		-
+			message: '#^Access to an undefined property Nette\\Forms\\Control\:\:\$value\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../Plugins/DynamicForms/Forms/DynamicFormFormFactory.php
+
+		-
+			message: '#^Access to an undefined property Nette\\Application\\UI\\Presenter\:\:\$editLocale\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../Plugins/Sliders/Components/SliderComponentFactory.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: ../Plugins/Stalker/Stalker.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: ../Plugins/Statistics/Statistics.php
+
+		-
+			message: '#^Left side of && is always true\.$#'
+			identifier: booleanAnd.leftAlwaysTrue
+			count: 1
+			path: ../Presenters/BasePresenter.php
+
+		-
+			message: '#^PHPDoc tag @param for parameter \$link with type Nette\\Application\\UI\\Link is incompatible with native type string\|null\.$#'
+			identifier: parameter.phpDocType
+			count: 1
+			path: ../Presenters/BasePresenter.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(bool\)\: Unexpected token "\\n\\t \* ", expected variable at offset 166 on line 5$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../Presenters/BasePresenter.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(string\)\: Unexpected token "\\n\\t \* ", expected variable at offset 149 on line 4$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../Presenters/BasePresenter.php
+
+		-
+			message: '#^Parameter \#1 \$token of method League\\OAuth2\\Client\\Provider\\Facebook\:\:getResourceOwner\(\) expects League\\OAuth2\\Client\\Token\\AccessToken, League\\OAuth2\\Client\\Token\\AccessTokenInterface given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../Security/FacebookLogin.php
+
+		-
+			message: '#^Access to an undefined property Nette\\Security\\IIdentity\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../Security/Role.php
+
+		-
+			message: '#^Call to an undefined method App\\Model\\Categories\:\:getAllInLanguage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../Service/Category.php
+
+		-
+			message: '#^Method App\\Service\\Meta\:\:getModelByType\(\) should return App\\Model\\BaseSubMetas but returns App\\Model\\Files\.$#'
+			identifier: return.type
+			count: 1
+			path: ../Service/Meta.php

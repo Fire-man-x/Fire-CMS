@@ -1,0 +1,23 @@
+{block content}
+
+<div class="container">
+	<div class="mt-5 col-xs-8 offset-xs-2 col-lg-4 offset-lg-4">
+		<h1 n:block=title>{_"Sign in"}</h1>
+		{* OR
+		{import '../Components/form.latte'}
+		{include form signInForm}
+		*}
+		{control signInForm}
+
+		{*<div class="clearfix"></div>
+		<p><a n:href="up">{_"Don't have an account yet? Sign up."}</a></p>
+		*}
+
+		<div id="other-login" class="login">
+			<h2>{_"Other sign in"}</h2>
+			<a href="{plink :Admin:Sign:facebook}" class="btn btn-primary mb-5"><span class="fa fa-facebook-official"></span> {_'Sign in with Facebook'}</a><br><br>
+		</div>
+	</div>
+</div>
+
+

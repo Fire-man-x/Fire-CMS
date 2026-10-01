@@ -1,0 +1,130 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Forms;
+
+use App\Model;
+use App\Service\LanguageService;
+use Nette\Application\UI\Form;
+use Nette\Localization\Translator;
+use Nette\Utils\ArrayHash;
+
+
+class MetaFormFactory extends BaseFormFactory
+{
+	public static string $allLanguages = "All languages";
+
+	private Translator $translator;
+
+	private Model\Database\Metas $model;
+
+	private LanguageService $languages;
+
+	/**
+	 * Types
+	 */
+	public static array $types = array(
+		'article' => 'Article',
+		'category' => 'Category',
+		'file' => 'File'
+	);
+
+
+	public function __construct(Translator $translator, LanguageService $languages, Model\Database\Metas $model)
+	{
+		parent::__construct();
+		$this->translator = $translator;
+		$this->languages = $languages;
+		$this->model = $model;
+	}
+
+
+	public function create(int|string $editId = null): Form
+	{
+		$form = parent::create($editId);
+
+		$form->addSelect('languageId', $this->translator->translate('Language'), $this->languages->getLanguages())
+			->setTranslator(null)
+			->setPrompt($this->translator->translate(self::$allLanguages));
+
+		$form->addSelect('type', 'Type', self::$types)
+			->setRequired(VALIDATE_REQUIRED);
+
+		$keyControl =$form->addText('key', 'Key')
+			->setRequired(VALIDATE_REQUIRED);
+		$keyControl->addRule(Form::PATTERN, '\'%label\' can contains only this chars "a-z" or "_".', '[a-z_]+');
+
+		$form->addText('value', 'Default value');
+
+		$form->addSubmit('send', 'Save');
+
+		$form->onValidate[] = array($this, 'formValidate');
+		$form->onSuccess[] = array($this, 'formSucceeded');
+		return $form;
+	}
+
+
+	public function formValidate(Form $form, ArrayHash $values)
+	{
+		$query = $this->model->findAll()
+			->where("type", $values->type)
+			->where("key", $values->key);
+
+		if ($this->isEditMode()) {
+			$query->where($this->model->getColumnId()." != ?", $this->getEditId());
+		}
+
+		$exist = $query->fetchAll();
+
+		if ($exist) {
+			if (!$values->languageId) {
+				//every item must be without language
+				//- can be only once
+				$error = true;
+			} else {
+				//every item must be with language
+				$error = false;
+				foreach ($exist as $item) {
+					if ($item->languageId == null) {
+						//cannot be twice
+						$error = true;
+					} elseif ($item->languageId == $values->languageId) {
+						//already exist
+						$error = true;
+					}
+				}
+			}
+
+			if ($error) {
+				$form->addError(FAIL_SAVE);
+				$form->getPresenter()->flashMessage(FAIL_SAVE, FLASH_FAILED);
+			}
+		}
+	}
+
+
+	public function formSucceeded($form, $values)
+	{
+		unset($values->editId);
+
+		if ($this->isEditMode()) {
+			$this->model->update($this->getEditId(), (array) $values);
+		} else {
+			$this->model->insert($values);
+		}
+	}
+
+
+	/**
+	 * Set default values to modal form
+	 */
+	public function setDefaultValues(Form $form, int $editId)
+	{
+		parent::setDefaultValues($form, $editId);
+
+		$defaults = $this->model->getById($editId);
+
+		$form->setDefaults($defaults);
+	}
+
+}

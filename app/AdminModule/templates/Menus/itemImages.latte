@@ -1,0 +1,11 @@
+{* Sloupec "Obrázky" v gridu položek menu (MenusPresenter::createComponentMenuItemsGrid). $item = řádek gridu. *}
+<div class="menu-item-images d-flex flex-wrap gap-1 align-items-center" data-sort-url="{plink sortItemImages! itemId=>$item['id']}">
+	<span n:foreach="$item['files'] as $file" class="img-thumbnail d-inline-block {if $iterator->first}selected{/if}" data-file-id="{$file->getId()}" title="{$file->getName()}">
+		<img n:src="$file, '40x40'" alt="{$file->getName()}">
+		<a href="{plink removeItemImage! itemId=>$item['id'], fileId=>$file->getId()}" class="ajax small text-danger" title="{_'Delete'}"><i class="fa fa-times"></i></a>
+	</span>
+	<a href="#" class="btn btn-outline-dark btn-sm" title="{_'Add'}"
+		data-bs-toggle="modal" data-bs-target="#filesModal" data-target="#filesModal"
+		data-src="{plink :Admin:FilesManager:default isWindowMode=>true}"
+		data-selected-files-url="{plink addItemImages! itemId=>$item['id']}"><i class="fa fa-image"></i></a>
+</div>

@@ -1,0 +1,59 @@
+{**
+ * This file is part of the Nextras community extensions of Nette Framework
+ *
+ * @license    MIT
+ * @link       https://github.com/nextras
+ *}
+<div class="grid" data-grid-name="{$control->getUniqueId()}">
+{snippet rows}
+
+{foreach $cellsTemplates as $cellsTemplate}
+	{import $cellsTemplate}
+{/foreach}
+
+{form form, class => 'ajax'}
+
+{*
+	$hasActionsColumn se počítá až po {import} – blok #row-actions může být
+	definovaný v některé z cells šablon (proto hasBlock). Obě hodnoty se pak
+	předávají explicitně do bloků, které je potřebují (#row-head-columns, #row).
+*}
+{var $hasActionsColumn = (bool) $control->getEditFormFactory() || hasBlock('row-actions')}
+{var $hasGlobalActionsColumn = isset($form['actions'])}
+
+{include #table-open-tag}
+	{include #table-thead-open-tag}
+		{include #row-head-columns hasActionsColumn => $hasActionsColumn}
+		{ifset $form['filter']}
+			{include #row-head-filter}
+		{/ifset}
+	{include #table-thead-close-tag}
+	{include #table-tbody-open-tag}
+		{if count($data)}
+			{foreach $data as $row}
+				{var $primary = $control->getter($row, $rowPrimaryKey)}
+				{var $rowId = $control->getSnippetId("rows-$primary")}
+				{include #row row => $row, rowId => $rowId, hasActionsColumn => $hasActionsColumn}
+			{/foreach}
+		{else}
+			{ifset #empty-result}{include #empty-result}{/ifset}
+		{/if}
+	{include #table-tbody-close-tag}
+	<tfoot n:if="isset($paginator) || $hasGlobalActionsColumn">
+		<tr>
+			<th colspan="{=count($columns) + $hasGlobalActionsColumn + $hasActionsColumn}">
+				{if $hasGlobalActionsColumn}
+					{include #global-actions}
+				{/if}
+				{ifset $paginator}
+					{include #pagination}
+				{/ifset}
+			</th>
+		</tr>
+	</tfoot>
+{include #table-close-tag}
+
+{/form}
+
+{/snippet}
+</div>

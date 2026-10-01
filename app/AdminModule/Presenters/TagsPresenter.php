@@ -1,0 +1,215 @@
+<?php
+declare(strict_types=1);
+
+namespace App\AdminModule\Presenters;
+
+use App\AdminModule\Forms\TagFormFactory;
+use App\Attributes\Privilege;
+use App\Attributes\Resource;
+use App\Attributes\Secured;
+use App\Model\Database\Tags;
+use Contributte\Datagrid\Column\ColumnText;
+use Contributte\Datagrid\Datagrid;
+use Nette;
+use Nette\Application\Attributes\Persistent;
+
+/**
+ * Tags presenter.
+ */
+#[Secured]
+#[Resource('Tags')]
+#[Privilege('view')]
+class TagsPresenter extends BasePresenter
+{
+
+	/**
+	 * Language from url
+	 */
+	#[Persistent]
+	public bool $onlyLocale = false;
+
+	/** @inject */
+	public TagFormFactory $factory;
+
+	/** @inject */
+	public Tags $model;
+
+	public function startup(): void
+	{
+		parent::startup();
+
+		$this->addBreadCrumbLink("Tags", $this->link(":Admin:Tags:default", array("id"=>null)));
+
+		//default language
+		/*if($this->language == $this->languages->getDefaultLanguage()) {
+			$this->redirect("this", array("language" => null));
+		}*/
+	}
+
+
+	#[Secured]
+	#[Resource('Tags')]
+	#[Privilege('view')]
+	public function actionDefault(): void
+	{
+		$this->template->onlyLocale = $this->onlyLocale;
+	}
+
+
+	/**
+	 * Tags grid
+	 */
+	protected function createComponentTagsGrid(string $name): Datagrid
+	{
+		$source = $this->model->findAll()
+			->select($this->model->getTableName().".*")
+			->order("title");
+		if ($this->onlyLocale) {
+			$source->select(":" . $this->model->getTranslationTable()->getName() . ".name AS title");
+			$source->where(":" . $this->model->getTranslationTable()->getName() . ".languageId", $this->editLocale);
+		} else {
+			//záložka "všechny jazyky" - název ve výchozím jazyce webu, počet překladů poddotazem (bez GROUP BY)
+			$this->model->selectTitle($source, "`" . $this->model->getTableName() . "`.`id`");
+			$source->select("(SELECT COUNT(*) FROM `" . Tags::TRANSLATION_TABLE_NAME . "` `translation`"
+				. " WHERE `translation`.`" . $this->model->getForeignKeyColumn() . "` = `" . $this->model->getTableName() . "`.`id`) AS `language_count`");
+		}
+
+		$primaryKey = $this->model->getColumnId();
+		$paramKey = $this->model->getForeignKeyColumn();
+
+		$grid = new Datagrid($this, $name);
+		$grid->setPrimaryKey($primaryKey);
+		$grid->setDataSource($source);
+		$grid->setTranslator($this->translator);
+		$grid->setRememberState(false);
+
+		$grid->addColumnText("title", "Tag")
+			->setSortable();
+			//->setFilterText('title');
+
+		if(count($this->languages->getLanguages()) > 1 && $this->onlyLocale == false){
+			$grid->addColumnText('language_count', 'Translation status')
+				//->setClass('btn btn-outline-primary btn-sm')
+				//->setIcon('ban') //default ban icon
+				//->setTitle($this->translator->translate('Set as default'))
+				->getElementPrototype("th")->setTitle($this->translator->translate("Default"));
+			//override default value
+			$grid->addColumnCallback("language_count", function(ColumnText $column, $data){
+				if ($data->language_count < count($this->languages->getLanguages())) {
+					$column->setRenderer(function() {
+						return '<span class="btn btn-outline-warning btn-sm" title="'.$this->translator->translate('Not translated in all languages').'"><i class="fas fa-exclamation-triangle"></i></span>';
+					});
+					$column->setTemplateEscaping(false);
+				}
+				else
+				{
+					$column->setRenderer(function() {
+						return '<span class="btn btn-outline-success btn-sm" title="'.$this->translator->translate('Ok').'"><i class="fa fa-check-circle"></i></span>';
+					});
+					$column->setTemplateEscaping(false);
+				}
+			});
+			/*$active_column = $grid->addColumnText('language_count', 'Translation status');
+
+			//$active_column = $grid->addColumnStatus('language_count', 'Translation status');
+			$active_column->getElementPrototype("th")->setTitle($this->translator->translate("Translation status"));
+			$index = 1;
+			while ($index < count($this->languages->getLanguages())) {
+				//'Not translated in all languages (only %value '.$index.')'
+				/*$active_column->addOption($index, 'Not translated in all languages') // show if status == 0
+				->setClass('btn-warning')
+					->setIcon('warning');
+				* /
+
+				$index++;
+			}*/
+		}
+
+		//Actions
+		$grid->addAction('edit', 'Edit', 'edit!', array($paramKey => $primaryKey))
+			->setClass('btn btn-primary btn-sm ajax')
+			->setIcon(ICON_EDIT)
+			->setTitle('Edit')
+			->addAttributes(array(
+				"data-bs-toggle" => "modal",
+				"data-bs-target" => "#modal"
+			));
+
+		$grid->addAction('delete', 'Delete', 'delete!', array($paramKey => $primaryKey))
+			->setClass('btn btn-danger btn-sm ajax')
+			->setIcon(ICON_DELETE)
+			->setTitle('Delete')
+			->addAttributes(array(
+				'data-bs-toggle' => 'modal',
+				"data-bs-target" => "#confirm-modal",
+				"data-confirm-text" => $this->translator->translate('Delete?'),
+			));
+
+		/*$actions->onRender[] = function ($rowData, \Mesour\Datagrid\Column\Actions $actionColumns) {
+			$actions = $actionColumns->getActions();
+			/* @var $permissionButton \Mesour\Datagrid\Components\Button * /
+			$permissionButton = $actions[1];
+			/* @var $deleteButton \Mesour\Datagrid\Components\Button * /
+			$deleteButton = $actions[2];
+			if($rowData["default"]){
+				$permissionButton->setDisabled();
+				$deleteButton->setDisabled();
+			}  else {
+				$permissionButton->setDisabled(false);
+				$deleteButton->setDisabled(false);
+			}
+		};*/
+
+		return $grid;
+	}
+
+
+	/**
+	 * Add user form
+	 */
+	protected function createComponentTagForm(): Nette\Application\UI\Form
+	{
+		$this->factory->asModal();
+		$form = $this->factory->create();
+		$form->setTranslator($this->translator);
+		$form->onSuccess[] = function ($form) {
+			$form->getPresenter()->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
+			$form->getPresenter()->redirect('this');
+		};
+
+		return $form;
+	}
+
+
+	/**
+	 * Add handler
+	 */
+	public function handleAdd(): void
+	{
+		$this->factory->resetEditMode();
+		$this->redrawControl("tagForm");
+	}
+
+
+	/**
+	 * Edit handler
+	 */
+	public function handleEdit(int $tagId): void
+	{
+		$this->factory->setEditId($tagId);
+		$this->factory->setDefaultValues($this["tagForm"], $tagId);
+		$this->redrawControl("tagForm");
+	}
+
+
+	/**
+	 * Delete handler
+	 */
+	public function handleDelete(int $tagId): void
+	{
+		$this->model->delete($tagId);
+		$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
+		$this->redirect('this');
+	}
+
+}

@@ -1,0 +1,16 @@
+services:
+    postgres:
+        image: docker.io/library/postgres:latest # Doporučená stabilní a lehká verze 16 (případně změňte na 'latest')
+        container_name: postgres_db
+        restart: unless-stopped
+        ports:
+            - "5432:5432" # Standardní port PostgreSQL
+        environment:
+            POSTGRES_USER: muj_uzivatel        # Přihlašovací jméno administrátora databáze
+            POSTGRES_PASSWORD: tajne_heslo_db   # Bezpečné heslo
+            POSTGRES_DB: moje_databaze          # Název výchozí databáze, která se vytvoří při startu
+        volumes:
+            - postgres_data:/var/lib/postgresql # Trvalé úložiště pro databázová data
+
+volumes:
+    postgres_data:

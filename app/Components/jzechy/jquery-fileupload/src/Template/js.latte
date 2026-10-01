@@ -1,0 +1,166 @@
+<script>
+	docReady(function () {
+		// -----------------------------------------------------------------------
+		// Control sys variables
+		// -----------------------------------------------------------------------
+		/**
+		 * Adresa pro zpracování nahrávání souborů.
+		 * @type string
+		 */
+		var uploadUrl = {$uploadUrl|escapeJs|noescape};
+
+		/**
+		 * HTML ID elementu.
+		 * @type string
+		 */
+		var input = {$inputId|escapeJs|noescape};
+
+		/**
+		 * Jedná se o vývojovou verzi?
+		 * @type boolean
+		 */
+		var productionMode = {$productionMode|escapeJs|noescape};
+
+		/**
+		 * Identifikační token.
+		 * @type string
+		 */
+		var token = {$token|escapeJs|noescape};
+
+		/**
+		 * Maximální počet souborů.
+		 * @type number
+		 */
+		var maxFiles = {$maxFiles|escapeJs|noescape};
+
+		/**
+		 * Maximální velikosti souboru.
+		 * @type number
+		 */
+		var maxFileSize = {$maxFileSize|escapeJs|noescape};
+
+		/**
+		 * Velikost souboru vyjádřena stylem např. 3MB.
+		 * @type String
+		 */
+		var fileSizeString = {$fileSizeString|escapeJs|noescape};
+
+		/**
+		 * Pole vlastních parametrů.
+		 */
+		var params = {$params|escapeJs|noescape};
+
+		/**
+		 * Seznam nadefinovaných komponent.
+		 */
+		var components = {$components|escapeJs|noescape};
+
+		/**
+		 * Odkaz pro smazání souboru.
+		 */
+		var removeLink = {$removeLink|escapeJs|noescape};
+
+		/**
+		 * Seznam výchozích souborů.
+		 */
+		var defaultFiles = {$defaultFiles|escapeJs|noescape};
+
+		/**
+		 * Konfigurace controlleru.
+		 * @type Object
+		 */
+		var controllerConfig = {
+			maxFiles: maxFiles,
+			maxFileSize: maxFileSize,
+			fileSizeString: fileSizeString,
+			productionMode: productionMode
+		};
+
+		/**
+		 * Zprávy pro chybová hlášení.
+		 */
+		var messages = {$messages|escapeJs|noescape};
+
+		/**
+		 * JS Renderer.
+		 * @type Renderer
+		 */
+		var renderer = new Renderer(token, components, input, removeLink);
+
+		/**
+		 * Třída pro práci s fileuploaderem.
+		 * @type FileUploadController
+		 */
+		var controller = new FileUploadController(input, token, renderer, controllerConfig, messages);
+
+		{syntax off}
+		$("#" + input).click(function (event) {
+			if (!controller.canUploadNextFile()) {
+				event.preventDefault();
+				alert(controller.getMessages().maxFiles.replace("{maxFiles}", controllerConfig.maxFiles));
+			}
+		});
+		{/syntax}
+
+		// -----------------------------------------------------------------------
+		// FileUpload definition
+		// -----------------------------------------------------------------------
+		$("#" + input).fileupload({
+			"url": uploadUrl,
+			"dataType": "json",
+			{foreach $settings as $name => $value}
+			{$name}: {$value|escapeJs|noescape},
+			{/foreach}
+
+			// Přidání nového souboru.
+			add: function (e, data) {
+				if (controller.add(data.files)) {
+					data.submit();
+				}
+			},
+
+			// Odesílání dat
+			submit: function (e, data) {
+				data.formData = [{
+					name: "id",
+					value: controller.getFileId()
+				}, {
+					name: "token",
+					value: token
+				}, {
+					name: "params",
+					value: params
+				}];
+			},
+
+			// Kompletní fronta nahrávání
+			progressall: function (e, data) {
+				controller.updateProgressAll(data);
+			},
+
+			// Progress jednoho souboru.
+			progress: function (e, data) {
+				controller.updateFileProgress(data);
+			},
+
+			// Start uploadu
+			start: function (e, data) {
+				controller.start();
+			},
+
+			// Po dokončení jednotlivých uploadů.
+			done: function (e, data) {
+				controller.done(data);
+			}
+		});
+
+		controller.addDefaultFiles(defaultFiles);
+	});
+</script>
+
+<script type="upload/file-container" class="upload-template-file-container" for="{$inputId|noescape}">
+	{$fileContainerTemplate|noescape}
+</script>
+<script type="upload/file-error" class="upload-template-file-error" for="{$inputId|noescape}">
+	{$fileErrorTemplate|noescape}
+</script>

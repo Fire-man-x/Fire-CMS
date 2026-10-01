@@ -1,0 +1,79 @@
+{
+	"name": "fire/cms",
+	"description": "Fire CMS system",
+	"type": "project",
+    "not used": "jzechy/jquery-fileupload\": \"*\",\"jzechy/nette-antispam\": \"*\"",
+	"require": {
+		"php": "~8.3",
+		"nette/nette": "^3.2",
+        "ublaboo/datagrid": "7.2.*",
+        "kdyby/forms-replicator": "*",
+
+        "guzzlehttp/guzzle": "*",
+
+        "contributte/oauth2-client": "*",
+        "league/oauth2-facebook": "^2.0",
+        "jwage/easy-csv": "*",
+		"nextras/migrations": "^3.5",
+		"contributte/console": "^0.11.0",
+		"vladahejda/livetranslator": "^3.0",
+		"dragonmantank/cron-expression": "^3.4",
+		"league/flysystem": "^3",
+		"league/flysystem-aws-s3-v3": "^3",
+		"contributte/sentry": "^0.5"
+    },
+	"require-dev": {
+		"nette/tester": "*",
+        "phpstan/phpstan-nette": "*",
+        "nextras/mail-panel": "*",
+		"league/flysystem-memory": "^3"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/Fire-man-x/LiveTranslator"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "App\\Plugins\\": ["app/Plugins", "theme/Plugins"],
+            "App\\": "app",
+            "Theme\\": "theme",
+			"Nextras\\Datagrid\\": "./libs/nextras/datagrid/src",
+			"Contributte\\FileUpload\\": "./libs/jzechy/jquery-fileupload/src"
+		},
+        "classmap": [
+        ],
+        "files": [
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests"
+        }
+    },
+	"scripts": {
+		"pre-autoload-dump": "Aws\\Script\\Composer\\Composer::removeUnusedServices",
+		"console": "@php bin/console",
+		"test": "@php \"vendor/bin/tester\" tests -C -s",
+		"stan": "@php \"vendor/bin/phpstan\" analyse --configuration \"app/config/phpstan.neon\" -vvv --ansi",
+		"stan-generate-baseline": "@php \"vendor/bin/phpstan\" analyse --configuration \"app/config/phpstan.neon\" --generate-baseline \"app/config/phpstan-baseline.neon\" -vvv --ansi",
+		"stan-report": "@php \"vendor/bin/phpstan\" analyse --configuration \"app/config/phpstan.neon\" --error-format=table > \"log/phpstan-report.txt\" 2>&1",
+		"stan-report-json": "@php \"vendor/bin/phpstan\" analyse --configuration \"app/config/phpstan.neon\" --error-format=json --no-progress > \"log/phpstan-report.json\"",
+		"stan9": "@composer stan -- --level 9",
+		"stan10": "@composer stan -- --level 10"
+    },
+	"scripts-descriptions": {
+		"console": "Runs a PHP application console command. Usage: \"composer console -- --help\"",
+		"test": "Runs Nette Tester over the tests/ directory. Usage: \"composer test\" or \"composer test -- tests/Modules/UrlModule\"",
+		"stan": "Runs PHPStan for static code analysis. Usage: \"composer stan {path to file or folder}\"",
+		"stan-generate-baseline": "Runs PHPStan and generate baseline.",
+		"stan-report": "Runs PHPStan and saves table output to log/phpstan-report.txt.",
+		"stan-report-json": "Runs PHPStan and saves JSON output to log/phpstan-report.json.",
+		"stan9": "Runs PHPStan at level 9. Usage: \"composer stan9 {path to file or folder}\"",
+		"stan10": "Runs PHPStan at level 10. Usage: \"composer stan10 {path to file or folder}\""
+    },
+	"extra": {
+		"aws/aws-sdk-php": ["S3", "Sts"]
+	}
+}

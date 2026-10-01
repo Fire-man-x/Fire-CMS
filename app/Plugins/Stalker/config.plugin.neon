@@ -1,0 +1,14 @@
+migrations:
+	groups:
+		stalker:
+			enabled: true
+			directory: %appDir%/Plugins/Stalker/data/migrations
+			dependencies: [structures]
+			generator: null
+
+services:
+	#Admin
+	- App\Plugins\Stalker\Model\Stalkers
+	stalker:
+		factory: App\Plugins\Stalker\Stalker
+		tags: [presenter.plugin: stalker]

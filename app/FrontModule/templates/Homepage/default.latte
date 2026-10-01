@@ -1,0 +1,110 @@
+{varType array $articles}
+{varType array $sections}
+{varType int|null $contactPageId}
+{varType array $options}
+
+{* úvodní stránka je přes celou šířku - bez bočního panelu a drobečkové navigace (viz @layout.latte) *}
+{var $showSidebar = false}
+{var $showBreadcrumb = false}
+
+{block h1}
+	{$options['main_title']}
+{/block}
+
+{block content}
+
+	{control pluginSlider main_menu}
+
+	{var $featured = $articles[0] ?? null}
+	<section n:if="$featured" class="home-section">
+		<div class="home-section-head">
+			<h2 class="home-section-title">{_"Latest articles"}</h2>
+		</div>
+
+		{* nejnovější článek zvýrazněný *}
+		<article class="card home-card home-featured mb-4">
+			<div class="row g-0">
+				<div class="col-md-6">
+					<div class="home-card-media h-100">
+						<img n:if="$featured['image']" n:src="$featured['image'], '800x450'" alt="{$featured['image']->getName()}">
+						<div n:if="!$featured['image']" class="home-card-placeholder"><i class="fa fa-newspaper" aria-hidden="true"></i></div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="card-body p-4 p-lg-5 d-flex flex-column h-100">
+						<p class="home-card-meta">
+							<span n:if="$featured['categoryTitle']" class="badge text-bg-dark">{$featured['categoryTitle']}</span>
+							<time n:if="$featured['date']" datetime="{$featured['date']|date:'Y-m-d'}">{$featured['date']|date:'j. n. Y'}</time>
+						</p>
+						<h3 class="home-featured-title">
+							<a n:href="Articles:detail id=>$featured['id']" class="stretched-link">{$featured['title']}</a>
+						</h3>
+						<p class="home-card-excerpt">{$featured['excerpt']}</p>
+						<span class="home-card-more mt-auto">{_"Read more"} <i class="fa fa-arrow-right" aria-hidden="true"></i></span>
+					</div>
+				</div>
+			</div>
+		</article>
+
+		{* další články v mřížce *}
+		<div n:if="count($articles) > 1" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+			<div n:foreach="array_slice($articles, 1) as $article" class="col">
+				<article class="card home-card h-100">
+					<div class="home-card-media ratio ratio-16x9">
+						<img n:if="$article['image']" n:src="$article['image'], '800x450'" alt="{$article['image']->getName()}">
+						<div n:if="!$article['image']" class="home-card-placeholder"><i class="fa fa-newspaper" aria-hidden="true"></i></div>
+					</div>
+					<div class="card-body d-flex flex-column">
+						<p class="home-card-meta">
+							<span n:if="$article['categoryTitle']" class="badge text-bg-light border">{$article['categoryTitle']}</span>
+							<time n:if="$article['date']" datetime="{$article['date']|date:'Y-m-d'}">{$article['date']|date:'j. n. Y'}</time>
+						</p>
+						<h3 class="home-card-title">
+							<a n:href="Articles:detail id=>$article['id']" class="stretched-link">{$article['title']}</a>
+						</h3>
+						<p class="home-card-excerpt">{$article['excerpt']}</p>
+						<span class="home-card-more mt-auto">{_"Read more"} <i class="fa fa-arrow-right" aria-hidden="true"></i></span>
+					</div>
+				</article>
+			</div>
+		</div>
+	</section>
+
+	<section n:if="$sections" class="home-section">
+		<div class="home-section-head">
+			<h2 class="home-section-title">{_"Sections"}</h2>
+		</div>
+
+		<div class="row row-cols-1 row-cols-md-2 g-4">
+			<div n:foreach="$sections as $section" class="col">
+				<div class="card home-card home-section-card h-100">
+					<div class="card-body p-4 d-flex flex-column">
+						<h3 class="home-card-title">
+							<a n:href="Sections:detail id=>$section['id']">{$section['title']}</a>
+						</h3>
+						<p n:if="$section['description']" class="home-card-excerpt">{$section['description']}</p>
+						<ul n:if="$section['categories']" class="list-inline home-section-categories">
+							<li n:foreach="$section['categories'] as $category" class="list-inline-item">
+								<a n:href="Categories:detail id=>$category['id']" class="badge rounded-pill text-bg-light border">{$category['title']}</a>
+							</li>
+						</ul>
+						<a n:href="Sections:detail id=>$section['id']" class="btn btn-outline-dark btn-sm align-self-start mt-auto">
+							{_"Show all"} <span class="badge text-bg-dark ms-1">{$section['articleCount']}</span>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section n:if="$contactPageId || $options['main_email']" class="home-cta">
+		<div>
+			<h2 class="home-cta-title">{_"Have a question?"}</h2>
+			<p class="mb-0">{_"Write to us and we will get back to you."}</p>
+		</div>
+		<div class="home-cta-actions">
+			<a n:if="$contactPageId" n:href="Pages:detail id=>$contactPageId" class="btn btn-light btn-lg"><i class="fa fa-map-marker-alt" aria-hidden="true"></i> {_"Contact us"}</a>
+			<a n:if="$options['main_email']" href="mailto:{$options['main_email']}" n:class="btn, btn-lg, $contactPageId ? btn-outline-light : btn-light"><i class="fa fa-envelope" aria-hidden="true"></i> {$options['main_email']}</a>
+		</div>
+	</section>
+{/block}

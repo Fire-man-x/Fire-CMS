@@ -1,0 +1,36 @@
+{block h1}
+	{$article->title}
+{/block}
+
+{block content}
+
+	<!-- Post Content -->
+	<article>
+		<div class="post-subtitle">
+			<div class="d-flex">
+				<div n:if="$article->mainFile" class="flex-shrink-0 me-3">
+					<a n:image="$article->mainFile">
+						<img n:src="$article->mainFile, '200x200'" alt="{$article->mainFile->getName()}">
+					</a>
+				</div>
+				<div class="flex-grow-1 text-justify">
+					{$article->excerpt|shortcodes|noescape}
+				</div>
+			</div>
+
+			{* Metas *}
+			{include '../../Components/Metas.latte' metas=>$article->metas}
+
+			{* Tags *}
+			{include '../../Components/Tags.latte' tags=>$article->tags}
+			<hr />
+		</div>
+
+		<div class="content text-justify">
+			{$article->content|shortcodes|noescape}
+		</div>
+
+		<p class="post-meta">{_"Posted by <a href='%s'>%s</a> on %s", "#",$article->author['author'], $article->publishingDate->format(\DATETIME_FORMAT) |noescape} {_'viewed'} {$article->viewCount}</p>
+	</article>
+
+	{control comments}

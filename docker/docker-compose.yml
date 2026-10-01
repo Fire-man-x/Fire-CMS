@@ -1,0 +1,19 @@
+services:
+    garage:
+        image: docker.io/dxflrs/garage:v2.4.1 # Doporučuje se specifikovat konkrétní stabilní verzi (např. v1.0.0)
+        container_name: garage_s3
+        restart: unless-stopped
+        ports:
+            - "3900:3900" # S3 API port
+            - "3901:3901" # RPC port pro propojení uzlů
+            - "3902:3902" # S3 Web port (pro statické weby)
+        volumes:
+            - ./garage.toml:/etc/garage.toml:ro  # Načtení konfigurace (pouze pro čtení)
+            #- garage_meta:/var/lib/garage/meta
+            #- garage_data:/var/lib/garage/data
+            - ./garage/meta:/var/lib/garage/meta    # Úložiště pro metadata (rychlý disk / SSD)
+            - ./garage/data:/var/lib/garage/data    # Úložiště pro samotná data (HDD / SSD)
+
+#volumes:
+#    garage_meta:
+#    garage_data:

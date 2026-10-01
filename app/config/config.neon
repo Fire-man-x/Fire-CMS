@@ -1,0 +1,349 @@
+#
+# WARNING: it is CRITICAL that this file & directory are NOT accessible directly via a web browser!
+# https://nette.org/security-warning
+#
+parameters:
+	themePath: "%rootDir%/www/theme"
+	# ukázková data (data/migrations/dummy-data) - zapnout jen lokálně v config.local.neon (`dummyData: true`),
+	# bin/console běží v produkčním režimu, takže %debugMode% tu nepomůže
+	dummyData: false
+	# token pro cron endpoint /cron (App\Presenters\CronPresenter) - nastavte v config.local.neon, prázdný = vypnuto
+	cronToken: ''
+	# login with Facebook (App\Security\FacebookLogin) - clientId and clientSecret  setup in config.local.neon
+	facebook:
+		clientId: ''
+		clientSecret: ''
+		graphApiVersion: v25.0
+	# login to Sentry - keys setup in config.local.neon
+	sentry:
+		key1: ''
+		key2: ''
+		key3: ''
+
+application:
+	errorPresenter: Error
+	mapping:
+		*: App\*Module\Presenters\*Presenter
+	debugger: true
+
+session:
+	expiration: 14 days
+	savePath: "%tempDir%/sessions"
+
+# Sessions mimo soubory (App\Session\DI\SessionHandlerExtension) - nastavuje se v theme.neon projektu, bez nastavení
+# zůstává výchozí PHP handler (soubory v savePath výše). Podrobnosti viz docs/Architecture/sessions.md.
+#sessionHandler:
+#	driver: mysql                  # mysql | postgresql | redis
+#	connection: @database.default  # připojení ze sekce database:, bez vyplnění hlavní připojení
+
+tracy:
+	bar:
+		- LiveTranslator\Panel\Panel
+
+search:
+	# Presentery v theme/ - přepisy presenterů z app/ (viz App\Application\PresenterFactory::themeOverride()).
+	# Musí být služby, jinak je PresenterFactoryCallback nenajde ("No services of type ..."). theme/Plugins je
+	# vynechané záměrně - presentery theme pluginů registruje search: blok v config.plugin.neon daného pluginu,
+	# jen když je plugin zapnutý (u vypnutého by chyběly jeho služby a kompilace kontejneru by spadla).
+	themePresenters:
+		in: %rootDir%/theme
+		implements: Nette\Application\IPresenter
+		files:
+			- *Presenter.php
+		exclude:
+			files:
+				- Plugins
+		tags:
+			- nette.inject
+
+	# Routery
+	router:
+		in: %appDir%/Router
+		implements: App\Router\RouterProvider
+
+	# Příkazový řádek
+	command:
+		in: %appDir%/Model/Console
+		extends: Symfony\Component\Console\Command\Command
+		classes:
+			- *Command
+		files:
+			- *Command.php
+
+
+extensions:
+	router: App\Router\DI\RouterProviderExtension
+	#uploadManager: ondrs\UploadManager\DI\Extension
+	fileUpload: Contributte\FileUpload\FileUploadExtension
+	fileManager: App\Components\FileManager\DI\Extension
+
+	#Input
+	tagInput: Achse\TagInput\Extension
+	dateInput: Vodacek\Forms\Controls\Extension
+	visualpaginator: AlesWita\Components\VisualPaginatorExtension
+	antispam: Zet\AntiSpam\AntiSpamExtension
+
+	#replicator
+	replicator: Kdyby\Replicator\DI\ReplicatorExtension
+
+	console: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
+	migrations: Nextras\Migrations\Bridges\NetteDI\MigrationsExtension
+
+	# úložiště sessions (MySQL/PostgreSQL/Redis), volí se v theme.neon projektu - viz výše u session:
+	sessionHandler: App\Session\DI\SessionHandlerExtension
+	sentry: Contributte\Sentry\DI\SentryExtension
+
+# Pořadí načítání rout (vyšší priorita = dřív = vyšší přednost).
+# Routery pluginů mají bez nastavení prioritu 0, ostatní -100.
+router:
+	priorities:
+		App\Router\AdminRouter: 100
+		App\Router\CronRouter: 90
+		App\Router\FileRouter: -50
+		App\Router\FrontRouter: -100
+
+# Core schema migrations only (data/migrations/<group>/). Each PLUGIN owns its own migrations
+# under its own tree instead (app/Plugins/<Name>/data/migrations/*.sql) and registers its own
+# group from its config.plugin.neon (`migrations: groups:`, e.g. app/Plugins/Sliders) - so
+# adding a plugin's migrations never requires touching this core file.
+migrations:
+	dir: %appDir%/../data/migrations
+	driver: mysql
+	dbal: nette
+	groups:
+		structures:
+			directory: %appDir%/../data/migrations/structures
+		basic-data:
+			directory: %appDir%/../data/migrations/basic-data
+			dependencies: [structures]
+		dummy-data:
+			enabled: %dummyData%
+			directory: %appDir%/../data/migrations/dummy-data
+			dependencies: [structures, basic-data]
+
+fileUpload:
+	maxFiles: 100
+	maxFileSize: 20M
+	#fileFilter: '' #Zet\FileUpload\Filter\ImageFilter
+	uploadModel: App\Model\MultiFileUploadModel
+	renderer: Contributte\FileUpload\Template\Renderer\Bootstrap4Renderer
+	#uiMode: 'full' # nebo minimal
+
+# Úložiště souborů (lokální disk nebo S3) a náhledy obrázků - viz docs/Architecture/file-storage.md.
+# Projekt přepíná na S3 v theme.neon / config.local.neon: storages: files: adapter: s3, bucket:, publicUrl: ...
+fileManager:
+	storages:
+		files:
+			adapter: local
+			root: %wwwDir%/files
+			publicUrl: /files/
+
+	# povolené náhledy obrázků ze šablon jádra ({image}/n:src = resize, {crop}/n:crop = crop);
+	# projekt a pluginy přidávají svoje ve vlastním neonu, seznamy se slučují
+	thumbnails:
+		resize:
+			- 40x40     # administrace: obrázky položek menu
+			- 100x100   # administrace: články, slidery, komentáře; výpis článků
+			- 130x130   # administrace: správce souborů, stránky, kategorie
+			- 200x200   # detail článku
+			- 300x300   # detail stránky (galerie)
+			- 800x450   # detail stránky (hlavní obrázek)
+			- 945x      # plugin Sliders
+		crop: []
+
+visualpaginator:
+	session: @Nette\Http\Session
+	translator: @Nette\Localization\Translator
+	template: AlesWita\Components\VisualPaginator::TEMPLATE_BOOTSTRAP_V4 # without '@' !!!
+	#itemsPerPageList: [1: 1, 2: 2, 3: 3]
+	messages:
+		"send": "paginator.send"
+		"itemsPerPage": "paginator.itemsPerPage"
+
+sentry:
+    # Enabled only on production
+    enable: %productionMode%
+
+    # Client configuration
+    client:
+        dsn: "https://%sentry.key1%@%sentry.key2%.ingest.sentry.io/%sentry.key3%"
+
+#imageStore:
+#	storageDir: %appDir%/../data/images
+#	cacheDir:   %wwwDir%/cached-images
+#	basePath:   /images/
+
+services:
+	pluginServiceLocator: App\DI\PluginServiceLocator
+
+	pluginComponentLocator:
+		implement: App\DI\IPluginComponentLocator
+		tagged: presenter.component
+
+	nette.latteFactory:
+		setup:
+			- addFilter('shortcodes', [@shortcodes, transform]) #[App\Components\Shortcodes, transform])
+
+	# Custom presenter factory: falls back to presenters living in plugin/module
+	# trees under their own PSR-4 namespace (App\Plugins\*, App\Modules\*).
+	# The PresenterFactoryCallback (DI-aware presenter instantiation) must be
+	# re-declared because redefining `factory` drops the inherited arguments;
+	# the setMapping() setup added by nette/application is kept automatically.
+	application.presenterFactory:
+		factory: App\Application\PresenterFactory(
+			Nette\Bridges\ApplicationDI\PresenterFactoryCallback(_, null)
+		)
+		setup:
+			- setScanDirs([%appDir%/Plugins, %appDir%/Modules, %appDir%/../theme/Plugins])
+
+	- App\Model\Plugin\PluginRepository(%rootDir%)
+	- App\Model\Plugin\PluginMigrator(%rootDir%)
+	- App\Model\Database\Users
+
+	# Cron - úlohy jsou všechny služby implementující App\Cron\CronTask (i z pluginů), viz App\Presenters\CronPresenter
+	- App\Model\Database\CronTasks
+	- App\Cron\CronSettings(%cronToken%)
+	- App\Cron\CronRunner(tasks: typed(App\Cron\CronTask), tempDir: %tempDir%)
+
+	- App\Model\UserManager
+	roles: App\Model\Database\Roles
+	formFactory: App\Forms\FormFactory
+	- App\Forms\SignInFormFactory
+	- App\Forms\SignUpFormFactory
+	- App\Modules\UrlModule\Model
+	- App\Modules\UrlModule\RedirectionsModel
+	urlManager: App\Modules\UrlModule\UrlManager
+
+	- App\Model\Database\Categories
+	- App\Service\Category
+	- App\Forms\CategoryFormFactory
+	- App\Forms\CategorySubtype\DefaultFormPart
+	- App\Modules\UrlModule\Forms\UrlFormFactory
+	- App\Modules\UrlModule\Forms\RedirectionFormFactory
+
+
+	- App\Model\Database\Articles
+	- App\Model\Database\Pages
+	- App\Model\Database\Sections
+	- App\Service\Article
+	- App\Forms\ArticleFormFactory
+	- App\Forms\PageFormFactory
+	- App\AdminModule\Forms\SectionFormFactory
+
+	- App\Modules\CommentsModule\Model\Comments
+	- App\Modules\CommentsModule\Comment
+	- App\Forms\CommentFormFactory
+
+	- App\Model\Database\Files
+	- App\Model\Database\FileFolders
+	- App\AdminModule\Forms\FilesManagerUploadFormFactory
+	- App\AdminModule\Forms\FilesManagerFolderFormFactory
+	- App\AdminModule\Forms\FilesManagerFileNameFormFactory
+	- App\Model\MultiFileUploadModel
+
+	- App\Components\Menu\Model\Menus
+	- App\Forms\MenuFormFactory
+	- App\Forms\MenuItemFormFactory
+	- App\Components\Menu\Model\MenuItemTitles
+
+	#Admin\Settings
+	- App\Model\Database\Settings
+	- App\AdminModule\Forms\SettingFormFactory
+	- App\Model\Database\Languages
+	- App\AdminModule\Forms\LanguageFormFactory
+	languages: App\Service\LanguageService
+	- App\Model\Database\Domains
+	- App\AdminModule\Forms\DomainFormFactory
+	domains: App\Service\DomainService
+	- App\AdminModule\Forms\RoleFormFactory
+	- App\AdminModule\Forms\TagFormFactory
+	modules: App\Model\Database\Modules
+	- App\AdminModule\Forms\UserFormFactory
+	- App\Model\Database\Tags
+
+	- App\Model\Database\Metas
+	- App\Model\Database\ArticleMetas
+	- App\Model\Database\CategoryMetas
+	- App\Forms\MetaFormFactory
+	- App\Forms\MetaValueFormFactory
+
+
+	#Admin Menu
+	- App\Components\CategoriesMenu\CategoriesMenu
+	- App\Components\FilesManagerMenu\FilesManagerMenu
+
+	#- ondrs\UploadManager\Managers\FileManager
+	- Zet\FileUpload\Model\BaseUploadModel
+
+	#Frontend
+	- App\Components\Menu\Menu
+	- App\FrontModule\Components\LanguageChanger\LanguageChanger
+	- App\FrontModule\Components\Articles\Articles
+	- App\FrontModule\Components\Categories\Categories
+	- App\FrontModule\Components\SearchControl\SearchFormFactory
+	- App\FrontModule\Components\SearchControl\SearchControl
+	- App\FrontModule\Components\LoginLinkControl\LoginLinkControl
+	- App\Modules\CommentsModule\Components\Comments\Comments
+	- App\Components\ViewCounter
+	shortcodes: App\Components\Shortcodes
+
+	#Services
+	- App\Service\Meta
+	- App\Service\Tag
+	- App\Service\ProjectFolders(%rootDir%, %appDir%, %wwwDir%, %wwwDir%/theme)
+
+	translator:
+		factory: LiveTranslator\Translator("en") #default lang "en" is overrided in BaseFrontPresenter
+		#setup:
+			#- setAvailableLanguages([en, cs])
+			#- setAvailableLanguages([
+			#	en: "nplurals=2; plural=(n==1) ? 0 : 1;",
+			#	cs: "nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4 ? 1 : 2));",
+			#])
+			##- setPresenterLanguageParam(lang)
+	# hlavní úložiště projektu + read-only překlady tématu a pluginů (služby s tagy translator.themeStorage
+	# a translator.pluginStorage), priorita v tomto pořadí - viz App\Localization\ChainTranslatorStorage
+	translatorStorage: App\Localization\ChainTranslatorStorage(
+		LiveTranslator\Storage\File(%appDir%/../data/localization/)
+		tagged(translator.themeStorage)
+		tagged(translator.pluginStorage)
+	)
+	# nepřeložené řetězce pro panel LiveTranslatoru: JSON <jazyk>.<namespace>.untranslated vedle překladů
+	# (data/localization/cs.admin.untranslated); do session místo souboru: - LiveTranslator\Storage\UntranslatedSession
+	- LiveTranslator\Storage\UntranslatedFile(%appDir%/../data/localization/)
+
+	user: App\Security\User
+	authorizator: App\Security\AuthorizatorFactory::create(@modules, @roles)
+
+
+	#Front
+	- App\FrontModule\Components\DynamicForms\ContactFormFactory
+	#contactFormControl: App\Components\ContactForm\ContactForm
+	- App\FrontModule\Components\DynamicForms\ContactFormControl
+	- App\Model\Database\DynamicForms
+	- App\AdminModule\Forms\DynamicFormFormFactory
+	- App\AdminModule\Forms\DynamicFormItemFormFactory
+
+	-
+		factory: App\FrontModule\Components\DynamicForms\ContactFormComponentFactory
+		tags: [presenter.component: contactFormControl]
+
+	#Admin
+	- App\Model\Database\Sliders
+	- App\Model\Database\SliderItems
+	- App\AdminModule\Forms\SliderFormFactory
+	- App\AdminModule\Forms\SliderItemFormFactory
+
+	#Front
+	- App\FrontModule\Components\Sliders\Slider
+	-
+		factory: App\FrontModule\Components\Sliders\SliderComponentFactory
+		tags: [presenter.component: pluginSlider]
+
+	- Contributte\OAuth2Client\Flow\Facebook\FacebookProvider([
+		clientId: %facebook.clientId%
+		clientSecret: %facebook.clientSecret%
+		graphApiVersion: %facebook.graphApiVersion%
+	])
+	- Contributte\OAuth2Client\Flow\Facebook\FacebookAuthCodeFlow
+	- App\Security\FacebookLogin
