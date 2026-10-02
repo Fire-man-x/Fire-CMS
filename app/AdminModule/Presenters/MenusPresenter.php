@@ -101,8 +101,8 @@ class MenusPresenter extends BasePresenter
 		// název = nadpis ve výchozím jazyce (firecms_menuDescriptions), menu bez nadpisu se pozná podle location
 		// select() vypíná výchozí `*`, sloupce tabulky je proto nutné vybrat výslovně
 		$source = $this->menusModel->findAll()
-			->select("`" . $this->menusModel->getTableName() . "`.*");
-		$this->menusModel->selectTitle($source, "`" . $this->menusModel->getTableName() . "`.`id`");
+			->select($this->menusModel->delimite($this->menusModel->getTableName()) . ".*");
+		$this->menusModel->selectTitle($source, $this->menusModel->getTableName() . ".id");
 		$source->order("title")->order("location");
 		$primaryKey = $this->menusModel->getColumnId();
 		$paramKey = $this->menusModel->getForeignKeyColumn();

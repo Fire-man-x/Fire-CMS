@@ -4,6 +4,14 @@
 # Postup a odkud vzít jednotlivé hodnoty viz doc/render-deploy.md.
 
 parameters:
+	# MariaDB/MySQL
+	migrations:
+		dir: %rootDir%/data/migrations
+		driver: mysql
+	# PostgreSQL - místo bloku výše
+	#migrations:
+	#	dir: %rootDir%/data/migrations-pgsql
+	#	driver: pgsql
 	# endpoint /cron - stejná hodnota jako CRON_TOKEN u služby (openssl rand -hex 32)
 	cronToken: ''
 	# login with Facebook (App\Security\FacebookLogin)

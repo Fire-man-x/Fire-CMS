@@ -125,12 +125,19 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 	 */
 	public function getAllForMenu()
 	{
-		$query = $this->findAll()
-			->where("historyId", null)
-			->where("status NOT IN ?", array("auto-draft", "trash"))
-			->order("categoryLeft");
+		return $this->findForMenu()->order("categoryLeft");
+	}
 
-		return $query;
+
+	/**
+	 * Kategorie stromu jako getAllForMenu(), ale bez řazení - pro UPDATE a agregace (MAX()). PostgreSQL nezná
+	 * UPDATE ... ORDER BY a ORDER BY podle neagregovaného sloupce vedle MAX() odmítne.
+	 */
+	public function findForMenu(): \Nette\Database\Table\Selection
+	{
+		return $this->findAll()
+			->where("historyId", null)
+			->where("status NOT IN ?", array("auto-draft", "trash"));
 	}
 
 
@@ -187,7 +194,7 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 	public function addViewCount(int $categoryId, string $language): void
 	{
 		$data = array(
-			"viewCount" => new SqlLiteral("viewCount+1")
+			"viewCount" => new SqlLiteral($this->delimite("viewCount") . " + 1")
 		);
 		$this->getTranslationTable()
 			->where($this->getForeignKeyColumn(), $categoryId)
@@ -202,7 +209,7 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 	 */
 	protected function getNextPosition()
 	{
-		return $this->findAll()->select("IFNULL(MAX(position),0)+1 AS position")->fetchField();
+		return (int) $this->findAll()->max("position") + 1;
 	}
 
 
@@ -212,20 +219,8 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 	 */
 	public function updateTreePositions(array $treePositions)
 	{
-		// search for columns to update
-		$keys = array_keys(array_values($treePositions)[0]);
-
-		// join keys for update statement
-		$updateStatement = array();
-		foreach ($keys as $key){
-			$updateStatement[$key] = new SqlLiteral("VALUES($key)");
-		}
-
-		foreach ($treePositions as &$treePosition){
-			$treePosition["createDate"] =  new SqlLiteral("NOW()");
-		}
-
-		$this->database->query("INSERT INTO `" . $this->getTableName() . "` ? ON DUPLICATE KEY UPDATE ? ", $treePositions, $updateStatement);
+		// řádky [id, parentId, position, level] existují, mění se jen pozice (dřív INSERT ... ON DUPLICATE KEY UPDATE)
+		$this->updateRowsById($treePositions);
 	}
 
 
@@ -257,22 +252,19 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 		$data["categoryId"] = $categoryId;
 		$data["fileId"] = $fileId;
 		if(!isset($data["isMain"])){
-			$isMain = $this->database->table(self::RELATION_FILE_TABLE_NAME)
-				->select("IF(COUNT(isMain)=0, 1, 0)")
+			// první soubor je hlavní (bool - isMain je v PostgreSQL boolean)
+			$data["isMain"] = $this->database->table(self::RELATION_FILE_TABLE_NAME)
 				->where("isMain", true)
 				->where("categoryId", $categoryId)
-				->fetchField();
-			$data["isMain"] = $isMain;
+				->count('*') === 0;
 		}
 		if(!isset($data["position"])){
-			$position = $this->database->table(self::RELATION_FILE_TABLE_NAME)
-				->select("IFNULL(MAX(position),0)+1")
-				->where("categoryId",$categoryId)
-				->fetchField();
-			$data["position"] = $position;
+			$data["position"] = (int) $this->database->table(self::RELATION_FILE_TABLE_NAME)
+				->where("categoryId", $categoryId)
+				->max("position") + 1;
 		}
 
-		$this->database->query('INSERT IGNORE INTO '.self::RELATION_FILE_TABLE_NAME.' ?', $data);
+		$this->insertIfNotExists(self::RELATION_FILE_TABLE_NAME, $data, ["categoryId", "fileId"]);
 	}
 
 
@@ -326,15 +318,14 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 		$data["categoryId"] = $categoryId;
 		$data["articleId"] = $articleId;
 		if(!isset($data["isMain"])){
-			$isMain = $this->database->table(self::RELATION_ARTICLE_TABLE_NAME)
-				->select("IF(COUNT(isMain)=0, 1, 0)")
+			// první kategorie článku je hlavní (bool - isMain je v PostgreSQL boolean)
+			$data["isMain"] = $this->database->table(self::RELATION_ARTICLE_TABLE_NAME)
 				->where("isMain", true)
 				->where("articleId", $articleId)
-				->fetchField();
-			$data["isMain"] = $isMain;
+				->count('*') === 0;
 		}
 
-		$this->database->query('INSERT IGNORE INTO '.self::RELATION_ARTICLE_TABLE_NAME.' ?', $data);
+		$this->insertIfNotExists(self::RELATION_ARTICLE_TABLE_NAME, $data, ["categoryId", "articleId"]);
 	}
 
 
@@ -409,7 +400,7 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 		$data[$this->getForeignKeyColumn()] = $categoryId;
 		$data["tagId"] = $tagId;
 
-		$this->database->query('INSERT IGNORE INTO ' . self::RELATION_TAG_TABLE_NAME . ' ?', $data);
+		$this->insertIfNotExists(self::RELATION_TAG_TABLE_NAME, $data, [$this->getForeignKeyColumn(), "tagId"]);
 	}
 
 
@@ -441,7 +432,8 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 	 */
 	public function getRelationCommentsTable(): \Nette\Database\Table\Selection
 	{
-		return $this->database->table(self::RELATION_COMMENT_ARTICLE_TABLE_NAME);
+		// komentáře kategorií (categoryId), ne článků - výpis (Comment::getAllCommentsWithChilds()) čte odtud
+		return $this->database->table(self::RELATION_COMMENT_CATEGORY_TABLE_NAME);
 	}
 
 
@@ -465,7 +457,7 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 		$data[$this->getForeignKeyColumn()] = $categoryId;
 		$data["commentId"] = $commentId;
 
-		$this->database->query('INSERT IGNORE INTO ' . self::RELATION_COMMENT_ARTICLE_TABLE_NAME . ' ?', $data);
+		$this->insertIfNotExists(self::RELATION_COMMENT_CATEGORY_TABLE_NAME, $data, [$this->getForeignKeyColumn(), "commentId"]);
 	}
 
 

@@ -106,9 +106,10 @@ private function findActive(): Selection
 - Překládaný obsah je v tabulce `<entita>Descriptions` (jeden řádek na jazyk). Model s takovou tabulkou
   implementuje `App\Model\Database\Translatable` a pro název v gridu používá `TranslatedTitleTrait`. Hlavní tabulka
   název nemá (žádný denormalizovaný `gridName`).
-- Migrace jádra jsou v `data/migrations/` (skupiny `structures`, `basic-data`, `dummy-data`, výchozí stav je
-  po jednom souboru na skupinu, viz `Changelog/2026-09-30-initial-core-state.md`), migrace pluginu v jeho
-  vlastním stromu. Jádro nezakládá žádnou `firecms_plugin_*` tabulku. Už spuštěnou migraci neupravujte,
+- Migrace jádra jsou v `data/migrations/` (MariaDB/MySQL) a stejně pojmenované v `data/migrations-pgsql/`
+  (PostgreSQL, volí se parametrem `migrations`, viz `configuration.md`), skupiny `structures`, `basic-data`, `dummy-data`,
+  výchozí stav je po jednom souboru na skupinu (viz `Changelog/2026-09-30-initial-core-state.md`), migrace
+  pluginu v jeho vlastním stromu. Jádro nezakládá žádnou `firecms_plugin_*` tabulku. Už spuštěnou migraci neupravujte,
   změna schématu = nový soubor (viz `gotchas.md`).
 
 ## Content model (jádro)
@@ -130,7 +131,13 @@ Pravidla, která nejsou vidět ze schématu:
   výš. `createdBy` je `ON DELETE SET NULL`. URL zůstávají ploché, router pracuje s jedním slugem.
 - **Sekce** s kategoriemi nebo články nejde smazat (FK bez CASCADE + kontrola v `Sections::delete()`). Článek
   ani kategorie nejde přesunout do jiné sekce, sekce se nastaví při založení. Oprávnění jsou po typu obsahu
-  (`Articles`, `Categories`), ne po sekcích. Vnořené množiny kategorií (`categoryLeft`/`Right`) jsou globální.
+  (`Articles`, `Categories`), ne po sekcích. Vnořené množiny kategorií (`categoryLeft`/`Right`) jsou globální. Po přetažení i smazání je
+  `Service\Category::recalculateTree()` přepočítá celé z `parentId` a pořadí (`sectionId`, pak `position` - pozice
+  se číslují v rámci sekce) včetně `level`; smazaná kategorie jde do koše a její podkategorie o úroveň výš.
+- **Komentáře** (`CommentsModule`) jsou vnořené množiny `left`/`right` číslované ZVLÁŠŤ pro každý článek/kategorii
+  (každá položka začíná od 1), vazby ve `firecms_articleComments`/`firecms_categoryComments` (sloupec podle
+  `ISubComments::getForeignKeyColumn()`). Hromadné `delete()`/`update()` podle `left`/`right` proto vždy omezte na
+  ID komentářů téže položky, jinak zasáhnou komentáře ostatních článků se stejnými čísly.
 - **Výchozí jazyk** je vždy právě jeden a aktivní (`Languages::setDefault()`), nejde deaktivovat.
   `LanguageService::getDefaultLanguage()` hledá jen mezi aktivními.
 - **`Settings`** má veřejné snake_case klíče (`main_title`, `seo_title`, `image_resolution`, `themePath`,

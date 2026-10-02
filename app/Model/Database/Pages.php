@@ -222,8 +222,8 @@ class Pages extends BaseModel implements Translatable
 	 */
 	public function getTree(?string $language = null): array
 	{
-		$selection = $this->findAll()->select('`' . $this->getTableName() . '`.*');
-		$this->selectTitle($selection, '`' . $this->getTableName() . '`.`id`', $language);
+		$selection = $this->findAll()->select($this->delimite($this->getTableName()) . '.*');
+		$this->selectTitle($selection, $this->getTableName() . '.id', $language);
 
 		$byParent = [];
 		foreach ($selection->order('position')->order('title') as $row) {

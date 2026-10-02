@@ -6,6 +6,7 @@ namespace App\Model\Plugin;
 use Nette\Database\Explorer;
 use Nette\Neon\Neon;
 use Nextras\Migrations\Configurations\Configuration;
+use Nextras\Migrations\Drivers\PgSqlDriver;
 use Nextras\Migrations\Engine\Runner;
 use Nextras\Migrations\Entities\Group;
 use Nextras\Migrations\IConfiguration;
@@ -17,7 +18,7 @@ use Nextras\Migrations\IDriver;
  * config.plugin.neon (a plugin just added to theme/config/plugins.neon isn't
  * part of the *currently running* compiled container yet - see
  * docs/AI-Context/gotchas.md). Conversely, when a plugin gets disabled, runs
- * its `data/deactivate.sql` (if it ships one, see deactivate()) - a
+ * its `data/deactivate/<driver>.sql` (if it ships one, see deactivate()) - a
  * destructive operation the Plugins admin gates behind a confirmation dialog.
  *
  * Migration discovery only understands the `migrations: groups: <name>:
@@ -73,7 +74,8 @@ final class PluginMigrator
 
 
 	/**
-	 * Whether the plugin ships a data/deactivate.sql - i.e. whether disabling
+	 * Whether the plugin ships a deactivate script for the current database
+	 * (see getDeactivateScriptPath()) - i.e. whether disabling
 	 * it is destructive (see deactivate()). Drives the Plugins admin's
 	 * confirmation dialog.
 	 */
@@ -84,8 +86,8 @@ final class PluginMigrator
 
 
 	/**
-	 * Runs the plugin's own data/deactivate.sql, e.g. `app/Plugins/Stalker/
-	 * data/deactivate.sql` - a plain SQL file the plugin author ships,
+	 * Runs the plugin's own deactivate script, e.g. `app/Plugins/Stalker/
+	 * data/deactivate/pgsql.sql` - a plain SQL file the plugin author ships,
 	 * conventionally DROP TABLE statements for whatever its migrations
 	 * created, but entirely up to the plugin (it may also clean up rows it
 	 * seeded into shared core tables like `roles`/`modules`). Does nothing if
@@ -95,7 +97,7 @@ final class PluginMigrator
 	 * table, so re-enabling it later re-runs its migrations from scratch
 	 * instead of them being skipped as "already executed".
 	 *
-	 * @return bool whether a deactivate.sql was found and executed
+	 * @return bool whether a deactivate script was found and executed
 	 * @throws \RuntimeException on a database error
 	 */
 	public function deactivate(PluginInfo $plugin): bool
@@ -116,16 +118,36 @@ final class PluginMigrator
 		}
 
 		foreach ($this->readGroups($plugin) as $group) {
-			$this->database->getConnection()->query('DELETE FROM `migrations` WHERE `group` = ?', $group->name);
+			$this->database->getConnection()->query('DELETE FROM ?name WHERE ?name = ?', 'migrations', 'group', $group->name);
 		}
 
 		return true;
 	}
 
 
+	/**
+	 * data/deactivate/<driver>.sql (mysql/pgsql podle Nextras driveru), u MariaDB/MySQL i starší
+	 * data/deactivate.sql (pluginy, které variantu pro PostgreSQL nemají)
+	 */
 	private function getDeactivateScriptPath(PluginInfo $plugin): string
 	{
-		return $this->rootDir . '/' . $plugin->location . '/' . $plugin->name . '/data/deactivate.sql';
+		$dataDir = $this->rootDir . '/' . $plugin->location . '/' . $plugin->name . '/data';
+		$path = $dataDir . '/deactivate/' . $this->getDriverName() . '.sql';
+		if (!is_file($path) && $this->getDriverName() === 'mysql' && is_file($dataDir . '/deactivate.sql')) {
+			return $dataDir . '/deactivate.sql';
+		}
+
+		return $path;
+	}
+
+
+	/**
+	 * Název databáze jako parametr migrations.driver (config.neon) - podle Nextras driveru, který PluginMigrator
+	 * dostal z DI, takže sedí s migracemi jádra
+	 */
+	private function getDriverName(): string
+	{
+		return $this->driver instanceof PgSqlDriver ? 'pgsql' : 'mysql';
 	}
 
 
@@ -190,6 +212,8 @@ final class PluginMigrator
 			'%rootDir%' => $this->rootDir,
 			'%appDir%' => $this->rootDir . '/app',
 			'%wwwDir%' => $this->rootDir . '/www',
+			// adresář migrací pluginu podle databáze (data/migrations/mysql|pgsql), viz config.plugin.neon
+			'%migrations.driver%' => $this->getDriverName(),
 		]);
 	}
 }

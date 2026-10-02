@@ -69,9 +69,10 @@ class TagsPresenter extends BasePresenter
 			$source->where(":" . $this->model->getTranslationTable()->getName() . ".languageId", $this->editLocale);
 		} else {
 			//záložka "všechny jazyky" - název ve výchozím jazyce webu, počet překladů poddotazem (bez GROUP BY)
-			$this->model->selectTitle($source, "`" . $this->model->getTableName() . "`.`id`");
-			$source->select("(SELECT COUNT(*) FROM `" . Tags::TRANSLATION_TABLE_NAME . "` `translation`"
-				. " WHERE `translation`.`" . $this->model->getForeignKeyColumn() . "` = `" . $this->model->getTableName() . "`.`id`) AS `language_count`");
+			$this->model->selectTitle($source, $this->model->getTableName() . ".id");
+			$source->select("(SELECT COUNT(*) FROM " . $this->model->delimite(Tags::TRANSLATION_TABLE_NAME) . " " . $this->model->delimite("translation")
+				. " WHERE " . $this->model->delimite("translation." . $this->model->getForeignKeyColumn()) . " = " . $this->model->delimite($this->model->getTableName() . ".id")
+				. ") AS " . $this->model->delimite("language_count"));
 		}
 
 		$primaryKey = $this->model->getColumnId();

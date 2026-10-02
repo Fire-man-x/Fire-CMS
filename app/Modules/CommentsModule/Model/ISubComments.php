@@ -11,6 +11,12 @@ interface ISubComments
 
 
 	/**
+	 * Sloupec vazební tabulky s ID položky (articleId, categoryId)
+	 */
+	public function getForeignKeyColumn(): string;
+
+
+	/**
 	 * Relation comments table
 	 */
 	public function getRelationCommentsTable(): \Nette\Database\Table\Selection;

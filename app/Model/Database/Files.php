@@ -101,7 +101,7 @@ class Files extends BaseModel implements IViewCounter
 	public function addViewCount(int|string $fileHash, string $language): void
 	{
 		$data = array(
-			"viewCount" => new SqlLiteral("viewCount+1")
+			"viewCount" => new SqlLiteral($this->delimite("viewCount") . " + 1")
 		);
 		$this->findByHash($fileHash)
 			->update($data);

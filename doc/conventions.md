@@ -33,6 +33,11 @@
 		```
     - Migrace se spouští přes `bin/console migrations:continue` (`nextras/migrations` +
       `contributte/console`, viz `composer console -- migrations:continue`).
+    - Balíček pro MariaDB i PostgreSQL má migrace zvlášť pro každou databázi
+      (`data/migrations/mysql/`, `data/migrations/pgsql/`, stejné názvy souborů) a adresář skupiny vybírá
+      parametrem `%migrations.driver%`, např. `$directory(%rootDir%/app/Plugins/název balíčku/data/migrations/%migrations.driver%)`.
+      Odinstalační skript je pak `data/deactivate/mysql.sql` a `data/deactivate/pgsql.sql`. Podrobnosti
+      v `docs/Architecture/plugins.md`.
 1. Zdroje `[CSS, LESS, images, ...]` jsou uloženy ve složce `./www/frontend/název balíčku`, například `./www/frontned/package/`.
 1. Výchozí šablony jsou uloženy v `./App/`, pokud se nejedná o společnou šablonu.
 1. Výchozí společné šablony jsou uloženy v `./theme/`. Příklad `./theme/FrontendModule/templates/Homepage/default.latte`

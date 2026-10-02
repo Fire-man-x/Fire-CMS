@@ -183,13 +183,14 @@ services:
         tags: [presenter.menu]
 
     # Vlastní migrace (schéma/seed data) - viz Architecture/plugins.md, "Migrace patří do vlastního
-    # stromu balíčku". Adresář je uvnitř balíčku, ne v core data/migrations/.
+    # stromu balíčku". Adresář je uvnitř balíčku, ne v core data/migrations/. Pro MariaDB i PostgreSQL
+    # data/migrations/mysql + data/migrations/pgsql, vybírá parametr migrations.driver.
     -
         factory: Nextras\Migrations\Entities\Group
         setup:
             - $name('x-structures')
             - $enabled(true)
-            - $directory(%rootDir%/app/Plugins/X/data/migrations)
+            - $directory(%rootDir%/app/Plugins/X/data/migrations/%migrations.driver%)
             - $dependencies([structures])
         tags: [nextras.migrations.group: {for: [migrations]}]
 ```

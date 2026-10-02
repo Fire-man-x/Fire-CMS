@@ -59,9 +59,8 @@ composer test -- tests/Modules/UrlModule
   (`UrlManager`, `CustomRouter`, menu, stránky, jazyky, překlady, správce souborů), ne kompletní regresní
   sada — `app/Model/Database/BaseModel` je přímo svázaný s
   `Explorer` (konkrétní třída, ne interface), takže čisté unit testy bez DB jsou v jádru vzácné a smysluplné
-  testy jsou většinou integrační. `BaseModel::insert()` navíc používá MySQL-specifické
-  `SELECT LAST_INSERT_ID()`, které SQLite nezná — testovací fixture data vkládejte přímo přes
-  `Explorer::query()`, ne přes model. Nové PHP soubory pod `tests/` vyžadují `composer dump-autoload`
+  testy jsou většinou integrační. Testovací fixture data vkládejte přímo přes `Explorer::query()`, ne přes
+  model (`BaseModel::insert()` prázdného řádku používá `(id) VALUES (DEFAULT)`, které SQLite nezná). Nové PHP soubory pod `tests/` vyžadují `composer dump-autoload`
   (`autoload-dev.psr-4: Tests\\ → tests`). `composer stan` tenhle strom nekontroluje (`paths` jen na
   `app/`) — nový test kód proto ověřte ručně přes `composer stan -- tests`. Podrobnosti a další pasti viz
   `docs/AI-Context/gotchas.md` sekce "Testování přes Nette Tester".
@@ -177,7 +176,9 @@ přesměrování, se kterými pracuje `CustomRouter`), `CommentsModule` (koment�
   neupravujte `HomepagePresenter.php` nebo `default.latte` z jádra — chování přepište z pluginu).
 - Migrace balíčku (schéma i výchozí/ukázková data) patří do jeho vlastního stromu
   (`app/Plugins/<Name>/data/migrations/`), ne do `data/migrations/` — to má jen jádro (skupiny `structures`,
-  `basic-data`, `dummy-data`, viz `docs/Architecture/configuration.md`).
+  `basic-data`, `dummy-data`, viz `docs/Architecture/configuration.md`). Migrace jádra jsou dvakrát:
+  `data/migrations/` (MariaDB/MySQL) a stejně pojmenované `data/migrations-pgsql/` (PostgreSQL, volí se
+  parametrem `migrations` v `config.local.neon`) — nová migrace jádra = oba soubory.
 - Vlastní frontendové assety balíčku (CSS/LESS/obrázky) patří do `www/frontend/<název-balíčku>/`.
 - Výchozí šablony balíčku patří pod `app/` (resp. do vlastního stromu balíčku), pokud nejde o
   sdílenou/přepisovatelnou šablonu — v takovém případě patří pod `theme/`.

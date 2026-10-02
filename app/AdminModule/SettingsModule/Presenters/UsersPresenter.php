@@ -41,16 +41,13 @@ class UsersPresenter extends BasePresenter
 
 	public function actionDetail(): void
 	{
-		if($this->id) {
-			$this->template->userInfo = $this->users->getById($this->id);
-		}
+		// nový uživatel (bez id) = null, Users/@layout.latte s $userInfo počítá i tak
+		$this->template->userInfo = $this->id ? $this->users->getById($this->id) : null;
 	}
 
 	public function actionPassword(): void
 	{
-		if($this->id) {
-			$this->template->userInfo = $this->users->getById($this->id);
-		}
+		$this->template->userInfo = $this->id ? $this->users->getById($this->id) : null;
 	}
 
 

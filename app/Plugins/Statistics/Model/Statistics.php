@@ -41,12 +41,16 @@ class Statistics extends BaseModel
 
 
 	/**
-	 * Get average per day
+	 * Průměrný počet zásahů za den (na 2 desetinná místa, 0 bez dat). CAST(... AS DATE) místo MySQL DATE()
+	 * a identifikátory přes delimite() - MariaDB i PostgreSQL. Dřív deklarovalo int, ale vracelo desetinné číslo.
 	 */
-	public function getAvgPerDay(): int
+	public function getAvgPerDay(): float
 	{
-		return $this->database->query("SELECT ROUND( AVG(sub.sub_count), 2) FROM "
-			. "(SELECT COUNT(*) sub_count FROM `" . $this->getTableName() . "` GROUP BY DATE(`createDate`)) AS sub")->fetchField();
+		$average = $this->database->query('SELECT ROUND(AVG(sub.hits), 2) FROM'
+			. ' (SELECT COUNT(*) AS hits FROM ' . $this->delimite($this->getTableName())
+			. ' GROUP BY CAST(' . $this->delimite('createDate') . ' AS DATE)) AS sub')->fetchField();
+
+		return is_numeric($average) ? (float) $average : 0.0;
 	}
 
 }

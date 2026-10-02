@@ -149,18 +149,27 @@ class Tag
 			$column = $model->getForeignKeyColumn();
 		}
 
-		//replacement
-		//název ve výchozím jazyce webu - pro štítky bez překladu do $language (s poznámkou "(default)")
-		$defaultNameSql = $this->tagsModel->getTitleSql("`firecms_tags`.`id`");
-		$titleParams = $this->tagsModel->getTitleParams();
-		$items = $this->db->query("SELECT ".$defaultNameSql." AS `defaultName`, `firecms_tags`.`id`, `". Model\Database\Tags::TRANSLATION_TABLE_NAME."`.`languageId`, `". Model\Database\Tags::TRANSLATION_TABLE_NAME."`.`name`,
-				IF(`". Model\Database\Tags::TRANSLATION_TABLE_NAME."`.`name` IS NULL, CONCAT(".$defaultNameSql.", ?), `". Model\Database\Tags::TRANSLATION_TABLE_NAME."`.`name`) AS `label`
-			FROM `".$model->getRelationTagsTable()->getName()."`
-			LEFT JOIN `firecms_tags` ON `".$model->getRelationTagsTable()->getName()."`.`tagId` = `firecms_tags`.`id`
-			LEFT JOIN `". Model\Database\Tags::TRANSLATION_TABLE_NAME."` ON `firecms_tags`.`id` = `". Model\Database\Tags::TRANSLATION_TABLE_NAME."`.`tagId` AND (`languageId` IS NULL OR `languageId` = ?)
-			WHERE `".$column."` = ?",
-			...[...$titleParams, ...$titleParams, $this->getDefaultText(), $language, $id])
-			->fetchAll();
+		// název ve výchozím jazyce webu - pro štítky bez překladu do $language (s poznámkou "(default)")
+		// identifikátory přes delimite(), popisek se skládá v PHP (withLabels()) - dotaz běží na MariaDB i PostgreSQL
+		$tags = $this->tagsModel;
+		$tagTable = $tags->getTableName();
+		$relationTable = $model->getRelationTagsTable()->getName();
+		$translationTable = Model\Database\Tags::TRANSLATION_TABLE_NAME;
+		$defaultNameSql = $tags->getTitleSql($tagTable . '.id');
+		$titleParams = $tags->getTitleParams();
+		$translatedName = $tags->delimite($translationTable . '.name');
+		$translationLanguage = $tags->delimite($translationTable . '.languageId');
+		$items = $this->db->query(
+			'SELECT ' . $defaultNameSql . ' AS ' . $tags->delimite('defaultName') . ', ' . $tags->delimite($tagTable . '.id') . ', '
+				. $translationLanguage . ', ' . $translatedName
+				. ' FROM ' . $tags->delimite($relationTable)
+				. ' LEFT JOIN ' . $tags->delimite($tagTable) . ' ON ' . $tags->delimite($relationTable . '.tagId') . ' = ' . $tags->delimite($tagTable . '.id')
+				. ' LEFT JOIN ' . $tags->delimite($translationTable) . ' ON ' . $tags->delimite($tagTable . '.id') . ' = ' . $tags->delimite($translationTable . '.tagId')
+				. ' AND (' . $translationLanguage . ' IS NULL OR ' . $translationLanguage . ' = ?)'
+				. ' WHERE ' . $tags->delimite($relationTable . '.' . $column) . ' = ?',
+			...[...$titleParams, $language, $id],
+		)->fetchAll();
+		$this->withLabels($items);
 
 		return $items;
 	}
@@ -173,20 +182,37 @@ class Tag
 	public function findByName(string $language, string $name): array
 	{
 		//název ve výchozím jazyce webu - pro štítky bez překladu do $language (s poznámkou "(default)")
-		$defaultNameSql = $this->tagsModel->getTitleSql("`" . $this->tagsModel->getTableName() . "`.`id`");
+		$defaultNameSql = $this->tagsModel->getTitleSql($this->tagsModel->getTableName() . ".id");
 		$titleParams = $this->tagsModel->getTitleParams();
 		$items = $this->tagsModel->findAll()
-			->select($defaultNameSql . " AS `defaultName`", ...$titleParams)
+			->select($defaultNameSql . " AS defaultName", ...$titleParams)
 			->select($this->tagsModel->getTableName().".id")
 			->select(":" . Model\Database\Tags::TRANSLATION_TABLE_NAME . ".languageId")
 			->select(":" . Model\Database\Tags::TRANSLATION_TABLE_NAME . ".name")
-			->select("IF(:" . Model\Database\Tags::TRANSLATION_TABLE_NAME . ".name IS NULL, CONCAT(" . $defaultNameSql . ", ?), :" . Model\Database\Tags::TRANSLATION_TABLE_NAME . ".name) AS label", ...[...$titleParams, $this->getDefaultText()])
 			->joinWhere(":" . Model\Database\Tags::TRANSLATION_TABLE_NAME, "languageId IS NULL OR languageId = ?", $language)
-			->where($defaultNameSql . " LIKE ? OR name LIKE ?", ...[...$titleParams, "%" . $name . "%", "%" . $name . "%"])
+			// LOWER(): LIKE je v PostgreSQL citlivý na velikost písmen (MariaDB s _ci kolací ne); hledaný text
+			// na malá písmena v PHP - LOWER(?) by PostgreSQL odmítl (neurčí typ parametru)
+			->where("LOWER(" . $defaultNameSql . ") LIKE ? OR LOWER(name) LIKE ?", ...[...$titleParams, "%" . mb_strtolower($name) . "%", "%" . mb_strtolower($name) . "%"])
 			->order("name")
 			->fetchAll();
 		$rows = array_map(iterator_to_array(...), $items);
+		$this->withLabels($rows);
 		return (array) Arrays::associate($rows, 'id');
+	}
+
+
+	/**
+	 * Doplní `label`: název v jazyce dotazu, jinak název ve výchozím jazyce webu s poznámkou getDefaultText().
+	 * Skládá se v PHP, ne v SQL - CONCAT(poddotaz, ?) PostgreSQL odmítne (neurčí typ parametru).
+	 * @param array<int|string, \Nette\Database\Row|array<mixed>> $rows řádky z query() (Row) nebo z findByName() (pole)
+	 */
+	private function withLabels(array &$rows): void
+	{
+		foreach ($rows as &$row) {
+			$name = $row['name'] ?? null;
+			$defaultName = $row['defaultName'] ?? null;
+			$row['label'] = $name ?? ($defaultName !== null ? $defaultName . $this->getDefaultText() : null);
+		}
 	}
 
 }

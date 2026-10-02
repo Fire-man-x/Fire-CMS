@@ -69,7 +69,7 @@ class MenuItemTitles
 		foreach ($ids as $linkType => $targetIds) {
 			$model = $models[$linkType];
 			$selection = $model->findAll()->select('id')->where('id', $targetIds);
-			$model->selectTitle($selection, '`' . $model->getTableName() . '`.`id`', $language);
+			$model->selectTitle($selection, $model->getTableName() . '.id', $language);
 			foreach ($selection as $row) {
 				if (is_string($row->title) && is_numeric($row->id)) {
 					$titles[$linkType][(int) $row->id] = $row->title;

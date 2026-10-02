@@ -203,21 +203,28 @@ class Menus extends BaseModel implements Translatable
 	{
 		return $this->getItemsTable()
 			->select(self::MENU_ITEM_TABLE_NAME . '.*')
-			->select(
-				'(SELECT `description`.`label` FROM `' . self::MENU_ITEM_TRANSLATION_TABLE_NAME . '` `description`'
-				. ' WHERE `description`.`menuItemId` = `' . self::MENU_ITEM_TABLE_NAME . '`.`id` AND `description`.`languageId` = ?) AS `label`',
-				$language,
-			)
+			->select($this->getItemLabelSql('description', 'label'), $language)
 			// náhradní popisek (výchozí jazyk) pro položky URL/route, které nemají vlastní název
-			->select(
-				'(SELECT `defaultDescription`.`label` FROM `' . self::MENU_ITEM_TRANSLATION_TABLE_NAME . '` `defaultDescription`'
-				. ' WHERE `defaultDescription`.`menuItemId` = `' . self::MENU_ITEM_TABLE_NAME . '`.`id` AND `defaultDescription`.`languageId` = ?) AS `defaultLabel`',
-				$this->languages->getDefaultLanguage(),
-			)
+			->select($this->getItemLabelSql('defaultDescription', 'defaultLabel'), $this->languages->getDefaultLanguage())
 			->where('menuId', $menuId)
 			->order('parentId IS NOT NULL')
 			->order('parentId')
 			->order('position');
+	}
+
+
+	/**
+	 * Poddotaz na popisek položky menu v jazyce "?" jako sloupec $alias. Identifikátory přes delimite()
+	 * (MariaDB i PostgreSQL), obalené je Nette Explorer nevykládá jako odkaz na navázanou tabulku.
+	 */
+	private function getItemLabelSql(string $tableAlias, string $alias): string
+	{
+		$description = $this->delimite($tableAlias);
+
+		return '(SELECT ' . $description . '.' . $this->delimite('label')
+			. ' FROM ' . $this->delimite(self::MENU_ITEM_TRANSLATION_TABLE_NAME) . ' ' . $description
+			. ' WHERE ' . $description . '.' . $this->delimite('menuItemId') . ' = ' . $this->delimite(self::MENU_ITEM_TABLE_NAME . '.id')
+			. ' AND ' . $description . '.' . $this->delimite('languageId') . ' = ?) AS ' . $this->delimite($alias);
 	}
 
 

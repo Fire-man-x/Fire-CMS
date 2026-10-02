@@ -362,3 +362,6 @@ a:2:{i:0;s:20:"Map - latitude (GPS)";i:1;s:33:"Mapa - zeměpisná šířka (GPS)
 a:2:{i:0;s:21:"Map - longitude (GPS)";i:1;s:31:"Mapa - zeměpisná délka (GPS)";}
 a:2:{i:0;s:7:"Address";i:1;s:6:"Adresa";}
 a:2:{i:0;s:7:"Contact";i:1;s:7:"Kontakt";}
+a:2:{i:0;s:7:"Enabled";i:1;s:8:"Povoleno";}
+a:2:{i:0;s:8:"Disabled";i:1;s:10:"Zakázáno";}
+a:2:{i:0;s:8:"Location";i:1;s:11:"Umístění";}

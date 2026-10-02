@@ -219,6 +219,53 @@ obsahu už spuštěné migrace skončí na „Previously executed migration has 
 nevznikne sloupec/tabulka, kterou jste do starého souboru dopsali. Změna schématu = nový soubor (`ALTER TABLE`,
 `RENAME TABLE`). Přepsat historickou migraci jde jen tehdy, když se všechny DB resetují (`migrations:reset`).
 
+## Migrace jádra jsou dvakrát: MariaDB (`data/migrations/`) a PostgreSQL (`data/migrations-pgsql/`)
+
+Každá nová migrace jádra potřebuje dvojče se STEJNÝM názvem souboru ve stejné skupině v obou adresářích,
+jinak se databáze na MariaDB a PostgreSQL rozejdou (který adresář se použije, určuje parametr `migrations`
+v `config.local.neon`, viz `Architecture/configuration.md`). PostgreSQL verzi napište ručně podle pravidel převodu tamtéž; nejčastější
+chyby: neuvozovkovaný camelCase identifikátor (PostgreSQL ho převede na malá písmena), `0`/`1` do `boolean`
+sloupce (chyba typu - pište `false`/`true`), chybějící `setval()` po INSERTu s pevným `id` (další INSERT pak
+spadne na duplicitním klíči) a nový index bez předpony tabulky (kolize názvu v rámci schématu). Ověření:
+`migrations:reset` proti oběma databázím, počty řádků musí sedět.
+
+Totéž platí pro pluginy, které běží na obou databázích (`data/migrations/mysql/` + `data/migrations/pgsql/`,
+`data/deactivate/mysql.sql` + `pgsql.sql`, viz `Architecture/plugins.md`). Plugin jen se staršími MySQL
+migracemi (`data/migrations/*.sql` bez `%migrations.driver%`) na PostgreSQL spustí MySQL SQL a migrace spadne.
+Pokud plugin `%migrations.driver%` používá a adresář `pgsql/` mu chybí, spadne už načtení skupiny (viz
+"Neexistující adresář v neonu jádra shodí čistý klon").
+
+## Ruční SQL pro MariaDB i PostgreSQL: `BaseModel::delimite()`, ne backticky
+
+Nette Explorer v `select()`/`where()`/`order()` sám obaluje identifikátory podle databáze, ale výraz
+`tabulka.sloupec` vykládá jako odkaz na navázanou tabulku (zkusí z něj udělat JOIN). Obalený identifikátor
+(`` `x` `` i `"x"`) nechá být. Pro poddotazy a `query()` proto identifikátory obalujte přes
+`$model->delimite('tabulka.sloupec')` (MariaDB `` `x` ``, PostgreSQL `"x"`, po částech) - backticky na
+PostgreSQL neprojdou a camelCase bez uvozovek PostgreSQL převede na malá písmena (`languageId` → `languageid`).
+
+- `Selection::alias()` je jen pro NAVÁZANOU tabulku (řetězec `:book_tag.tag`), hlavní tabulku dotazu
+  nepřejmenuje: `alias('firecms_xDescriptions', 'translation')` vyrobí prázdný
+  `LEFT JOIN "translation" ON . = "translation".`. Korelovaný poddotaz se proto skládá ručně
+  (`TranslatedTitleTrait::getTitleSql()`), `where('x', $idColumn)` by navíc `$idColumn` dosadil jako hodnotu.
+- PostgreSQL neurčí typ parametru ve funkci s přetíženými variantami: `CONCAT(..., ?)`, `LOWER(?)` skončí na
+  `could not determine data type of parameter`. Skládejte text v PHP (`Service\Tag::withLabels()`), hledaný
+  text převeďte na malá písmena v PHP (`LOWER(sloupec) LIKE ?`). `LIKE` je v PostgreSQL citlivý na velikost
+  písmen, MariaDB s kolací `_ci` ne.
+- Místo `IF(a IS NULL, b, a)`/`IFNULL()` pište `COALESCE()`, místo `IF(podmínka, a, b)` `CASE WHEN ... END`
+  (obě databáze), alias sloupce v ručním SQL obalte taky (`AS ' . $model->delimite('categoryTitle')`).
+- `SqlLiteral` Nette neobaluje: `new SqlLiteral('viewCount + 1')` hledá v PostgreSQL `viewcount`, `left`/`right`
+  (nested set) jsou vyhrazená slova - `new SqlLiteral($model->delimite('viewCount') . ' + 1')`.
+- `INSERT IGNORE` → `BaseModel::insertIfNotExists($table, $data, $keyColumns)`, `INSERT ... ON DUPLICATE KEY
+  UPDATE` → `BaseModel::updateRowsById()` (existující řádky) nebo kontrola existence a insert/update. Chybu
+  duplicity NEzachytávejte - v PostgreSQL nechá probíhající transakci v chybovém stavu („current transaction is
+  aborted“) a další dotazy v ní spadnou.
+- Příští pozice/maximum přes `Selection::max('position')` (+1 v PHP), ne `SELECT IFNULL(MAX(...),0)+1`.
+- PostgreSQL nezná `UPDATE ... ORDER BY` a odmítne `ORDER BY` neagregovaného sloupce vedle `MAX()`/`COUNT()`:
+  `update()` ani agregace nevolejte na Selection s `order()` (proto `Categories::findForMenu()` vedle
+  `getAllForMenu()`).
+- Příznaky jsou v PostgreSQL `boolean`: `where('default', false)`, ne `0`; do `isMain` apod. zapisujte `bool`
+  (`count(...) === 0`), ne `IF(COUNT(...)=0, 1, 0)` - MariaDB `bool` uloží jako 1/0, PostgreSQL `0`/`1` odmítne.
+
 ## Nová migrace musí mít časové razítko za POSLEDNÍ provedenou migrací ze VŠECH skupin
 
 `nextras/migrations` řadí migrace napříč všemi skupinami (`structures`, `basic-data`, skupiny pluginů, …) podle
@@ -228,6 +275,13 @@ migration "structures/20261001000000.sql"`. Nový soubor proto pojmenujte aktuá
 dne“. Kontrola: `SELECT file FROM migrations ORDER BY file DESC LIMIT 1`. Stejný název souboru ve dvou různých
 skupinách je povolený (jádro má `20261001000000.sql` ve `structures` i `basic-data`). Při ručním porovnávání
 souborů s tabulkou `migrations` proto porovnávejte dvojici skupina + soubor, ne jen název.
+
+Pluginy: migrace pluginu musí být novější než výchozí migrace jádra (`20261001…`), proto mají `Stalker` a
+`Statistics` soubory `20261002000001.sql`/`20261002000002.sql`. Stejné pravidlo platí i pro opětovné zapnutí
+pluginu: vypnutí (`PluginMigrator::deactivate()`) smaže záznamy pluginu z tabulky `migrations` a jeho migrace
+jsou pak pro Nextras zase „nové“. Pokud mezitím jádro nebo jiný plugin dostal novější migraci, opětovné zapnutí
+spadne na „must follow after the latest executed migration“. Nextras to obejít neumí, řešení je ruční zásah
+v DB, nebo nová migrace pluginu s aktuálním datem.
 
 ## PK sloupce se jmenují `id`, FK `<entita>Id` — `getColumnId()` vs. `getForeignKeyColumn()`
 
@@ -411,8 +465,8 @@ obal přímo nad `Nette\Database\Explorer` (konkrétní třída, ne interface) �
 partial mock frameworku, což je křehké. `tests/Helpers/SqliteDatabase::create()` postaví `Explorer` ručně
 (Connection + Structure + MemoryStorage cache + `DiscoveredConventions` jako aplikace), BEZ DI kontejneru, BEZ
 `config.local.neon` (tam bývají ostrá přihlašovací data). Na co pamatovat:
-- **`BaseModel::insert()` volá MySQL-specifické `SELECT LAST_INSERT_ID()`, které SQLite nezná** — fixture data
-  vkládejte přímo přes `Explorer::query('INSERT INTO ...')`, ne přes model.
+- **Fixture data vkládejte přímo přes `Explorer::query('INSERT INTO ...')`, ne přes model** — `BaseModel::insert()`
+  prázdného řádku používá `(id) VALUES (DEFAULT)` (MariaDB i PostgreSQL), které SQLite nezná.
 - **Cizí klíče v SQLite DDL deklarujte** (`REFERENCES tabulka(id)`), jinak je `Structure` nenajde a zápis přes
   cizí klíč (`page.status`) skončí na „no such table: page“, i když v aplikaci funguje.
 - `Nette\Http\Request` pro testy routerů staví `tests/Helpers/RequestFactory.php`. `UrlScript` musí dostat

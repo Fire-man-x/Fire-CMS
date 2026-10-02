@@ -239,7 +239,7 @@ class MenuItemFormFactory extends BaseFormFactory
 			->where('status NOT IN ?', ['auto-draft', 'trash'])
 			->order('categoryLeft')
 			->order('position');
-		$this->categoriesModel->selectTitle($selection, '`' . $this->categoriesModel->getTableName() . '`.`id`', $language);
+		$this->categoriesModel->selectTitle($selection, $this->categoriesModel->getTableName() . '.id', $language);
 
 		$options = [];
 		foreach ($selection as $category) {
@@ -261,7 +261,7 @@ class MenuItemFormFactory extends BaseFormFactory
 			->select('id')
 			->where('historyId', null)
 			->where('status NOT IN ?', ['auto-draft', 'trash']);
-		$this->articlesModel->selectTitle($selection, '`' . $this->articlesModel->getTableName() . '`.`id`', $language);
+		$this->articlesModel->selectTitle($selection, $this->articlesModel->getTableName() . '.id', $language);
 
 		$options = [];
 		foreach ($selection->order('title') as $article) {

@@ -104,7 +104,7 @@ class PluginsPresenter extends BasePresenter
 
 	/**
 	 * Confirmation text shown before disabling a plugin - empty (= no dialog,
-	 * see column_status.latte) unless the plugin ships a data/deactivate.sql,
+	 * see column_status.latte) unless the plugin ships a deactivate script (data/deactivate/<driver>.sql),
 	 * i.e. disabling it runs that script and may destroy data.
 	 */
 	private function getDisableConfirmation(string $id): string
@@ -115,7 +115,7 @@ class PluginsPresenter extends BasePresenter
 		}
 
 		return sprintf(
-			'Disabling "%s" will run its data/deactivate.sql cleanup script, which may permanently delete data. Continue?',
+			'Disabling "%s" will run its deactivate cleanup script, which may permanently delete data. Continue?',
 			$plugin->name,
 		);
 	}
@@ -149,7 +149,7 @@ class PluginsPresenter extends BasePresenter
 
 
 	/**
-	 * Runs the just-disabled plugin's data/deactivate.sql, if it has one - the
+	 * Runs the just-disabled plugin's deactivate script, if it has one - the
 	 * admin already confirmed this via getDisableConfirmation() before the
 	 * request even got here.
 	 */

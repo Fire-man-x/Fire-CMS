@@ -48,7 +48,7 @@ class SliderItems extends BaseModel
 	 */
 	protected function getNextPosition(string $language): int
 	{
-		return $this->findAll()->select("IFNULL(MAX(position),0)+1 AS position")->where("languageId", $language)->fetchField();
+		return (int) $this->findAll()->where("languageId", $language)->max("position") + 1;
 	}
 
 

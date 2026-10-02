@@ -187,7 +187,7 @@ class Articles extends BaseModel implements Translatable, IViewCounter, ISubTags
 	public function addViewCount(int $articleId, string $language): void
 	{
 		$data = array(
-			"viewCount" => new SqlLiteral("viewCount+1")
+			"viewCount" => new SqlLiteral($this->delimite("viewCount") . " + 1")
 		);
 		$this->getTranslationTable()
 			->where($this->getForeignKeyColumn(), $articleId)
@@ -202,20 +202,8 @@ class Articles extends BaseModel implements Translatable, IViewCounter, ISubTags
 	 */
 	public function updateTreePositions(array $treePositions)
 	{
-		// search for columns to update
-		$keys = array_keys(array_values($treePositions)[0]);
-
-		// join keys for update statement
-		$updateStatement = array();
-		foreach ($keys as $key){
-			$updateStatement[$key] = new SqlLiteral("VALUES($key)");
-		}
-
-		foreach ($treePositions as &$treePosition){
-			$treePosition["createDate"] =  new SqlLiteral("NOW()");
-		}
-
-		$this->database->query("INSERT INTO `" . $this->getTableName() . "` ? ON DUPLICATE KEY UPDATE ? ", $treePositions, $updateStatement);
+		// řádky [id, parentId, position, level] existují, mění se jen pozice (dřív INSERT ... ON DUPLICATE KEY UPDATE)
+		$this->updateRowsById($treePositions);
 	}
 
 
@@ -247,22 +235,19 @@ class Articles extends BaseModel implements Translatable, IViewCounter, ISubTags
 		$data["articleId"] = $articleId;
 		$data["fileId"] = $fileId;
 		if(!isset($data["isMain"])){
-			$isMain = $this->database->table(self::RELATION_FILE_TABLE_NAME)
-				->select("IF(COUNT(isMain)=0, 1, 0)")
+			// první soubor je hlavní (bool - isMain je v PostgreSQL boolean)
+			$data["isMain"] = $this->database->table(self::RELATION_FILE_TABLE_NAME)
 				->where("isMain", true)
 				->where("articleId", $articleId)
-				->fetchField();
-			$data["isMain"] = $isMain;
+				->count('*') === 0;
 		}
 		if(!isset($data["position"])){
-			$position = $this->database->table(self::RELATION_FILE_TABLE_NAME)
-				->select("IFNULL(MAX(position),0)+1")
-				->where("articleId",$articleId)
-				->fetchField();
-			$data["position"] = $position;
+			$data["position"] = (int) $this->database->table(self::RELATION_FILE_TABLE_NAME)
+				->where("articleId", $articleId)
+				->max("position") + 1;
 		}
 
-		$this->database->query('INSERT IGNORE INTO '.self::RELATION_FILE_TABLE_NAME.' ?', $data);
+		$this->insertIfNotExists(self::RELATION_FILE_TABLE_NAME, $data, ["articleId", "fileId"]);
 	}
 
 
@@ -315,7 +300,7 @@ class Articles extends BaseModel implements Translatable, IViewCounter, ISubTags
 		$data[$this->getForeignKeyColumn()] = $articleId;
 		$data["tagId"] = $tagId;
 
-		$this->database->query('INSERT IGNORE INTO ' . self::RELATION_TAG_TABLE_NAME . ' ?', $data);
+		$this->insertIfNotExists(self::RELATION_TAG_TABLE_NAME, $data, [$this->getForeignKeyColumn(), "tagId"]);
 	}
 
 
@@ -370,7 +355,7 @@ class Articles extends BaseModel implements Translatable, IViewCounter, ISubTags
 		$data[$this->getForeignKeyColumn()] = $articleId;
 		$data["commentId"] = $commentId;
 
-		$this->database->query('INSERT IGNORE INTO ' . self::RELATION_COMMENT_TABLE_NAME . ' ?', $data);
+		$this->insertIfNotExists(self::RELATION_COMMENT_TABLE_NAME, $data, [$this->getForeignKeyColumn(), "commentId"]);
 	}
 
 

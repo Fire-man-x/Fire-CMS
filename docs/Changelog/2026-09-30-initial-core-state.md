@@ -37,7 +37,9 @@ tabulek, přepsané migrace, ruční kroky v existujících DB) popisovaly stav,
 - `data/migrations/dummy-data/20261001010000.sql` — ukázkový obsah (jen s `dummyData`): sekce, kategorie, články
   se štítky a komentáři, stránky včetně kontaktní, menu pro `top-menu`/`left-menu`/`text-box`, slider `main_menu`,
   popis webu, SEO a kontaktní údaje v Nastavení (Brno, telefon, GPS).
-Další změny schématu už jen jako nové soubory s pozdějším časovým razítkem (viz `AI-Context/gotchas.md`).
+Stejné soubory pro PostgreSQL jsou v `data/migrations-pgsql/` (volí se parametrem `migrations` v
+`config.local.neon`, viz `Architecture/configuration.md`). Další změny schématu už jen jako nové soubory s pozdějším časovým razítkem,
+vždy v obou adresářích (viz `AI-Context/gotchas.md`).
 
 **Projekty založené na starší verzi jádra:**
 Nová historie nemá s dřívějšími commity nic společného. Merge jádra do projektu forknutého dřív skončí na

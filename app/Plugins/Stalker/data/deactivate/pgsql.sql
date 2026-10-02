@@ -1,0 +1,2 @@
+-- PostgreSQL varianta mysql.sql
+DROP TABLE IF EXISTS "firecms_plugin_stalkers";

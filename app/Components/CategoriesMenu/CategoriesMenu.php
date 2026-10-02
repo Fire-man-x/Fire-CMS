@@ -84,7 +84,7 @@ class CategoriesMenu extends Control
 		if ($this->sectionId !== null) {
 			$categories->where($this->categoriesModel->getTableName() . ".sectionId", $this->sectionId);
 		}
-		$this->categoriesModel->selectTitle($categories, "`" . $this->categoriesModel->getTableName() . "`.`id`", $this->language);
+		$this->categoriesModel->selectTitle($categories, $this->categoriesModel->getTableName() . ".id", $this->language);
 		$this->categories = $this->createTree($categories->fetchAll());
 
 		$this->template->categories = $this->categories;

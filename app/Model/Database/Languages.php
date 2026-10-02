@@ -30,8 +30,8 @@ class Languages extends BaseModel
 	public function insert(ArrayHash $data): int
 	{
 		$data->position = $this->getNextPosition();
-		$this->getTable()->insert($data);
-		return (int) $this->database->getInsertId();
+		// klíč je languageId (kód jazyka), ne automatické ID - getInsertId() by na PostgreSQL spadl (lastval())
+		return parent::insert($data);
 	}
 
 	/**
@@ -82,7 +82,7 @@ class Languages extends BaseModel
 	public function delete(int|string $id): ?int
 	{
 		return $this->findById($id)
-			->where("default", 0)
+			->where("default", false) // boolean sloupec - PostgreSQL 0 neporovná
 			->delete();
 	}
 
@@ -92,7 +92,7 @@ class Languages extends BaseModel
 	 */
 	protected function getNextPosition(): int
 	{
-		return $this->findAll()->select("IFNULL(MAX(position),0)+1 AS position")->fetchField();
+		return (int) $this->findAll()->max("position") + 1;
 	}
 
 }

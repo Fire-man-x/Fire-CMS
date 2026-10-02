@@ -28,45 +28,42 @@ class Category
 	/**
 	 * Insert category
 	 */
-	public function insert(ArrayHash $values, string $language, ArrayHash $translationValues)
+	public function insert(ArrayHash $values, string $language, ArrayHash $translationValues): int
 	{
-		//begin
-		$this->categoriesModel->getDatabase()->beginTransaction();
+		// transaction(): při výjimce rollback (dřív zůstala transakce otevřená), vnořené volání nevadí
+		return $this->categoriesModel->getDatabase()->transaction(function () use ($values, $language, $translationValues): int {
+			$hasParent = isset($values["parentId"]);
 
-		$hasParent = isset($values["parentId"]);
-		
-		//last right
-		$rightQuery = $this->categoriesModel->getAllForMenu();
-		if($hasParent){
-			$rightQuery->select($this->categoriesModel->getTableName().".categoryRight AS max_right");
-			$rightQuery->where("id", $values["parentId"]);
-		}else{
-			$rightQuery->select("IFNULL(MAX(".$this->categoriesModel->getTableName().".categoryRight), 0) AS max_right");
-		}
-		$right = $rightQuery->fetchField();
-		if ($hasParent) {
-			$values["categoryLeft"] = $right;
-			$values["categoryRight"] = $right + 1;
+			//last right
+			$rightQuery = $this->categoriesModel->findForMenu();
+			if($hasParent){
+				$rightQuery->select($this->categoriesModel->getTableName().".categoryRight AS max_right");
+				$rightQuery->where("id", $values["parentId"]);
+			}else{
+				$rightQuery->select("COALESCE(MAX(".$this->categoriesModel->getTableName().".categoryRight), 0) AS max_right");
+			}
+			$right = $rightQuery->fetchField();
+			if ($hasParent) {
+				$values["categoryLeft"] = $right;
+				$values["categoryRight"] = $right + 1;
 
-			$this->categoriesModel->getAllForMenu()
-				->where("categoryRight >= ?", $right)
-				->update(array("categoryRight" => new \Nette\Database\SqlLiteral("`categoryRight` + 2")));
+				$this->categoriesModel->findForMenu()
+					->where("categoryRight >= ?", $right)
+					->update(array("categoryRight" => new \Nette\Database\SqlLiteral($this->categoriesModel->delimite("categoryRight") . " + 2")));
 
-			$this->categoriesModel->getAllForMenu()
-				->where("categoryLeft >= ?", $right)
-				->update(array("categoryLeft" => new \Nette\Database\SqlLiteral("`categoryLeft` + 2")));
-		} else {
-			$values["categoryLeft"] = $right + 1;
-			$values["categoryRight"] = $right + 2;
-		}
+				$this->categoriesModel->findForMenu()
+					->where("categoryLeft >= ?", $right)
+					->update(array("categoryLeft" => new \Nette\Database\SqlLiteral($this->categoriesModel->delimite("categoryLeft") . " + 2")));
+			} else {
+				$values["categoryLeft"] = $right + 1;
+				$values["categoryRight"] = $right + 2;
+			}
 
-		$id = $this->categoriesModel->insert($values);
-		$this->categoriesModel->insertTranslation($id, $language, $translationValues);
+			$id = $this->categoriesModel->insert($values);
+			$this->categoriesModel->insertTranslation($id, $language, $translationValues);
 
-		//commit
-		$this->categoriesModel->getDatabase()->commit();
-
-		return $id;
+			return $id;
+		});
 	}
 
 
@@ -84,47 +81,48 @@ class Category
 
 
 	/**
-	 * Update category by id
+	 * Smaže kategorii (do koše) - podkategorie se přesunou o úroveň výš k jejímu rodiči a strom
+	 * (categoryLeft/categoryRight) se přepočítá z parentId/position.
+	 * @return int|null rodič smazané kategorie, null = byla na nejvyšší úrovni
 	 * @throws ForbiddenRequestException
 	 */
-	public function delete(int $categoryId): int
+	public function delete(int $categoryId): ?int
 	{
 		$categoryInfo = $this->categoriesModel->getById($categoryId);
+		if (!$categoryInfo instanceof \Nette\Database\Table\ActiveRow) {
+			throw new ForbiddenRequestException("Category '$categoryId' doesn't exist.");
+		}
+		$parentId = $categoryInfo->parentId === null ? null : (int) $categoryInfo->parentId;
 
-		//delete
-		$this->categoriesModel->update($categoryId, array("status"=>"trash"));
+		// koš, přesun podkategorií i přepočet stromu najednou - při chybě uprostřed se nic nezmění
+		$this->categoriesModel->getDatabase()->transaction(function () use ($categoryId, $parentId): void {
+			//delete
+			$this->categoriesModel->update($categoryId, array("status"=>"trash"));
 
-		//repair parent
-		$this->categoriesModel->getAllForMenu()
-			->where("parentId", $categoryId)
-			->update(array("parentId" => $categoryInfo->parentId));
+			//repair parent
+			$this->categoriesModel->findForMenu()
+				->where("parentId", $categoryId)
+				->update(array("parentId" => $parentId));
 
-		//repair left-right
-		$left = $categoryInfo->categoryLeft;
-		$right = $categoryInfo->categoryRight;
-		$width = $right - $left + 1;
+			// přepočet celého stromu - dřívější posun hranic o šířku smazané kategorie počítal s tím, že zmizí
+			// i podkategorie, ty se ale jen přesunou výš (překrývaly by se se sousedy)
+			$this->recalculateTree();
+		});
 
-		$this->categoriesModel->findAll()
-			->where("categoryRight >= ?", $right)
-			->update(array("categoryRight"=> new \Nette\Database\SqlLiteral("`categoryRight` - ".$width)));
-
-		$this->categoriesModel->findAll()
-			->where("categoryLeft >= ?", $left)
-			->update(array("categoryLeft"=> new \Nette\Database\SqlLiteral("`categoryLeft` - ".$width)));
-
-		return $categoryInfo->parentId;
+		return $parentId;
 	}
 
 
 	/**
 	 * Update tree positions
 	 */
-	public function updateTreePositions(array $treePositions)
+	public function updateTreePositions(array $treePositions): void
 	{
-		//update position
-		$this->categoriesModel->updateTreePositions($treePositions);
-
-		$this->recalculateTree();
+		// pozice i přepočet stromu najednou - při chybě uprostřed nezůstane strom napůl přepočítaný
+		$this->categoriesModel->getDatabase()->transaction(function () use ($treePositions): void {
+			$this->categoriesModel->updateTreePositions($treePositions);
+			$this->recalculateTree();
+		});
 	}
 
 
@@ -224,54 +222,52 @@ class Category
 
 
 	/**
-	 * Create tree from list
+	 * Přepočítá vnořené množiny (categoryLeft/categoryRight) celého stromu kategorií z parentId a pořadí
+	 * sourozenců (position). Strom je společný pro všechny sekce a position se čísluje v rámci sekce, proto
+	 * nejdřív sectionId (kategorie sekce zůstanou pohromadě), pak position - ne podle starého categoryLeft
+	 * (getAllForMenu()), jinak by se přetažení mezi sourozenci neprojevilo.
 	 */
 	public function recalculateTree(): void
 	{
-		//list
-		$categoriesList = $this->categoriesModel->getAllForMenu()
-			->select($this->categoriesModel->getTableName() . ".id, " . $this->categoriesModel->getTableName() . ".parentId")
-			->order("position ASC")
-			->fetchAssoc("parentId|id");
-
-		$parents = $categoriesList[null];
-		unset($categoriesList[null]);
-		/**
-		 * @var int $parentId
-		 * @var array $parent
-		 */
-		foreach ($parents as $parentId => $parent){
-			$parents[$parentId] = $this->createTree($parent, $categoriesList);
+		/** @var array<int, list<int>> $childIds parentId (0 = nejvyšší úroveň) => id dětí v pořadí */
+		$childIds = [];
+		$rows = $this->categoriesModel->findForMenu()
+			->select("id, parentId")
+			->order("sectionId")
+			->order("position")
+			->order("id");
+		foreach ($rows as $row) {
+			$childIds[$row->parentId === null ? 0 : (int) $row->parentId][] = (int) $row->id;
 		}
 
-		//set left-right
 		$left = 1;
-		foreach ($parents as $parentId => &$parent){
-			$left = $this->setLeftRight($parent, $left);
+		foreach ($childIds[0] ?? [] as $categoryId) {
+			$left = $this->setLeftRight($categoryId, $childIds, $left, 0);
 		}
 	}
 
 
 	/**
-	 * Set left-right to node
+	 * Uloží hranice a hloubku kategorie a jejích potomků, vrátí další volné číslo. Hloubka se ukládá taky -
+	 * po smazání rodiče se podkategorie přesunou o úroveň výš.
+	 * @param array<int, list<int>> $childIds
 	 */
-	private function setLeftRight(array $node, int $left): int
+	private function setLeftRight(int $categoryId, array $childIds, int $left, int $level): int
 	{
-		$node['left'] = $left++;
-		foreach ($node['childs'] as $child){
-			$left = $this->setLeftRight($child, $left);
+		$categoryLeft = $left++;
+		foreach ($childIds[$categoryId] ?? [] as $childId) {
+			$left = $this->setLeftRight($childId, $childIds, $left, $level + 1);
 		}
-		$node['right'] = $left++;
 
-		//save to DB
 		$this->categoriesModel->findAll()
-			->where("id", $node['id'])
+			->where("id", $categoryId)
 			->update(array(
-				"categoryLeft"=> $node['left'],
-				"categoryRight"=> $node['right'],
+				"categoryLeft" => $categoryLeft,
+				"categoryRight" => $left,
+				"level" => $level,
 			));
 
-		return $left;
+		return $left + 1;
 	}
 
 

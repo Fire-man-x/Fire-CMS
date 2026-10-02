@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace App\Model\Database;
 
 use Nette\Database\Explorer;
-use Nette\Database\SqlLiteral;
 use Nette\Utils\ArrayHash;
 
 /**
@@ -57,7 +56,7 @@ class FileFolders extends BaseModel
 	 */
 	protected function getNextPosition(): int
 	{
-		return $this->findAll()->select("IFNULL(MAX(position),0)+1 AS position")->fetchField();
+		return (int) $this->findAll()->max("position") + 1;
 	}
 
 
@@ -66,20 +65,8 @@ class FileFolders extends BaseModel
 	 */
 	public function updateTreePositions(array $treePositions): void
 	{
-		// search for columns to update
-		$keys = array_keys(array_values($treePositions)[0]);
-
-		// join keys for update statement
-		$updateStatement = array();
-		foreach ($keys as $key){
-			$updateStatement[$key] = new SqlLiteral("VALUES($key)");
-		}
-
-		foreach ($treePositions as &$treePosition){
-			$treePosition["name"] = "";//must be, should not be updated
-		}
-
-		$this->database->query("INSERT INTO `" . $this->getTableName() . "` ? ON DUPLICATE KEY UPDATE ? ", $treePositions, $updateStatement);
+		// řádky [id, parentId, position, level] existují, mění se jen pozice (dřív INSERT ... ON DUPLICATE KEY UPDATE)
+		$this->updateRowsById($treePositions);
 	}
 
 }

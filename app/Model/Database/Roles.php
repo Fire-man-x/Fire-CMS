@@ -47,7 +47,7 @@ class Roles extends BaseModel implements IList
 	public function delete(int $id): ?int
 	{
 		return $this->findById($id)
-			->where("default", 0)
+			->where("default", false) // boolean sloupec - PostgreSQL 0 neporovná
 			->delete();
 	}
 

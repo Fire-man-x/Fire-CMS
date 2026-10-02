@@ -53,13 +53,12 @@ class Comment
 	 */
 	public function getTypeByStoredItem(int $commentId): string
 	{
-		$articles = $this->articlesModel->getRelationCommentsTable()->where("commentId", $commentId);
-		if($articles){
+		// count(), ne if ($selection) - objekt Selection je vždy pravdivý (dřív vždy vyšel článek)
+		if ($this->articlesModel->getRelationCommentsTable()->where("commentId", $commentId)->count('*') > 0) {
 			return self::TYPE_ARTICLE;
 		}
 
-		$categories = $this->categoriesModel->getRelationCommentsTable()->where("commentId", $commentId);
-		if($categories){
+		if ($this->categoriesModel->getRelationCommentsTable()->where("commentId", $commentId)->count('*') > 0) {
 			return self::TYPE_CATEGORY;
 		}
 
@@ -86,24 +85,21 @@ class Comment
 			$data["createdBy"] = null;
 		}
 
-		//begin
-		$this->commentsModel->getDatabase()->beginTransaction();
+		// transaction(): při výjimce rollback (dřív zůstala transakce otevřená), vnořené volání nevadí
+		return $this->commentsModel->getDatabase()->transaction(function () use ($model, $relationColumnId, $data): int {
+			//right
+			$right = $model->getRelationComments($relationColumnId)
+				->select("COALESCE(MAX(comment.right), 0) AS max_right")
+				->fetchField();
+			$data["left"] = $right+1;
+			$data["right"] = $right+2;
 
-		//right
-		$right = $model->getRelationComments($relationColumnId)
-			->select("IFNULL(MAX(comment.right), 0) AS max_right")
-			->fetchField();
-		$data["left"] = $right+1;
-		$data["right"] = $right+2;
+			$commentId = $this->commentsModel->insert($data);
 
-		$commentId = $this->commentsModel->insert($data);
+			$model->insertRelationComments($relationColumnId, $commentId);
 
-		$model->insertRelationComments($relationColumnId, $commentId);
-
-		//commit
-		$this->commentsModel->getDatabase()->commit();
-
-		return $commentId;
+			return $commentId;
+		});
 	}
 
 
@@ -129,43 +125,46 @@ class Comment
 			$data["createdBy"] = null;
 		}
 
-		//begin
-		$this->commentsModel->getDatabase()->beginTransaction();
+		// transaction(): při výjimce rollback (dřív zůstala transakce otevřená), vnořené volání nevadí
+		// sloupec vazby podle typu (articleId/categoryId) - dřív natvrdo articleId, odpověď v kategorii nefungovala
+		$column = $model->getForeignKeyColumn();
 
-		//right
-		$parentComment = $model->getRelationCommentsTable()
-			->select("articleId")
-			->select("comment.right")
-			->where("comment.id", $replyToId)
-			->fetch();
+		return $this->commentsModel->getDatabase()->transaction(function () use ($model, $column, $replyToId, $data): int {
+			//right
+			$parentComment = $model->getRelationCommentsTable()
+				->select($column)
+				->select("comment.right")
+				->where("comment.id", $replyToId)
+				->fetch();
+			if (!$parentComment instanceof \Nette\Database\Table\ActiveRow) {
+				throw new \InvalidArgumentException("Comment '$replyToId' doesn't exist.");
+			}
 
-		$articleId = $parentComment["articleId"];
-		$right = $parentComment["right"];
+			$relationId = (int) $parentComment[$column];
+			$right = $parentComment["right"];
 
-		$data["left"] = $right;
-		$data["right"] = $right+1;
+			$data["left"] = $right;
+			$data["right"] = $right+1;
 
-		$allComments = $model->getRelationComments($articleId)->fetchPairs("commentId", "articleId");
-		$allCommentsIds = array_keys($allComments);
+			$allComments = $model->getRelationComments($relationId)->fetchPairs("commentId", $column);
+			$allCommentsIds = array_keys($allComments);
 
-		$this->commentsModel->findAll()
-			->where("id", $allCommentsIds)
-			->where("right >= ?", $right)
-			->update(array("right"=> new \Nette\Database\SqlLiteral("`right` + 2")));
+			$this->commentsModel->findAll()
+				->where("id", $allCommentsIds)
+				->where("right >= ?", $right)
+				->update(array("right"=> new \Nette\Database\SqlLiteral($this->commentsModel->delimite("right") . " + 2")));
 
-		$this->commentsModel->findAll()
-			->where("id", $allCommentsIds)
-			->where("left >= ?", $right)
-			->update(array("left"=> new \Nette\Database\SqlLiteral("`left` + 2")));
+			$this->commentsModel->findAll()
+				->where("id", $allCommentsIds)
+				->where("left >= ?", $right)
+				->update(array("left"=> new \Nette\Database\SqlLiteral($this->commentsModel->delimite("left") . " + 2")));
 
-		$commentId = $this->commentsModel->insert($data);
+			$commentId = $this->commentsModel->insert($data);
 
-		$model->insertRelationComments($articleId, $commentId);
+			$model->insertRelationComments($relationId, $commentId);
 
-		//commit
-		$this->commentsModel->getDatabase()->commit();
-
-		return $commentId;
+			return $commentId;
+		});
 	}
 
 
@@ -186,34 +185,40 @@ class Comment
 		 */
 		$type = $this->getTypeByStoredItem($commentId);
 		$model = $this->getModelByType($type);
+		$column = $model->getForeignKeyColumn();
 
-		$articleId = $model->getRelationCommentsTable()
-			->select("articleId")
-			->where("commentId", $commentId)
-			->fetchField("articleId");
+		$this->commentsModel->getDatabase()->transaction(function () use ($model, $column, $commentId): void {
+			$relationId = $model->getRelationCommentsTable()
+				->where("commentId", $commentId)
+				->fetchField($column);
+			$comment = $this->commentsModel->getById($commentId);
+			if ($relationId === null || !$comment instanceof \Nette\Database\Table\ActiveRow) {
+				return;
+			}
 
-		$allComments = $model->getRelationComments($articleId)->fetchPairs("commentId", "articleId");
-		$allCommentsIds = array_keys($allComments);
+			// left/right se čísluje zvlášť pro každý článek/kategorii - mazat a posouvat jen v rámci téže položky
+			// (dřív "left BETWEEN" nad všemi komentáři smazal i komentáře jiných článků se stejnými čísly)
+			$allCommentsIds = array_keys($model->getRelationComments((int) $relationId)->fetchPairs("commentId", $column));
 
-		$comment = $this->commentsModel->getById($commentId);
+			$left = (int) $comment->left;
+			$right = (int) $comment->right;
+			$width = $right - $left + 1;
 
-		$left = $comment?->left;
-		$right = $comment?->right;
-		$width = $right - $left + 1;
+			$this->commentsModel->findAll()
+				->where("id", $allCommentsIds)
+				->where("left BETWEEN ? AND ?", $left, $right)
+				->delete();
 
-		$this->commentsModel->findAll()
-			->where("left BETWEEN ? AND ?", $left, $right)
-			->delete();
+			$this->commentsModel->findAll()
+				->where("id", $allCommentsIds)
+				->where("right >= ?", $right)
+				->update(array("right"=> new \Nette\Database\SqlLiteral($this->commentsModel->delimite("right") . " - " . $width)));
 
-		$this->commentsModel->findAll()
-			->where("id", $allCommentsIds)
-			->where("right >= ?", $right)
-			->update(array("right"=> new \Nette\Database\SqlLiteral("`right` - ".$width)));
-
-		$this->commentsModel->findAll()
-			->where("id", $allCommentsIds)
-			->where("left >= ?", $left)
-			->update(array("left"=> new \Nette\Database\SqlLiteral("`left` - ".$width)));
+			$this->commentsModel->findAll()
+				->where("id", $allCommentsIds)
+				->where("left >= ?", $left)
+				->update(array("left"=> new \Nette\Database\SqlLiteral($this->commentsModel->delimite("left") . " - " . $width)));
+		});
 	}
 
 

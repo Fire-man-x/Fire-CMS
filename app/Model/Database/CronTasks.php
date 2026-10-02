@@ -35,11 +35,13 @@ class CronTasks extends BaseModel
 	 */
 	public function markStarted(string $name, \DateTimeImmutable $now): void
 	{
-		$this->database->query(
-			'INSERT INTO ?name ?values ON DUPLICATE KEY UPDATE lastRunAt = VALUES(lastRunAt)',
-			$this->getTableName(),
-			['name' => $name, 'lastRunAt' => $now],
-		);
+		// insert nebo update (dřív INSERT ... ON DUPLICATE KEY UPDATE, který PostgreSQL nezná); podle existence
+		// řádku, ne podle počtu změněných řádků - MariaDB ho u nezměněné hodnoty vrací 0
+		if ($this->findAll()->where('name', $name)->count('*') > 0) {
+			$this->findAll()->where('name', $name)->update(['lastRunAt' => $now]);
+		} else {
+			$this->findAll()->insert(['name' => $name, 'lastRunAt' => $now]);
+		}
 	}
 
 

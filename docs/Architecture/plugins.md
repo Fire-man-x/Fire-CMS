@@ -45,6 +45,33 @@ svoji migrační skupinu zaregistruje sám ve vlastním `config.plugin.neon` jak
 balíčku tak nikdy nevyžaduje editovat core `app/config/config.neon`. Migrace se pouští přes `bin/console
 migrations:continue` (`nextras/migrations` + `contributte/console`, viz `Architecture/configuration.md`).
 
+**Plugin pro MariaDB i PostgreSQL** (vzor: `Stalker`, `Statistics`) má migrace i odinstalační skript zvlášť pro
+každou databázi, se stejnými názvy souborů:
+
+```
+app/Plugins/<Name>/data/
+	migrations/mysql/20261002000001.sql
+	migrations/pgsql/20261002000001.sql
+	deactivate/mysql.sql
+	deactivate/pgsql.sql
+```
+
+Adresář skupiny se vybere parametrem `migrations.driver` (stejný jako u jádra, `mysql`/`pgsql`, viz
+`Architecture/configuration.md`):
+
+```neon
+migrations:
+	groups:
+		stalker:
+			directory: %appDir%/Plugins/Stalker/data/migrations/%migrations.driver%
+			dependencies: [structures]
+```
+
+`PluginMigrator` (zapnutí z administrace) `%migrations.driver%` dosazuje sám podle Nextras driveru. PostgreSQL
+verze migrace se píše podle stejných pravidel převodu jako u jádra (`Architecture/configuration.md`), trigger pro
+`updateDate` používá funkci jádra `firecms_set_update_date()`. Plugin jen pro MariaDB (starší rozvržení
+`data/migrations/*.sql` + `data/deactivate.sql`) funguje dál, na PostgreSQL ale nepůjde nainstalovat.
+
 ## Jak `PresenterFactory` najde presenter uvnitř Modules/Plugins
 
 Výchozí Nette mapování je `App\*Module\Presenters\*Presenter`. `application.presenterFactory` je v
@@ -184,6 +211,9 @@ PluginRepository::findAll()` (skenuje `app/Plugins` + `theme/Plugins`, porovná 
 `theme/config/plugins.neon`), se sloupcem zapnout/vypnout, který přepíše `theme/config/plugins.neon` na
 disku. Při zapnutí pluginu `App\Model\Plugin\PluginMigrator` hned spustí jeho migrace, ale jen ze sekce
 `migrations: groups:` v `config.plugin.neon` (skupinu registrovanou otagovanou službou `Group` nenajde, ta
-potřebuje ruční `bin/console migrations:continue`). Při vypnutí spustí jeho `data/deactivate.sql`, pokud ho
-plugin má (destruktivní, administrace se ptá na potvrzení). Vypnutí `app/Plugins/*` pluginu naráží na
+potřebuje ruční `bin/console migrations:continue`). Při vypnutí spustí jeho `data/deactivate/<driver>.sql`
+(`mysql.sql`/`pgsql.sql`, na MariaDB/MySQL i starší `data/deactivate.sql`), pokud ho plugin má (destruktivní,
+administrace se ptá na potvrzení), a smaže záznamy skupin pluginu z tabulky `migrations`, takže se při dalším
+zapnutí migrace pustí znovu (pozor na pořadí migrací, viz `gotchas.md`, "Nová migrace musí mít časové razítko
+za POSLEDNÍ provedenou migrací"). Vypnutí `app/Plugins/*` pluginu naráží na
 kompilaci kontejneru, viz `gotchas.md`, "Vypnutý plugin a kompilace kontejneru".

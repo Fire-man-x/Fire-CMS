@@ -763,21 +763,9 @@ parameters:
 			path: ../Modules/CommentsModule/Comment.php
 
 		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
-			count: 1
-			path: ../Modules/CommentsModule/Comment.php
-
-		-
 			message: '#^PHPDoc tag @param has invalid value \(\\Nette\\Utils\\ArrayHash\)\: Unexpected token "\\n\\t ", expected variable at offset 48 on line 3$#'
 			identifier: phpDoc.parseError
 			count: 2
-			path: ../Modules/CommentsModule/Comment.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
 			path: ../Modules/CommentsModule/Comment.php
 
 		-

@@ -188,10 +188,13 @@ class ArticlesPresenter extends BasePresenter
 			->where($this->articlesModel->getTableName().".sectionId", $this->getSectionId())
 			->order($this->articlesModel->getTableName().".createDate DESC")
 			->order($this->articlesModel->getTableName().".".$this->articlesModel->getColumnId());
-		$this->articlesModel->selectTitle($source, "`" . $this->articlesModel->getTableName() . "`.`id`", $this->editLocale);
+		$this->articlesModel->selectTitle($source, $this->articlesModel->getTableName() . ".id", $this->editLocale);
 		//název hlavní kategorie článku
-		$this->categoriesModel->selectTitle($source, "(SELECT `relation`.`categoryId` FROM `" . Categories::RELATION_ARTICLE_TABLE_NAME . "` `relation`"
-			. " WHERE `relation`.`articleId` = `" . $this->articlesModel->getTableName() . "`.`id` ORDER BY `relation`.`isMain` DESC LIMIT 1)", $this->editLocale, "categoryTitle");
+		$categories = $this->categoriesModel;
+		$this->categoriesModel->selectTitle($source, "(SELECT " . $categories->delimite('relation.categoryId')
+			. " FROM " . $categories->delimite(Categories::RELATION_ARTICLE_TABLE_NAME) . " " . $categories->delimite('relation')
+			. " WHERE " . $categories->delimite('relation.articleId') . " = " . $categories->delimite($this->articlesModel->getTableName() . '.id')
+			. " ORDER BY " . $categories->delimite('relation.isMain') . " DESC LIMIT 1)", $this->editLocale, "categoryTitle");
 		switch ($this->show) {
 			case "personal":
 				$source->where($this->articlesModel->getTableName().".createdBy = ?", $this->user->getId());
@@ -324,7 +327,7 @@ class ArticlesPresenter extends BasePresenter
 	protected function createComponentCategoriesGrid($name)
 	{
 		$source = $this->articlesModel->getRelationCategory($this->id);
-		$this->categoriesModel->selectTitle($source, "`" . Categories::RELATION_ARTICLE_TABLE_NAME . "`.`categoryId`", $this->editLocale)
+		$this->categoriesModel->selectTitle($source, Categories::RELATION_ARTICLE_TABLE_NAME . ".categoryId", $this->editLocale)
 			->order("title");
 		$primaryKey = "categoryId";
 
@@ -379,7 +382,7 @@ class ArticlesPresenter extends BasePresenter
 		$source = $this->categoriesModel->getAllForMenu()
 			->select($this->categoriesModel->getTableName() . ".*")
 			->where($this->categoriesModel->getTableName() . ".sectionId", $this->getSectionId());
-		$this->categoriesModel->selectTitle($source, "`" . $this->categoriesModel->getTableName() . "`.`id`", $this->editLocale)
+		$this->categoriesModel->selectTitle($source, $this->categoriesModel->getTableName() . ".id", $this->editLocale)
 			->order("title");
 		$primaryKey = $this->categoriesModel->getColumnId();
 		$paramKey = $this->categoriesModel->getForeignKeyColumn();

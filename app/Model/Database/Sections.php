@@ -60,8 +60,8 @@ class Sections extends BaseModel implements Translatable
 	 */
 	public function getList(?string $language = null): array
 	{
-		$selection = $this->findAll()->select('`' . $this->getTableName() . '`.*');
-		$this->selectTitle($selection, '`' . $this->getTableName() . '`.`id`', $language);
+		$selection = $this->findAll()->select($this->getTableName() . '.*');
+		$this->selectTitle($selection, $this->getTableName() . '.id', $language);
 
 		$list = [];
 		foreach ($selection->order('position')->order('id') as $row) {

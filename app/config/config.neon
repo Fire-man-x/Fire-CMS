@@ -7,6 +7,9 @@ parameters:
 	# ukázková data (data/migrations/dummy-data) - zapnout jen lokálně v config.local.neon (`dummyData: true`),
 	# bin/console běží v produkčním režimu, takže %debugMode% tu nepomůže
 	dummyData: false
+	migrations:
+		dir: %rootDir%/data/migrations
+		driver: mysql
 	# token pro cron endpoint /cron (App\Presenters\CronPresenter) - nastavte v config.local.neon, prázdný = vypnuto
 	cronToken: ''
 	# login with Facebook (App\Security\FacebookLogin) - clientId and clientSecret  setup in config.local.neon
@@ -107,18 +110,18 @@ router:
 # group from its config.plugin.neon (`migrations: groups:`, e.g. app/Plugins/Sliders) - so
 # adding a plugin's migrations never requires touching this core file.
 migrations:
-	dir: %appDir%/../data/migrations
-	driver: mysql
+	dir: %migrations.dir%
+	driver: %migrations.driver%
 	dbal: nette
 	groups:
 		structures:
-			directory: %appDir%/../data/migrations/structures
+			directory: %migrations.dir%/structures
 		basic-data:
-			directory: %appDir%/../data/migrations/basic-data
+			directory: %migrations.dir%/basic-data
 			dependencies: [structures]
 		dummy-data:
 			enabled: %dummyData%
-			directory: %appDir%/../data/migrations/dummy-data
+			directory: %migrations.dir%/dummy-data
 			dependencies: [structures, basic-data]
 
 fileUpload:

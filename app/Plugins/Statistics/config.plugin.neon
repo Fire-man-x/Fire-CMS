@@ -2,7 +2,8 @@ migrations:
 	groups:
 		statistics:
 			enabled: true
-			directory: %appDir%/Plugins/Statistics/data/migrations
+			# data/migrations/mysql nebo data/migrations/pgsql podle parametru migrations.driver (config.neon)
+			directory: %appDir%/Plugins/Statistics/data/migrations/%migrations.driver%
 			dependencies: [structures]
 			generator: null
 

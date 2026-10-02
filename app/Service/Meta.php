@@ -87,7 +87,8 @@ class Meta
 			$items->select($metaTable . ".id");
 			$items->select(":" . $model->getTableName() . ".value");
 		} else {
-			$items->select("IF(:" . $model->getTableName() . ".value = '' OR :" . $model->getTableName() . ".value IS NULL, IF(" . $metaTable . ".value = '', NULL, " . $metaTable . ".value), :" . $model->getTableName() . ".value) AS value");
+			// vlastní hodnota položky, prázdná = výchozí hodnota mety (prázdná = NULL); CASE/NULLIF místo MySQL IF()
+			$items->select("CASE WHEN :" . $model->getTableName() . ".value = '' OR :" . $model->getTableName() . ".value IS NULL THEN NULLIF(" . $metaTable . ".value, '') ELSE :" . $model->getTableName() . ".value END AS value");
 		}
 
 		$rows = array_map(iterator_to_array(...), $items->fetchAll());
