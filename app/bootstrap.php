@@ -11,8 +11,7 @@ define("APP_DIR", __DIR__."/");
 
 $configurator = new Configurator();
 
-//$configurator->setDebugMode('192.168.88.127'); // enable for your remote IP
-$configurator->setDebugMode('CoreReligis951@78.80.64.67');
+$configurator->setDebugMode(['FireCmsCore951@::1','FireCmsCore951@127.0.0.1']);
 $configurator->enableTracy(__DIR__ . '/../log');
 
 $configurator->setTimeZone('Europe/Prague');
