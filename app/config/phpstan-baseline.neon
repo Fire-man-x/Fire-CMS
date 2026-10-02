@@ -1,6 +1,18 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Property App\\AdminModule\\Forms\\DomainFormFactory\:\:\$translator is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../AdminModule/Forms/DomainFormFactory.php
+
+		-
+			message: '#^Access to an undefined property Nette\\Forms\\Control\:\:\$value\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../AdminModule/Forms/DynamicFormFormFactory.php
+
+		-
 			message: '#^Access to an undefined property Nette\\Application\\UI\\Form\:\:\$data\.$#'
 			identifier: property.notFound
 			count: 1
@@ -41,6 +53,18 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: ../AdminModule/Forms/RoleFormFactory.php
+
+		-
+			message: '#^PHPDoc tag @var with type SplFileInfo is not subtype of native type Nette\\Utils\\FileInfo\.$#'
+			identifier: varTag.nativeType
+			count: 1
+			path: ../AdminModule/Forms/SettingFormFactory.php
+
+		-
+			message: '#^Method Nette\\Application\\UI\\Control\:\:flashMessage\(\) invoked with 3 parameters, 1\-2 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: ../AdminModule/Forms/TagFormFactory.php
 
 		-
 			message: '#^Access to an undefined property App\\AdminModule\\Forms\\UserFormFactory\:\:\$sender\.$#'
@@ -95,6 +119,42 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../AdminModule/Presenters/BasePresenter.php
+
+		-
+			message: '#^Access to an undefined property App\\AdminModule\\Presenters\\DynamicFormsPresenter\:\:\$categoriesModel\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../AdminModule/Presenters/DynamicFormsPresenter.php
+
+		-
+			message: '#^Class Contributte\\Datagrid\\Datagrid referenced with incorrect case\: Contributte\\Datagrid\\DataGrid\.$#'
+			identifier: class.nameCase
+			count: 1
+			path: ../AdminModule/Presenters/DynamicFormsPresenter.php
+
+		-
+			message: '#^PHPDoc tag @throws with type LiveTranslator\\TranslatorException\|Ublaboo\\DataGrid\\Exception\\DataGridColumnStatusException\|Ublaboo\\DataGrid\\Exception\\DataGridException is not subtype of Throwable$#'
+			identifier: throws.notThrowable
+			count: 1
+			path: ../AdminModule/Presenters/DynamicFormsPresenter.php
+
+		-
+			message: '#^PHPDoc tag @throws with type LiveTranslator\\TranslatorException\|Ublaboo\\DataGrid\\Exception\\DataGridException is not subtype of Throwable$#'
+			identifier: throws.notThrowable
+			count: 1
+			path: ../AdminModule/Presenters/DynamicFormsPresenter.php
+
+		-
+			message: '#^Property App\\AdminModule\\Presenters\\DynamicFormsPresenter\:\:\$language \(string\|null\) is never assigned string so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: ../AdminModule/Presenters/DynamicFormsPresenter.php
+
+		-
+			message: '#^Property App\\AdminModule\\Presenters\\DynamicFormsPresenter\:\:\$parent is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../AdminModule/Presenters/DynamicFormsPresenter.php
 
 		-
 			message: '#^Property App\\AdminModule\\Presenters\\FilesManagerPresenter\:\:\$parent \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
@@ -205,7 +265,7 @@ parameters:
 			path: ../Components/TwitterBootstrapRenderer/TwitterBootstrapRenderer.php
 
 		-
-			message: '#^Instanceof between App\\Model\\Articles\|App\\Model\\Categories\|App\\Model\\Files and App\\Components\\IViewCounter will always evaluate to true\.$#'
+			message: '#^Instanceof between App\\Model\\Database\\Articles\|App\\Model\\Database\\Categories\|App\\Model\\Database\\Files and App\\Components\\IViewCounter will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1
 			path: ../Components/ViewCounter.php
@@ -481,24 +541,6 @@ parameters:
 			path: ../Forms/CategoryFormFactory.php
 
 		-
-			message: '#^PHPDoc tag @var with type SplFileInfo is not subtype of native type Nette\\Utils\\FileInfo\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: ../Forms/SettingFormFactory.php
-
-		-
-			message: '#^Method Nette\\Application\\UI\\Control\:\:flashMessage\(\) invoked with 3 parameters, 1\-2 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: ../Forms/TagFormFactory.php
-
-		-
-			message: '#^Property App\\Forms\\TagFormFactory\:\:\$modelModules is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../Forms/TagFormFactory.php
-
-		-
 			message: '#^Property App\\FrontModule\\Components\\Articles\\Articles\:\:\$articles is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
@@ -511,6 +553,42 @@ parameters:
 			path: ../FrontModule/Components/Categories/Categories.php
 
 		-
+			message: '#^Access to an undefined property Nette\\Application\\UI\\Presenter\:\:\$editLocale\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../FrontModule/Components/DynamicForms/ContactFormComponentFactory.php
+
+		-
+			message: '#^Call to an undefined method Nette\\Application\\UI\\Form\:\:addAntiSpam\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../FrontModule/Components/DynamicForms/ContactFormFactory.php
+
+		-
+			message: '#^Cannot access property \$editId on array\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../FrontModule/Components/DynamicForms/ContactFormFactory.php
+
+		-
+			message: '#^Cannot access property \$formName on array\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../FrontModule/Components/DynamicForms/ContactFormFactory.php
+
+		-
+			message: '#^Property App\\FrontModule\\Components\\DynamicForms\\ContactFormFactory\:\:\$commentService is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../FrontModule/Components/DynamicForms/ContactFormFactory.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: ../FrontModule/Components/DynamicForms/ContactFormFactory.php
+
+		-
 			message: '#^Property App\\FrontModule\\Components\\SearchControl\\SearchControl\:\:\$articles is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
@@ -521,6 +599,12 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: ../FrontModule/Components/SearchControl/SearchControl.php
+
+		-
+			message: '#^Access to an undefined property Nette\\Application\\UI\\Presenter\:\:\$locale\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../FrontModule/Components/Sliders/SliderComponentFactory.php
 
 		-
 			message: '#^Property App\\FrontModule\\Presenters\\ArticlesPresenter\:\:\$parent is never read, only written\.$#'
@@ -559,58 +643,58 @@ parameters:
 			path: ../FrontModule/Presenters/SearchPresenter.php
 
 		-
-			message: '#^Default value of the parameter \#3 \$data \(array\) of method App\\Model\\Articles\:\:insertRelationFile\(\) is incompatible with type Nette\\Utils\\ArrayHash\.$#'
+			message: '#^Default value of the parameter \#3 \$data \(array\) of method App\\Model\\Database\\Articles\:\:insertRelationFile\(\) is incompatible with type Nette\\Utils\\ArrayHash\.$#'
 			identifier: parameter.defaultValue
 			count: 1
-			path: ../Model/Articles.php
+			path: ../Model/Database/Articles.php
 
 		-
-			message: '#^Method App\\Model\\Articles\:\:deleteRelationFile\(\) should return int but return statement is missing\.$#'
+			message: '#^Method App\\Model\\Database\\Articles\:\:deleteRelationFile\(\) should return int but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
-			path: ../Model/Articles.php
+			path: ../Model/Database/Articles.php
 
 		-
-			message: '#^Method App\\Model\\Articles\:\:insertRelationFile\(\) should return int but return statement is missing\.$#'
+			message: '#^Method App\\Model\\Database\\Articles\:\:insertRelationFile\(\) should return int but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
-			path: ../Model/Articles.php
+			path: ../Model/Database/Articles.php
 
 		-
 			message: '#^Call to function is_null\(\) with int will always evaluate to false\.$#'
 			identifier: function.impossibleType
 			count: 1
-			path: ../Model/BaseSubMetas.php
+			path: ../Model/Database/BaseSubMetas.php
 
 		-
-			message: '#^Default value of the parameter \#3 \$data \(array\) of method App\\Model\\Categories\:\:insertRelationFile\(\) is incompatible with type Nette\\Utils\\ArrayHash\.$#'
+			message: '#^Default value of the parameter \#3 \$data \(array\) of method App\\Model\\Database\\Categories\:\:insertRelationFile\(\) is incompatible with type Nette\\Utils\\ArrayHash\.$#'
 			identifier: parameter.defaultValue
 			count: 1
-			path: ../Model/Categories.php
+			path: ../Model/Database/Categories.php
 
 		-
-			message: '#^Method App\\Model\\Categories\:\:insertRelationFile\(\) should return int but return statement is missing\.$#'
+			message: '#^Method App\\Model\\Database\\Categories\:\:insertRelationFile\(\) should return int but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
-			path: ../Model/Categories.php
+			path: ../Model/Database/Categories.php
 
 		-
-			message: '#^Method App\\Model\\Categories\:\:updateTranslation\(\) should return int but return statement is missing\.$#'
+			message: '#^Method App\\Model\\Database\\Categories\:\:updateTranslation\(\) should return int but return statement is missing\.$#'
 			identifier: return.missing
 			count: 2
-			path: ../Model/Categories.php
+			path: ../Model/Database/Categories.php
 
 		-
 			message: '#^PHPDoc tag @param references unknown parameter\: \$id$#'
 			identifier: parameter.notFound
 			count: 1
-			path: ../Model/Categories.php
+			path: ../Model/Database/Categories.php
 
 		-
-			message: '#^Property App\\Model\\Metas\:\:\$languages is never read, only written\.$#'
+			message: '#^Property App\\Model\\Database\\Metas\:\:\$languages is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
-			path: ../Model/Metas.php
+			path: ../Model/Database/Metas.php
 
 		-
 			message: '#^Negated boolean expression is always false\.$#'
@@ -745,108 +829,6 @@ parameters:
 			path: ../Modules/UrlModule/UrlManager.php
 
 		-
-			message: '#^Access to an undefined property App\\Plugins\\DynamicForms\\AdminModule\\DynamicFormsPresenter\:\:\$categoriesModel\.$#'
-			identifier: property.notFound
-			count: 1
-			path: ../Plugins/DynamicForms/AdminModule/DynamicFormsPresenter.php
-
-		-
-			message: '#^Class Contributte\\Datagrid\\Datagrid referenced with incorrect case\: Contributte\\Datagrid\\DataGrid\.$#'
-			identifier: class.nameCase
-			count: 1
-			path: ../Plugins/DynamicForms/AdminModule/DynamicFormsPresenter.php
-
-		-
-			message: '#^PHPDoc tag @throws with type LiveTranslator\\TranslatorException\|Ublaboo\\DataGrid\\Exception\\DataGridColumnStatusException\|Ublaboo\\DataGrid\\Exception\\DataGridException is not subtype of Throwable$#'
-			identifier: throws.notThrowable
-			count: 1
-			path: ../Plugins/DynamicForms/AdminModule/DynamicFormsPresenter.php
-
-		-
-			message: '#^PHPDoc tag @throws with type LiveTranslator\\TranslatorException\|Ublaboo\\DataGrid\\Exception\\DataGridException is not subtype of Throwable$#'
-			identifier: throws.notThrowable
-			count: 1
-			path: ../Plugins/DynamicForms/AdminModule/DynamicFormsPresenter.php
-
-		-
-			message: '#^Property App\\Plugins\\DynamicForms\\AdminModule\\DynamicFormsPresenter\:\:\$language \(string\|null\) is never assigned string so it can be removed from the property type\.$#'
-			identifier: property.unusedType
-			count: 1
-			path: ../Plugins/DynamicForms/AdminModule/DynamicFormsPresenter.php
-
-		-
-			message: '#^Property App\\Plugins\\DynamicForms\\AdminModule\\DynamicFormsPresenter\:\:\$parent is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../Plugins/DynamicForms/AdminModule/DynamicFormsPresenter.php
-
-		-
-			message: '#^Access to an undefined property Nette\\Application\\UI\\Presenter\:\:\$editLocale\.$#'
-			identifier: property.notFound
-			count: 1
-			path: ../Plugins/DynamicForms/Components/ContactFormComponentFactory.php
-
-		-
-			message: '#^Call to an undefined static method Nette\\Utils\\Callback\:\:invokeArgs\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: ../Plugins/DynamicForms/DI/Extension.php
-
-		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$controlNameFromTemplate$#'
-			identifier: parameter.notFound
-			count: 1
-			path: ../Plugins/DynamicForms/DI/Extension.php
-
-		-
-			message: '#^Parameter \#1 \$parent of method Nette\\ComponentModel\\Component\:\:setParent\(\) expects Nette\\ComponentModel\\IContainer\|null, Nette\\Application\\IPresenter\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Plugins/DynamicForms/DI/Extension.php
-
-		-
-			message: '#^Call to an undefined method Nette\\Application\\UI\\Form\:\:addAntiSpam\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../Plugins/DynamicForms/Forms/ContactFormFactory.php
-
-		-
-			message: '#^Cannot access property \$editId on array\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: ../Plugins/DynamicForms/Forms/ContactFormFactory.php
-
-		-
-			message: '#^Cannot access property \$formName on array\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: ../Plugins/DynamicForms/Forms/ContactFormFactory.php
-
-		-
-			message: '#^Property App\\Plugins\\DynamicForms\\Forms\\ContactFormFactory\:\:\$commentService is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../Plugins/DynamicForms/Forms/ContactFormFactory.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: ../Plugins/DynamicForms/Forms/ContactFormFactory.php
-
-		-
-			message: '#^Access to an undefined property Nette\\Forms\\Control\:\:\$value\.$#'
-			identifier: property.notFound
-			count: 1
-			path: ../Plugins/DynamicForms/Forms/DynamicFormFormFactory.php
-
-		-
-			message: '#^Access to an undefined property Nette\\Application\\UI\\Presenter\:\:\$editLocale\.$#'
-			identifier: property.notFound
-			count: 1
-			path: ../Plugins/Sliders/Components/SliderComponentFactory.php
-
-		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
@@ -895,13 +877,13 @@ parameters:
 			path: ../Security/Role.php
 
 		-
-			message: '#^Call to an undefined method App\\Model\\Categories\:\:getAllInLanguage\(\)\.$#'
+			message: '#^Call to an undefined method App\\Model\\Database\\Categories\:\:getAllInLanguage\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: ../Service/Category.php
 
 		-
-			message: '#^Method App\\Service\\Meta\:\:getModelByType\(\) should return App\\Model\\BaseSubMetas but returns App\\Model\\Files\.$#'
+			message: '#^Method App\\Service\\Meta\:\:getModelByType\(\) should return App\\Model\\Database\\BaseSubMetas but returns App\\Model\\Database\\Files\.$#'
 			identifier: return.type
 			count: 1
 			path: ../Service/Meta.php

@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Testy (Nette Tester)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: gd, exif, intl, pdo_sqlite
+          coverage: none
+          tools: composer:v2
+
+      - name: Composer install
+        run: composer install --no-interaction --no-progress --prefer-dist
+        env:
+          # LiveTranslator je vcs repozitář na GitHubu, bez tokenu hrozí limit GitHub API
+          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.GITHUB_TOKEN }}"}}'
+
+      - name: Testy
+        run: composer test
+
+  phpstan:
+    name: PHPStan (level 5 + baseline)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: gd, exif, intl
+          coverage: none
+          tools: composer:v2
+
+      - name: Composer install
+        run: composer install --no-interaction --no-progress --prefer-dist
+        env:
+          # LiveTranslator je vcs repozitář na GitHubu, bez tokenu hrozí limit GitHub API
+          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.GITHUB_TOKEN }}"}}'
+
+      # Stejná brána jako lokální `composer stan` (app/config/phpstan.neon: level 5 + phpstan-baseline.neon).
+      # error-format=github = chyby jako anotace přímo u řádků v pull requestu.
+      - name: PHPStan
+        run: composer stan -- --no-progress --error-format=github --memory-limit=2G

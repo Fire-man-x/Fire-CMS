@@ -1,0 +1,69 @@
+# Šablona Secret File `config.local.neon` pro Render (služba "project-name" > Environment > Secret Files).
+# Vyplněná verze do repozitáře NEPATŘÍ. Entrypoint ji při startu zkopíruje do theme/config/config.local.neon,
+# načítá se jako poslední vrstva konfigurace (přepíše config.neon, plugins.neon i theme.neon).
+# Postup a odkud vzít jednotlivé hodnoty viz doc/render-deploy.md.
+
+parameters:
+	# endpoint /cron - stejná hodnota jako CRON_TOKEN u služby (openssl rand -hex 32)
+	cronToken: ''
+	# login with Facebook (App\Security\FacebookLogin)
+	facebook:
+		clientId: ''
+		clientSecret: ''
+	# login to Sentry
+	sentry:
+		key1: ''
+		key2: ''
+		key3: ''
+
+
+database:
+	default:
+		# MariaDB (služba project-name-db z render.yaml): host = interní adresa služby (Connect > Internal), bez portu
+		dsn: 'mysql:host=project-name-db;port=3306;dbname=firecms'
+		user: firecms
+		password: ''  # MARIADB_PASSWORD ze služby project-name-db (Environment)
+		options:
+			lazy: yes
+
+# Sessions v Render Key Value (služba project-name-sessions), viz docs/Architecture/sessions.md
+sessionHandler:
+	driver: redis
+	redis:
+		host: red-xxxxxxxxxxxxxxxxxxxx  # interní adresa (Connect > Internal), jen host bez redis:// a portu
+		port: 6379
+		password: null                  # interní připojení je bez hesla, pokud v Key Value nezapnete ověřování
+		database: 0
+		prefix: 'project-name:session:'
+
+# Chyby do Sentry (zapnuté jen v produkčním režimu, app/config/config.neon). Celé DSN přepíše skládání z
+# parametrů sentry.key1-3 v config.neon. Release (commit deploye) nastaví entrypoint z RENDER_GIT_COMMIT.
+sentry:
+	client:
+		dsn: 'https://<public key>@<org>.ingest.de.sentry.io/<project id>'  # Project Settings > Client Keys (DSN)
+		environment: production
+
+# Nahrané soubory do S3 - disk Renderu se při každém deployi maže, viz docs/Architecture/file-storage.md
+fileManager:
+	storages:
+		files:
+			adapter: s3
+			bucket: ''
+			region: eu-central-1
+			publicUrl: 'https://<bucket nebo CDN>/'  # včetně prefix, pokud ho nastavíte
+			key: ''
+			secret: ''
+			# jen S3 kompatibilní úložiště (Cloudflare R2, Garage, MinIO):
+			#endpoint: 'https://<account id>.r2.cloudflarestorage.com'
+			#pathStyleEndpoint: true
+			#checksums: when_required
+
+# E-maily (kontaktní formulář, notifikace pluginů, e-maily z cron úloh). V image není sendmail, bez SMTP
+# odeslání selže.
+mail:
+	smtp: true
+	host: ''
+	port: 587
+	username: ''
+	password: ''
+	encryption: tls

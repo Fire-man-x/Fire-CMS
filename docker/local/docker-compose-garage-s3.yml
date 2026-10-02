@@ -9,11 +9,9 @@ services:
             - "3902:3902" # S3 Web port (pro statické weby)
         volumes:
             - ./garage.toml:/etc/garage.toml:ro  # Načtení konfigurace (pouze pro čtení)
-            #- garage_meta:/var/lib/garage/meta
-            #- garage_data:/var/lib/garage/data
-            - ./garage/meta:/var/lib/garage/meta    # Úložiště pro metadata (rychlý disk / SSD)
-            - ./garage/data:/var/lib/garage/data    # Úložiště pro samotná data (HDD / SSD)
+            - garage_meta:/var/lib/garage/meta # Úložiště pro metadata (rychlý disk / SSD)
+            - garage_data:/var/lib/garage/data # Úložiště pro samotná data (HDD / SSD)
 
-#volumes:
-#    garage_meta:
-#    garage_data:
+volumes:
+    garage_meta:
+    garage_data:
