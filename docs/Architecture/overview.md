@@ -2,7 +2,7 @@
 
 Fire CMS je interní CMS jádro/produkt Small Street Studio na Nette Frameworku. Klientské projekty vznikají
 naklonováním tohoto jádra a zůstávají s ním propojené přes git remote `fire-cms`, díky čemuž lze do nich
-zpětně mergovat opravy jádra (viz `doc/update-project-with-gitlab-deploy.md`).
+zpětně mergovat opravy jádra (viz `doc/update-project.md`).
 Proto se `app/Modules/**` a vše mimo `app/Plugins/**` bere jako jádro — úpravy tam se mají promítnout do
 všech klientských projektů, klientsky specifické chování patří do `app/Plugins/`.
 

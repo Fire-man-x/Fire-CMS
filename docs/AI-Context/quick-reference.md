@@ -10,6 +10,8 @@ kořenovém `CLAUDE.md` — ten je závazný, tohle je jen shrnutí pro rychlou 
 | ORM? | Žádné. `App\Model\Database\BaseModel` = tenký obal nad `Nette\Database\Explorer`. Viz `Architecture/orm.md`. |
 | Jak se hledají třídy? | Nette RobotLoader (tokenizace, ne PSR-4 sken). Composer psr-4 je jen konvence, ne vynucené — viz `AI-Context/gotchas.md`. |
 | Kde je jádro vs. klientský kód? | `app/Modules/**` a vše mimo `app/Plugins/**` = jádro (promítá se do všech klientských projektů). `app/Plugins/<Name>/` = volitelné systémové pluginy. Kód šitý jednomu klientovi patří do `theme/Plugins/` klientského projektu, ne do jádra. |
+| Nasazení projektu? | Vlastní `.github/workflows/deploy.yml` v každém klientském projektu, kopie vzoru `.github/workflows/deploy.yml.dist` (CI z `ci.yml` → rsync přes SSH → smazání `temp/cache/` → migrace), postup v `doc/github-deploy.md`. Jádro `deploy.yml` neobsahuje, aby merge jádra nesahal do nasazení projektů. `ci.yml` běží při pushi do `master` i v projektech. |
+| Dokumentace projektu? | `theme/docs/`, hlavní soubor `theme/docs/README.md` (jen když je potřeba). `docs/` a `doc/` patří jádru, projektové věci se do nich nepíšou. |
 | Kolik je pluginů? | Proměnlivé, aktuálně 5 (`ls app/Plugins`). Nepředpokládejte fixní číslo. |
 | DB konvence? | Tabulky `firecms_<camelCase>` / `firecms_plugin_<camelCase>`, sloupce camelCase, PK `id`, FK `<entita>Id`, `createDate`/`updateDate`. Viz `Architecture/orm.md`. |
 | Datagrid knihovna? | `Contributte\Datagrid\Datagrid` (nový kód). Ne `Ublaboo\DataGrid\DataGrid` (staré, viz composer.json historie). |

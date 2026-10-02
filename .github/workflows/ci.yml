@@ -1,9 +1,12 @@
 name: CI
 
+# Běží při pushi do master a u pull requestů v jádru i v klientském projektu. Navíc ho jako první krok volá
+# deploy.yml projektu (vzor deploy.yml.dist), takže se nasadí jen kód, který prošel.
 on:
   push:
     branches: [master]
   pull_request:
+  workflow_call:
 
 permissions:
   contents: read

@@ -1,0 +1,140 @@
+# Vzor nasazení klientského projektu na server přes SSH a rsync.
+#
+# Jádro Fire CMS dodává jen tento vzor. GitHub soubory s příponou .dist nespouští, takže v jádru nic nenasazuje.
+# Projekt si ho zkopíruje do .github/workflows/deploy.yml, upraví větev a v Settings -> Environments nastaví
+# proměnné a secrets podle doc/github-deploy.md. Soubor deploy.yml patří jen do projektu, ne do jádra.
+name: Deploy
+
+on:
+  push:
+    branches: [master] # větev, ze které se projekt nasazuje
+  workflow_dispatch:
+    inputs:
+      reset:
+        description: 'migrations:reset - SMAŽE CELOU DATABÁZI a založí ji znovu (jen demo/testovací web)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# Dvě nasazení stejného prostředí nikdy neběží současně, další počká na dokončení předchozího
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  # Testy a PHPStan z ci.yml jádra - nasadí se jen kód, který jimi prošel
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    name: Nasazení
+    needs: ci
+    runs-on: ubuntu-latest
+    environment: production # Settings -> Environments: proměnné, secrets, případně schválení nasazení
+    env:
+      DEPLOY_HOST: ${{ vars.DEPLOY_HOST }} # uzivatel@server.cz
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH }} # kořen projektu na serveru (relativně k domovskému adresáři nebo absolutně)
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: gd, exif, intl
+          coverage: none
+          tools: composer:v2
+
+      - name: Composer install (bez dev balíčků)
+        run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress --prefer-dist
+        env:
+          # LiveTranslator je vcs repozitář na GitHubu, bez tokenu hrozí limit GitHub API
+          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.GITHUB_TOKEN }}"}}'
+
+      - name: Nastavení SSH
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }} # výstup ssh-keyscan, viz doc/github-deploy.md
+          DEPLOY_PORT: ${{ vars.DEPLOY_PORT || '22' }}
+        run: |
+          for name in DEPLOY_HOST DEPLOY_PATH DEPLOY_KEY DEPLOY_KNOWN_HOSTS; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Chybí $name v prostředí production (Settings -> Environments), viz doc/github-deploy.md."
+              exit 1
+            fi
+          done
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/deploy_key ~/.ssh/known_hosts
+          # klíč serveru se ověřuje proti DEPLOY_KNOWN_HOSTS (žádné StrictHostKeyChecking=no)
+          printf 'Host *\n\tPort %s\n\tIdentityFile ~/.ssh/deploy_key\n\tIdentitiesOnly yes\n\tBatchMode yes\n\tStrictHostKeyChecking yes\n' \
+            "$DEPLOY_PORT" > ~/.ssh/config
+
+      - name: Kontrola cílového adresáře
+        run: |
+          # rsync --delete smaže v cíli vše, co není v repozitáři ani ve výjimkách níže. Chybná DEPLOY_PATH
+          # (např. domovský adresář) by tak smazala cizí data. Nasazuje se proto jen tam, kde už je
+          # theme/config/config.local.neon - ten se na serveru zakládá ručně před prvním nasazením.
+          ssh "$DEPLOY_HOST" "bash -s -- $(printf '%q' "$DEPLOY_PATH")" <<'EOF'
+          set -eu
+          cd "$1"
+          if [ ! -f theme/config/config.local.neon ]; then
+            echo "::error::V $1 chybí theme/config/config.local.neon. Založte ho na serveru podle theme/config/config.local.neon.dist."
+            exit 1
+          fi
+          EOF
+
+      - name: Nahrání souborů
+        run: |
+          # --checksum bez --times: přepíšou se jen skutečně změněné soubory, ostatní si nechají čas změny
+          # (OPcache změnu pozná podle času souboru). --delay-updates vymění změněné soubory najednou až na
+          # konci přenosu. --delete maže soubory odstraněné z repozitáře, RobotLoader by jinak dál našel
+          # smazané třídy.
+          # Výjimky (--exclude) jsou stav serveru: rsync je nepřenáší ani nemaže. Adresáře, které vznikají
+          # jen na serveru (nahrané soubory, exporty, ...), doplňte sem, jinak je --delete smaže.
+          rsync --recursive --links --checksum --compress --delete-delay --delay-updates \
+            --exclude=/.git/ \
+            --exclude=/.github/ \
+            --exclude=/.idea/ \
+            --exclude=/.claude/ \
+            --exclude=/docker/ \
+            --exclude=/doc/ \
+            --exclude=/docs/ \
+            --exclude=/tests/ \
+            --exclude=/theme/docs/ \
+            --exclude=/CLAUDE.md \
+            --exclude=/theme/config/config.local.neon \
+            --exclude=/data/localization/*.untranslated \
+            --include=/www/files/.htaccess \
+            --exclude=/www/files/* \
+            --include=/log/.htaccess \
+            --exclude=/log/* \
+            --include=/temp/.htaccess \
+            --exclude=/temp/* \
+            ./ "$DEPLOY_HOST:$DEPLOY_PATH/"
+
+      - name: Migrace a smazání cache
+        env:
+          DEPLOY_PHP: ${{ vars.DEPLOY_PHP || 'php' }} # např. /opt/php83/bin/php, pokud je v SSH jiná verze PHP
+          DEPLOY_RUN_AS: ${{ vars.DEPLOY_RUN_AS }} # uživatel PHP webu (např. www-data), pokud se liší od SSH uživatele
+          MIGRATIONS: ${{ inputs.reset && 'reset' || 'continue' }}
+        run: |
+          ssh "$DEPLOY_HOST" "bash -s -- $(printf '%q ' "$DEPLOY_PATH" "$DEPLOY_PHP" "$DEPLOY_RUN_AS" "$MIGRATIONS")" <<'EOF'
+          set -euo pipefail
+          cd "$1"
+          php=$2
+          run_as=$3
+          command=migrations:$4
+          # cache a zkompilovaný kontejner musí patřit uživateli, pod kterým běží PHP webu
+          run() { if [ -n "$run_as" ]; then sudo -n -u "$run_as" "$@"; else "$@"; fi; }
+          clear_cache() { if [ -d temp/cache ]; then run find temp/cache -mindepth 1 -delete; fi; }
+
+          # Produkční režim nehlídá změny neon souborů ani šablon (docs/AI-Context/gotchas.md). Bez smazání by
+          # bin/console i web běžely se zkompilovaným kontejnerem, šablonami a RobotLoaderem předchozí verze.
+          clear_cache
+          run "$php" bin/console "$command"
+          # Znovu po migraci: cache struktury DB je ze stavu před ní
+          clear_cache
+          EOF

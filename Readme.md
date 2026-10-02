@@ -7,4 +7,4 @@ Base project with CMS.
 
 Tento klientský projekt vychází z našeho jádra **Fire-man-x/Fire-CMS**.
 
-Po naklonování si propojte upstream pro stahování **[aktualizací jádra](./doc/update-project-with-gitlab-deploy.md)**
+Po naklonování si propojte upstream pro stahování **[aktualizací jádra](./doc/update-project.md)**. Nasazení projektu viz **[GitHub nasazení](./doc/github-deploy.md)**.

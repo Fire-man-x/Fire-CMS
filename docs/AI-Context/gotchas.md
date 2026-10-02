@@ -356,10 +356,10 @@ stejně jako `temp/cache/nette.configurator/` po změně konfigurace.
 
 ## Po resetu DB nebo změně schématu smazat cache struktury Nette Database
 
-Nette Explorer si ukládá strukturu DB (sloupce, primární klíče, cizí klíče) do `temp/_Nette.Database.Structure.*`
-a použité sloupce do `temp/_Nette.Database.*`. Po resetu DB s přejmenovanými sloupci se cache sama neobnoví.
+Nette Explorer si ukládá strukturu DB (sloupce, primární klíče, cizí klíče) do `temp/cache/_Nette.Database.Structure.*`
+a použité sloupce do `temp/cache/_Nette.Database.*`. Po resetu DB s přejmenovanými sloupci se cache sama neobnoví.
 Dotazy pak skládají SQL se starými názvy sloupců, přestože v kódu ani v DB takový sloupec není. Po každé změně
-schématu smažte `temp/_Nette.Database*` (adresáře patří `www-data`, takže je potřeba `sudo`, nebo je přesuňte
+schématu smažte `temp/cache/_Nette.Database*` (adresáře patří `www-data`, takže je potřeba `sudo`, nebo je přesuňte
 stranou, protože `temp/` je zapisovatelné).
 
 Nově přidaný sloupec čtený přes `$row->sloupec ?? ''` (tj. `ActiveRow::__isset()`) zůstane prázdný, dokud se
@@ -367,6 +367,16 @@ cache použitých sloupců nesmaže: `__isset()` chybějící sloupec nedotáhne
 sloupce. Na produkci by se to projevilo po každém nasazení s novým sloupcem. Kde se čtou sloupce dynamicky
 (mapa klíč → sloupec, `?? ''`), použijte `$row->toArray()` - načte všechny sloupce (viz
 `Settings::getAllForLanguage()`). Přímé `$row->sloupec` (`__get()`) sloupec dotáhne samo.
+
+## Nasazení přes `deploy.yml`: `rsync --delete` a stav serveru
+
+Vzor `.github/workflows/deploy.yml.dist` (`doc/github-deploy.md`) nahrává soubory s `--delete`. Na serveru
+zůstane jen to, co je v repozitáři, a výjimky (`config.local.neon`, `www/files/`, `log/`, `temp/`,
+`*.untranslated`). Nový kód, který zapisuje na disk mimo tyto cesty, proto potřebuje i novou výjimku v
+`deploy.yml` projektů (a ve vzoru), jinak mu každé nasazení data smaže. `theme/config/plugins.neon` se nasazuje
+z gitu: zapnutí nebo vypnutí pluginu v administraci na serveru další nasazení vrátí, migrace nebo `deactivate`
+skript v DB ale zůstanou provedené. Po nahrání se maže celé `temp/cache/` (kontejner, Latte, RobotLoader,
+struktura DB), sessions v `temp/sessions/` zůstávají.
 
 ## Testování přes `curl` na sdíleném/multi-tenant boxu
 

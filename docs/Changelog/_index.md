@@ -4,6 +4,11 @@ Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na det
 
 ## 2026-10-02
 
+- **Nasazení projektů přes GitHub Actions.** Vzor `.github/workflows/deploy.yml.dist` (CI → rsync přes SSH →
+  migrace), každý projekt si vytvoří vlastní `deploy.yml`. Dokumentace projektu patří do `theme/docs/`. Návody
+  `doc/github-deploy.md` a `doc/update-project.md` nahradily GitLab verze. Viz
+  [2026-10-02-github-deploy.md](2026-10-02-github-deploy.md).
+
 - **Pluginy Stalker a Statistics na PostgreSQL.** Migrace a `deactivate` skript zvlášť pro MariaDB a PostgreSQL
   (`data/migrations/<driver>/`), migrace přejmenované na `2026100200000x`. Projekty se zapnutým pluginem musí
   přejmenovat záznam v tabulce `migrations`. Viz [2026-10-02-plugins-postgresql.md](2026-10-02-plugins-postgresql.md).

@@ -3,8 +3,13 @@
 > Dokumentace projektu Fire CMS. Slouží jako znalostní báze pro vývojáře i AI asistenty.
 
 Pozor na rozlišení: `docs/` (tento adresář) je znalostní báze architektury. `doc/` (bez "s", o úroveň výš)
-obsahuje provozní návody — merge/rebase jádra do klientských projektů, nastavení GitLab CI/CD nasazení a
+obsahuje provozní návody — merge/rebase jádra do klientských projektů, nastavení GitHub nasazení (`doc/github-deploy.md`) a
 konvence balíčků. Viz `CLAUDE.md` v kořeni repozitáře pro odkazy na oba.
+
+Tato dokumentace popisuje jen jádro a `app/Plugins/`. Dokumentace konkrétního klientského projektu patří do
+`theme/docs/` s hlavním souborem `theme/docs/README.md` a vytváří se jen tehdy, když je potřeba. Nasazení
+projektu si každý projekt popíše vlastním `.github/workflows/deploy.yml` podle vzoru
+`.github/workflows/deploy.yml.dist` (`doc/github-deploy.md`). Jádro `theme/docs/` ani `deploy.yml` neobsahuje.
 
 ## Navigace
 
@@ -36,7 +41,7 @@ konvence balíčků. Viz `CLAUDE.md` v kořeni repozitáře pro odkazy na oba.
 ## Jak používat
 
 ### Pro vývojáře
-Dokumentace je ve standardním Markdownu — funguje na GitLabu i lokálně.
+Dokumentace je ve standardním Markdownu — funguje na GitHubu i lokálně.
 
 ### Pro AI asistenty
 Načti soubor `AI-Context/quick-reference.md` — obsahuje kompaktní přehled celého systému optimalizovaný na

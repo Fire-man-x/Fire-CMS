@@ -8,14 +8,23 @@ Fire CMS je interní CMS jádro/produkt společnosti Small Street Studio postave
 klientské projekty vznikají
 naklonováním tohoto jádra a zůstávají s ním propojené přes git remote `fire-cms`, díky čemuž lze do nich
 později mergovat aktualizace/opravy jádra, a naopak. Přesný postup merge/rebase najdete v
-`doc/update-project-with-gitlab-deploy.md`, nastavení automatického nasazení přes GitLab CI/CD pak v
-`doc/gitlab-deploy.md` (oba dokumenty jsou v češtině).
+`doc/update-project.md`, nastavení automatického nasazení přes GitHub Actions pak v
+`doc/github-deploy.md` (oba dokumenty jsou v češtině).
 
 Kvůli tomuto forkovému vztahu berte `app/Modules/**` a vše mimo `app/Plugins/**` jako jádro: neupravujte to
 zlehka tak, jak byste to dělali v běžné jednoúčelové aplikaci — změny na těchto místech se mají promítnout
 do všech navazujících klientských projektů. Volitelné systémové pluginy patří pod `app/Plugins/`, chování šité
 jednomu klientovi do `theme/Plugins/` klientského projektu (viz Konvence níže). Dokumentace v `docs/` popisuje
 jen jádro a `app/Plugins/`, klientské balíčky se v ní nezmiňují.
+
+Některé soubory si vytváří až klientský projekt a jádro je neobsahuje, aby se při mergi jádra nepřepsaly
+nebo nekolidovaly:
+- `.github/workflows/deploy.yml` — nasazení konkrétního projektu (server, větev, secrets). Každý projekt si
+  vytvoří vlastní kopií vzoru `.github/workflows/deploy.yml.dist` (GitHub `.dist` nespouští), postup v
+  `doc/github-deploy.md`. Jádro má `ci.yml` (testy + PHPStan), který běží při pushi do `master` a u pull
+  requestů v jádru i v projektech a který `deploy.yml` volá jako první krok (`workflow_call`).
+- `theme/docs/` s hlavním souborem `theme/docs/README.md` — dokumentace konkrétního projektu, pokud je
+  potřeba (klientské pluginy v `theme/Plugins/`, nasazení, odchylky od jádra).
 
 ## Jazyk
 Komentáře, dokumentace, vysvětlení → **česky**.
@@ -198,5 +207,8 @@ Znalostní báze pro vývojáře i AI je v `docs/` (viz `docs/README.md` pro nav
    nebo `docs/AI-Context/patterns.md`
 
 `docs/` je oddělené od `doc/` (bez "s") zmíněného výše v tomto souboru — `doc/` obsahuje provozní
-návody (merge/rebase jádra, GitLab CI/CD nasazení, konvence balíčků), `docs/` je znalostní báze
+návody (merge/rebase jádra, nasazení přes GitHub Actions, konvence balíčků), `docs/` je znalostní báze
 architektury pro AI asistenty a nové vývojáře.
+
+V klientském projektu se změny specifické pro projekt dokumentují v `theme/docs/` (vstup
+`theme/docs/README.md`), ne v `docs/` ani `doc/`. Ty patří jádru a přepíše je další merge jádra.
