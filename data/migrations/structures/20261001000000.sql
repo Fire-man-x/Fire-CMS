@@ -12,7 +12,7 @@ CREATE TABLE `firecms_roles` (
 	PRIMARY KEY (`id`),
 	UNIQUE KEY `name` (`name`),
 	KEY `parentId` (`parentId`),
-	CONSTRAINT `roles_ibfk_1` FOREIGN KEY (`parentId`) REFERENCES `firecms_roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_roles_ibfk_1` FOREIGN KEY (`parentId`) REFERENCES `firecms_roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -37,7 +37,7 @@ CREATE TABLE `firecms_users` (
 	UNIQUE KEY `email` (`email`),
 	KEY `nicknameKey` (`nickname`),
 	KEY `roleId` (`roleId`),
-	CONSTRAINT `users_ibfk_2` FOREIGN KEY (`roleId`) REFERENCES `firecms_roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_users_ibfk_2` FOREIGN KEY (`roleId`) REFERENCES `firecms_roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -75,9 +75,9 @@ CREATE TABLE `firecms_comments` (
 	KEY `createdBy` (`createdBy`),
 	KEY `parentId` (`parentId`),
 	KEY `languageId` (`languageId`),
-	CONSTRAINT `comments_ibfk_3` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `comments_ibfk_4` FOREIGN KEY (`parentId`) REFERENCES `firecms_comments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `comments_ibfk_6` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_comments_ibfk_3` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_comments_ibfk_4` FOREIGN KEY (`parentId`) REFERENCES `firecms_comments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_comments_ibfk_6` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -103,8 +103,8 @@ CREATE TABLE `firecms_sectionDescriptions` (
 	`seoKeywords` text DEFAULT NULL,
 	PRIMARY KEY (`sectionId`,`languageId`),
 	KEY `languageId` (`languageId`),
-	CONSTRAINT `sectionDescriptions_ibfk_1` FOREIGN KEY (`sectionId`) REFERENCES `firecms_sections` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `sectionDescriptions_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_sectionDescriptions_ibfk_1` FOREIGN KEY (`sectionId`) REFERENCES `firecms_sections` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_sectionDescriptions_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -135,8 +135,8 @@ CREATE TABLE `firecms_settingDescriptions` (
 	`seoKeywords` text DEFAULT NULL,
 	PRIMARY KEY (`settingId`,`languageId`),
 	KEY `languageId` (`languageId`),
-	CONSTRAINT `settingDescriptions_ibfk_1` FOREIGN KEY (`settingId`) REFERENCES `firecms_settings` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `settingDescriptions_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_settingDescriptions_ibfk_1` FOREIGN KEY (`settingId`) REFERENCES `firecms_settings` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_settingDescriptions_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -156,9 +156,9 @@ CREATE TABLE `firecms_articles` (
 	KEY `historyId` (`historyId`),
 	KEY `createdBy` (`createdBy`),
 	KEY `sectionId` (`sectionId`),
-	CONSTRAINT `articles_ibfk_1` FOREIGN KEY (`historyId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `articles_ibfk_2` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `articles_section_fk` FOREIGN KEY (`sectionId`) REFERENCES `firecms_sections` (`id`) ON UPDATE CASCADE
+	CONSTRAINT `firecms_articles_ibfk_1` FOREIGN KEY (`historyId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_articles_ibfk_2` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_articles_section_fk` FOREIGN KEY (`sectionId`) REFERENCES `firecms_sections` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -187,10 +187,10 @@ CREATE TABLE `firecms_categories` (
 	KEY `createdBy` (`createdBy`),
 	KEY `historyId` (`historyId`),
 	KEY `sectionId` (`sectionId`),
-	CONSTRAINT `categories_ibfk_1` FOREIGN KEY (`parentId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `categories_ibfk_2` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`) ON UPDATE CASCADE,
-	CONSTRAINT `categories_ibfk_3` FOREIGN KEY (`historyId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `categories_section_fk` FOREIGN KEY (`sectionId`) REFERENCES `firecms_sections` (`id`) ON UPDATE CASCADE
+	CONSTRAINT `firecms_categories_ibfk_1` FOREIGN KEY (`parentId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_categories_ibfk_2` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`) ON UPDATE CASCADE,
+	CONSTRAINT `firecms_categories_ibfk_3` FOREIGN KEY (`historyId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_categories_section_fk` FOREIGN KEY (`sectionId`) REFERENCES `firecms_sections` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -201,8 +201,8 @@ CREATE TABLE `firecms_articleComments` (
 	`updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
 	KEY `articleId` (`articleId`),
 	KEY `commentId` (`commentId`),
-	CONSTRAINT `articleComments_ibfk_3` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `articleComments_ibfk_4` FOREIGN KEY (`commentId`) REFERENCES `firecms_comments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_articleComments_ibfk_3` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_articleComments_ibfk_4` FOREIGN KEY (`commentId`) REFERENCES `firecms_comments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -221,8 +221,8 @@ CREATE TABLE `firecms_articleDescriptions` (
 	PRIMARY KEY (`articleId`,`languageId`),
 	KEY `languageId` (`languageId`),
 	KEY `articleId` (`articleId`),
-	CONSTRAINT `articleDescriptions_ibfk_1` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `articleDescriptions_ibfk_2` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_articleDescriptions_ibfk_1` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_articleDescriptions_ibfk_2` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -237,7 +237,7 @@ CREATE TABLE `firecms_fileFolders` (
 	`level` int(11) NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`),
 	KEY `parentId` (`parentId`),
-	CONSTRAINT `fileFolders_ibfk_2` FOREIGN KEY (`parentId`) REFERENCES `firecms_fileFolders` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+	CONSTRAINT `firecms_fileFolders_ibfk_2` FOREIGN KEY (`parentId`) REFERENCES `firecms_fileFolders` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -256,7 +256,7 @@ CREATE TABLE `firecms_files` (
 	`viewCount` int(11) unsigned NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`),
 	KEY `fileFolderId` (`fileFolderId`),
-	CONSTRAINT `files_ibfk_2` FOREIGN KEY (`fileFolderId`) REFERENCES `firecms_fileFolders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_files_ibfk_2` FOREIGN KEY (`fileFolderId`) REFERENCES `firecms_fileFolders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -270,8 +270,8 @@ CREATE TABLE `firecms_articleFiles` (
 	PRIMARY KEY (`articleId`,`fileId`),
 	KEY `fileId` (`fileId`),
 	KEY `articleId` (`articleId`),
-	CONSTRAINT `articleFiles_ibfk_1` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `articleFiles_ibfk_2` FOREIGN KEY (`fileId`) REFERENCES `firecms_files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_articleFiles_ibfk_1` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_articleFiles_ibfk_2` FOREIGN KEY (`fileId`) REFERENCES `firecms_files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -286,7 +286,7 @@ CREATE TABLE `firecms_metas` (
 	`value` text NOT NULL,
 	PRIMARY KEY (`id`),
 	UNIQUE KEY `languageIdTypeKey` (`languageId`,`type`,`key`),
-	CONSTRAINT `metas_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_metas_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -307,8 +307,8 @@ CREATE TABLE `firecms_tagDescriptions` (
 	PRIMARY KEY (`tagId`,`languageId`,`name`),
 	KEY `languageId` (`languageId`),
 	KEY `tagId` (`tagId`),
-	CONSTRAINT `tagDescriptions_ibfk_3` FOREIGN KEY (`tagId`) REFERENCES `firecms_tags` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `tagDescriptions_ibfk_4` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_tagDescriptions_ibfk_3` FOREIGN KEY (`tagId`) REFERENCES `firecms_tags` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_tagDescriptions_ibfk_4` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -324,9 +324,9 @@ CREATE TABLE `firecms_articleMetas` (
 	UNIQUE KEY `articleIdMetaId` (`articleId`,`metaId`),
 	KEY `createdBy` (`createdBy`),
 	KEY `metaId` (`metaId`),
-	CONSTRAINT `articleMetas_ibfk_1` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`),
-	CONSTRAINT `articleMetas_ibfk_3` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`),
-	CONSTRAINT `articleMetas_ibfk_5` FOREIGN KEY (`metaId`) REFERENCES `firecms_metas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_articleMetas_ibfk_1` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`),
+	CONSTRAINT `firecms_articleMetas_ibfk_3` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`),
+	CONSTRAINT `firecms_articleMetas_ibfk_5` FOREIGN KEY (`metaId`) REFERENCES `firecms_metas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -338,8 +338,8 @@ CREATE TABLE `firecms_articleTags` (
 	PRIMARY KEY (`articleId`,`tagId`),
 	KEY `tagId` (`tagId`),
 	KEY `articleId` (`articleId`),
-	CONSTRAINT `articleTags_ibfk_3` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `articleTags_ibfk_4` FOREIGN KEY (`tagId`) REFERENCES `firecms_tags` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_articleTags_ibfk_3` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_articleTags_ibfk_4` FOREIGN KEY (`tagId`) REFERENCES `firecms_tags` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -352,8 +352,8 @@ CREATE TABLE `firecms_categoryArticle` (
 	PRIMARY KEY (`categoryId`,`articleId`),
 	KEY `categoryId` (`categoryId`),
 	KEY `articleId` (`articleId`),
-	CONSTRAINT `categoryArticle_ibfk_3` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `categoryArticle_ibfk_4` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_categoryArticle_ibfk_3` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_categoryArticle_ibfk_4` FOREIGN KEY (`articleId`) REFERENCES `firecms_articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -364,8 +364,8 @@ CREATE TABLE `firecms_categoryComments` (
 	`updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
 	KEY `categoryId` (`categoryId`),
 	KEY `commentId` (`commentId`),
-	CONSTRAINT `categoryComments_ibfk_3` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `categoryComments_ibfk_4` FOREIGN KEY (`commentId`) REFERENCES `firecms_comments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_categoryComments_ibfk_3` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_categoryComments_ibfk_4` FOREIGN KEY (`commentId`) REFERENCES `firecms_comments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -384,8 +384,8 @@ CREATE TABLE `firecms_categoryDescriptions` (
 	PRIMARY KEY (`categoryId`,`languageId`),
 	KEY `relCategoryCategoryDescription` (`categoryId`) USING BTREE,
 	KEY `languageId` (`languageId`),
-	CONSTRAINT `categoryDescriptions_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `categoryDescriptions_ibfk_3` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_categoryDescriptions_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_categoryDescriptions_ibfk_3` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -399,8 +399,8 @@ CREATE TABLE `firecms_categoryFiles` (
 	PRIMARY KEY (`categoryId`,`fileId`),
 	KEY `categoryId` (`categoryId`),
 	KEY `fileId` (`fileId`),
-	CONSTRAINT `categoryFiles_ibfk_3` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `categoryFiles_ibfk_4` FOREIGN KEY (`fileId`) REFERENCES `firecms_files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_categoryFiles_ibfk_3` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_categoryFiles_ibfk_4` FOREIGN KEY (`fileId`) REFERENCES `firecms_files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -416,9 +416,9 @@ CREATE TABLE `firecms_categoryMetas` (
 	UNIQUE KEY `categoryIdMetaId` (`categoryId`,`metaId`),
 	KEY `createdBy` (`createdBy`),
 	KEY `metaId` (`metaId`),
-	CONSTRAINT `categoryMetas_ibfk_1` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`),
-	CONSTRAINT `categoryMetas_ibfk_3` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`),
-	CONSTRAINT `categoryMetas_ibfk_5` FOREIGN KEY (`metaId`) REFERENCES `firecms_metas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_categoryMetas_ibfk_1` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`),
+	CONSTRAINT `firecms_categoryMetas_ibfk_3` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`),
+	CONSTRAINT `firecms_categoryMetas_ibfk_5` FOREIGN KEY (`metaId`) REFERENCES `firecms_metas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -429,8 +429,8 @@ CREATE TABLE `firecms_categoryTags` (
 	`updateDate` datetime DEFAULT NULL ON UPDATE current_timestamp(),
 	KEY `categoryId` (`categoryId`),
 	KEY `tagId` (`tagId`),
-	CONSTRAINT `categoryTags_ibfk_3` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `categoryTags_ibfk_4` FOREIGN KEY (`tagId`) REFERENCES `firecms_tags` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_categoryTags_ibfk_3` FOREIGN KEY (`categoryId`) REFERENCES `firecms_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_categoryTags_ibfk_4` FOREIGN KEY (`tagId`) REFERENCES `firecms_tags` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -459,7 +459,7 @@ CREATE TABLE `firecms_domains` (
 	PRIMARY KEY (`id`),
 	UNIQUE KEY `domain` (`domain`),
 	KEY `languageId` (`languageId`),
-	CONSTRAINT `domains_ibfk_1` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_domains_ibfk_1` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -487,8 +487,8 @@ CREATE TABLE `firecms_dynamicFormDescriptions` (
 	`submitMessage` varchar(200) DEFAULT NULL,
 	PRIMARY KEY (`dynamicFormId`,`languageId`),
 	KEY `languageId` (`languageId`),
-	CONSTRAINT `dynamicFormDescriptions_ibfk_3` FOREIGN KEY (`dynamicFormId`) REFERENCES `firecms_dynamicForms` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `dynamicFormDescriptions_ibfk_4` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_dynamicFormDescriptions_ibfk_3` FOREIGN KEY (`dynamicFormId`) REFERENCES `firecms_dynamicForms` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_dynamicFormDescriptions_ibfk_4` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -503,8 +503,8 @@ CREATE TABLE `firecms_dynamicFormSendedValues` (
 	KEY `dynamicFormId` (`dynamicFormId`),
 	KEY `languageId` (`languageId`),
 	KEY `dynamicFormIdLanguageId` (`dynamicFormId`,`languageId`),
-	CONSTRAINT `dynamicFormSendedValues_ibfk_1` FOREIGN KEY (`dynamicFormId`) REFERENCES `firecms_dynamicForms` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `dynamicFormSendedValues_ibfk_3` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_dynamicFormSendedValues_ibfk_1` FOREIGN KEY (`dynamicFormId`) REFERENCES `firecms_dynamicForms` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_dynamicFormSendedValues_ibfk_3` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -527,8 +527,8 @@ CREATE TABLE `firecms_menuDescriptions` (
 	`title` varchar(255) DEFAULT NULL,
 	PRIMARY KEY (`menuId`,`languageId`),
 	KEY `languageId` (`languageId`),
-	CONSTRAINT `menuDescriptions_ibfk_1` FOREIGN KEY (`menuId`) REFERENCES `firecms_menus` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `menuDescriptions_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_menuDescriptions_ibfk_1` FOREIGN KEY (`menuId`) REFERENCES `firecms_menus` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_menuDescriptions_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -547,8 +547,8 @@ CREATE TABLE `firecms_menuItems` (
 	KEY `menuId` (`menuId`),
 	KEY `parentId` (`parentId`),
 	KEY `linkTypeTarget` (`linkType`,`target`(191)),
-	CONSTRAINT `menuItems_ibfk_1` FOREIGN KEY (`menuId`) REFERENCES `firecms_menus` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `menuItems_ibfk_2` FOREIGN KEY (`parentId`) REFERENCES `firecms_menuItems` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_menuItems_ibfk_1` FOREIGN KEY (`menuId`) REFERENCES `firecms_menus` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_menuItems_ibfk_2` FOREIGN KEY (`parentId`) REFERENCES `firecms_menuItems` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -560,8 +560,8 @@ CREATE TABLE `firecms_menuItemDescriptions` (
 	`label` varchar(255) DEFAULT NULL,
 	PRIMARY KEY (`menuItemId`,`languageId`),
 	KEY `languageId` (`languageId`),
-	CONSTRAINT `menuItemDescriptions_ibfk_1` FOREIGN KEY (`menuItemId`) REFERENCES `firecms_menuItems` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `menuItemDescriptions_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_menuItemDescriptions_ibfk_1` FOREIGN KEY (`menuItemId`) REFERENCES `firecms_menuItems` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_menuItemDescriptions_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -573,8 +573,8 @@ CREATE TABLE `firecms_menuItemFiles` (
 	`position` int(11) NOT NULL DEFAULT 0,
 	PRIMARY KEY (`menuItemId`,`fileId`),
 	KEY `fileId` (`fileId`),
-	CONSTRAINT `menuItemFiles_ibfk_1` FOREIGN KEY (`menuItemId`) REFERENCES `firecms_menuItems` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `menuItemFiles_ibfk_2` FOREIGN KEY (`fileId`) REFERENCES `firecms_files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_menuItemFiles_ibfk_1` FOREIGN KEY (`menuItemId`) REFERENCES `firecms_menuItems` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_menuItemFiles_ibfk_2` FOREIGN KEY (`fileId`) REFERENCES `firecms_files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -590,7 +590,7 @@ CREATE TABLE `firecms_modules` (
 	UNIQUE KEY `name` (`name`),
 	KEY `parentId` (`parentId`),
 	KEY `namePrivilege` (`name`,`privilege`),
-	CONSTRAINT `modules_ibfk_1` FOREIGN KEY (`parentId`) REFERENCES `firecms_modules` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_modules_ibfk_1` FOREIGN KEY (`parentId`) REFERENCES `firecms_modules` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -608,8 +608,8 @@ CREATE TABLE `firecms_pages` (
 	PRIMARY KEY (`id`),
 	KEY `createdBy` (`createdBy`),
 	KEY `parentId` (`parentId`),
-	CONSTRAINT `pages_ibfk_1` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-	CONSTRAINT `pages_ibfk_2` FOREIGN KEY (`parentId`) REFERENCES `firecms_pages` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+	CONSTRAINT `firecms_pages_ibfk_1` FOREIGN KEY (`createdBy`) REFERENCES `firecms_users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+	CONSTRAINT `firecms_pages_ibfk_2` FOREIGN KEY (`parentId`) REFERENCES `firecms_pages` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -625,8 +625,8 @@ CREATE TABLE `firecms_pageDescriptions` (
 	`seoKeywords` text DEFAULT NULL,
 	PRIMARY KEY (`pageId`,`languageId`),
 	KEY `languageId` (`languageId`),
-	CONSTRAINT `pageDescriptions_ibfk_1` FOREIGN KEY (`pageId`) REFERENCES `firecms_pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `pageDescriptions_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_pageDescriptions_ibfk_1` FOREIGN KEY (`pageId`) REFERENCES `firecms_pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_pageDescriptions_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -638,8 +638,8 @@ CREATE TABLE `firecms_pageFiles` (
 	`position` int(11) NOT NULL DEFAULT 0,
 	PRIMARY KEY (`pageId`,`fileId`),
 	KEY `fileId` (`fileId`),
-	CONSTRAINT `pageFiles_ibfk_1` FOREIGN KEY (`pageId`) REFERENCES `firecms_pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `pageFiles_ibfk_2` FOREIGN KEY (`fileId`) REFERENCES `firecms_files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_pageFiles_ibfk_1` FOREIGN KEY (`pageId`) REFERENCES `firecms_pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_pageFiles_ibfk_2` FOREIGN KEY (`fileId`) REFERENCES `firecms_files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -651,8 +651,8 @@ CREATE TABLE `firecms_roleModule` (
 	`privilege` varchar(15) NOT NULL,
 	PRIMARY KEY (`roleId`,`moduleId`),
 	KEY `moduleId` (`moduleId`),
-	CONSTRAINT `roleModule_ibfk_6` FOREIGN KEY (`moduleId`) REFERENCES `firecms_modules` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `roleModule_ibfk_7` FOREIGN KEY (`roleId`) REFERENCES `firecms_roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_roleModule_ibfk_6` FOREIGN KEY (`moduleId`) REFERENCES `firecms_modules` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_roleModule_ibfk_7` FOREIGN KEY (`roleId`) REFERENCES `firecms_roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -683,9 +683,9 @@ CREATE TABLE `firecms_sliderItems` (
 	KEY `languageId` (`languageId`),
 	KEY `fileId` (`fileId`),
 	KEY `sliderId` (`sliderId`),
-	CONSTRAINT `sliderItems_ibfk_2` FOREIGN KEY (`sliderId`) REFERENCES `firecms_sliders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `sliderItems_ibfk_5` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT `sliderItems_ibfk_6` FOREIGN KEY (`fileId`) REFERENCES `firecms_files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_sliderItems_ibfk_2` FOREIGN KEY (`sliderId`) REFERENCES `firecms_sliders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_sliderItems_ibfk_5` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `firecms_sliderItems_ibfk_6` FOREIGN KEY (`fileId`) REFERENCES `firecms_files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -699,7 +699,7 @@ CREATE TABLE `firecms_urlRedirections` (
 	`lastUsageDate` datetime DEFAULT NULL,
 	PRIMARY KEY (`id`),
 	KEY `languageId` (`languageId`),
-	CONSTRAINT `urlRedirections_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_urlRedirections_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -713,5 +713,5 @@ CREATE TABLE `firecms_urls` (
 	`url` varchar(2000) NOT NULL,
 	PRIMARY KEY (`id`),
 	UNIQUE KEY `languageIdTypeKey` (`languageId`,`type`,`key`),
-	CONSTRAINT `urls_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT `firecms_urls_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `firecms_languages` (`languageId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

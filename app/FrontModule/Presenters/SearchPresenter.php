@@ -13,7 +13,7 @@ class SearchPresenter extends BasePresenter
 	 * Search query
 	 */
 	#[Persistent]
-	public string $query;
+	public ?string $query = null;
 
 	/** @inject */
 	public Model\Database\Articles $articlesModel;
@@ -30,18 +30,20 @@ class SearchPresenter extends BasePresenter
 		//override main
 		$this->template->options["main_description"] = $this->translator->translate("Search results: %s", $this->query);
 
-		//set query to control
-		$this->search->setQuery($this->query);
+		if($this->query) {
+			//set query to control
+			$this->search->setQuery($this->query);
 
-		//set query to control
-		$this->articles->setQuery($this->query);
-		$this->categories->setQuery($this->query);
+			//set query to control
+			$this->articles->setQuery($this->query);
+			$this->categories->setQuery($this->query);
+		}
 
 		//set links to languageChanger
 		foreach ($this->languages->getActiveLanguages() as $lanuageItem => $languageName) {
 			$this->languageChanger->setLinkForLanguage($lanuageItem, $this->link("this", array(
-					"query" => $this->query,
-					"locale" => $lanuageItem
+				"query" => $this->query,
+				"locale" => $lanuageItem
 			)));
 		}
 	}
