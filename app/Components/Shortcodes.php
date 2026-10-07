@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace App\Components;
 
-use App\Components\FileManager\Exceptions\InvalidThumbnailException;
-use App\Components\FileManager\Files\HashImageEntity;
-use App\Components\FileManager\Request\ImageRequest;
+use App\FileStorage\Exceptions\InvalidThumbnailException;
+use App\FileStorage\Files\HashImageEntity;
+use App\FileStorage\Request\ImageRequest;
 use App\Model\Database\Files;
 use App\Model\Exceptions\RecordNotFoundException;
 use BadFunctionCallException;
@@ -30,7 +30,7 @@ class Shortcodes
 	 * Constructor
 	 */
 	public function __construct(
-		private FileManager\FileManager $fileManager,
+		private \App\FileStorage\FileManager $fileManager,
 		public Files $filesModel,
 		public LinkGenerator $linkGenerator,
 		public Translator $translator)

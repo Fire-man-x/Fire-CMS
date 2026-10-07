@@ -140,7 +140,7 @@ U datumových polí proto dávejte `min`/`max` jen jako HTML atribut (`setHtmlAt
 dělejte v `onValidate`. Systémové řešení je aktualizovat netteForms.js v jádru (`www/vendors/`) na verzi
 odpovídající Nette Forms 3.x.
 
-## `App\Components\FileManager\Macro\ImageRequest` — konstruktor a dimenze
+## `App\FileStorage\Request\ImageRequest` — konstruktor a dimenze
 
 Konstruktor `__construct(IFile $file, $dimensions = IRequest::ORIGINAL, ...)` má netypovaný parametr s
 `int` defaultem (`IRequest::ORIGINAL = 0`), ale property `$dimensions` je typovaná `string` a v šablonách
@@ -162,12 +162,12 @@ entity, ne skutečná chyba v typu).
 
 Podrobně viz `Architecture/file-storage.md`.
 - **Nový rozměr obrázku v šabloně = povolit náhled v neonu.** `n:src="$file, '320x240'"` bez
-  `fileManager: thumbnails: resize: [320x240]` v debug režimu vyhodí `InvalidThumbnailException`, na produkci
+  `fileStorage: thumbnails: resize: [320x240]` v debug režimu vyhodí `InvalidThumbnailException`, na produkci
   zobrazí originál a zaloguje warning. Náhledy pluginu patří do jeho `config.plugin.neon`, projektu do
   `theme.neon`. `{crop}`/`n:crop` = seznam `crop:`.
 - **Nesahejte na soubory přes `%wwwDir%/files/...`.** Soubor může ležet v S3. Čtení a zápis jen přes
   `FlysystemStorage` (`original()`, `modifyOriginal()`, `getFilesystem()`) nebo přes služby
-  `@fileManager.filesystem.<název>`. `getOriginalPath()` vrací klíč v úložišti, ne cestu na disku.
+  `@fileStorage.filesystem.<název>`. `getOriginalPath()` vrací klíč v úložišti, ne cestu na disku.
 - **Originál upravujte jen přes `FlysystemStorage::modifyOriginal()`**, ne vlastním `Image::save()`. GD zahodí
   EXIF, `modifyOriginal()` ho přenese zpět (s orientací 1 a novými rozměry) a smaže náhledy. Novou velikost pak
   uložte přes `Files::updateSize()`. URL se nemění: prohlížeče drží náhledy z S3 až 1 den.
@@ -179,7 +179,7 @@ Podrobně viz `Architecture/file-storage.md`.
 - **Starší struktury souborů na disku jsou dvě, obě jiné než `<h0>/<h1>/<hash>.<ext>`:**
   `<h01>/<h23>/<hash>.<ext>` (nejstarší data) a `<h0>/<h1>/<původní název>.<ext>` (`HashFileStorage`).
   `FlysystemStorage` je nenajde, převod `bin/console files:migrate`.
-- **Změna v `fileManager:` se na webu v produkčním režimu neprojeví bez smazání `temp/cache`** (viz níže).
+- **Změna v `fileStorage:` se na webu v produkčním režimu neprojeví bez smazání `temp/cache`** (viz níže).
 
 ## `config.local.neon` a přístupové údaje
 
@@ -482,7 +482,7 @@ partial mock frameworku, což je křehké. `tests/Helpers/SqliteDatabase::create
 - `Nette\Http\Request` pro testy routerů staví `tests/Helpers/RequestFactory.php`. `UrlScript` musí dostat
   explicitní `scriptPath = "/"` (ne prázdný řetězec), jinak `getPathInfo()` vrací vždy prázdný string.
 - Čisté unit testy bez DB jdou jen tam, kde třída na `Explorer` nezávisí (`App\Security\Role`, správce souborů
-  nad `InMemoryAdapter`). Test proti S3 (`tests/Components/FileManager/S3StorageTest.phpt`) se bez proměnných
+  nad `InMemoryAdapter`). Test proti S3 (`tests/FileStorage/S3StorageTest.phpt`) se bez proměnných
   `FILEMANAGER_S3_*` přeskočí.
 
 Chování zdokumentované testy:

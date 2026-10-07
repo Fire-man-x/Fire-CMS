@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\FrontModule\Components\Articles;
 
 use AlesWita\Components\VisualPaginator;
-use App\Components\FileManager\FileManager;
+use App\FileStorage\FileManager;
 use App\Model;
 use Nette\Application\UI\Control;
 

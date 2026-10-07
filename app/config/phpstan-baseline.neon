@@ -187,60 +187,6 @@ parameters:
 			path: ../Components/DateInput/DateInput.php
 
 		-
-			message: '#^Unsafe usage of new static\(\)\.$#'
-			identifier: new.static
-			count: 1
-			path: ../Components/FileManager/Macro/Nodes/BgNode.php
-
-		-
-			message: '#^Unsafe usage of new static\(\)\.$#'
-			identifier: new.static
-			count: 1
-			path: ../Components/FileManager/Macro/Nodes/CropNode.php
-
-		-
-			message: '#^Unsafe usage of new static\(\)\.$#'
-			identifier: new.static
-			count: 1
-			path: ../Components/FileManager/Macro/Nodes/ImageNode.php
-
-		-
-			message: '#^Unsafe usage of new static\(\)\.$#'
-			identifier: new.static
-			count: 1
-			path: ../Components/FileManager/Macro/Nodes/SrcNode.php
-
-		-
-			message: '#^Call to an undefined method App\\Components\\FileManager\\Storages\\FileStorage\:\:createCacheDirectoryPath\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../Components/FileManager/Storages/FileStorage.php
-
-		-
-			message: '#^PHPDoc tag @var above a class has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: ../Components/FileManager/Storages/FileStorage.php
-
-		-
-			message: '#^Parameter \#1 \$filename of function unlink expects string, Nette\\Utils\\FileInfo given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Components/FileManager/Storages/FileStorage.php
-
-		-
-			message: '#^Parameter \#1 \$filename of function unlink expects string, Nette\\Utils\\FileInfo given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Components/FileManager/Storages/HashFileStorage.php
-
-		-
-			message: '#^Parameter \#1 \$imageRequest of method App\\Components\\FileManager\\Storages\\HashFileStorage\:\:getCacheFilePath\(\) expects App\\Components\\FileManager\\Request\\ImageRequest, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Components/FileManager/Storages/HashFileStorage.php
-
-		-
 			message: '#^Call to function is_callable\(\) with callable\(\)\: mixed will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -479,6 +425,60 @@ parameters:
 			identifier: booleanNot.alwaysFalse
 			count: 1
 			path: ../Components/jzechy/nette-antispam/src/Validator.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: ../FileStorage/Macro/Nodes/BgNode.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: ../FileStorage/Macro/Nodes/CropNode.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: ../FileStorage/Macro/Nodes/ImageNode.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: ../FileStorage/Macro/Nodes/SrcNode.php
+
+		-
+			message: '#^Call to an undefined method App\\FileStorage\\Storages\\FileStorage\:\:createCacheDirectoryPath\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../FileStorage/Storages/FileStorage.php
+
+		-
+			message: '#^PHPDoc tag @var above a class has no effect\.$#'
+			identifier: varTag.misplaced
+			count: 1
+			path: ../FileStorage/Storages/FileStorage.php
+
+		-
+			message: '#^Parameter \#1 \$filename of function unlink expects string, Nette\\Utils\\FileInfo given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../FileStorage/Storages/FileStorage.php
+
+		-
+			message: '#^Parameter \#1 \$filename of function unlink expects string, Nette\\Utils\\FileInfo given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../FileStorage/Storages/HashFileStorage.php
+
+		-
+			message: '#^Parameter \#1 \$imageRequest of method App\\FileStorage\\Storages\\HashFileStorage\:\:getCacheFilePath\(\) expects App\\FileStorage\\Request\\ImageRequest, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../FileStorage/Storages/HashFileStorage.php
 
 		-
 			message: '#^Call to an undefined method Nette\\Application\\UI\\Form\:\:addTagInput\(\)\.$#'

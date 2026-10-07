@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace App\FrontModule\Presenters;
 
-use App\Components\FileManager\Exceptions\InvalidThumbnailException;
-use App\Components\FileManager\Files\HashImageEntity;
-use App\Components\FileManager\Request\FileRequest;
-use App\Components\FileManager\Storages\FlysystemStorage;
 use App\Components\ViewCounter;
+use App\FileStorage\Exceptions\InvalidThumbnailException;
+use App\FileStorage\Files\HashImageEntity;
+use App\FileStorage\Request\FileRequest;
+use App\FileStorage\Storages\FlysystemStorage;
 use App\Model;
 use League\Flysystem\FilesystemException;
 use Nette\Application\Attributes\Persistent;
@@ -29,7 +29,7 @@ class FilesPresenter extends BasePresenter
 	public ViewCounter $viewCounter;
 
 	/** @inject */
-	public \App\Components\FileManager\FileManager $fileManager;
+	public \App\FileStorage\FileManager $fileManager;
 
 	/** @inject */
 	public FlysystemStorage $storage;

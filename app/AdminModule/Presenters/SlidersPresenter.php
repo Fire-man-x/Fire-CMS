@@ -47,7 +47,7 @@ class SlidersPresenter extends BasePresenter
 	public SliderItems $modelSliderItems;
 
 	/** @inject */
-	public \App\Components\FileManager\FileManager $fileManager;
+	public \App\FileStorage\FileManager $fileManager;
 
 
 	public function startup(): void

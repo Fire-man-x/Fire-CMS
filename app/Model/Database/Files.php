@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace App\Model\Database;
 
-use App\Components\FileManager\Files\HashFileEntity;
-use App\Components\FileManager\Files\HashImageEntity;
 use App\Components\IViewCounter;
+use App\FileStorage\Files\HashFileEntity;
+use App\FileStorage\Files\HashImageEntity;
 use Nette\Database\Explorer;
 use Nette\Database\SqlLiteral;
 use Nette\Database\Table\ActiveRow;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace App\FrontModule\Components\Sliders;
 
 use App\Components\BaseControl;
-use App\Components\FileManager\FileManager;
-use App\Components\FileManager\TPresenter;
+use App\FileStorage\FileManager;
+use App\FileStorage\TPresenter;
 use App\Model\Database\Files;
 use App\Plugins\Sliders\Model;
 

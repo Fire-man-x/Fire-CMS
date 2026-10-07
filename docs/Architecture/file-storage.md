@@ -1,11 +1,12 @@
 # Úložiště souborů — lokální disk nebo S3, náhledy obrázků
 
 Správce souborů (`firecms_files`, administrace > Správce souborů, obrázky článků/stránek/menu/sliderů) ukládá přes
-`App\Components\FileManager\Storages\FlysystemStorage` nad knihovnou [Flysystem](https://flysystem.thephpleague.com/).
+`App\FileStorage\Storages\FlysystemStorage` nad knihovnou [Flysystem](https://flysystem.thephpleague.com/).
 Kam se ukládá, určuje neon: výchozí je lokální disk `www/files` (URL `/files/`), projekt může přepnout na
 AWS S3 nebo úložiště kompatibilní s S3 (Garage, MinIO, Cloudflare R2, …). Kód se tím nemění.
 
-Registruje to DI rozšíření `fileManager:` (`App\Components\FileManager\DI\Extension`, v `app/config/config.neon`).
+Kód je v `app/FileStorage/` (namespace `App\FileStorage`, do 2026-10 `app/Components/FileManager/`). Registruje ho DI
+rozšíření `fileStorage:` (`App\FileStorage\DI\Extension`, v `app/config/config.neon`, do 2026-10 `fileManager:`).
 
 ## Struktura klíčů
 
@@ -26,7 +27,7 @@ povolené, a náhledy ve formátu dřívějšího `HashFileStorage`.
 Výchozí stav v `app/config/config.neon`:
 
 ```neon
-fileManager:
+fileStorage:
 	storages:
 		files:
 			adapter: local
@@ -38,7 +39,7 @@ Projekt na S3 to přepíše v `theme.neon` a přístupové údaje dá do `config
 verzovaného neonu:
 
 ```neon
-fileManager:
+fileStorage:
 	storages:
 		files:
 			adapter: s3
@@ -61,7 +62,7 @@ fileManager:
 | `acl` | `bucket-owner-full-control` | ACL posílané s každým zápisem, viz níže |
 | `checksums` | `when_supported` | `when_required`, když S3 kompatibilní úložiště nezná nové kontrolní součty AWS SDK |
 
-Další volby `fileManager:` mimo `storages:`:
+Další volby `fileStorage:` mimo `storages:`:
 - `defaultStorage: files` — úložiště, do kterého ukládá správce souborů.
 - `thumbnails:` — povolené náhledy obrázků (níže).
 - `strictThumbnails: null` — nepovolený náhled vyhodí výjimku; `null` = jen v debug režimu.
@@ -95,7 +96,7 @@ Náhled vznikne až při prvním zobrazení a jen když je **povolený**. Bez se
 URL generovat libovolné rozměry.
 
 ```neon
-fileManager:
+fileStorage:
 	thumbnails:
 		resize: [100x100, 945x, x60, '300x200-f1']   # {image} / n:src / n:image; -f<N> = příznaky Image::resize()
 		crop: [130x130]                                # {crop} / n:crop - zmenšení a ořez ze středu
@@ -134,7 +135,7 @@ Náhled smazaný mimo aplikaci (ručně v bucketu) se znovu vytvoří až po vyp
 - zmenší obrázek větší než `dimensions`,
 - JPEG/WebP přeuloží v kvalitě 90.
 
-**Metadata originálu** (`App\Components\FileManager\Images\JpegMetadata`): GD metadata nezapisuje, proto se
+**Metadata originálu** (`App\FileStorage\Images\JpegMetadata`): GD metadata nezapisuje, proto se
 EXIF, XMP, IPTC a barevný profil ICC z nahraného souboru přenesou do přeuloženého obrázku. V EXIF i XMP se
 nastaví orientace 1 (obrázek je už narovnaný, prohlížeč by ho jinak otočil podruhé) a nové rozměry, zahodí
 se vložený náhled EXIF (zůstal by v původní orientaci). GPS poloha zůstává, s `stripGps: true` se odstraní (v EXIF
@@ -155,11 +156,11 @@ velikost souboru přes `Files::updateSize($id, $size)`. Adresa souboru se neměn
 
 ## Vlastní úložiště pro plugin
 
-Každé úložiště z `fileManager: storages:` je služba `fileManager.filesystem.<název>`
+Každé úložiště z `fileStorage: storages:` je služba `fileStorage.filesystem.<název>`
 (`League\Flysystem\Filesystem`, bez autowiringu):
 
 ```neon
-fileManager:
+fileStorage:
 	storages:
 		attachments:
 			adapter: local
@@ -167,11 +168,11 @@ fileManager:
 			publicUrl: /upload/attachments/
 
 services:
-	- App\Plugins\X\Service\Attachments(@fileManager.filesystem.attachments)
+	- App\Plugins\X\Service\Attachments(@fileStorage.filesystem.attachments)
 ```
 
 Plugin, který dnes ukládá po svém na lokální disk (`FileStorage`, `move()`), na S3 nepoběží. Nový kód
-používá vlastní úložiště z `fileManager: storages:`.
+používá vlastní úložiště z `fileStorage: storages:`.
 
 ## Převod existujících souborů — `bin/console files:migrate`
 
@@ -200,7 +201,7 @@ Veřejné URL (`publicUrl`) servíruje webový endpoint `:3902` jen bucketu s po
 
 ```neon
 # config.local.neon
-fileManager:
+fileStorage:
 	storages:
 		files:
 			adapter: s3
@@ -213,10 +214,10 @@ fileManager:
 ```
 
 Test proti S3 (bez proměnných se přeskočí):
-`FILEMANAGER_S3_BUCKET=muj-bucket FILEMANAGER_S3_ENDPOINT=http://localhost:3900 FILEMANAGER_S3_KEY=GK… FILEMANAGER_S3_SECRET=… composer test -- tests/Components/FileManager/S3StorageTest.phpt`
+`FILEMANAGER_S3_BUCKET=muj-bucket FILEMANAGER_S3_ENDPOINT=http://localhost:3900 FILEMANAGER_S3_KEY=GK… FILEMANAGER_S3_SECRET=… composer test -- tests/FileStorage/S3StorageTest.phpt`
 
 ## Omezení
 
 - Stahování (`Front:Files:default`) posílá soubor přes PHP (`StreamResponse`), bez HTTP Range, kvůli počítadlu
   stažení a původnímu názvu souboru.
-- `FileStorage` / `HashFileStorage` zůstávají jen kvůli pluginům, které z nich dědí. Jádro je neregistruje.
+- `Storages\FileStorage` / `Storages\HashFileStorage` zůstávají jen kvůli pluginům, které z nich dědí. Jádro je neregistruje.

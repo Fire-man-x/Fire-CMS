@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\FrontModule\Presenters;
 
-use App\Components\FileManager\Files\HashImageEntity;
+use App\FileStorage\Files\HashImageEntity;
 use App\Model\Database\Articles;
 use App\Model\Database\Categories;
 use App\Model\Database\Files;

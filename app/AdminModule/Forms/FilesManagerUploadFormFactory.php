@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Forms;
 
-use App\Components\FileManager\Files\HashFile;
-use App\Components\FileManager\Files\HashImageEntity;
+use App\FileStorage\Files\HashFile;
+use App\FileStorage\Files\HashImageEntity;
 use App\Forms\BaseFormFactory;
 use App\Model;
 use Nette\Application\UI\Form;

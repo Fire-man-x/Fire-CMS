@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\FrontModule\Components\DynamicForms;
 
 use App\Components\BaseControl;
-use App\Components\FileManager\FileManager;
+use App\FileStorage\FileManager;
 use App\Model\Database\DynamicForms;
 use Nette\Localization\Translator;
 

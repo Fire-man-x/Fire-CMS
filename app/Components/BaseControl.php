@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Components;
 
-use App\Components\FileManager\FileManager;
-use App\Components\FileManager\TPresenter;
+use App\FileStorage\FileManager;
+use App\FileStorage\TPresenter;
 use Nette\Application\UI\Control;
 
 /**

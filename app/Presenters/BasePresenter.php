@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Presenters;
 
 use Alnux\NetteBreadCrumb\BreadCrumb;
-use App\Components\FileManager\TPresenter;
+use App\FileStorage\TPresenter;
 use Nette\Application\Helpers;
 use Nette\Application\UI\Presenter;
 use Nette\HtmlStringable;

@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use App\Components\FileManager\FileManager;
-use App\Components\FileManager\Files\File;
+use App\FileStorage\FileManager;
+use App\FileStorage\Files\File;
 use App\Model\Database\Settings;
 use Contributte\FileUpload\Model\IUploadModel;
 use Nette\Http\FileUpload;

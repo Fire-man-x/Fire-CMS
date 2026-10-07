@@ -31,24 +31,25 @@ patří.
     jazyce → název cíle → `target`. Popisek položky typu `url`/`route` je povinný ve výchozím jazyce.
   - Odkaz typu `route` dostane `locale` automaticky, pokud míří na `:Front:` nebo je relativní.
   - Podstránky (`Pages`) se do menu nepřidávají automaticky, na rozdíl od podkategorií.
-- `FileManager` — správa souborů/obrázků (upload, úložiště disk/S3, náhledy, viz
-  [file-storage.md](file-storage.md)). Vlastní Latte makra
-  (`n:image`, `n:src`, `n:crop`, `n:bg` — viz `App\Components\FileManager\Macro\*`), registrovaná přes
-  `App\Components\FileManager\DI\Extension` (výchozí makro-extension `Macro\ImageMacro`, dá se přidat
-  další přes `fileManager: macros: [...]` v `config.neon`).
 
 `App\Security\*` (`User`, `AuthorizatorFactory`, `Acl`, `Role`) je v `app/Security/`, ne v `app/Components/`.
 
+Správa souborů/obrázků (`FileManager`, úložiště disk/S3, náhledy) taky není komponenta — je v
+`app/FileStorage/` (namespace `App\FileStorage`, do 2026-10 `App\Components\FileManager`), viz
+[file-storage.md](file-storage.md). Vlastní Latte makra (`n:image`, `n:src`, `n:crop`, `n:bg` — viz
+`App\FileStorage\Macro\*`) registruje `App\FileStorage\DI\Extension` (výchozí makro-extension
+`Macro\ImageMacro`, dá se přidat další přes `fileStorage: macros: [...]` v `config.neon`).
+
 ### `TPresenter` trait vzor
 
-`App\Components\FileManager\TPresenter` je trait, který presenteru přidá `/** @inject */ FileManager
+`App\FileStorage\TPresenter` je trait, který presenteru přidá `/** @inject */ FileManager
 $fileManager` a přepíše `createTemplate()` tak, aby do šablony automaticky vložil `$template->__imagestore`
 (potřebné pro `n:image`/`n:src` makra):
 
 ```php
 class GalleryPresenter extends BasePresenter
 {
-    use \App\Components\FileManager\TPresenter;
+    use \App\FileStorage\TPresenter;
     // ...
 }
 ```

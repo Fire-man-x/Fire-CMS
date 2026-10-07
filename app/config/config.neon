@@ -75,7 +75,7 @@ extensions:
 	router: App\Router\DI\RouterProviderExtension
 	#uploadManager: ondrs\UploadManager\DI\Extension
 	fileUpload: Contributte\FileUpload\FileUploadExtension
-	fileManager: App\Components\FileManager\DI\Extension
+	fileStorage: App\FileStorage\DI\Extension
 
 	#Input
 	tagInput: Achse\TagInput\Extension
@@ -131,7 +131,7 @@ fileUpload:
 
 # Úložiště souborů (lokální disk nebo S3) a náhledy obrázků - viz docs/Architecture/file-storage.md.
 # Projekt přepíná na S3 v theme.neon / config.local.neon: storages: files: adapter: s3, bucket:, publicUrl: ...
-fileManager:
+fileStorage:
 	storages:
 		files:
 			adapter: local

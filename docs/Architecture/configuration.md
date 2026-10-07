@@ -15,7 +15,7 @@ Pořadí načtení v `app/bootstrap.php` (viz `overview.md` pro detail): `app/co
 extensions:
     router: App\Router\DI\RouterProviderExtension   # viz routing.md
     fileUpload: Contributte\FileUpload\FileUploadExtension   # addFileUpload() na Nette\Forms\Container
-    fileManager: App\Components\FileManager\DI\Extension   # úložiště souborů (disk/S3), viz file-storage.md
+    fileStorage: App\FileStorage\DI\Extension   # úložiště souborů (disk/S3), viz file-storage.md
     tagInput: Achse\TagInput\Extension
     dateInput: Vodacek\Forms\Controls\Extension
     visualpaginator: AlesWita\Components\VisualPaginatorExtension

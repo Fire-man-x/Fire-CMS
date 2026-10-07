@@ -61,7 +61,7 @@
 				{snippet files}
 					{if $files}
 						{foreach $files as $file}
-							{var $isImage = $file instanceof App\Components\FileManager\Files\HashImageEntity}
+							{var $isImage = $file instanceof App\FileStorage\Files\HashImageEntity}
 							{var $fileId = $file->getId()}
 							<div n:snippet="file-{$fileId}" class="img-thumbnail galery-thumbnail d-inline-block float-left" data-file-id="{$file->getId()}" data-is-image="{if $isImage}1{else}0{/if}">
 								<input type="checkbox" id="checkbox{$file->getId()}"  class="btn-primary"/>
