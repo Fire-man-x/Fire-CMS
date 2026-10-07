@@ -52,7 +52,7 @@ class DateInput extends BaseControl  {
 
 	protected string $type;
 
-	private bool $nullable;
+	private bool $nullable = false;
 
 	protected array $range = ['min' => null, 'max' => null];
 
