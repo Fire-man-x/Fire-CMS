@@ -27,6 +27,8 @@ fi
 if [ "${1:-}" = apache2-foreground ]; then
 	# Záloha za pre-deploy příkaz (free plán ho nemá): migrace při startu instance
 	if [ "${MIGRATE_ON_START:-0}" = 1 ]; then
+		# srovná kontrolní součty upravených migrací, jinak migrations:continue odmítne pokračovat
+		runuser -u www-data -- php "$APP_DIR/bin/console" migrations:repairChecksum
 		runuser -u www-data -- php "$APP_DIR/bin/console" migrations:continue
 	fi
 	# Apache předává do PHP jen proměnné z PassEnv (apache-vhost.conf)
