@@ -15,13 +15,6 @@ use Nette\Utils\UnknownImageFileException;
 
 class FilesPresenter extends BasePresenter
 {
-
-	/**
-	 * Hash
-	 */
-	#[Persistent]
-	public string $hash;
-
 	/** @inject */
 	public Model\Database\Files $filesModel;
 
@@ -36,22 +29,22 @@ class FilesPresenter extends BasePresenter
 
 
 	/** Get files, increment if viewed, download */
-	public function actionDefault($hash): void
+	public function actionDefault(string $hash): void
 	{
-		$fileInfo = $this->filesModel->findByHash($this->hash)->fetch();
+		$fileInfo = $this->filesModel->findByHash($hash)->fetch();
 		if (!$fileInfo) {
-			throw new BadRequestException("File with hash '$this->hash' doesn't exist.");
+			throw new BadRequestException("File with hash '$hash' doesn't exist.");
 		}
 
 		//viewCounter
-		$this->viewCounter->itemViewed(ViewCounter::TYPE_FILE, $this->hash, $this->language);
+		$this->viewCounter->itemViewed(ViewCounter::TYPE_FILE, $fileInfo->id, $this->language);
 
 		$fileEntity = $this->filesModel->toFileEntity($fileInfo);
 		$fileRequest = FileRequest::fromFile($fileEntity);
 		try {
 			$response = $this->fileManager->download($fileRequest);
 		} catch (FilesystemException $e) {
-			throw new BadRequestException("File with hash '$this->hash' is missing in the storage.", 404, $e);
+			throw new BadRequestException("File with hash '$hash' is missing in the storage.", 404, $e);
 		}
 		$this->sendResponse($response);
 	}

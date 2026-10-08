@@ -601,12 +601,6 @@ parameters:
 			path: ../FrontModule/Presenters/BasePresenter.php
 
 		-
-			message: '#^Parameter \#2 \$itemId of method App\\Components\\ViewCounter\:\:itemViewed\(\) expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../FrontModule/Presenters/FilesPresenter.php
-
-		-
 			message: '#^Parameter \#3 \$icon of method App\\Presenters\\BasePresenter\:\:addBreadCrumbLink\(\) expects null, string given\.$#'
 			identifier: argument.type
 			count: 1
