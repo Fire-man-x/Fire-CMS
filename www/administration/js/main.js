@@ -38,14 +38,18 @@ $(function () {
 
 	//show bootstrap confirm - disable ajax before show modal
 	$.nette.ext('confirm', {
-		init: function() {
-			//store href to different attribute
-			$('[data-target="#confirm-modal"]').each(function(){
-				$(this).data('confirm-url', $(this).attr('href'));
-				$(this).attr('href', '#');
-			});
-		},
 		load: function (rh) {
+			//store href to different attribute (Bootstrap 5: data-bs-target) - v load, ne v init: i odkazy v gridu
+			//překresleném AJAXem, jinak by nette.ajax po kliknutí odeslal požadavek hned, bez potvrzení;
+			//už zpracovaný odkaz (href #) se přeskočí, aby se uložená adresa nepřepsala
+			$('[data-bs-target="#confirm-modal"]').each(function(){
+				var href = $(this).attr('href');
+				if (href && href !== '#') {
+					$(this).data('confirm-url', href);
+					$(this).attr('href', '#');
+				}
+			});
+
 			//remove click event, added - if added class .ajax to element and run reload
 			$('#confirm-modal a#confirm-button').off('click.nette', rh);
 			$('#confirm-modal a.ajax').on('click.nette', rh);
@@ -124,9 +128,9 @@ $(function () {
 		window.location = $(this).find(":selected").data("link");
 	});
 
-	//change iframe src
-	$(document).on('click', "[data-src][data-target]", function() {
-		var target = $(this).data('target');
+	//change iframe src (Bootstrap 5: data-bs-target)
+	$(document).on('click', "[data-src][data-bs-target]", function() {
+		var target = $(this).attr('data-bs-target');
 		var src = $(this).attr('data-src');
 		var height = $(this).attr('data-height') || $(window).height() - 113; /* - is outerHeight + margin; Math.abs($(".modal-header").outerHeight())*/;
 		var width = $(this).attr('data-width') || "100%";

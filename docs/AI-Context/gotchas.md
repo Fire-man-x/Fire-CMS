@@ -112,6 +112,19 @@ Vlastní šablona sloupce (`$column->setTemplate(...)`) nedostane proměnné, kt
 šabloně. Typicky chybí `$__imagestore` (proměnná maker `n:src`/`n:image`) a grid spadne na „Undefined variable
 $__imagestore“. Předejte ji explicitně: `setTemplate($file, ['__imagestore' => $this->fileManager])`.
 
+## JS administrace a Bootstrap 5: selektory na `data-bs-*`
+
+Administrace běží na Bootstrapu 5, odkazy mají `data-bs-toggle` / `data-bs-target`. Selektory ve
+`www/administration/js/main.js` proto musí hledat `data-bs-target`, ne `data-target` (Bootstrap 4) — se
+starým atributem se handler tiše nespustí (do 2026-10-08 se tak nespouštělo potvrzovací okno ani okno
+s iframe správce souborů).
+
+U potvrzovacího okna to je nebezpečné: odkaz s třídou `ajax` a `data-bs-target="#confirm-modal"` musí mít
+`href` přesunutý do `data-confirm-url` (rozšíření `confirm` v `main.js`, v `load`, aby se zpracovaly i gridy
+překreslené AJAXem). Jinak ho `nette.ajax` po kliknutí odešle hned a akce (mazání) proběhne bez potvrzení.
+Akce gridu s potvrzením: třída `ajax`, `data-bs-toggle="modal"`, `data-bs-target="#confirm-modal"`,
+`data-confirm-text`.
+
 ## `IList::getList()` — phpDoc-only návratový typ
 
 `App\Model\Database\IList::getList()` deklaruje `@return array|\Nette\Database\Table\Selection` jen v phpDoc, metoda

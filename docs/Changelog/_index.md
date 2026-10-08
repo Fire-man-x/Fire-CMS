@@ -2,6 +2,12 @@
 
 Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na detailní záznam v `Changelog/`.
 
+## 2026-10-08
+
+- **Potvrzovací okno v gridech administrace.** `main.js` hledal `data-target` místo `data-bs-target`
+  (Bootstrap 5): „Smazat“ v gridu mazalo hned bez potvrzení a okno pro výběr obrázku zůstávalo prázdné.
+  Opraveno i pro gridy překreslené AJAXem. Viz [2026-10-08-admin-confirm-modal.md](2026-10-08-admin-confirm-modal.md).
+
 ## 2026-10-07
 
 - **Přímé odkazy na náhledy (`directThumbnails`).** Lokální úložiště může odkazovat přímo na náhledy;
