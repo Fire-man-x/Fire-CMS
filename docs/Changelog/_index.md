@@ -4,6 +4,22 @@ Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na det
 
 ## 2026-10-07
 
+- **Přímé odkazy na náhledy (`directThumbnails`).** Lokální úložiště může odkazovat přímo na náhledy;
+  existující pošle web server, chybějící (i smazaný) vytvoří aplikace na jeho adrese
+  (`NamingScheme::parseThumbnailPath()`, `FlysystemStorage::thumbnailFromPath()`). Kořen úložiště potřebuje
+  `.htaccess` jako `www/files/.htaccess`. Viz [2026-10-07-direct-thumbnails.md](2026-10-07-direct-thumbnails.md).
+
+- **Obecná úložiště: schéma názvů a náhledy pro každé úložiště.** Každá položka pod `fileStorage:` je
+  úložiště (`FlysystemStorage`) s vlastním schématem názvů (`NamingScheme`, správce souborů `HashNamingScheme`)
+  a vlastním seznamem náhledů (`thumbnails:` u úložiště, aliasy rozměrů). Generátor náhledů obslouží každé
+  úložiště (`/files/thumbnail/<úložiště>/<klíč originálu>/<náhled>`, bez DB). Globální `fileStorage: thumbnails:`
+  shodí start aplikace, staré `FileStorage`/`HashFileStorage` jsou smazané. Viz
+  [2026-10-07-storage-naming-schemes.md](2026-10-07-storage-naming-schemes.md).
+
+- **`ImageRequest` přijímá libovolnou `ImageEntity`.** Makra `n:src`/`n:image`/`n:crop`/`n:bg` umí i obrázky
+  mimo správce souborů (bez id a hashe). Viz
+  [2026-10-07-imagerequest-image-entity.md](2026-10-07-imagerequest-image-entity.md).
+
 - **Správce souborů v `app/FileStorage`, DI rozšíření `fileStorage:`.** Namespace `App\Components\FileManager`
   → `App\FileStorage`, sekce neonu `fileManager:` → `fileStorage:` (služby `@fileStorage.filesystem.<název>`).
   Projekty musí upravit kód pluginů a šablon a neon včetně `config.local.neon` na serveru, jinak web po deployi

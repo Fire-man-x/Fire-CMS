@@ -9,7 +9,7 @@ zavádějící.
 
 **Dotčené soubory/oblasti:**
 - `app/FileStorage/**` — přesunuté soubory, jen namespace a texty s názvem klíče (`fileStorage: thumbnails:`
-  v chybové hlášce nepovoleného náhledu, `fileStorage: storages:` v hláškách konfigurace)
+  v chybové hlášce nepovoleného náhledu, `fileStorage: <název>:` v hláškách konfigurace)
 - `app/FileStorage/Macro/Nodes/*` — vygenerovaný kód šablon volá `App\FileStorage\Request\ImageRequest`
 - `app/config/config.neon` — `fileStorage: App\FileStorage\DI\Extension` a sekce `fileStorage:`
 - `theme/config/config.local.neon.dist` — sekce `fileStorage:`
@@ -26,8 +26,9 @@ nevznikl: Nette spojuje název sekce s názvem rozšíření a dvě rozšířen�
 přetahovala o definice. Starý klíč proto shodí start aplikace hned (`Found section 'fileManager' in
 configuration, but corresponding extension is missing`), ne potichu.
 
-Služba `FileManager` a cache náhledů (`FileManager.thumbnails.<úložiště>.<verze>`) se nepřejmenovávají.
-Náhledy se proto nemusí generovat znovu.
+Služba `FileManager` se nepřejmenovává. Evidence náhledů v Nette Cache se jmenuje nově
+`FileStorage.thumbnails.*` (viz [2026-10-07-storage-naming-schemes.md](2026-10-07-storage-naming-schemes.md)), uložené
+náhledy zůstávají a generovat se znovu nemusí.
 
 **Co musí udělat projekt při mergi jádra:**
 1. Kód pluginů a šablon v projektu (`theme/`, vlastní `app/Plugins/*`):
@@ -35,7 +36,9 @@ Náhledy se proto nemusí generovat znovu.
    Hledejte i relativní zápisy uvnitř namespace `App\Components` (např. `FileManager\FileManager`).
    Pozor na šablony: `instanceof` s neexistující třídou nehlásí chybu, jen vrací `false`.
 2. Neon: sekce `fileManager:` → `fileStorage:` v `theme/config/theme.neon`, v `config.plugin.neon`
-   klientských pluginů a v `theme/config/config.local.neon`. Odkazy na služby
+   klientských pluginů a v `theme/config/config.local.neon`; úložiště přímo pod ní
+   (`fileManager: storages: files:` → `fileStorage: files:`, viz
+   [2026-10-07-storage-naming-schemes.md](2026-10-07-storage-naming-schemes.md)). Odkazy na služby
    `@fileManager.filesystem.<název>` → `@fileStorage.filesystem.<název>`.
 3. **`config.local.neon` na serveru upravte ve stejném okamžiku jako nasazení** (je mimo git, deploy ho
    nezmění). S neupraveným souborem web po deployi nenastartuje.

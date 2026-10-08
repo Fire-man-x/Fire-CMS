@@ -5,12 +5,15 @@ namespace App\FileStorage\Request;
 
 
 use App\FileStorage\Files\File;
-use App\FileStorage\Files\HashImageEntity;
+use App\FileStorage\Files\ImageEntity;
 use Nette\SmartObject;
 use Nette\Utils\Image;
 
 /**
  * Image request encapsulation
+ *
+ * Obrázek je libovolná ImageEntity - i obrázek mimo správce souborů (bez id a hashe), např. soubor na disku
+ * načtený pluginem s vlastním úložištěm (IStorage). FlysystemStorage pracuje jen s obrázky s hashem (HashFile).
  */
 class ImageRequest implements Request
 {
@@ -20,7 +23,7 @@ class ImageRequest implements Request
 	 * The requested image file information.
 	 *
 	 */
-	private HashImageEntity $file;
+	private ImageEntity $file;
 
 	/**
 	 * The requested image thumbnail dimensions
@@ -44,7 +47,7 @@ class ImageRequest implements Request
 	/**
 	 * Constructs the image request from the given file information, requested dimensions and flags.
 	 */
-	public function __construct(HashImageEntity $file, string $dimensions = Request::ORIGINAL, int $flags = 0, bool $crop = false)
+	public function __construct(ImageEntity $file, string $dimensions = Request::ORIGINAL, int $flags = 0, bool $crop = false)
 	{
 		/*if((string)intval($dimensions) == $dimensions && intval($dimensions) === IRequest::ORIGINAL)
 		{
@@ -61,9 +64,9 @@ class ImageRequest implements Request
 	/**
 	 * Creates the image request from the crop macro arguments.
 	 *
-	 * @return ImageRequest
+	 * @param array{0?: string} $args rozměry ořezu, např. ['130x130']
 	 */
-	public static function crop(HashImageEntity $image = null, array $args = array())
+	public static function crop(ImageEntity $image, array $args = array()): ImageRequest
 	{
 		$dimensions = $args[0] ?? Request::ORIGINAL;
 		$flags = Image::OrSmaller;
@@ -76,8 +79,10 @@ class ImageRequest implements Request
 
 	/**
 	 * Creates the image request from the image macro arguments.
+	 *
+	 * @param array{0?: string, 1?: int} $args rozměry a příznaky Image::*, např. ['300x200', Image::ShrinkOnly]
 	 */
-	public static function fromMacro(HashImageEntity $image = null, array $args = array()): ImageRequest
+	public static function fromMacro(ImageEntity $image, array $args = array()): ImageRequest
 	{
 		return new ImageRequest($image, $args[0] ?? Request::ORIGINAL, $args[1] ?? 0);
 	}
@@ -89,16 +94,16 @@ class ImageRequest implements Request
 	}
 
 
-	public function getFile(): HashImageEntity
+	public function getFile(): ImageEntity
 	{
 		return $this->file;
 	}
 
 
-	public function setFile(File|HashImageEntity $file): void
+	public function setFile(File $file): void
 	{
-		if(!$file instanceof HashImageEntity){
-			throw new \LogicException('File is not instance of HashImageEntity.');
+		if(!$file instanceof ImageEntity){
+			throw new \LogicException('File is not instance of ImageEntity.');
 		}
 
 		$this->file = $file;

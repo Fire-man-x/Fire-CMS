@@ -6,6 +6,7 @@ namespace Tests\FileStorage;
 
 use App\FileStorage\Files\HashImageEntity;
 use App\FileStorage\Flysystem\FilesystemFactory;
+use App\FileStorage\Naming\HashNamingScheme;
 use App\FileStorage\Request\ImageRequest;
 use App\FileStorage\Responses\StreamResponse;
 use App\FileStorage\Storages\FlysystemStorage;
@@ -83,9 +84,10 @@ final class S3StorageTest extends TestCase
 	public function testStorageOnS3(): void
 	{
 		$router = new RouteList();
-		$router->addRoute('files/thumbnail/<hash>/<thumbnail>', 'Front:Files:thumbnail');
+		$router->addRoute('files/thumbnail/<storage>/<path .+>/<thumbnail [^/]+>', 'Front:Files:thumbnail');
 		$storage = new FlysystemStorage(
 			$this->filesystem,
+			new HashNamingScheme(),
 			new AllowedThumbnails(['10x10'], ['8x8']),
 			new LinkGenerator($router, new UrlScript('https://example.com/')),
 			new MemoryStorage(),
@@ -100,10 +102,10 @@ final class S3StorageTest extends TestCase
 
 		// náhledy na vyžádání
 		Assert::contains('/files/thumbnail/', $storage->link(ImageRequest::fromMacro($file, ['10x10'])));
-		Assert::type(StreamResponse::class, $storage->thumbnail($file, '10x10'));
-		$storage->thumbnail($file, 'crop-8x8');
+		Assert::type(StreamResponse::class, $storage->thumbnail($storage->getOriginalPath($file), '10x10'));
+		$storage->thumbnail($storage->getOriginalPath($file), 'crop-8x8');
 		Assert::same(
-			'https://cdn.example.com/' . FlysystemStorage::CacheDirectory . '/' . $file->getHash()[0] . '/' . $file->getHash()[1] . '/' . $file->getHash() . '.10x10.jpg',
+			'https://cdn.example.com/' . HashNamingScheme::CacheDirectory . '/' . $file->getHash()[0] . '/' . $file->getHash()[1] . '/' . $file->getHash() . '.10x10.jpg',
 			$storage->link(ImageRequest::fromMacro($file, ['10x10'])),
 		);
 		Assert::count(2, $storage->listThumbnails($file));

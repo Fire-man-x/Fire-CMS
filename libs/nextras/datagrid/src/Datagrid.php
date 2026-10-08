@@ -286,7 +286,7 @@ class Datagrid extends UI\Control
 
 	public function redrawRow($primaryValue)
 	{
-		if ($this->presenter->isAjax()) {
+		if ($this->getPresenter()->isAjax()) {
 			if (isset($this->filterDataSource[$this->rowPrimaryKey])) {
 				$this->filterDataSource = [$this->rowPrimaryKey => $this->filterDataSource[$this->rowPrimaryKey]];
 				if (is_string($this->filterDataSource[$this->rowPrimaryKey])) {
@@ -332,7 +332,7 @@ class Datagrid extends UI\Control
 	protected function getData($key = null)
 	{
 		if (!$this->data) {
-			$onlyRow = $key !== null && $this->presenter->isAjax();
+			$onlyRow = $key !== null && $this->getPresenter()->isAjax();
 
 			if ($this->orderColumn !== NULL && !isset($this->columns[$this->orderColumn])) {
 				$this->orderColumn = NULL;
@@ -402,7 +402,7 @@ class Datagrid extends UI\Control
 	public function handleEdit($primaryValue, $cancelEditPrimaryValue = null)
 	{
 		$this->editRowKey = $primaryValue;
-		if ($this->presenter->isAjax()) {
+		if ($this->getPresenter()->isAjax()) {
 			$this->redrawRow($primaryValue);
 			if ($cancelEditPrimaryValue) {
 				foreach (explode(',', $cancelEditPrimaryValue) as $pv) {
@@ -415,7 +415,7 @@ class Datagrid extends UI\Control
 
 	public function handleSort()
 	{
-		if ($this->presenter->isAjax()) {
+		if ($this->getPresenter()->isAjax()) {
 			$this->redrawControl('rows');
 		}
 	}
@@ -534,7 +534,7 @@ class Datagrid extends UI\Control
 			}
 		}
 
-		if (!$this->presenter->isAjax() && $allowRedirect) {
+		if (!$this->getPresenter()->isAjax() && $allowRedirect) {
 			$this->redirect('this');
 		}
 	}
@@ -561,7 +561,7 @@ class Datagrid extends UI\Control
 
 	public function handlePaginate()
 	{
-		if ($this->presenter->isAjax()) {
+		if ($this->getPresenter()->isAjax()) {
 			$this->redrawControl('rows');
 		}
 	}

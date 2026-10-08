@@ -15,7 +15,7 @@ use Nette\InvalidArgumentException;
 use Nette\StaticClass;
 
 /**
- * Vytváří Flysystem úložiště (lokální adresář nebo S3 bucket) z konfigurace `fileStorage: storages: <název>:`,
+ * Vytváří Flysystem úložiště (lokální adresář nebo S3 bucket) z konfigurace `fileStorage: <název>:`,
  * viz App\FileStorage\DI\Extension.
  *
  * @phpstan-type StorageConfig array{
@@ -65,11 +65,12 @@ final class FilesystemFactory
 			Config::OPTION_VISIBILITY => Visibility::PUBLIC,
 			Config::OPTION_DIRECTORY_VISIBILITY => Visibility::PUBLIC,
 		];
-		if ($config['publicUrl'] !== null) {
-			$options['public_url'] = $config['publicUrl'];
-		}
 
-		return new Filesystem($adapter, $options);
+		return new Filesystem(
+			$adapter,
+			$options,
+			publicUrlGenerator: $config['publicUrl'] !== null ? new EncodedPublicUrlGenerator($config['publicUrl']) : null,
+		);
 	}
 
 

@@ -5,11 +5,10 @@ namespace App\FileStorage\Request;
 
 
 use App\FileStorage\Files\File;
-use App\FileStorage\Files\FileEntity;
 use Nette\SmartObject;
 
 /**
- * File request encapsulation
+ * File request encapsulation - libovolný soubor (File), i obrázek správce souborů (HashImageEntity)
  */
 class FileRequest implements Request
 {
@@ -19,14 +18,14 @@ class FileRequest implements Request
 	 * The requested file information.
 	 *
 	 */
-	private FileEntity $file;
+	private File $file;
 
 
 	/**
 	 * Constructs the file request from the given file information, requested dimensions and flags.
 	 *
 	 */
-	public function __construct(FileEntity $file)
+	public function __construct(File $file)
 	{
 		$this->file = $file;
 	}
@@ -34,23 +33,19 @@ class FileRequest implements Request
 	/**
 	 * Creates the file request from the file macro arguments.
 	 */
-	public static function fromFile(FileEntity $file = null): self
+	public static function fromFile(File $file): self
 	{
 		return new FileRequest($file);
 	}
 
-	public function getFile(): FileEntity
+	public function getFile(): File
 	{
 		return $this->file;
 	}
 
 
-	public function setFile(File|FileEntity $file): void
+	public function setFile(File $file): void
 	{
-		if(!$file instanceof FileEntity){
-			throw new \LogicException('File is not instance of FileEntity.');
-		}
-
 		$this->file = $file;
 	}
 

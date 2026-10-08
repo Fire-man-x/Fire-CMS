@@ -174,8 +174,9 @@ Základní entity: Articles (články), Pages (stránky - samostatný typ obsahu
 kategorie článků i články mají povinné `sectionId`, administrace je po sekcích přes `SectionAwareTrait`),
 Categories (kategorie článků, bez typů - formulář je `CategorySubtype\DefaultFormPart`; odkazy řeší položky
 menu, galerie/obsahové stránky jsou Pages, úvodní stránka je `Front:Homepage`), Files/FileFolders (správce souborů v administraci;
-soubory ukládá `FlysystemStorage` na lokální disk nebo S3 podle `fileStorage: storages:`, náhledy obrázků jen
-povolené v `fileStorage: thumbnails:` - viz `docs/Architecture/file-storage.md`), Menus (menu), Tags (štítky), Metas
+soubory ukládá `FlysystemStorage` na lokální disk nebo S3 podle `fileStorage: <název úložiště>:`, náhledy obrázků jen
+povolené v `fileStorage: <název>: thumbnails:`; úložišť může být víc, každé s vlastním schématem názvů
+(`NamingScheme`) - viz `docs/Architecture/file-storage.md`), Menus (menu), Tags (štítky), Metas
 (SEO meta na úrovni článku/kategorie), Users/Roles (uživatelé/role), Languages (vícejazyčnost přes
 `LiveTranslator` plus vlastní model `Languages`/`LanguageService`), `UrlModule` (vlastní hezká URL +
 přesměrování, se kterými pracuje `CustomRouter`), `CommentsModule` (komentáře).

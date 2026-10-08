@@ -49,19 +49,18 @@ sentry:
 		environment: production
 
 # Nahrané soubory do S3 - disk Renderu se při každém deployi maže, viz docs/Architecture/file-storage.md
-fileManager:
-	storages:
-		files:
-			adapter: s3
-			bucket: ''
-			region: eu-central-1
-			publicUrl: 'https://<bucket nebo CDN>/'  # včetně prefix, pokud ho nastavíte
-			key: ''
-			secret: ''
-			# jen S3 kompatibilní úložiště (Cloudflare R2, Garage, MinIO):
-			#endpoint: 'https://<account id>.r2.cloudflarestorage.com'
-			#pathStyleEndpoint: true
-			#checksums: when_required
+fileStorage:
+	files:
+		adapter: s3
+		bucket: ''
+		region: eu-central-1
+		publicUrl: 'https://<bucket nebo CDN>/'  # včetně prefix, pokud ho nastavíte
+		key: ''
+		secret: ''
+		# jen S3 kompatibilní úložiště (Cloudflare R2, Garage, MinIO):
+		#endpoint: 'https://<account id>.r2.cloudflarestorage.com'
+		#pathStyleEndpoint: true
+		#checksums: when_required
 
 # E-maily (kontaktní formulář, notifikace pluginů, e-maily z cron úloh). V image není sendmail, bez SMTP
 # odeslání selže.

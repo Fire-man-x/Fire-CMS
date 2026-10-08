@@ -5,13 +5,13 @@ namespace App\FrontModule\Presenters;
 
 use App\Components\ViewCounter;
 use App\FileStorage\Exceptions\InvalidThumbnailException;
-use App\FileStorage\Files\HashImageEntity;
 use App\FileStorage\Request\FileRequest;
-use App\FileStorage\Storages\FlysystemStorage;
+use App\FileStorage\Storages\StorageRegistry;
 use App\Model;
 use League\Flysystem\FilesystemException;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\BadRequestException;
+use Nette\Utils\UnknownImageFileException;
 
 class FilesPresenter extends BasePresenter
 {
@@ -32,7 +32,7 @@ class FilesPresenter extends BasePresenter
 	public \App\FileStorage\FileManager $fileManager;
 
 	/** @inject */
-	public FlysystemStorage $storage;
+	public StorageRegistry $storages;
 
 
 	/** Get files, increment if viewed, download */
@@ -60,21 +60,47 @@ class FilesPresenter extends BasePresenter
 	/**
 	 * Generátor náhledů: vytvoří povolený náhled obrázku při prvním zobrazení, uloží ho do úložiště
 	 * a pošle. Další vykreslení šablony už odkazuje přímo na uložený náhled (viz FlysystemStorage::link()).
+	 * Funguje pro každé úložiště z `fileStorage: <název>:` - originál určuje jeho klíč, ne záznam v DB.
+	 *
+	 * @param string $path klíč originálu v úložišti
 	 */
-	public function actionThumbnail(string $hash, string $thumbnail): void
+	public function actionThumbnail(string $storage, string $path, string $thumbnail): void
 	{
-		$fileInfo = $this->filesModel->findByHash($hash)->fetch();
-		$fileEntity = $fileInfo ? $this->filesModel->toFileEntity($fileInfo) : null;
-		if (!$fileEntity instanceof HashImageEntity) {
-			throw new BadRequestException("Image with hash '$hash' doesn't exist.");
-		}
+		$fileStorage = $this->storages->find($storage)
+			?? throw new BadRequestException("Storage '$storage' doesn't exist.");
 
 		try {
-			$response = $this->storage->thumbnail($fileEntity, $thumbnail);
+			$response = $fileStorage->thumbnail($path, $thumbnail);
 		} catch (InvalidThumbnailException $e) {
 			throw new BadRequestException($e->getMessage(), 404, $e);
 		} catch (FilesystemException $e) {
-			throw new BadRequestException("Image with hash '$hash' is missing in the storage.", 404, $e);
+			throw new BadRequestException("Image '$path' is missing in the storage '$storage'.", 404, $e);
+		} catch (UnknownImageFileException $e) {
+			throw new BadRequestException("File '$path' in the storage '$storage' is not an image.", 404, $e);
+		}
+		$this->sendResponse($response);
+	}
+
+
+	/**
+	 * Náhled vyžádaný přímo na jeho adrese v úložišti s directThumbnails - web server sem pošle jen požadavek
+	 * na soubor, který na disku není. Náhled vytvoří a uloží, další požadavky obslouží web server.
+	 *
+	 * @param string $path klíč náhledu v úložišti (cesta z URL za publicUrl úložiště)
+	 */
+	public function actionMissingThumbnail(string $storage, string $path): void
+	{
+		$fileStorage = $this->storages->find($storage)
+			?? throw new BadRequestException("Storage '$storage' doesn't exist.");
+
+		try {
+			$response = $fileStorage->thumbnailFromPath($path);
+		} catch (InvalidThumbnailException $e) {
+			throw new BadRequestException($e->getMessage(), 404, $e);
+		} catch (FilesystemException $e) {
+			throw new BadRequestException("Thumbnail '$path' in the storage '$storage' can't be created.", 404, $e);
+		} catch (UnknownImageFileException $e) {
+			throw new BadRequestException("Original of '$path' in the storage '$storage' is not an image.", 404, $e);
 		}
 		$this->sendResponse($response);
 	}

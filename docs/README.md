@@ -23,7 +23,7 @@ projektu si každý projekt popíše vlastním `.github/workflows/deploy.yml` po
 - [Konfigurace](Architecture/configuration.md) — NEON vrstvení, DI extensions
 - [Cron](Architecture/cron.md) — endpoint `/cron`, `App\Cron\CronTask`, kdy úloha poběží
 - [Sessions](Architecture/sessions.md) — úložiště sessions (soubory, MySQL, PostgreSQL, Redis), `sessionHandler:` v theme.neon
-- [Úložiště souborů](Architecture/file-storage.md) — správce souborů na lokálním disku nebo S3 (`fileStorage: storages:`), povolené náhledy obrázků (`fileStorage: thumbnails:`)
+- [Úložiště souborů](Architecture/file-storage.md) — úložiště na lokálním disku nebo S3 (`fileStorage: <název>:`) se schématem názvů (`NamingScheme`) a povolenými náhledy obrázků (`thumbnails:` u úložiště)
 
 ### Moduly
 - [FrontModule](Modules/front.md) — veřejný frontend

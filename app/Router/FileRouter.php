@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Router;
 
+use App\FileStorage\DirectThumbnailRoutes;
 use App\Service\LanguageService;
 use Nette\Application\Routers\RouteList;
 
@@ -10,7 +11,10 @@ use Nette\Application\Routers\RouteList;
 class FileRouter implements RouterProvider
 {
 
-	public function __construct(private LanguageService $languages)
+	public function __construct(
+		private LanguageService $languages,
+		private DirectThumbnailRoutes $directThumbnailRoutes,
+	)
 	{
 
 	}
@@ -28,13 +32,26 @@ class FileRouter implements RouterProvider
 
 		//$router->addRoute('[<locale='.$languages->getDefaultLanguage().' [a-z]{2}>/]<presenter>/<action>[/<id>]', 'Front:Default:default');
 		*/
-		// generátor náhledů FlysystemStorage - vytvoří náhled obrázku při prvním zobrazení (viz FilesPresenter::actionThumbnail())
-		$router->addRoute('files/thumbnail/<hash [0-9a-f]{40}>/<thumbnail>', array(
+		// generátor náhledů FlysystemStorage - vytvoří náhled obrázku při prvním zobrazení (viz FilesPresenter::actionThumbnail()).
+		// Klíč náhledu je na konci, aby URL nekončila příponou obrázku - takovou by .htaccess nepustil do index.php.
+		$router->addRoute('files/thumbnail/<storage [a-zA-Z0-9_-]+>/<path .+>/<thumbnail [^/]+>', array(
 			'module' => 'Front',
 			'presenter' => 'Files',
 			'action' => 'thumbnail',
 			'locale' => $this->languages->getDefaultLanguage()
 		));
+
+		// úložiště s directThumbnails: existující náhled pošle web server, požadavek na chybějící soubor pod jejich
+		// publicUrl dojde sem a FilesPresenter::actionMissingThumbnail() náhled vytvoří (FlysystemStorage::thumbnailFromPath())
+		foreach ($this->directThumbnailRoutes->getPrefixes() as $name => $prefix) {
+			$router->addRoute($prefix . '/<path .+>', [
+				'module' => 'Front',
+				'presenter' => 'Files',
+				'action' => 'missingThumbnail',
+				'storage' => $name,
+				'locale' => $this->languages->getDefaultLanguage(),
+			]);
+		}
 
 		return $router;
 	}

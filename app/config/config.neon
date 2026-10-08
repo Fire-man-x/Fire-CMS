@@ -130,26 +130,27 @@ fileUpload:
 	#uiMode: 'full' # nebo minimal
 
 # Úložiště souborů (lokální disk nebo S3) a náhledy obrázků - viz docs/Architecture/file-storage.md.
-# Projekt přepíná na S3 v theme.neon / config.local.neon: storages: files: adapter: s3, bucket:, publicUrl: ...
+# Úložiště jsou položky pod fileStorage: (název úložiště: nastavení). Projekt přepíná správce souborů na S3
+# v theme.neon / config.local.neon: files: adapter: s3, bucket:, publicUrl: ...
 fileStorage:
-	storages:
-		files:
-			adapter: local
-			root: %wwwDir%/files
-			publicUrl: /files/
+	# správce souborů (administrace > Správce souborů), schéma názvů podle hashe (výchozí HashNamingScheme)
+	files:
+		adapter: local
+		root: %wwwDir%/files
+		publicUrl: /files/
 
-	# povolené náhledy obrázků ze šablon jádra ({image}/n:src = resize, {crop}/n:crop = crop);
-	# projekt a pluginy přidávají svoje ve vlastním neonu, seznamy se slučují
-	thumbnails:
-		resize:
-			- 40x40     # administrace: obrázky položek menu
-			- 100x100   # administrace: články, slidery, komentáře; výpis článků
-			- 130x130   # administrace: správce souborů, stránky, kategorie
-			- 200x200   # detail článku
-			- 300x300   # detail stránky (galerie)
-			- 800x450   # detail stránky (hlavní obrázek)
-			- 945x      # plugin Sliders
-		crop: []
+		# povolené náhledy obrázků ze šablon jádra ({image}/n:src = resize, {crop}/n:crop = crop);
+		# projekt a pluginy přidávají svoje ve vlastním neonu, seznamy se slučují
+		thumbnails:
+			resize:
+				- 40x40     # administrace: obrázky položek menu
+				- 100x100   # administrace: články, slidery, komentáře; výpis článků
+				- 130x130   # administrace: správce souborů, stránky, kategorie
+				- 200x200   # detail článku
+				- 300x300   # detail stránky (galerie)
+				- 800x450   # detail stránky (hlavní obrázek)
+				- 945x      # plugin Sliders
+			crop: []
 
 visualpaginator:
 	session: @Nette\Http\Session

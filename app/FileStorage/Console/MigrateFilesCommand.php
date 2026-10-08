@@ -5,6 +5,7 @@ namespace App\FileStorage\Console;
 
 use App\FileStorage\Exceptions\HashException;
 use App\FileStorage\Files\HashFile;
+use App\FileStorage\Naming\HashNamingScheme;
 use App\FileStorage\Storages\FlysystemStorage;
 use App\Model\Database\Files;
 use League\Flysystem\Filesystem;
@@ -26,7 +27,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * Ve zdrojovém adresáři se hledá (v tomto pořadí):
  * - `<h0>/<h1>/<hash>.<přípona>` - už nová struktura (při převodu na S3 se jen zkopíruje)
  * - `<h01>/<h23>/<hash>.<přípona>` - nejstarší úložiště (dva znaky hashe na úroveň)
- * - `<h0>/<h1>/<původní název>.<přípona>` - HashFileStorage do 2026-09 (název souboru = originalName, resp. newName)
+ * - `<h0>/<h1>/<původní název>.<přípona>` - dřívější HashFileStorage do 2026-09 (název souboru = originalName, resp. newName)
  *
  * Staré náhledy (`cache/`) se nepřevádějí - vygenerují se znovu.
  */
@@ -108,7 +109,7 @@ final class MigrateFilesCommand extends Command
 			$io->note('--dry-run: nic se nezměnilo.');
 		}
 
-		$io->note('Staré náhledy v ' . $sourceDir . '/' . FlysystemStorage::CacheDirectory . '/ už se nepoužívají - vygenerují se znovu v nové struktuře. Smažte je, až ověříte převod.');
+		$io->note('Staré náhledy v ' . $sourceDir . '/' . HashNamingScheme::CacheDirectory . '/ už se nepoužívají - vygenerují se znovu v nové struktuře. Smažte je, až ověříte převod.');
 
 		return $counts['chyba'] > 0 ? self::FAILURE : self::SUCCESS;
 	}

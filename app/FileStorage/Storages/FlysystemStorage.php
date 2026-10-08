@@ -6,11 +6,10 @@ namespace App\FileStorage\Storages;
 use App\FileStorage\Exceptions\InvalidThumbnailException;
 use App\FileStorage\Exceptions\UploaderException;
 use App\FileStorage\Files\File;
-use App\FileStorage\Files\HashFile;
-use App\FileStorage\Files\HashFileEntity;
-use App\FileStorage\Files\HashImageEntity;
+use App\FileStorage\Files\ImageEntity;
 use App\FileStorage\Images\ExifOrientation;
 use App\FileStorage\Images\JpegMetadata;
+use App\FileStorage\Naming\NamingScheme;
 use App\FileStorage\Request\ImageRequest;
 use App\FileStorage\Request\Request;
 use App\FileStorage\Responses\StreamResponse;
@@ -27,33 +26,34 @@ use Nette\Http\FileUpload;
 use Nette\Utils\FileSystem;
 use Nette\Utils\Image;
 use Nette\Utils\ImageType;
+use Nette\Utils\UnknownImageFileException;
 use Tracy\ILogger;
 
 /**
- * Úložiště souborů správce souborů nad Flysystemem - lokální disk i S3 podle `fileStorage: storages:` v neonu.
+ * Úložiště souborů nad Flysystemem, jedno pro každou položku `fileStorage: <název>:` v neonu:
+ * - kam: lokální adresář nebo S3 bucket (Flysystem, viz FilesystemFactory),
+ * - jak se soubory jmenují: schéma názvů (NamingScheme, výchozí HashNamingScheme správce souborů),
+ * - které náhledy obrázků smí vzniknout: AllowedThumbnails úložiště.
  *
- * Struktura klíčů (h0 = první znak SHA1 hashe, h1 druhý - na disku nejvýš 16 × 16 adresářů):
- * - originál: `<h0>/<h1>/<hash>.<přípona>`
- * - náhledy: `cache/<h0>/<h1>/<hash>.<klíč náhledu>.<přípona>` - bez vlastní složky pro každý obrázek;
- *   náhledy souboru se hledají výpisem `cache/<h0>/<h1>/` podle předpony `<hash>.` (listThumbnails())
- *
- * Náhledy vznikají až na vyžádání a jen povolené (AllowedThumbnails). link() kvůli S3 úložiště
- * nekontroluje (každá kontrola by byl HTTP požadavek), o vygenerovaných náhledech vede evidenci v Nette
- * Cache. Dokud náhled v evidenci není, vrací link() adresu generátoru (Front:Files:thumbnail), který
- * náhled vytvoří, uloží a pošle - další vykreslení už odkazuje přímo na veřejnou URL náhledu.
+ * Náhledy vznikají až na vyžádání a jen povolené, dvěma způsoby:
+ * - výchozí (i pro S3): link() úložiště nekontroluje (každá kontrola by byl HTTP požadavek), o vygenerovaných
+ *   náhledech vede evidenci v Nette Cache (podle klíče originálu). Dokud náhled v evidenci není, vrací link()
+ *   adresu generátoru (Front:Files:thumbnail s názvem úložiště a klíčem originálu), který náhled vytvoří, uloží
+ *   a pošle - další vykreslení už odkazuje přímo na veřejnou URL náhledu.
+ * - `directThumbnails` (lokální disk): link() vrací vždy přímou URL náhledu. Existující soubor pošle web server,
+ *   požadavek na chybějící pošle do aplikace (Front:Files:missingThumbnail) a náhled vytvoří thumbnailFromPath().
+ *   Náhled smazaný mimo aplikaci tak vznikne znovu hned při dalším požadavku.
  */
 final class FlysystemStorage implements IStorage
 {
-	public const string CacheDirectory = 'cache';
-
 	/** Jak dlouho platí záznam o vygenerovaném náhledu - náhled smazaný mimo aplikaci se znovu vytvoří nejpozději po této době */
 	private const string RegistryExpiration = '30 days';
 
 	/**
-	 * Verze struktury klíčů náhledů v názvu evidence - při změně getThumbnailPath() ji zvyšte, jinak by evidence
-	 * odkazovala na náhledy na místech, kde už nejsou (2 = náhledy bez vlastní složky, `<hash>.<klíč>.<přípona>`).
+	 * Verze evidence náhledů v názvu cache - zvyšte ji, když se změní, kde náhledy leží (schéma názvů), jinak by
+	 * evidence odkazovala na náhledy na místech, kde už nejsou (3 = evidence podle klíče originálu).
 	 */
-	private const int ThumbnailLayoutVersion = 2;
+	private const int RegistryVersion = 3;
 
 	/**
 	 * Cache náhledu v prohlížeči a CDN (S3). Po otočení obrázku zůstává adresa náhledu stejná, takže se nová
@@ -67,13 +67,16 @@ final class FlysystemStorage implements IStorage
 	 */
 	private const string GeneratorExpiration = '0';
 
+	/** Náhled poslaný na jeho vlastní adrese (directThumbnails) se cachuje jako statický soubor (ThumbnailCacheControl) */
+	private const string DirectThumbnailExpiration = '1 day';
+
 	/** Kvalita JPEG/WebP při přeuložení originálu (narovnání, zmenšení, otočení) a u náhledů */
 	private const int OriginalQuality = 90;
 	private const int ThumbnailQuality = 75;
 
 	private Cache $registry;
 
-	/** @var array<string, array<string, true>> hash => vygenerované náhledy, načtené během tohoto požadavku */
+	/** @var array<string, array<string, true>> klíč originálu => vygenerované náhledy, načtené během tohoto požadavku */
 	private array $known = [];
 
 	/** @var array<string, true> nepovolené náhledy už zalogované v tomto požadavku */
@@ -85,27 +88,43 @@ final class FlysystemStorage implements IStorage
 	 * @param bool $keepMetadata ponechat originálu JPEG metadata (EXIF, XMP, IPTC) i po zmenšení a narovnání;
 	 *   false = zahodit (barevný profil ICC zůstává vždy). Náhledy metadata nemají.
 	 * @param bool $stripGps odstranit z metadat originálu GPS polohu, kde byla fotka pořízena
-	 * @param string $name název úložiště - odděluje evidenci náhledů více úložišť v Nette Cache
+	 * @param string $name název úložiště z neonu - v URL generátoru náhledů a v názvu evidence náhledů v Nette Cache
+	 * @param bool $directThumbnails odkazy přímo na náhledy, chybějící vytvoří thumbnailFromPath() (web server
+	 *   posílá požadavky na neexistující soubory pod publicUrl do aplikace)
 	 */
 	public function __construct(
 		private readonly FilesystemOperator $filesystem,
+		private readonly NamingScheme $naming,
 		private readonly AllowedThumbnails $allowedThumbnails,
 		private readonly LinkGenerator $linkGenerator,
 		CacheStorage $cacheStorage,
 		private readonly bool $strictThumbnails = false,
 		private readonly bool $keepMetadata = true,
 		private readonly bool $stripGps = false,
-		string $name = 'files',
+		private readonly string $name = 'files',
 		private readonly ?ILogger $logger = null,
+		private readonly bool $directThumbnails = false,
 	)
 	{
-		$this->registry = new Cache($cacheStorage, 'FileManager.thumbnails.' . $name . '.' . self::ThumbnailLayoutVersion);
+		$this->registry = new Cache($cacheStorage, 'FileStorage.thumbnails.' . $name . '.' . self::RegistryVersion);
+	}
+
+
+	public function getName(): string
+	{
+		return $this->name;
 	}
 
 
 	public function getFilesystem(): FilesystemOperator
 	{
 		return $this->filesystem;
+	}
+
+
+	public function getNamingScheme(): NamingScheme
+	{
+		return $this->naming;
 	}
 
 
@@ -120,59 +139,51 @@ final class FlysystemStorage implements IStorage
 	 */
 	public function exist(File $file): bool
 	{
-		return $this->filesystem->fileExists($this->getOriginalPath($this->toHashFile($file)));
+		return $this->filesystem->fileExists($this->getOriginalPath($file));
 	}
 
 
 	/**
 	 * @throws FilesystemException
+	 * @throws UnknownImageFileException soubor není podporovaný obrázek
 	 */
 	public function original(File $file): Image
 	{
-		return $this->loadImage($this->getOriginalPath($this->toHashFile($file)))[0];
+		return $this->loadImage($this->getOriginalPath($file))[0];
 	}
 
 
 	/**
-	 * Uloží nahraný soubor. Obrázek se narovná podle EXIF orientace a zmenší na `dimensions`, metadata JPEG
-	 * se přenesou do přeuloženého obrázku (viz $keepMetadata, $stripGps).
+	 * Uloží nahraný soubor pod klíčem ze schématu názvů. Obrázek (ImageEntity) se narovná podle EXIF orientace
+	 * a zmenší na `dimensions`, metadata JPEG se přenesou do přeuloženého obrázku (viz $keepMetadata, $stripGps).
+	 * Soubor se stejným klíčem se přepíše a smažou se jeho staré náhledy.
 	 *
-	 * @param array<string, mixed> $settings `dimensions` => největší rozměr originálu, např. '1000x1000'
+	 * @param array<string, mixed> $settings `dimensions` => největší rozměr originálu, např. '1000x1000';
+	 *   další nastavení předá schématu názvů (NamingScheme::createFile())
 	 * @throws UploaderException
 	 * @throws FilesystemException
 	 */
-	public function upload(FileUpload $upload, array $settings = []): HashFileEntity|HashImageEntity
+	public function upload(FileUpload $upload, array $settings = []): File
 	{
 		if (!$upload->isOk()) {
 			throw new UploaderException($upload->getError());
 		}
 
 		$temporaryFile = $upload->getTemporaryFile();
-		$untrustedName = $upload->getUntrustedName();
-		$extension = strtolower(pathinfo($untrustedName, PATHINFO_EXTENSION));
 		$mimeType = $upload->getContentType() ?? 'application/octet-stream';
 		$maxDimensions = $settings['dimensions'] ?? null;
 
-		$contents = null;
-		if ($upload->isImage()) {
-			$file = new HashImageEntity();
-			$file->setMimeType($mimeType);
-			$contents = $this->prepareImage($temporaryFile, $file, is_string($maxDimensions) ? $maxDimensions : null);
-		} else {
-			$file = new HashFileEntity();
-			$file->setMimeType($mimeType);
+		$file = $this->naming->createFile($upload, $upload->isImage(), $settings, $this->filesystem->fileExists(...));
+		$file->setMimeType($mimeType);
+		$contents = $file instanceof ImageEntity && $upload->isImage()
+			? $this->prepareImage($temporaryFile, $file, is_string($maxDimensions) ? $maxDimensions : null)
+			: null;
+
+		$path = $this->naming->getOriginalPath($file);
+		if ($this->filesystem->fileExists($path)) {
+			$this->removeCache($file); // schéma nechalo soubor přepsat (např. stejný název v albu) - staré náhledy pryč
 		}
 
-		$file->setName(pathinfo($untrustedName, PATHINFO_FILENAME));
-		$file->setExtension($extension === 'jpeg' ? 'jpg' : $extension);
-		$file->setHash(sha1_file($temporaryFile) ?: throw new \RuntimeException("Nelze přečíst nahraný soubor '$temporaryFile'."));
-
-		// stejný obsah už může být nahraný - každý upload dostane vlastní soubor, aby smazání jednoho nerozbilo druhý
-		while ($this->filesystem->fileExists($this->getOriginalPath($file))) {
-			$file->setHash(sha1(random_bytes(20)));
-		}
-
-		$path = $this->getOriginalPath($file);
 		$config = ['mimetype' => $mimeType];
 		if ($contents !== null) {
 			$this->filesystem->write($path, $contents, $config);
@@ -201,15 +212,16 @@ final class FlysystemStorage implements IStorage
 	 *
 	 * @throws FilesystemException soubor v úložišti chybí
 	 * @throws InvalidThumbnailException nepovolený náhled
+	 * @throws UnknownImageFileException náhled souboru, který není podporovaný obrázek
 	 */
 	public function download(Request $request): Response
 	{
-		$file = $this->toHashFile($request->getFile());
+		$file = $request->getFile();
+		$path = $this->getOriginalPath($file);
 		if ($request instanceof ImageRequest && $request->getDimensions() !== Request::ORIGINAL) {
-			return $this->thumbnail($request->getFile(), Thumbnail::fromRequest($request)->getKey());
+			return $this->thumbnail($path, $this->allowedThumbnails->fromRequest($request)->getKey());
 		}
 
-		$path = $this->getOriginalPath($file);
 		$size = $this->filesystem->fileSize($path); // před readStream() - chybějící soubor tak skončí dřív, než se otevře stream
 
 		return new StreamResponse(
@@ -222,52 +234,90 @@ final class FlysystemStorage implements IStorage
 
 
 	/**
-	 * URL originálu, u ImageRequest s rozměry URL náhledu (nebo generátoru, dokud náhled neexistuje).
+	 * URL originálu, u ImageRequest s rozměry URL náhledu (bez directThumbnails URL generátoru, dokud náhled neexistuje).
 	 *
 	 * @throws InvalidThumbnailException nepovolený náhled a $strictThumbnails
 	 */
 	public function link(Request $request): string
 	{
-		$file = $this->toHashFile($request->getFile());
+		$path = $this->getOriginalPath($request->getFile());
 		if ($request instanceof ImageRequest && $request->getDimensions() !== Request::ORIGINAL) {
 			$thumbnail = $this->resolveThumbnail($request);
 			if ($thumbnail !== null) {
-				return $this->thumbnailLink($file, $thumbnail);
+				return $this->thumbnailLink($path, $thumbnail);
 			}
 		}
 
-		return $this->filesystem->publicUrl($this->getOriginalPath($file));
+		return $this->filesystem->publicUrl($path);
 	}
 
 
 	/**
 	 * Náhled pro generátor náhledů (Front:Files:thumbnail) - vytvoří ho, pokud ještě neexistuje.
 	 *
-	 * @throws InvalidThumbnailException nepovolený náhled
+	 * @param string $path klíč originálu (z URL generátoru)
+	 * @param string $key klíč náhledu, např. `300x200`
+	 * @throws InvalidThumbnailException nepovolený náhled nebo $path není originál v tomto úložišti
 	 * @throws FilesystemException originál chybí nebo chyba úložiště
+	 * @throws UnknownImageFileException originál není podporovaný obrázek
 	 */
-	public function thumbnail(HashImageEntity $file, string $key): Response
+	public function thumbnail(string $path, string $key): Response
 	{
+		if (!$this->naming->isOriginalPath($path)) {
+			throw new InvalidThumbnailException(sprintf("'%s' není originál v úložišti '%s'.", $path, $this->name));
+		}
+
 		$thumbnail = $this->allowedThumbnails->get($key)
 			?? throw new InvalidThumbnailException(sprintf("Náhled '%s' není povolený.", $key));
 
-		$path = $this->getThumbnailPath($file, $thumbnail);
-		if ($this->filesystem->fileExists($path)) {
-			$this->rememberThumbnail($file, $thumbnail);
-			return new RedirectResponse($this->filesystem->publicUrl($path));
+		$thumbnailPath = $this->naming->getThumbnailPath($path, $thumbnail);
+		if ($this->filesystem->fileExists($thumbnailPath)) {
+			$this->rememberThumbnail($path, $thumbnail);
+			return new RedirectResponse($this->filesystem->publicUrl($thumbnailPath));
 		}
 
-		[$image, $type, $original] = $this->loadImage($this->getOriginalPath($file));
-		// originály nahrané dřív, než se fotky narovnávaly při uploadu, můžou mít EXIF orientaci - GD ji ignoruje
-		ExifOrientation::apply($image, ExifOrientation::read($original));
-		$thumbnail->apply($image);
-		$contents = $image->toString($type, self::quality($type, self::ThumbnailQuality)); // GD metadata nezapisuje
-		$mimeType = Image::typeToMimeType($type);
+		return $this->createThumbnail($path, $thumbnail, $thumbnailPath, self::GeneratorExpiration);
+	}
 
-		$this->filesystem->write($path, $contents, ['mimetype' => $mimeType, 'CacheControl' => self::ThumbnailCacheControl]);
-		$this->rememberThumbnail($file, $thumbnail);
 
-		return new StreamResponse($contents, $mimeType, expiration: self::GeneratorExpiration);
+	/**
+	 * Náhled vyžádaný přímo na jeho adrese (directThumbnails, Front:Files:missingThumbnail): web server pošle do
+	 * aplikace požadavek na náhled, který v úložišti není. Originál a klíč náhledu zjistí ze schématu názvů
+	 * (NamingScheme::parseThumbnailPath()), náhled vytvoří, uloží a pošle - další požadavky obslouží web server.
+	 *
+	 * @param string $thumbnailPath klíč náhledu v úložišti (cesta z URL za `publicUrl`)
+	 * @throws InvalidThumbnailException cesta není povolený náhled existujícího originálu v tomto úložišti
+	 * @throws FilesystemException chyba úložiště
+	 * @throws UnknownImageFileException originál není podporovaný obrázek
+	 */
+	public function thumbnailFromPath(string $thumbnailPath): Response
+	{
+		foreach ($this->naming->parseThumbnailPath($thumbnailPath) as [$path, $key]) {
+			$thumbnail = $this->allowedThumbnails->get($key);
+			// zpětná kontrola: náhled musí ležet přesně tam, kam ho schéma ukládá (jinak by šlo zapsat kamkoliv)
+			if (
+				$thumbnail === null
+				|| !$this->naming->isOriginalPath($path)
+				|| $this->naming->getThumbnailPath($path, $thumbnail) !== $thumbnailPath
+				|| !$this->filesystem->fileExists($path)
+			) {
+				continue;
+			}
+
+			if ($this->filesystem->fileExists($thumbnailPath)) {
+				// existující soubor měl poslat web server - přesměrování na stejnou adresu by se mohlo zacyklit
+				return new StreamResponse(
+					$this->filesystem->readStream($thumbnailPath),
+					$this->filesystem->mimeType($thumbnailPath),
+					contentLength: $this->filesystem->fileSize($thumbnailPath),
+					expiration: self::DirectThumbnailExpiration,
+				);
+			}
+
+			return $this->createThumbnail($path, $thumbnail, $thumbnailPath, self::DirectThumbnailExpiration);
+		}
+
+		throw new InvalidThumbnailException(sprintf("'%s' není povolený náhled existujícího originálu v úložišti '%s'.", $thumbnailPath, $this->name));
 	}
 
 
@@ -278,7 +328,6 @@ final class FlysystemStorage implements IStorage
 	 */
 	public function remove(File $file): void
 	{
-		$file = $this->toHashFile($file);
 		$this->filesystem->delete($this->getOriginalPath($file));
 		$this->removeCache($file);
 	}
@@ -291,24 +340,25 @@ final class FlysystemStorage implements IStorage
 	 */
 	public function removeCache(File $file): void
 	{
-		$file = $this->toHashFile($file);
-		foreach ($this->listThumbnails($file) as $path) {
-			$this->filesystem->delete($path);
+		$path = $this->getOriginalPath($file);
+		foreach ($this->naming->listThumbnails($path, $this->filesystem) as $thumbnailPath) {
+			$this->filesystem->delete($thumbnailPath);
 		}
 
-		unset($this->known[$file->getHash()]);
-		$this->registry->remove($file->getHash());
+		unset($this->known[$path]);
+		$this->registry->remove($path);
 	}
 
 
 	/**
 	 * Upraví originál obrázku (např. otočení) a smaže jeho náhledy, metadata JPEG zachová. Vrací novou velikost
-	 * souboru v bajtech - volající ji má uložit do DB (Files::updateSize()).
+	 * souboru v bajtech - volající ji má uložit (správce souborů: Files::updateSize()).
 	 *
 	 * @param callable(Image): void $modifier
 	 * @throws FilesystemException
+	 * @throws UnknownImageFileException
 	 */
-	public function modifyOriginal(HashImageEntity $file, callable $modifier): int
+	public function modifyOriginal(ImageEntity $file, callable $modifier): int
 	{
 		$path = $this->getOriginalPath($file);
 		[$image, $type, $contents] = $this->loadImage($path);
@@ -323,8 +373,9 @@ final class FlysystemStorage implements IStorage
 	 * Vrací novou velikost souboru, null když obrázek narovnávat nebylo potřeba.
 	 *
 	 * @throws FilesystemException
+	 * @throws UnknownImageFileException
 	 */
-	public function fixOrientation(HashImageEntity $file): ?int
+	public function fixOrientation(ImageEntity $file): ?int
 	{
 		$path = $this->getOriginalPath($file);
 		[$image, $type, $contents] = $this->loadImage($path);
@@ -339,38 +390,27 @@ final class FlysystemStorage implements IStorage
 	}
 
 
-	public function getOriginalPath(HashFile $file): string
+	public function getOriginalPath(File $file): string
 	{
-		return self::hashDirectory($file->getHash()) . '/' . self::withExtension($file->getHash(), $file->getExtension());
+		return $this->naming->getOriginalPath($file);
 	}
 
 
-	public function getThumbnailPath(HashFile $file, Thumbnail $thumbnail): string
+	public function getThumbnailPath(File $file, Thumbnail $thumbnail): string
 	{
-		return self::thumbnailDirectory($file) . '/'
-			. self::withExtension($file->getHash() . '.' . $thumbnail->getKey(), $file->getExtension());
+		return $this->naming->getThumbnailPath($this->getOriginalPath($file), $thumbnail);
 	}
 
 
 	/**
-	 * Cesty všech uložených náhledů souboru (i náhledů, které už nejsou povolené). Vypíše se sdílená složka
-	 * `cache/<h0>/<h1>/` a vyberou soubory začínající `<hash>.` - klíč náhledu tečku neobsahuje a hash má
-	 * pevnou délku, takže se nemůže splést s jiným souborem.
+	 * Klíče všech uložených náhledů souboru (i náhledů, které už nejsou povolené).
 	 *
 	 * @return list<string>
 	 * @throws FilesystemException
 	 */
-	public function listThumbnails(HashFile $file): array
+	public function listThumbnails(File $file): array
 	{
-		$prefix = self::thumbnailDirectory($file) . '/' . $file->getHash() . '.';
-		$paths = [];
-		foreach ($this->filesystem->listContents(self::thumbnailDirectory($file), false) as $item) {
-			if ($item->isFile() && str_starts_with($item->path(), $prefix)) {
-				$paths[] = $item->path();
-			}
-		}
-
-		return $paths;
+		return $this->naming->listThumbnails($this->getOriginalPath($file), $this->filesystem);
 	}
 
 
@@ -382,14 +422,15 @@ final class FlysystemStorage implements IStorage
 	private function resolveThumbnail(ImageRequest $request): ?Thumbnail
 	{
 		try {
-			$thumbnail = Thumbnail::fromRequest($request);
+			$thumbnail = $this->allowedThumbnails->fromRequest($request);
 			if ($this->allowedThumbnails->isAllowed($thumbnail)) {
 				return $thumbnail;
 			}
 
 			$message = sprintf(
-				"Náhled '%s' není povolený - přidejte ho do neonu projektu nebo pluginu: fileStorage: thumbnails: %s: [%s]",
+				"Náhled '%s' není povolený - přidejte ho do neonu projektu nebo pluginu: fileStorage: %s: thumbnails: %s: [%s]",
 				$thumbnail->getKey(),
+				$this->name,
 				$thumbnail->crop ? 'crop' : 'resize',
 				$thumbnail->getConfigEntry(),
 			);
@@ -410,50 +451,75 @@ final class FlysystemStorage implements IStorage
 	}
 
 
-	private function thumbnailLink(HashFile $file, Thumbnail $thumbnail): string
+	/**
+	 * Vytvoří náhled z originálu, uloží ho a pošle.
+	 *
+	 * @throws FilesystemException
+	 * @throws UnknownImageFileException
+	 */
+	private function createThumbnail(string $path, Thumbnail $thumbnail, string $thumbnailPath, string $expiration): StreamResponse
 	{
-		if ($this->isThumbnailKnown($file, $thumbnail)) {
-			return $this->filesystem->publicUrl($this->getThumbnailPath($file, $thumbnail));
+		[$image, $type, $original] = $this->loadImage($path);
+		// originály nahrané dřív, než se fotky narovnávaly při uploadu, můžou mít EXIF orientaci - GD ji ignoruje
+		ExifOrientation::apply($image, ExifOrientation::read($original));
+		$thumbnail->apply($image);
+		$contents = $image->toString($type, self::quality($type, self::ThumbnailQuality)); // GD metadata nezapisuje
+		$mimeType = Image::typeToMimeType($type);
+
+		$this->filesystem->write($thumbnailPath, $contents, ['mimetype' => $mimeType, 'CacheControl' => self::ThumbnailCacheControl]);
+		$this->rememberThumbnail($path, $thumbnail);
+
+		return new StreamResponse($contents, $mimeType, expiration: $expiration);
+	}
+
+
+	private function thumbnailLink(string $path, Thumbnail $thumbnail): string
+	{
+		if ($this->directThumbnails || $this->isThumbnailKnown($path, $thumbnail)) {
+			return $this->filesystem->publicUrl($this->naming->getThumbnailPath($path, $thumbnail));
 		}
 
-		return $this->linkGenerator->link('Front:Files:thumbnail', ['hash' => $file->getHash(), 'thumbnail' => $thumbnail->getKey()]);
+		return $this->linkGenerator->link('Front:Files:thumbnail', [
+			'storage' => $this->name,
+			'path' => $path,
+			'thumbnail' => $thumbnail->getKey(),
+		]);
 	}
 
 
-	private function isThumbnailKnown(HashFile $file, Thumbnail $thumbnail): bool
+	private function isThumbnailKnown(string $path, Thumbnail $thumbnail): bool
 	{
-		return isset($this->loadKnownThumbnails($file)[$thumbnail->getKey()]);
+		return isset($this->loadKnownThumbnails($path)[$thumbnail->getKey()]);
 	}
 
 
-	private function rememberThumbnail(HashFile $file, Thumbnail $thumbnail): void
+	private function rememberThumbnail(string $path, Thumbnail $thumbnail): void
 	{
-		$known = $this->loadKnownThumbnails($file);
+		$known = $this->loadKnownThumbnails($path);
 		$known[$thumbnail->getKey()] = true;
-		$this->known[$file->getHash()] = $known;
-		$this->registry->save($file->getHash(), $known, [Cache::Expire => self::RegistryExpiration]);
+		$this->known[$path] = $known;
+		$this->registry->save($path, $known, [Cache::Expire => self::RegistryExpiration]);
 	}
 
 
 	/**
 	 * @return array<string, true>
 	 */
-	private function loadKnownThumbnails(HashFile $file): array
+	private function loadKnownThumbnails(string $path): array
 	{
-		$hash = $file->getHash();
-		if (!isset($this->known[$hash])) {
-			$known = $this->registry->load($hash);
-			$this->known[$hash] = [];
+		if (!isset($this->known[$path])) {
+			$known = $this->registry->load($path);
+			$this->known[$path] = [];
 			if (is_array($known)) {
 				foreach ($known as $key => $value) {
 					if (is_string($key)) {
-						$this->known[$hash][$key] = true;
+						$this->known[$path][$key] = true;
 					}
 				}
 			}
 		}
 
-		return $this->known[$hash];
+		return $this->known[$path];
 	}
 
 
@@ -461,7 +527,7 @@ final class FlysystemStorage implements IStorage
 	 * Narovná obrázek podle EXIF a zmenší ho na $maxDimensions, metadata JPEG přenese do přeuloženého obrázku.
 	 * Vrací nový obsah, nebo null, když se obrázek měnit nemusel a uloží se tak, jak byl nahraný.
 	 */
-	private function prepareImage(string $temporaryFile, HashImageEntity $file, ?string $maxDimensions): ?string
+	private function prepareImage(string $temporaryFile, ImageEntity $file, ?string $maxDimensions): ?string
 	{
 		$contents = FileSystem::read($temporaryFile);
 		$type = Image::detectTypeFromString($contents, $width, $height);
@@ -544,7 +610,7 @@ final class FlysystemStorage implements IStorage
 	 * @param string $previous dosavadní obsah originálu (metadata se přenesou)
 	 * @throws FilesystemException
 	 */
-	private function saveOriginal(HashFile $file, string $path, Image $image, int $type, string $previous): int
+	private function saveOriginal(File $file, string $path, Image $image, int $type, string $previous): int
 	{
 		$metadata = $type === ImageType::JPEG ? JpegMetadata::fromJpeg($previous) : null;
 		$contents = $this->encodeOriginal($image, $type, $metadata);
@@ -558,24 +624,15 @@ final class FlysystemStorage implements IStorage
 	/**
 	 * @return array{Image, ImageType::*, string} obrázek, jeho typ a původní obsah souboru
 	 * @throws FilesystemException
+	 * @throws UnknownImageFileException
 	 */
 	private function loadImage(string $path): array
 	{
 		$contents = $this->filesystem->read($path);
 		$type = Image::detectTypeFromString($contents)
-			?? throw new \RuntimeException("Soubor '$path' v úložišti není podporovaný obrázek.");
+			?? throw new UnknownImageFileException("Soubor '$path' v úložišti není podporovaný obrázek.");
 
 		return [Image::fromString($contents), $type, $contents];
-	}
-
-
-	private function toHashFile(File $file): HashFile
-	{
-		if (!$file instanceof HashFile) {
-			throw new \LogicException(sprintf('FlysystemStorage pracuje jen se soubory s hashem (%s), předán %s.', HashFile::class, $file::class));
-		}
-
-		return $file;
 	}
 
 
@@ -598,21 +655,4 @@ final class FlysystemStorage implements IStorage
 		return $type === ImageType::JPEG || $type === ImageType::WEBP ? $quality : null;
 	}
 
-
-	private static function hashDirectory(string $hash): string
-	{
-		return $hash[0] . '/' . $hash[1];
-	}
-
-
-	private static function thumbnailDirectory(HashFile $file): string
-	{
-		return self::CacheDirectory . '/' . self::hashDirectory($file->getHash());
-	}
-
-
-	private static function withExtension(string $name, string $extension): string
-	{
-		return $extension === '' ? $name : $name . '.' . $extension;
-	}
 }

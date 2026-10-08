@@ -8,7 +8,7 @@ seřazení sestupně podle `router.priorities` v `config.neon` (vyšší číslo
 |---|---|---|---|
 | `AdminRouter` | 100 | `/administrace/<presenter>/<action>[/<id>]` | `Admin` |
 | `CronRouter` | 90 | `cron` (viz [cron.md](cron.md)) | — |
-| `FileRouter` | -50 | `files/thumbnail/<hash>/<thumbnail>` (generátor náhledů, viz [file-storage.md](file-storage.md)) | `Front` |
+| `FileRouter` | -50 | `files/thumbnail/<storage>/<path>/<thumbnail>` (generátor náhledů) a `<publicUrl>/<path>` úložišť s `directThumbnails` (chybějící náhled), viz [file-storage.md](file-storage.md) | `Front` |
 | `FrontRouter` | -100 | deleguje na `CustomRouter`, fallback `[<locale>/]<presenter>/<action>[/<id>]` | `Front` |
 
 Registrace a řazení (včetně tagu `router: [priority: N]` jako alternativy ke config sekci) řeší

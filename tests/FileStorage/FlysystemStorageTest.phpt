@@ -7,8 +7,10 @@ namespace Tests\FileStorage;
 use App\FileStorage\Exceptions\InvalidThumbnailException;
 use App\FileStorage\Files\HashFileEntity;
 use App\FileStorage\Files\HashImageEntity;
+use App\FileStorage\Files\ImageEntity;
 use App\FileStorage\Images\ExifOrientation;
 use App\FileStorage\Images\JpegMetadata;
+use App\FileStorage\Naming\HashNamingScheme;
 use App\FileStorage\Request\FileRequest;
 use App\FileStorage\Request\ImageRequest;
 use App\FileStorage\Responses\StreamResponse;
@@ -56,10 +58,11 @@ final class FlysystemStorageTest extends TestCase
 	private function createStorage(bool $strict = false, bool $keepMetadata = true, bool $stripGps = false, ?ILogger $logger = null): FlysystemStorage
 	{
 		$router = new RouteList();
-		$router->addRoute('files/thumbnail/<hash>/<thumbnail>', 'Front:Files:thumbnail');
+		$router->addRoute('files/thumbnail/<storage>/<path .+>/<thumbnail [^/]+>', 'Front:Files:thumbnail');
 
 		return new FlysystemStorage(
 			$this->filesystem,
+			new HashNamingScheme(),
 			new AllowedThumbnails(['10x10', '20x'], ['8x8']),
 			new LinkGenerator($router, new UrlScript('https://example.com/')),
 			$this->cache,
@@ -226,11 +229,11 @@ final class FlysystemStorageTest extends TestCase
 		$hash = $file->getHash();
 		$request = ImageRequest::fromMacro($file, ['10x10']);
 
-		Assert::same("https://example.com/files/thumbnail/$hash/10x10", $storage->link($request), 'dokud náhled není, odkaz vede na generátor');
+		Assert::same("https://example.com/files/thumbnail/files/$hash[0]/$hash[1]/$hash.png/10x10", $storage->link($request), 'dokud náhled není, odkaz vede na generátor');
 		Assert::false($this->filesystem->fileExists($storage->getThumbnailPath($file, $storage->getAllowedThumbnails()->get('10x10') ?? throw new \LogicException())));
 
-		Assert::type(StreamResponse::class, $storage->thumbnail($file, '10x10'));
-		$thumbnailPath = FlysystemStorage::CacheDirectory . "/$hash[0]/$hash[1]/$hash.10x10.png";
+		Assert::type(StreamResponse::class, $storage->thumbnail($storage->getOriginalPath($file), '10x10'));
+		$thumbnailPath = HashNamingScheme::CacheDirectory . "/$hash[0]/$hash[1]/$hash.10x10.png";
 		Assert::true($this->filesystem->fileExists($thumbnailPath));
 		$thumbnailImage = Image::fromString($this->filesystem->read($thumbnailPath));
 		Assert::same([10, 5], [$thumbnailImage->getWidth(), $thumbnailImage->getHeight()]);
@@ -239,7 +242,7 @@ final class FlysystemStorageTest extends TestCase
 		Assert::same("/files/$thumbnailPath", $storage->link($request), 'vygenerovaný náhled - přímý odkaz');
 		Assert::same("/files/$thumbnailPath", $this->createStorage()->link($request), 'evidence náhledů přežije požadavek (Nette Cache)');
 
-		$redirect = $storage->thumbnail($file, '10x10');
+		$redirect = $storage->thumbnail($storage->getOriginalPath($file), '10x10');
 		Assert::type(RedirectResponse::class, $redirect);
 		assert($redirect instanceof RedirectResponse);
 		Assert::same("/files/$thumbnailPath", $redirect->getUrl(), 'existující náhled - přesměrování, žádné nové generování');
@@ -252,7 +255,7 @@ final class FlysystemStorageTest extends TestCase
 		$file = $this->uploadImage($storage, TestImages::halves());
 
 		Assert::contains('/crop-8x8', $storage->link(ImageRequest::crop($file, ['8x8'])));
-		$storage->thumbnail($file, 'crop-8x8');
+		$storage->thumbnail($storage->getOriginalPath($file), 'crop-8x8');
 		$thumbnail = $storage->getAllowedThumbnails()->get('crop-8x8') ?? throw new \LogicException();
 		$thumbnailImage = Image::fromString($this->filesystem->read($storage->getThumbnailPath($file, $thumbnail)));
 		Assert::same([8, 8], [$thumbnailImage->getWidth(), $thumbnailImage->getHeight()]);
@@ -278,15 +281,52 @@ final class FlysystemStorageTest extends TestCase
 		Assert::same($originalUrl, $storage->link(ImageRequest::fromMacro($file, ['11x11'])));
 		Assert::same($originalUrl, $storage->link(ImageRequest::fromMacro($file, ['smallest'])));
 		Assert::count(2, $logger->messages, 'každý nepovolený náhled se v požadavku zaloguje jen jednou');
-		Assert::contains('fileStorage: thumbnails: resize: [11x11]', $logger->messages[0]);
+		Assert::contains('fileStorage: files: thumbnails: resize: [11x11]', $logger->messages[0]);
 
 		Assert::exception(
 			fn() => $this->createStorage(strict: true)->link(ImageRequest::fromMacro($file, ['11x11'])),
 			InvalidThumbnailException::class,
 			"%a%'11x11' není povolený%a%",
 		);
-		Assert::exception(fn() => $storage->thumbnail($file, '11x11'), InvalidThumbnailException::class);
-		Assert::exception(fn() => $storage->thumbnail($file, '../10x10'), InvalidThumbnailException::class);
+		Assert::exception(fn() => $storage->thumbnail($storage->getOriginalPath($file), '11x11'), InvalidThumbnailException::class);
+		Assert::exception(fn() => $storage->thumbnail($storage->getOriginalPath($file), '../10x10'), InvalidThumbnailException::class);
+	}
+
+
+	public function testThumbnailFromItsOwnPath(): void
+	{
+		$storage = $this->createStorage();
+		$file = $this->uploadImage($storage, TestImages::halves(type: ImageType::PNG), 'photo.png');
+		$hash = $file->getHash();
+		$thumbnailPath = HashNamingScheme::CacheDirectory . "/$hash[0]/$hash[1]/$hash.10x10.png";
+
+		Assert::type(StreamResponse::class, $storage->thumbnailFromPath($thumbnailPath));
+		Assert::true($this->filesystem->fileExists($thumbnailPath));
+		Assert::type(StreamResponse::class, $storage->thumbnailFromPath($thumbnailPath), 'existující náhled se pošle, ne přesměruje na sebe');
+
+		$message = "%a%není povolený náhled existujícího originálu v úložišti 'files'.";
+		foreach ([$storage->getOriginalPath($file), HashNamingScheme::CacheDirectory . "/$hash[0]/$hash[1]/$hash.11x11.png", HashNamingScheme::CacheDirectory . "/$hash[0]/$hash[1]/$hash.10x10.jpg", HashNamingScheme::CacheDirectory . '/a/a/' . str_repeat('a', 40) . '.10x10.png'] as $path) {
+			Assert::exception(fn() => $storage->thumbnailFromPath($path), InvalidThumbnailException::class, $message);
+		}
+	}
+
+
+	public function testGeneratorAcceptsOnlyOriginals(): void
+	{
+		$storage = $this->createStorage();
+		$file = $this->uploadImage($storage, TestImages::halves());
+		$original = $storage->getOriginalPath($file);
+		$thumbnail = $storage->getAllowedThumbnails()->get('10x10') ?? throw new \LogicException();
+		$storage->thumbnail($original, '10x10');
+
+		$message = "%a%není originál v úložišti 'files'.";
+		foreach ([$storage->getThumbnailPath($file, $thumbnail), '../' . $original, 'x/' . $original, strtoupper($original), 'a/b/' . $file->getHash() . '.jpg'] as $path) {
+			Assert::exception(fn() => $storage->thumbnail($path, '10x10'), InvalidThumbnailException::class, $message);
+		}
+
+		// originál, který v úložišti není
+		$missing = str_repeat('a', 40);
+		Assert::exception(fn() => $storage->thumbnail("a/a/$missing.jpg", '10x10'), FilesystemException::class);
 	}
 
 
@@ -294,8 +334,8 @@ final class FlysystemStorageTest extends TestCase
 	{
 		$storage = $this->createStorage();
 		$file = $this->uploadImage($storage, TestImages::halves());
-		$storage->thumbnail($file, '10x10');
-		$storage->thumbnail($file, 'crop-8x8');
+		$storage->thumbnail($storage->getOriginalPath($file), '10x10');
+		$storage->thumbnail($storage->getOriginalPath($file), 'crop-8x8');
 
 		Assert::count(2, $storage->listThumbnails($file));
 
@@ -305,9 +345,9 @@ final class FlysystemStorageTest extends TestCase
 		$neighbour->setExtension('jpg');
 		$neighbour->setMimeType('image/jpeg');
 		$this->filesystem->write($storage->getOriginalPath($neighbour), TestImages::halves());
-		$storage->thumbnail($neighbour, '10x10');
+		$storage->thumbnail($storage->getOriginalPath($neighbour), '10x10');
 		// náhled ve formátu HashFileStorage (<hash>.<rozměry>.<příznaky>.<ořez>.<přípona>) ve stejné složce
-		$legacy = FlysystemStorage::CacheDirectory . '/' . $file->getHash()[0] . '/' . $file->getHash()[1] . '/' . $file->getHash() . '.130x130.0.0.jpg';
+		$legacy = HashNamingScheme::CacheDirectory . '/' . $file->getHash()[0] . '/' . $file->getHash()[1] . '/' . $file->getHash() . '.130x130.0.0.jpg';
 		$this->filesystem->write($legacy, 'x');
 
 		$storage->removeCache($file);
@@ -330,7 +370,7 @@ final class FlysystemStorageTest extends TestCase
 	{
 		$storage = $this->createStorage();
 		$file = $this->uploadImage($storage, TestImages::withSegments(TestImages::halves(), [[0xE1, TestImages::exif(1)]]));
-		$storage->thumbnail($file, '10x10');
+		$storage->thumbnail($storage->getOriginalPath($file), '10x10');
 
 		$size = $storage->modifyOriginal($file, fn(Image $image) => ExifOrientation::rotate($image, 270));
 
@@ -365,7 +405,7 @@ final class FlysystemStorageTest extends TestCase
 		$file = $this->uploadImage($storage, TestImages::halves());
 		$this->filesystem->write($storage->getOriginalPath($file), self::phonePhoto()); // originál s EXIF orientací 6
 
-		$storage->thumbnail($file, '20x');
+		$storage->thumbnail($storage->getOriginalPath($file), '20x');
 		$thumbnail = $storage->getAllowedThumbnails()->get('20x') ?? throw new \LogicException();
 		$thumbnailImage = Image::fromString($this->filesystem->read($storage->getThumbnailPath($file, $thumbnail)));
 		Assert::same([20, 40], [$thumbnailImage->getWidth(), $thumbnailImage->getHeight()], 'náhled se narovná podle EXIF originálu');
@@ -378,13 +418,28 @@ final class FlysystemStorageTest extends TestCase
 	{
 		$storage = $this->createStorage();
 		$file = $this->uploadImage($storage, TestImages::halves());
-		$storage->thumbnail($file, '10x10');
+		$storage->thumbnail($storage->getOriginalPath($file), '10x10');
 
 		$storage->remove($file);
 
 		Assert::false($storage->exist($file));
 		Assert::same([], $this->filesystem->listContents('', true)->toArray());
-		Assert::exception(fn() => $storage->thumbnail($file, '10x10'), FilesystemException::class);
+		Assert::exception(fn() => $storage->thumbnail($storage->getOriginalPath($file), '10x10'), FilesystemException::class);
+	}
+
+
+	public function testImageWithoutHashIsRejected(): void
+	{
+		$storage = $this->createStorage();
+		$image = new ImageEntity();
+		$image->setName('photo');
+		$image->setExtension('jpg');
+		$image->setMimeType('image/jpeg');
+
+		$message = 'HashNamingScheme pracuje jen se soubory s hashem %a%';
+		Assert::exception(fn() => $storage->link(ImageRequest::fromMacro($image)), \LogicException::class, $message);
+		Assert::exception(fn() => $storage->link(ImageRequest::fromMacro($image, ['10x10'])), \LogicException::class, $message);
+		Assert::exception(fn() => $storage->download(ImageRequest::fromMacro($image, ['10x10'])), \LogicException::class, $message);
 	}
 }
 

@@ -161,13 +161,26 @@ entity, ne skutečná chyba v typu).
 ## Úložiště souborů (`FlysystemStorage`) — na co si dát pozor
 
 Podrobně viz `Architecture/file-storage.md`.
-- **Nový rozměr obrázku v šabloně = povolit náhled v neonu.** `n:src="$file, '320x240'"` bez
-  `fileStorage: thumbnails: resize: [320x240]` v debug režimu vyhodí `InvalidThumbnailException`, na produkci
-  zobrazí originál a zaloguje warning. Náhledy pluginu patří do jeho `config.plugin.neon`, projektu do
-  `theme.neon`. `{crop}`/`n:crop` = seznam `crop:`.
+- **Nový rozměr obrázku v šabloně = povolit náhled v neonu, u správného úložiště.** `n:src="$file, '320x240'"`
+  bez `fileStorage: files: thumbnails: resize: [320x240]` v debug režimu vyhodí
+  `InvalidThumbnailException`, na produkci zobrazí originál a zaloguje warning. Seznam má každé úložiště
+  vlastní (`files` = správce souborů); globální `fileStorage: thumbnails:` už neexistuje a shodí start
+  aplikace. Náhledy pluginu patří do jeho `config.plugin.neon`, projektu do `theme.neon`. `{crop}`/`n:crop` =
+  seznam `crop:`.
 - **Nesahejte na soubory přes `%wwwDir%/files/...`.** Soubor může ležet v S3. Čtení a zápis jen přes
   `FlysystemStorage` (`original()`, `modifyOriginal()`, `getFilesystem()`) nebo přes služby
-  `@fileStorage.filesystem.<název>`. `getOriginalPath()` vrací klíč v úložišti, ne cestu na disku.
+  `@fileStorage.storage.<název>` / `@fileStorage.filesystem.<název>`. `getOriginalPath()` vrací klíč
+  v úložišti, ne cestu na disku.
+- **`directThumbnails` potřebuje, aby web server posílal chybějící soubory do aplikace.** `www/.htaccess`
+  pustí do `index.php` jen přípony mimo svůj seznam statických souborů a seznam rozlišuje velikost písmen
+  (`.JPG` projde, `.jpg` ne). Kořen takového úložiště proto potřebuje vlastní `.htaccess` jako
+  `www/files/.htaccess`. Bez něj chybějící náhled s malou příponou skončí 404 v Apache a nikdy nevznikne.
+- **Router nesmí záviset na úložištích** (`StorageRegistry`, `FlysystemStorage`): úložiště potřebují
+  `LinkGenerator` a ten router, DI skončí na „Circular reference“. Router dostává cesty z konfigurace
+  (`DirectThumbnailRoutes`).
+- **Vlastní schéma názvů (`NamingScheme::isOriginalPath()`) musí odmítnout všechno kromě originálů.** Generátor
+  náhledů (`/files/thumbnail/<úložiště>/<klíč>/<náhled>`) bere klíč originálu z URL a databázi nekontroluje.
+  Propustí-li schéma klíč náhledu nebo cestu s `..`, vyrobí náhled z náhledu nebo z cizího souboru úložiště.
 - **Originál upravujte jen přes `FlysystemStorage::modifyOriginal()`**, ne vlastním `Image::save()`. GD zahodí
   EXIF, `modifyOriginal()` ho přenese zpět (s orientací 1 a novými rozměry) a smaže náhledy. Novou velikost pak
   uložte přes `Files::updateSize()`. URL se nemění: prohlížeče drží náhledy z S3 až 1 den.

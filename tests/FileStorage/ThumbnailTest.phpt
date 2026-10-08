@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\FileStorage;
 
 use App\FileStorage\Exceptions\InvalidThumbnailException;
+use App\FileStorage\Files\ImageEntity;
+use App\FileStorage\Request\ImageRequest;
 use App\FileStorage\Thumbnails\Thumbnail;
 use App\FileStorage\Thumbnails\AllowedThumbnails;
 use Nette\Utils\Image;
@@ -69,7 +71,26 @@ final class ThumbnailTest extends TestCase
 		Assert::exception(
 			fn() => new AllowedThumbnails(['300xx']),
 			InvalidThumbnailException::class,
-			"fileStorage.thumbnails.resize: Neplatné rozměry náhledu '300xx'%a%",
+			"thumbnails.resize: Neplatné rozměry náhledu '300xx'%a%",
+		);
+	}
+
+
+	public function testAliases(): void
+	{
+		$allowed = new AllowedThumbnails(['x192', '300x200-f1'], ['130x130'], ['smallest' => 'x192', 'square' => 130, 'small' => '300x200']);
+		$image = new ImageEntity();
+
+		Assert::same('x192', $allowed->fromRequest(ImageRequest::fromMacro($image, ['smallest']))->getKey());
+		Assert::same('crop-130x130', $allowed->fromRequest(ImageRequest::crop($image, ['square']))->getKey(), 'alias pro ořez');
+		Assert::same('300x200-f1', $allowed->fromRequest(ImageRequest::fromMacro($image, ['small', Image::ShrinkOnly]))->getKey(), 'příznaky z makra');
+		Assert::same('100x100', $allowed->fromRequest(ImageRequest::fromMacro($image, ['100x100']))->getKey(), 'rozměry bez aliasu');
+		Assert::false($allowed->isAllowed($allowed->fromRequest(ImageRequest::fromMacro($image, ['square']))), 'alias neplatí za povolení');
+
+		Assert::exception(
+			fn() => new AllowedThumbnails([], [], ['smallest' => 'nejmenší']),
+			InvalidThumbnailException::class,
+			"thumbnails.aliases.smallest: Neplatné rozměry náhledu 'nejmenší'%a%",
 		);
 	}
 

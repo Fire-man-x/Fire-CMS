@@ -12,8 +12,7 @@ use Nette\Utils\Image;
 /**
  * Image Storage Interface
  *
- * Výchozí implementace je FlysystemStorage (lokální disk i S3). FileStorage/HashFileStorage jsou původní
- * implementace jen pro lokální disk - zůstávají kvůli pluginům, které z nich dědí.
+ * Implementace je FlysystemStorage (lokální disk i S3, schéma názvů podle úložiště), viz `fileStorage: <název>:`.
  */
 interface IStorage
 {

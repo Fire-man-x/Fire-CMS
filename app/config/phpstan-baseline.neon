@@ -451,36 +451,6 @@ parameters:
 			path: ../FileStorage/Macro/Nodes/SrcNode.php
 
 		-
-			message: '#^Call to an undefined method App\\FileStorage\\Storages\\FileStorage\:\:createCacheDirectoryPath\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../FileStorage/Storages/FileStorage.php
-
-		-
-			message: '#^PHPDoc tag @var above a class has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: ../FileStorage/Storages/FileStorage.php
-
-		-
-			message: '#^Parameter \#1 \$filename of function unlink expects string, Nette\\Utils\\FileInfo given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../FileStorage/Storages/FileStorage.php
-
-		-
-			message: '#^Parameter \#1 \$filename of function unlink expects string, Nette\\Utils\\FileInfo given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../FileStorage/Storages/HashFileStorage.php
-
-		-
-			message: '#^Parameter \#1 \$imageRequest of method App\\FileStorage\\Storages\\HashFileStorage\:\:getCacheFilePath\(\) expects App\\FileStorage\\Request\\ImageRequest, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../FileStorage/Storages/HashFileStorage.php
-
-		-
 			message: '#^Call to an undefined method Nette\\Application\\UI\\Form\:\:addTagInput\(\)\.$#'
 			identifier: method.notFound
 			count: 1

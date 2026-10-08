@@ -11,7 +11,7 @@ use Nette\Utils\Image;
  * Náhled obrázku: rozměry, režim (zmenšení / ořez) a příznaky `Nette\Utils\Image::resize()`.
  *
  * Klíč náhledu (`getKey()`) je součástí URL generátoru náhledů i cesty náhledu v úložišti a zároveň je to
- * zápis, kterým se náhled povoluje v neonu (`fileStorage: thumbnails:`, viz AllowedThumbnails):
+ * zápis, kterým se náhled povoluje v neonu (`fileStorage: <název>: thumbnails:`, viz AllowedThumbnails):
  * - `300x200`, `945x`, `x50` - zmenšení, chybějící rozměr se dopočítá z poměru stran
  * - `300x200-f1` - zmenšení s příznaky Image::resize() (zde Image::ShrinkOnly)
  * - `crop-130x130` - zmenšení a ořez ze středu na přesný rozměr (makro `{crop}`, vyžaduje oba rozměry)
@@ -114,14 +114,17 @@ final class Thumbnail
 
 
 	/**
+	 * @param string|null $dimensions rozměry místo rozměrů z požadavku (pojmenované rozměry, viz AllowedThumbnails)
 	 * @throws InvalidThumbnailException
 	 */
-	public static function fromRequest(ImageRequest $request): self
+	public static function fromRequest(ImageRequest $request, ?string $dimensions = null): self
 	{
+		$dimensions ??= $request->getDimensions();
+
 		// makro {crop} posílá příznak OrSmaller, ořez má vlastní režim (Image::Cover)
 		return $request->getCrop()
-			? self::fromDimensions($request->getDimensions(), true)
-			: self::fromDimensions($request->getDimensions(), false, $request->getFlags());
+			? self::fromDimensions($dimensions, true)
+			: self::fromDimensions($dimensions, false, $request->getFlags());
 	}
 
 
@@ -134,7 +137,7 @@ final class Thumbnail
 
 
 	/**
-	 * Zápis náhledu v seznamu `fileStorage: thumbnails: resize:` / `crop:` (klíč bez předpony `crop-`).
+	 * Zápis náhledu v seznamu `thumbnails: resize:` / `crop:` úložiště (klíč bez předpony `crop-`).
 	 */
 	public function getConfigEntry(): string
 	{
