@@ -21,8 +21,11 @@ use Nette\Localization\Translator;
  */
 class MenuItemFormFactory extends BaseFormFactory
 {
-	/** Tvar cíle typu route: ":Front:Presenter:action" nebo "Presenter:action", volitelně "?param=hodnota&..." */
-	private const RoutePattern = '#^:?([A-Z][A-Za-z0-9]*:)+[a-z][A-Za-z0-9]*(\?.*)?$#';
+	/**
+	 * Tvar cíle typu route: ":Front:Presenter:action" nebo "Presenter:action", volitelně "?param=hodnota&..."
+	 * Bez oddělovačů a ^$ - Form::Pattern si výraz obaluje sám (^(?:…)$, na serveru i v HTML atributu pattern)
+	 */
+	private const RoutePattern = ':?([A-Z][A-Za-z0-9]*:)+[a-z][A-Za-z0-9]*(\?.*)?';
 
 
 	public function __construct(
