@@ -256,10 +256,6 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	protected function createComponentBreadCrumb(): BreadCrumb
 	{
 		$breadCrumb = parent::createComponentBreadCrumb();
-		$path = $this->getWwwThemePath()."/BreadCrumb.latte";
-		if(file_exists($path)) {
-			$breadCrumb->customTemplate($path);
-		}
 
 		return $breadCrumb;
 	}
@@ -272,10 +268,6 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	{
 		$control = $this->menu;
 		$control->setLanguage($this->language);
-		$path = $this->getWwwThemePath()."/Menu.latte";
-		if(file_exists($path)) {
-			$control->customTemplate($path);
-		}
 
 		return $control;
 	}
@@ -288,10 +280,6 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	{
 		$control = $this->languageChanger;
 		$control->setLanguage($this->language);
-		$path = $this->getWwwThemePath()."/LanguageChanger.latte";
-		if(file_exists($path)) {
-			$control->customTemplate($path);
-		}
 
 		return $control;
 	}

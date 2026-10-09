@@ -127,3 +127,5 @@ a:2:{i:0;s:6:"E-mail";i:1;s:6:"E-mail";}
 a:2:{i:0;s:11:"Write to us";i:1;s:13:"Napište nám";}
 a:2:{i:0;s:16:"Show on Mapy.com";i:1;s:20:"Zobrazit na Mapy.com";}
 a:2:{i:0;s:3:"Map";i:1;s:4:"Mapa";}
+a:2:{i:0;s:6:"Log in";i:1;s:14:"Přihlásit se";}
+a:2:{i:0;s:29:"Please enter a valid integer.";i:1;s:24:"Vložte prosím číslo.";}

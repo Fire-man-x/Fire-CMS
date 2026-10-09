@@ -2,6 +2,13 @@
 
 Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na detailní záznam v `Changelog/`.
 
+## 2026-10-09
+
+- **Šablony komponent z tématu (`TemplateLookupTrait`), zatím u Menu.** Šablona komponenty se hledá v
+  `theme/FrontModule/Components/<Komponenta>/` projektu, pak u komponenty. `{control menu:<view> <location>}` vykreslí
+  menu vlastní šablonou `<view>.latte`.
+  Viz [2026-10-09-menu-custom-template.md](2026-10-09-menu-custom-template.md).
+
 ## 2026-10-08
 
 - **Potvrzovací okno v gridech administrace.** `main.js` hledal `data-target` místo `data-bs-target`

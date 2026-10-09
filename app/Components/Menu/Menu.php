@@ -7,7 +7,9 @@ use App\Components\Menu\Model\MenuItem;
 use App\Components\Menu\Model\MenuLinkType;
 use App\Components\Menu\Model\Menus;
 use App\Components\Shortcodes;
+use App\Components\TemplateLookupTrait\TemplateLookupTrait;
 use App\Model;
+use App\Service\ProjectFolders;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\InvalidLinkException;
 use Nette\Utils\ArrayHash;
@@ -16,10 +18,15 @@ use Nette\Utils\ArrayHash;
  * Webové menu (`{control menu <location>, maxSublevel, menuClass, itemClass, showTitle}`) z položek firecms_menuItems.
  * showTitle = vykreslit nad menu jeho nadpis v aktuálním jazyce (firecms_menuDescriptions), např. v bočním panelu.
  * Položka odkazuje na kategorii, článek, URL nebo presenter (MenuLinkType)
+ *
+ * Šablonu vybírá TemplateLookupTrait: výchozí Menu.latte jde v projektu přepsat souborem
+ * theme/FrontModule/Components/Menu/Menu.latte. Vlastní šablona: `{control menu:<šablona> <location>, ...}` (stejné
+ * parametry) vykreslí menu šablonou `<šablona>.latte` z theme/FrontModule/Components/Menu/, případně z adresáře
+ * této komponenty - viz __call().
  */
 class Menu extends Control
 {
-	private string $templateFile;
+	use TemplateLookupTrait;
 
 	private array $firstLevelCategories;
 
@@ -56,40 +63,68 @@ class Menu extends Control
 		private Model\Database\Sections $sectionsModel,
 		private Model\Database\Files $filesModel,
 		private \Nette\Localization\Translator $translator,
-		private Shortcodes $shortcodes)
+		private Shortcodes $shortcodes,
+		private ProjectFolders $projectFolders)
 	{
 	}
 
 
-	public function setLanguage($language)
+	/**
+	 * Adresář tématu pro TemplateLookupTrait
+	 */
+	protected function getThemeDir(): string
+	{
+		return $this->projectFolders->getThemeDir();
+	}
+
+
+	public function setLanguage($language): void
 	{
 		$this->language = $language;
-		return $this;
 	}
 
 
-	public function setActiveMenuItem($activeCategory)
+	public function setActiveMenuItem($activeCategory): void
 	{
 		$this->activeMenuItem = $activeCategory;
-		return $this;
-	}
-
-
-
-	public function customTemplate(string $template = null): void
-	{
-		$this->templateFile = $template ?: __DIR__ . '/Menu.latte';
 	}
 
 
 	/**
 	 * Render function
 	 */
-	public function render($location = null, $maxSublevel = null, $menuClass = "", $itemClass = "", bool $showTitle = false)
+	public function render(string $location, int $maxSublevel = null, string $menuClass = "", string $itemClass = "", bool $showTitle = false): void
 	{
-		$this->customTemplate();
+		$this->printMenu(null, $location, $maxSublevel, $menuClass, $itemClass, $showTitle);
+	}
 
-		$this->template->setFile($this->templateFile);
+
+	/**
+	 * `{control menu:<šablona> <location>, ...}` - Latte volá `render<Šablona>()`, u názvu s pomlčkou dynamicky
+	 * (`{control menu:usp-info ...}` → `$menu->{'render' . 'usp-info'}(...)`), takže metoda neexistuje a přijde sem.
+	 * Parametry jsou stejné jako u render(). Ostatní volání řeší SmartObject (výjimka u neznámé metody).
+	 *
+	 * @param array<int|string, mixed> $args
+	 */
+	public function __call(string $name, array $args): mixed
+	{
+		if (strncasecmp($name, 'render', 6) === 0 && strlen($name) > 6) {
+			$this->printMenu(substr($name, 6), ...$args);
+
+			return null;
+		}
+
+		return parent::__call($name, $args);
+	}
+
+
+	/**
+	 * Vykreslí menu umístění $location zadanou šablonou (proměnné šablony viz níže a buildItems()). Parametry bez
+	 * nativních typů jako u render() - přicházejí rovnou ze šablon a strict_types by změnilo jejich dosavadní chování.
+	 */
+	private function printMenu(?string $templateFile, string $location, int $maxSublevel = null, string $menuClass = "", string $itemClass = "", bool $showTitle = false): void
+	{
+		$this->template->setFile($this->findTemplateFile($templateFile));
 
 		$menuExist = $this->menusModel->findAll()
 			->where("location", $location)

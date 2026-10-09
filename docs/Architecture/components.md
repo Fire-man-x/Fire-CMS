@@ -11,6 +11,13 @@ patří.
 - `Menu`, `LanguageChanger`, `CategoriesMenu`, `FilesManagerMenu`, `Breadcrumb`, `ViewCounter` — běžné
   Nette komponenty vytvářené přes `createComponentX()`.
 - `Menu` (`app/Components/Menu/`) — webové menu `{control menu <location>, maxSublevel, menuClass, itemClass}`.
+  Šablonu vybírá `App\Components\TemplateLookupTrait\TemplateLookupTrait` (obdoba `Presenter::formatTemplateFiles()`):
+  nejdřív `theme/FrontModule/Components/Menu/<view>.latte` projektu, pak `app/Components/Menu/<view>.latte`, výchozí view
+  `Menu`. Projekt tak přepíše výchozí šablonu souborem `theme/FrontModule/Components/Menu/Menu.latte`.
+  Vlastní šablona: `{control menu:<view> <location>, …}` (stejné parametry) vykreslí menu šablonou `<view>.latte`,
+  neexistující = `Nette\FileNotFoundException`. Latte volá `render<View>()` (název s pomlčkou dynamicky), obsluhuje
+  to `Menu::__call()`. Šablona dostává stejné proměnné jako `Menu.latte` (`$categories`, `$menuTitle`, `$menuClass`, …).
+  `customTemplate()` je bez účinku (deprecated) - dřív ho `render()` stejně vždy přepsal.
   Položky (`firecms_menuItems`) jsou samostatné entity, **ne vazba na kategorii**: `linkType`
   (`App\Components\Menu\Model\MenuLinkType`: `category` | `article` | `page` | `section` | `url` | `route`) + jeden sloupec
   `target` (id kategorie/článku/stránky, URL/kotva, nebo `:Front:Presenter:action?param=x`), `parentId` pro
