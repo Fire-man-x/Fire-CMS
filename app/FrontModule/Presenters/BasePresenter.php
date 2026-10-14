@@ -7,8 +7,8 @@ use Alnux\NetteBreadCrumb\BreadCrumb;
 use App\Components\Menu;
 use App\Components\Shortcodes;
 use App\FrontModule\Components;
+use App\FrontModule\Components\Comments\Comments;
 use App\Model;
-use App\Modules\CommentsModule\Components\Comments\Comments;
 use App\Plugins\Statistics\Statistics;
 use App\Service\LanguageService;
 use App\Service\ProjectFolders;
@@ -25,10 +25,9 @@ use Nette\DI\MissingServiceException;
 abstract class BasePresenter extends \App\Presenters\BasePresenter
 {
 	/**
-	 * Path to theme
-	 * @var string
+	 * Path to theme (načte se při prvním getWwwThemePath())
 	 */
-	private $themePath;
+	private ?string $themePath = null;
 
 	/**
 	 * Language from url
@@ -79,7 +78,7 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	 */
 	protected function getWwwThemePath(): string
 	{
-		if(!isset($this->themePath))
+		if($this->themePath === null)
 		{
 			$themePathOption = $this->options->getByKey('themePath');
 			$this->themePath = $this->projectFolders->getWwwThemeDir().'/'.$themePathOption."/templates";
@@ -331,7 +330,6 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	protected function createComponentSearch(): Components\SearchControl\SearchControl
 	{
 		$control = $this->search;
-		$control->setLanguage($this->language);
 
 		return $control;
 	}

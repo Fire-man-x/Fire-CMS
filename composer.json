@@ -67,7 +67,7 @@
     },
 	"scripts-descriptions": {
 		"console": "Runs a PHP application console command. Usage: \"composer console -- --help\"",
-		"test": "Runs Nette Tester over the tests/ directory. Usage: \"composer test\" or \"composer test -- tests/Modules/UrlModule\"",
+		"test": "Runs Nette Tester over the tests/ directory. Usage: \"composer test\" or \"composer test -- tests/Model\"",
 		"stan": "Runs PHPStan for static code analysis. Usage: \"composer stan {path to file or folder}\"",
 		"stan-generate-baseline": "Runs PHPStan and generate baseline.",
 		"stan-report": "Runs PHPStan and saves table output to log/phpstan-report.txt.",

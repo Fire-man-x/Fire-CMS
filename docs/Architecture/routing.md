@@ -24,8 +24,8 @@ přímo, ne přes `Route` masku) jako PRVNÍ položku — zkouší se před fall
 1. Zjistí locale — nejdřív podle domény (`App\Service\DomainService::getLanguageByDomain()`, viz
    Lokalizace a domény níže), a jen když doména žádnému jazyku nepatří, zkusí volitelný `<locale>/` prefix
    na začátku URL (2 znaky, pak `existLanguage()` check).
-2. Zbytek URL hledá v `App\Modules\UrlModule\UrlManager::getUrlInfoByUrl()` — databázová tabulka
-   spravovaná přes `UrlModule` (viz `orm.md` obsahový model).
+2. Zbytek URL hledá v `App\Model\UrlManager::getUrlInfoByUrl()` — databázová tabulka (model
+   `App\Model\Database\Urls`, přesměrování `Redirections`) spravovaná v `:Admin:Settings:Urls` (viz `orm.md`).
 3. Nenajde-li se, zkusí `getRedirectionInfoByUrl()` (přesměrování, s "last_usage_date" auditem).
 4. Podle `type` (`article`/`category`/`page`/`section`, dále `default`/`user`) namapuje na
    `Front:Articles` / `Front:Categories` / `Front:Pages` / `Front:Sections`, `action` = `detail` pro tyto

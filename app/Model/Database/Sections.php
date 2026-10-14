@@ -6,7 +6,7 @@ namespace App\Model\Database;
 use App\Components\Menu\Model\MenuLinkType;
 use App\Components\Menu\Model\Menus;
 use App\Model\TranslatedTitleTrait\TranslatedTitleTrait;
-use App\Modules\UrlModule\UrlManager;
+use App\Model\UrlManager;
 use App\Service\LanguageService;
 use Nette\Database\Explorer;
 use Nette\Database\Table\ActiveRow;

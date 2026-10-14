@@ -176,7 +176,7 @@ services:
 			- addFilter('shortcodes', [@shortcodes, transform]) #[App\Components\Shortcodes, transform])
 
 	# Custom presenter factory: falls back to presenters living in plugin/module
-	# trees under their own PSR-4 namespace (App\Plugins\*, App\Modules\*).
+	# trees under their own PSR-4 namespace (App\Plugins\*, theme pluginy).
 	# The PresenterFactoryCallback (DI-aware presenter instantiation) must be
 	# re-declared because redefining `factory` drops the inherited arguments;
 	# the setMapping() setup added by nette/application is kept automatically.
@@ -185,7 +185,7 @@ services:
 			Nette\Bridges\ApplicationDI\PresenterFactoryCallback(_, null)
 		)
 		setup:
-			- setScanDirs([%appDir%/Plugins, %appDir%/Modules, %appDir%/../theme/Plugins])
+			- setScanDirs([%appDir%/Plugins, %appDir%/../theme/Plugins])
 
 	- App\Model\Plugin\PluginRepository(%rootDir%)
 	- App\Model\Plugin\PluginMigrator(%rootDir%)
@@ -201,9 +201,9 @@ services:
 	formFactory: App\Forms\FormFactory
 	- App\Forms\SignInFormFactory
 	- App\Forms\SignUpFormFactory
-	- App\Modules\UrlModule\Model
-	- App\Modules\UrlModule\RedirectionsModel
-	urlManager: App\Modules\UrlModule\UrlManager
+	- App\Model\Database\Urls
+	- App\Model\Database\Redirections
+	urlManager: App\Model\UrlManager
 	# šablona paginatoru pro administraci (Bootstrap 5) i web; jednotlivě lze přepsat přes $paginator->templateFile
 	visualPaginatorFactory: AlesWita\VisualPaginator\VisualPaginatorFactory(templateFile: AlesWita\VisualPaginator\VisualPaginator::TEMPLATE_BOOTSTRAP5)
 
@@ -212,8 +212,8 @@ services:
 	- App\Service\Category
 	- App\AdminModule\Forms\CategoryFormFactory
 	- App\AdminModule\Forms\CategorySubtype\DefaultFormPart
-	- App\Modules\UrlModule\Forms\UrlFormFactory
-	- App\Modules\UrlModule\Forms\RedirectionFormFactory
+	- App\AdminModule\Forms\UrlFormFactory
+	- App\AdminModule\Forms\RedirectionFormFactory
 
 
 	- App\Model\Database\Articles
@@ -224,8 +224,8 @@ services:
 	- App\AdminModule\Forms\PageFormFactory
 	- App\AdminModule\Forms\SectionFormFactory
 
-	- App\Modules\CommentsModule\Model\Comments
-	- App\Modules\CommentsModule\Comment
+	- App\Model\Database\Comments
+	- App\Model\CommentManager
 	- App\Forms\CommentFormFactory
 
 	- App\Model\Database\Files
@@ -274,7 +274,7 @@ services:
 	- App\FrontModule\Components\SearchControl\SearchFormFactory
 	- App\FrontModule\Components\SearchControl\SearchControl
 	- App\FrontModule\Components\LoginLinkControl\LoginLinkControl
-	- App\Modules\CommentsModule\Components\Comments\Comments
+	- App\FrontModule\Components\Comments\Comments
 	- App\Components\ViewCounter
 	shortcodes: App\Components\Shortcodes
 

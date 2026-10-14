@@ -7,10 +7,9 @@ a přepíná session na samostatný `'admin'` auth namespace — viz `Architectu
 ## Struktura
 
 - `app/AdminModule/Presenters/*Presenter.php` — obsahové CRUD presentery jádra (`Sections`, `Articles`,
-  `Categories`, `Pages`, `Menus`, `FilesManager`, `Plugins`, ...). Komentáře (`Comments`) a URL (`Urls`) mají
-  presentery v `app/Modules/CommentsModule` a `app/Modules/UrlModule`.
+  `Categories`, `Pages`, `Menus`, `FilesManager`, `Plugins`, ...). Patří sem i komentáře (`Comments`).
 - `app/AdminModule/SettingsModule/Presenters/*Presenter.php` — nastavení (`Users`, `Roles`, `Languages`,
-  `Domains`, `Tags`, `Metas`, ...), vlastní `BasePresenter` dědící z `AdminModule\Presenters\BasePresenter`.
+  `Domains`, `Tags`, `Metas`, `Urls` - hezká URL a přesměrování, ...), vlastní `BasePresenter` dědící z `AdminModule\Presenters\BasePresenter`.
 - Články a kategorie se spravují po sekcích (`SectionAwareTrait`, persistentní parametr `section`), menu
   „Obsah“ vypíše články a kategorie pro každou sekci.
 - `app/AdminModule/templates/@layout.latte` — sdílený layout administrace, obsahuje hlavní navigaci

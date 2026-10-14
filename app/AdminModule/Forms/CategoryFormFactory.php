@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Forms;
 
-use App\Components\TagsInput\DataSourceDescriptor;
-use App\Components\TagsInput\TagInput;
 use App\AdminModule\Forms\CategorySubtype\DefaultFormPart;
 use App\AdminModule\Forms\CategorySubtype\ICategoryFormType;
+use App\Components\TagsInput\DataSourceDescriptor;
+use App\Components\TagsInput\TagInput;
 use App\Model;
-use App\Modules\UrlModule\UrlManager;
+use App\Model\UrlManager;
 use App\Service\Category;
 use App\Service\Tag;
 use Nette\InvalidArgumentException;

@@ -13,8 +13,7 @@ use Nette\Utils\Finder;
  * Nette's presenter mapping is keyed only by the first name segment (module),
  * so a single "Admin" mask cannot reach classes such as
  *   App\Plugins\Sliders\AdminModule\Presenters\SlidersPresenter
- *   App\Modules\CommentsModule\AdminModule\CommentsPresenter
- *   App\Modules\UrlModule\AdminModule\SettingsModule\UrlsPresenter
+ *   App\Plugins\SDHCalendar\AdminModule\Presenters\CalendarPresenter (theme/Plugins)
  *
  * This factory first asks Nette's standard mapping. When the resulting class
  * does not exist, it looks the presenter up in an index built by scanning the

@@ -6,9 +6,9 @@ namespace Tests\Router;
 
 use App\Model\Database\Domains;
 use App\Model\Database\Languages;
-use App\Modules\UrlModule\Model;
-use App\Modules\UrlModule\RedirectionsModel;
-use App\Modules\UrlModule\UrlManager;
+use App\Model\Database\Urls;
+use App\Model\Database\Redirections;
+use App\Model\UrlManager;
 use App\Router\CustomRouter;
 use App\Service\DomainService;
 use App\Service\LanguageService;
@@ -71,8 +71,8 @@ final class CustomRouterTest extends TestCase
 		$this->insertLanguage('en', active: true, default: false, position: 2);
 
 		$urlManager = new UrlManager(
-			new Model($this->db),
-			new RedirectionsModel($this->db),
+			new Urls($this->db),
+			new Redirections($this->db),
 			new LanguageService(new Languages($this->db)),
 			$this->db,
 		);

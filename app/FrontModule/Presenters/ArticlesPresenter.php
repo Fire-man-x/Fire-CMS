@@ -6,7 +6,7 @@ namespace App\FrontModule\Presenters;
 use App\AdminModule\Forms\ArticleFormFactory;
 use App\Components\ViewCounter;
 use App\Model;
-use App\Modules\UrlModule\UrlManager;
+use App\Model\UrlManager;
 use App\Service\Meta;
 use App\Service\Tag;
 use Nette;
@@ -21,11 +21,6 @@ class ArticlesPresenter extends BasePresenter
 	 */
 	#[Persistent]
 	public int $id;
-
-	/**
-	 * Article parent
-	 */
-	private ?int $parent = null;
 
 	/**
 	 * Actual language
@@ -69,10 +64,8 @@ class ArticlesPresenter extends BasePresenter
 	}
 
 
-	public function actionDetail($parent = null): void
+	public function actionDetail(): void
 	{
-		$this->parent = $parent;
-
 		$this->template->articles = $this->articlesModel;
 
 		//@todo: udelat jenom jedno nacteni

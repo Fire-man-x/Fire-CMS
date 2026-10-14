@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\UrlModule\AdminModule\SettingsModule;
+namespace App\AdminModule\SettingsModule\Presenters;
 
+use App\AdminModule\Forms\RedirectionFormFactory;
+use App\AdminModule\Forms\UrlFormFactory;
 use App\AdminModule\Presenters\BasePresenter;
-use App\Modules\UrlModule\Forms\RedirectionFormFactory;
-use App\Modules\UrlModule\Forms\UrlFormFactory;
-use App\Modules\UrlModule\Model;
-use App\Modules\UrlModule\RedirectionsModel;
+use App\Model\Database\Redirections;
+use App\Model\Database\Urls;
 use Contributte\Datagrid\Datagrid;
 use Nette;
 use Nette\Application\Attributes\Persistent;
@@ -31,10 +31,10 @@ class UrlsPresenter extends BasePresenter
 	public RedirectionFormFactory $redirectionFormFactory;
 
 	/** @inject */
-	public Model $model;
+	public Urls $model;
 
 	/** @inject */
-	public RedirectionsModel $redirectionsModel;
+	public Redirections $redirectionsModel;
 
 
 	public function startup(): void

@@ -6,9 +6,9 @@ namespace App\Model\Database;
 use App\Components\IViewCounter;
 use App\Components\Menu\Model\Menus;
 use App\Model\TranslatedTitleTrait\TranslatedTitleTrait;
-use App\Modules\CommentsModule\Model\ISubComments;
 use App\Service\LanguageService;
 use Nette\Database\SqlLiteral;
+use Nette\Database\Table\ActiveRow;
 use Nette\Database\Table\Selection;
 use Nette\Utils\ArrayHash;
 
@@ -60,7 +60,7 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 
 
 
-	/**
+	/* *
 	 * Delete
 	 * @param int $id
 	 * /
@@ -91,9 +91,9 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 
 	/**
 	 * Get table
-	 * @return \Nette\Database\Table\Selection
+	 * @return Selection
 	 */
-	public function getTranslationTable(): \Nette\Database\Table\Selection
+	public function getTranslationTable(): Selection
 	{
 		return $this->database->table(self::TRANSLATION_TABLE_NAME);
 	}
@@ -102,7 +102,7 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 	/**
 	 * Get all with translation
 	 * @param string $language If null then show in all languages
-	 * @return \Nette\Database\Table\Selection Selection
+	 * @return Selection Selection
 	 */
 	public function getAllWithTranslation($language = null)
 	{
@@ -121,7 +121,7 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 
 	/**
 	 * Get all for menu
-	 * @return \Nette\Database\Table\Selection Selection
+	 * @return Selection Selection
 	 */
 	public function getAllForMenu()
 	{
@@ -133,7 +133,7 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 	 * Kategorie stromu jako getAllForMenu(), ale bez řazení - pro UPDATE a agregace (MAX()). PostgreSQL nezná
 	 * UPDATE ... ORDER BY a ORDER BY podle neagregovaného sloupce vedle MAX() odmítne.
 	 */
-	public function findForMenu(): \Nette\Database\Table\Selection
+	public function findForMenu(): Selection
 	{
 		return $this->findAll()
 			->where("historyId", null)
@@ -143,12 +143,8 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 
 	/**
 	 * Inserts new
-	 * @param int $categoryId
-	 * @param string $language
-	 * @param ArrayHash $data
-	 * @return int Row id
 	 */
-	public function insertTranslation($categoryId, $language, $data)
+	public function insertTranslation(int $categoryId, string $language, ArrayHash $data): ActiveRow|array|int
 	{
 		$data->{$this->getForeignKeyColumn()} = $categoryId;
 		$data->languageId = $language;
@@ -158,12 +154,8 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 
 	/**
 	 * Update translation
-	 * @param int $categoryId
-	 * @param string $language
-	 * @param ArrayHash $data
-	 * @return int Row id
 	 */
-	public function updateTranslation($categoryId, $language, $data)
+	public function updateTranslation(int $categoryId, string $language, ArrayHash $data): void
 	{
 		$finded = $this->findTranslationBy($categoryId, $language);
 		if($finded->fetch()){
@@ -178,7 +170,7 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 	 * Find translation
 	 * @param int $categoryId
 	 * @param string $language
-	 * @return \Nette\Database\Table\Selection Selection
+	 * @return Selection Selection
 	 */
 	public function findTranslationBy($categoryId, $language)
 	{
@@ -205,9 +197,8 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 
 	/**
 	 * Get next position
-	 * @return int
 	 */
-	protected function getNextPosition()
+	protected function getNextPosition(): int
 	{
 		return (int) $this->findAll()->max("position") + 1;
 	}
@@ -226,10 +217,9 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 
 	/**
 	 * Inserts relation with file
-	 * @param int $categoryId
-	 * @return \Nette\Database\Table\Selection All files relation
+	 * @return Selection All files relation
 	 */
-	public function getRelationFile($categoryId)
+	public function getRelationFile(int $categoryId): Selection
 	{
 		return $this->database->table(self::RELATION_FILE_TABLE_NAME)
 			->select(self::RELATION_FILE_TABLE_NAME.".*")
@@ -242,13 +232,12 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 
 	/**
 	 * Inserts relation with file
-	 * @param int $categoryId
-	 * @param int $fileId
-	 * @param ArrayHash $data
-	 * @return int Row id
 	 */
-	public function insertRelationFile($categoryId, $fileId, $data = array())
+	public function insertRelationFile(int $categoryId, int $fileId, ArrayHash $data = null): void
 	{
+		if(!$data){
+			$data = new ArrayHash();
+		}
 		$data["categoryId"] = $categoryId;
 		$data["fileId"] = $fileId;
 		if(!isset($data["isMain"])){
@@ -385,7 +374,7 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 	/**
 	 * Relation tags table
 	 */
-	public function getRelationTagsTable(): \Nette\Database\Table\Selection
+	public function getRelationTagsTable(): Selection
 	{
 		return $this->database->table(self::RELATION_TAG_TABLE_NAME);
 	}
@@ -430,9 +419,9 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 	/**
 	 * Relation comments table
 	 */
-	public function getRelationCommentsTable(): \Nette\Database\Table\Selection
+	public function getRelationCommentsTable(): Selection
 	{
-		// komentáře kategorií (categoryId), ne článků - výpis (Comment::getAllCommentsWithChilds()) čte odtud
+		// komentáře kategorií (categoryId), ne článků - výpis (CommentManager::getAllCommentsWithChilds()) čte odtud
 		return $this->database->table(self::RELATION_COMMENT_CATEGORY_TABLE_NAME);
 	}
 
@@ -441,7 +430,7 @@ class Categories extends BaseModel implements Translatable, IViewCounter, ISubTa
 	/**
 	 * Get relation with comment
 	 */
-	public function getRelationComments(int $id): \Nette\Database\Table\Selection
+	public function getRelationComments(int $id): Selection
 	{
 		return $this->getRelationCommentsTable()
 			->where($this->getForeignKeyColumn(), $id);

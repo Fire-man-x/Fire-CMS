@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace App\Router;
 
+use App\Model\UrlManager;
 use App\Service\DomainService;
 use App\Service\LanguageService;
-use App\Modules\UrlModule\UrlManager;
 use Nette;
 use Nette\Http;
 use Nette\Routing\Router;

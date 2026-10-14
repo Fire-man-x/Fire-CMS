@@ -8,9 +8,9 @@ use App\Components\Menu\Model\MenuLinkType;
 use App\Components\Menu\Model\Menus;
 use App\Model\Database\Languages;
 use App\Model\Database\Pages;
-use App\Modules\UrlModule\Model;
-use App\Modules\UrlModule\RedirectionsModel;
-use App\Modules\UrlModule\UrlManager;
+use App\Model\Database\Urls;
+use App\Model\Database\Redirections;
+use App\Model\UrlManager;
 use App\Service\LanguageService;
 use Nette\Database\Explorer;
 use Tester\Assert;
@@ -71,7 +71,7 @@ final class PagesTest extends TestCase
 
 		$languages = new LanguageService(new Languages($this->db));
 		$this->menus = new Menus($this->db, $languages);
-		$urlManager = new UrlManager(new Model($this->db), new RedirectionsModel($this->db), $languages, $this->db);
+		$urlManager = new UrlManager(new Urls($this->db), new Redirections($this->db), $languages, $this->db);
 		$this->pages = new Pages($this->db, $languages, $this->menus, $urlManager);
 	}
 

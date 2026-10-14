@@ -1,13 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\CommentsModule\Components\Comments;
+namespace App\FrontModule\Components\Comments;
 
 use AlesWita\VisualPaginator\VisualPaginator;
 use AlesWita\VisualPaginator\VisualPaginatorFactory;
 use App\Forms\CommentFormFactory;
-use App\Modules\CommentsModule;
+use App\Model\Exceptions\RecordNotFoundException;
 use Nette\Application\UI\Control;
+use Nette\Application\UI\Form;
 use Nette\Localization\Translator;
 
 /**
@@ -40,7 +41,7 @@ class Comments extends Control
 	public function __construct(
 		private readonly Translator $translator,
 		private readonly CommentFormFactory $commentFormFactory,
-		private readonly CommentsModule\Comment $commentsService,
+		private readonly \App\Model\CommentManager $commentsService,
 		private readonly VisualPaginatorFactory $visualPaginatorFactory,
 	) {
 	}
@@ -48,7 +49,7 @@ class Comments extends Control
 
 	private function setType($type): self
 	{
-		if (!in_array($type, array(CommentsModule\Comment::TYPE_ARTICLE, CommentsModule\Comment::TYPE_CATEGORY))) {
+		if (!in_array($type, array(\App\Model\CommentManager::TYPE_ARTICLE, \App\Model\CommentManager::TYPE_CATEGORY))) {
 			throw new \InvalidArgumentException("Type '$type' is not valid.");
 		}
 
@@ -67,7 +68,7 @@ class Comments extends Control
 		}
 		$this->articleId = $articleId;
 
-		$this->setType(CommentsModule\Comment::TYPE_ARTICLE);
+		$this->setType(\App\Model\CommentManager::TYPE_ARTICLE);
 		return $this;
 	}
 
@@ -82,7 +83,7 @@ class Comments extends Control
 		}
 		$this->categoryId = $categoryId;
 
-		$this->setType(CommentsModule\Comment::TYPE_CATEGORY);
+		$this->setType(\App\Model\CommentManager::TYPE_CATEGORY);
 		return $this;
 	}
 
@@ -152,17 +153,22 @@ class Comments extends Control
 
 
 	/**
-	 * Comment form factory.
+	 * CommentManager form factory.
 	 */
-	protected function createComponentCommentForm(): \Nette\Application\UI\Form
+	protected function createComponentCommentForm(): Form
 	{
 		$this->commentFormFactory->setType($this->type);
+		$form = null;
 		if($this->articleId){
 			$form = $this->commentFormFactory->create(null, $this->language, $this->articleId);
 		}
 		if($this->categoryId){
 			$form = $this->commentFormFactory->create(null, $this->language, $this->categoryId);
 		}
+		if(!$form){
+			throw new RecordNotFoundException("Form type not found");
+		}
+
 		$form->setTranslator($this->translator);
 
 		return $form;

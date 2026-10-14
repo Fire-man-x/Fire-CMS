@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\UrlModule;
+namespace App\Model;
 
 
+use App\Model\Database\Redirections;
+use App\Model\Database\Urls;
 use App\Service\LanguageService;
 use Nette\Database\Explorer;
 use Nette\InvalidArgumentException;
@@ -33,8 +35,8 @@ class UrlManager
 	 * UrlManager constructor.
 	 */
 	public function __construct(
-		protected Model $model,
-		protected RedirectionsModel $redirectionsModel,
+		protected Urls $model,
+		protected Redirections $redirectionsModel,
 		protected LanguageService $languages,
 		protected Explorer $db)
 	{

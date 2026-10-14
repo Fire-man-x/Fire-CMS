@@ -6,8 +6,9 @@ namespace App\Security;
 use App\Model\Database\Users;
 use App\Model\UserManager;
 use Contributte\OAuth2Client\Flow\Facebook\FacebookAuthCodeFlow;
+use GuzzleHttp\Exception\GuzzleException;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
-use League\OAuth2\Client\Provider\FacebookUser;
+use League\OAuth2\Client\Token\AccessToken;
 use Nette\Application\UI\Presenter;
 use Nette\Security\AuthenticationException;
 use Nette\Security\SimpleIdentity;
@@ -56,13 +57,18 @@ class FacebookLogin
 
 		try {
 			$accessToken = $this->flow->getAccessToken($parameters);
+			if(!$accessToken instanceof AccessToken){
+				throw new IdentityProviderException("AccessToken is not created", 404, "");
+			}
+
+			$oauthUser = $this->flow->getProvider()->getResourceOwner($accessToken);
 		} catch (IdentityProviderException $e) {
 			// Identity provider failure, cannot get information about user
 			throw new AuthenticationException($e->getMessage());
+		} catch (GuzzleException $e) {
+			// Identity provider failure, cannot get information about user
+			throw new AuthenticationException($e->getMessage());
 		}
-
-		/** @var FacebookUser $oauthUser */
-		$oauthUser = $this->flow->getProvider()->getResourceOwner($accessToken);
 
 		// found existing user by OAuth
 		try {

@@ -17,24 +17,17 @@ class Meta
 	const TYPE_CATEGORY = "category";
 	const TYPE_FILE = "file";
 
-	private Model\Database\Metas $metasModel;
-
-	private Model\Database\ArticleMetas $articleMetasModel;
-
-	private Model\Database\CategoryMetas $categoryMetasModel;
-
-	private Model\Database\Files $filesModel;
-
 
 	/**
 	 * Constructor
 	 */
-	public function __construct(Model\Database\Metas $metasModel, Model\Database\ArticleMetas $articlesModel, Model\Database\CategoryMetas $categoryMetasModel, Model\Database\Files $filesModel)
+	public function __construct(
+		private Model\Database\Metas $metasModel,
+		private Model\Database\ArticleMetas $articleMetasModel,
+		private Model\Database\CategoryMetas $categoryMetasModel,
+		//private Model\Database\Files $filesModel
+	)
 	{
-		$this->metasModel = $metasModel;
-		$this->articleMetasModel = $articlesModel;
-		$this->categoryMetasModel = $categoryMetasModel;
-		$this->filesModel = $filesModel;
 	}
 
 
@@ -49,8 +42,8 @@ class Meta
 				return $this->articleMetasModel;
 			case self::TYPE_CATEGORY:
 				return $this->categoryMetasModel;
-			case self::TYPE_FILE:
-				return $this->filesModel;
+			//case self::TYPE_FILE:
+			//	return $this->filesModel;
 			default:
 				throw new \InvalidArgumentException("Model for type '$type' doesn't exist.");
 		}

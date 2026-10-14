@@ -8,7 +8,7 @@ use App\Attributes\Privilege;
 use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Model\Database\Sections;
-use App\Modules\UrlModule\UrlManager;
+use App\Model\UrlManager;
 use Contributte\Datagrid\Datagrid;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Form;

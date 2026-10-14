@@ -26,6 +26,6 @@
 			{control commentReplyForm}
 		{/snippet}
 	{/capture}
-	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal', label=>$control->translator->translate('Comment'), modalContent=>$modalContent} {*, size=>'modal-sm'*}
+	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal', label=>$control->translator->translate('CommentManager'), modalContent=>$modalContent} {*, size=>'modal-sm'*}
 
 	{control commentsGrid}

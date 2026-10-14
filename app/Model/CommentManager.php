@@ -1,18 +1,20 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\CommentsModule;
+namespace App\Model;
 
 use App\Model;
-use App\Modules\CommentsModule\Model\Comments;
-use App\Modules\CommentsModule\Model\ISubComments;
+use App\Model\Database\Comments;
+use App\Model\Database\ISubComments;
 use Nette\Security\User;
 use Nette\Utils\ArrayHash;
+use Nette\Utils\Arrays;
+use Nette\Utils\Paginator;
 
 /**
- * Comment Service
+ * CommentManager Service
  */
-class Comment
+class CommentManager
 {
 
 	const TYPE_ARTICLE = "article";
@@ -137,7 +139,7 @@ class Comment
 				->where("comment.id", $replyToId)
 				->fetch();
 			if (!$parentComment instanceof \Nette\Database\Table\ActiveRow) {
-				throw new \InvalidArgumentException("Comment '$replyToId' doesn't exist.");
+				throw new \InvalidArgumentException("CommentManager '$replyToId' doesn't exist.");
 			}
 
 			$relationId = (int) $parentComment[$column];
@@ -236,10 +238,13 @@ class Comment
 			$comments->where(":" . Model\Database\Articles::RELATION_COMMENT_TABLE_NAME . ".articleId", $columnId);
 		}
 		//list
-		$commentsList = $comments->select("comments.id, comments.parentId")->fetchAssoc("parentId|id");
+		$query = $comments->select("comments.id, comments.parentId")->fetchAll();
+		$rows = array_map(iterator_to_array(...), $query);
+		$commentsList = (array) Arrays::associate($rows, "parentId|id");
 
 		\Tracy\Debugger::$maxDepth=6;
 		//dump($commentsList);
+		/** @var array<int,array<string,mixed>> $parents */
 		$parents = $commentsList[null];
 		unset($commentsList[null]);
 		foreach ($parents as $parentId => $parent){
@@ -257,7 +262,7 @@ class Comment
 	/**
 	 * Set left-right to node
 	 */
-	private function setLeftRight(array $node, int $left): int
+	private function setLeftRight(ArrayHash $node, int $left): int
 	{
 		$node->left = $left++;
 		foreach ($node->childs as $child){
@@ -283,7 +288,7 @@ class Comment
 	 * Jen schválené komentáře (status "publish") - výpis je pro web, pending/trash vidí jen administrace.
 	 * Odpovědi neschváleného komentáře se nezobrazí ani když jsou schválené (nemají kam se zavěsit).
 	 */
-	public function getAllCommentsWithChilds(string $language, string $type, int $columnId, \Nette\Utils\Paginator $paginator): array
+	public function getAllCommentsWithChilds(string $language, string $type, int $columnId, Paginator $paginator): array
 	{
 
 		$comments = $this->commentsModel->getAllInLanguage($language)
@@ -318,10 +323,12 @@ class Comment
 
 	/**
 	 * Create tree from list
+	 * @param array<string,mixed> $parent
+	 * @param array<string,mixed> $childList
 	 */
 	protected function createTree(array $parent, array $childList): ArrayHash
 	{
-		$parentComment = \Nette\Utils\ArrayHash::from($parent);
+		$parentComment = ArrayHash::from($parent);
 		$parentCommentId = $parentComment->id;
 		if (in_array($parentCommentId, array_keys($childList))) {
 			$parentComment->childs = $childList[$parentCommentId];

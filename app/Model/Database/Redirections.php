@@ -1,16 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\UrlModule;
+namespace App\Model\Database;
 
 
-use App\Model\Database\BaseModel;
 use Nette\Database\Explorer;
 
 /**
  * Url redirections Model
  */
-class RedirectionsModel extends BaseModel
+class Redirections extends BaseModel
 {
 
 	public function __construct(Explorer $database)

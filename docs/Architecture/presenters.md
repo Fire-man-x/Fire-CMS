@@ -13,8 +13,7 @@ App\Presenters\BasePresenter                          (app/Presenters/BasePresen
 ```
 
 Presentery pluginů/modulů dědí od `App\AdminModule\Presenters\BasePresenter` (resp. `FrontModule`
-obdobně), i když fyzicky leží jinde (`app/Plugins/<Name>/AdminModule/Presenters/<Name>Presenter.php`,
-`app/Modules/CommentsModule/AdminModule/CommentsPresenter.php`) — viz [plugins.md](plugins.md) jak je
+obdobně), i když fyzicky leží jinde (`app/Plugins/<Name>/AdminModule/Presenters/<Name>Presenter.php`) — viz [plugins.md](plugins.md) jak je
 `PresenterFactory` najde.
 
 ## Přepis presenteru z `theme/`

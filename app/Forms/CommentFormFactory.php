@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace App\Forms;
 
-use App\Modules\CommentsModule;
 use Nette\Application\UI\Form;
 use Nette\Security\User;
 
@@ -15,16 +14,16 @@ class CommentFormFactory extends BaseFormFactory
 
 	private User $user;
 
-	private CommentsModule\Model\Comments $model;
+	private \App\Model\Database\Comments $model;
 
-	private CommentsModule\Comment $service;
+	private \App\Model\CommentManager $service;
 
 	private string $type;
 
 	private int $columnId;
 
 
-	public function __construct(User $user, CommentsModule\Model\Comments $model, CommentsModule\Comment $service)
+	public function __construct(User $user, \App\Model\Database\Comments $model, \App\Model\CommentManager $service)
 	{
 		parent::__construct();
 		$this->user = $user;
@@ -35,7 +34,7 @@ class CommentFormFactory extends BaseFormFactory
 
 	public function setType($type): self
 	{
-		if (!in_array($type, array(CommentsModule\Comment::TYPE_ARTICLE, CommentsModule\Comment::TYPE_CATEGORY))) {
+		if (!in_array($type, array(\App\Model\CommentManager::TYPE_ARTICLE, \App\Model\CommentManager::TYPE_CATEGORY))) {
 			throw new \InvalidArgumentException("Type '$type' is not valid.");
 		}
 
@@ -65,7 +64,7 @@ class CommentFormFactory extends BaseFormFactory
 		$form->addText('title', 'Title')
 			->setNullable();
 
-		$form->addTextArea('text', 'Comment')
+		$form->addTextArea('text', 'CommentManager')
 			->setRequired(VALIDATE_REQUIRED);
 
 		$form->addSubmit('send', 'Save');
@@ -136,7 +135,7 @@ class CommentFormFactory extends BaseFormFactory
 		$form->addText('title', 'Title')
 			->setNullable();
 
-		$form->addTextArea('text', 'Comment')
+		$form->addTextArea('text', 'CommentManager')
 			->setRequired(VALIDATE_REQUIRED);
 
 		$form->addHidden("reply_to", $replyTo);

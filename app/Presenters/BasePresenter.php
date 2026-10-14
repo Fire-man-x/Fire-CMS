@@ -5,9 +5,9 @@ namespace App\Presenters;
 
 use Alnux\NetteBreadCrumb\BreadCrumb;
 use App\FileStorage\TPresenter;
+use LiveTranslator\TranslatorException;
 use Nette\Application\Helpers;
 use Nette\Application\UI\Presenter;
-use Nette\HtmlStringable;
 
 
 /**
@@ -72,14 +72,11 @@ abstract class BasePresenter extends Presenter
 
 	/**
 	 * Saves the message to template, that can be displayed after redirect.
-	 * @param  string|\stdClass|HtmlStringable  $message
-	 * @param  string
-	 * @param  bool
-	 * @return \stdClass
+	 * @throws TranslatorException
 	 */
-	public function flashMessage($message, string $type = 'info', bool $translate = true): \stdClass
+	public function flashMessage(string|\stdClass|\Stringable $message, string $type = 'info', bool $translate = true): \stdClass
 	{
-		if ($this->translator && $translate){
+		if ($translate){
 			$message = $this->translator->translate($message);
 		}
 
@@ -104,12 +101,12 @@ abstract class BasePresenter extends Presenter
 
 	/**
 	 * Add link to BreadCrumb control
-	 * @param \Nette\Application\UI\Link $link
-	 * @param null $icon
+	 * @param ?string $icon CSS třídy ikony (např. "fa fa-home")
 	 */
-	protected function addBreadCrumbLink(string $title, string $link = null, $icon = null, $translate = true): void
+	protected function addBreadCrumbLink(string $title, ?string $link = null, ?string $icon = null, bool $translate = true): void
 	{
-		$this["breadCrumb"]->addLink($translate ? $this->translator->translate($title) : $title, $link, $icon);
+		// Translator::translate() vrací string|Stringable, BreadCrumb::addLink() chce string
+		$this["breadCrumb"]->addLink($translate ? (string) $this->translator->translate($title) : $title, $link, $icon);
 	}
 
 

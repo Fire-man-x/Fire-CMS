@@ -55,34 +55,34 @@ parameters:
 			path: ../AdminModule/Presenters/ArticlesPresenter.php
 
 		-
-			message: '#^Parameter \#3 \$icon of method App\\Presenters\\BasePresenter\:\:addBreadCrumbLink\(\) expects null, string given\.$#'
-			identifier: argument.type
+			message: '#^Access to private property \$parent of parent class Nette\\ComponentModel\\Component\.$#'
+			identifier: property.private
 			count: 1
-			path: ../AdminModule/Presenters/BasePresenter.php
+			path: ../AdminModule/Presenters/CommentsPresenter.php
 
 		-
-			message: '#^Access to an undefined property App\\AdminModule\\Presenters\\DynamicFormsPresenter\:\:\$categoriesModel\.$#'
-			identifier: property.notFound
+			message: '#^Call to an undefined method App\\Model\\CommentManager\:\:getRevisionsCount\(\)\.$#'
+			identifier: method.notFound
 			count: 1
-			path: ../AdminModule/Presenters/DynamicFormsPresenter.php
+			path: ../AdminModule/Presenters/CommentsPresenter.php
 
 		-
-			message: '#^Class Contributte\\Datagrid\\Datagrid referenced with incorrect case\: Contributte\\Datagrid\\DataGrid\.$#'
-			identifier: class.nameCase
-			count: 1
-			path: ../AdminModule/Presenters/DynamicFormsPresenter.php
+			message: '#^Call to an undefined method App\\Model\\CommentManager\:\:makeBackup\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: ../AdminModule/Presenters/CommentsPresenter.php
 
 		-
-			message: '#^PHPDoc tag @throws with type LiveTranslator\\TranslatorException\|Ublaboo\\DataGrid\\Exception\\DataGridColumnStatusException\|Ublaboo\\DataGrid\\Exception\\DataGridException is not subtype of Throwable$#'
-			identifier: throws.notThrowable
+			message: '#^Call to an undefined method App\\Model\\Database\\Comments\:\:statusPublish\(\)\.$#'
+			identifier: method.notFound
 			count: 1
-			path: ../AdminModule/Presenters/DynamicFormsPresenter.php
+			path: ../AdminModule/Presenters/CommentsPresenter.php
 
 		-
-			message: '#^PHPDoc tag @throws with type LiveTranslator\\TranslatorException\|Ublaboo\\DataGrid\\Exception\\DataGridException is not subtype of Throwable$#'
-			identifier: throws.notThrowable
+			message: '#^Default value of the parameter \#2 \$status \(int\) of method App\\AdminModule\\Presenters\\CommentsPresenter\:\:handleActivate\(\) is incompatible with type bool\.$#'
+			identifier: parameter.defaultValue
 			count: 1
-			path: ../AdminModule/Presenters/DynamicFormsPresenter.php
+			path: ../AdminModule/Presenters/CommentsPresenter.php
 
 		-
 			message: '#^Property App\\AdminModule\\Presenters\\DynamicFormsPresenter\:\:\$language \(string\|null\) is never assigned string so it can be removed from the property type\.$#'
@@ -163,10 +163,16 @@ parameters:
 			path: ../FrontModule/Components/Categories/Categories.php
 
 		-
-			message: '#^Access to an undefined property Nette\\Application\\UI\\Presenter\:\:\$editLocale\.$#'
-			identifier: property.notFound
+			message: '#^Property App\\FrontModule\\Components\\Comments\\Comments\:\:\$comments is never read, only written\.$#'
+			identifier: property.onlyWritten
 			count: 1
-			path: ../FrontModule/Components/DynamicForms/ContactFormComponentFactory.php
+			path: ../FrontModule/Components/Comments/Comments.php
+
+		-
+			message: '#^Variable \$columnId might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: ../FrontModule/Components/Comments/Comments.php
 
 		-
 			message: '#^Call to an undefined method Nette\\Application\\UI\\Form\:\:addAntiSpam\(\)\.$#'
@@ -187,28 +193,10 @@ parameters:
 			path: ../FrontModule/Components/DynamicForms/ContactFormFactory.php
 
 		-
-			message: '#^Property App\\FrontModule\\Components\\DynamicForms\\ContactFormFactory\:\:\$commentService is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../FrontModule/Components/DynamicForms/ContactFormFactory.php
-
-		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
 			path: ../FrontModule/Components/DynamicForms/ContactFormFactory.php
-
-		-
-			message: '#^Property App\\FrontModule\\Components\\SearchControl\\SearchControl\:\:\$articles is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../FrontModule/Components/SearchControl/SearchControl.php
-
-		-
-			message: '#^Property App\\FrontModule\\Components\\SearchControl\\SearchControl\:\:\$language is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../FrontModule/Components/SearchControl/SearchControl.php
 
 		-
 			message: '#^Access to an undefined property Nette\\Application\\UI\\Presenter\:\:\$locale\.$#'
@@ -217,46 +205,10 @@ parameters:
 			path: ../FrontModule/Components/Sliders/SliderComponentFactory.php
 
 		-
-			message: '#^Property App\\FrontModule\\Presenters\\ArticlesPresenter\:\:\$parent is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../FrontModule/Presenters/ArticlesPresenter.php
-
-		-
-			message: '#^Parameter \#3 \$icon of method App\\Presenters\\BasePresenter\:\:addBreadCrumbLink\(\) expects null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../FrontModule/Presenters/BasePresenter.php
-
-		-
-			message: '#^Property App\\FrontModule\\Presenters\\BasePresenter\:\:\$themePath \(string\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: ../FrontModule/Presenters/BasePresenter.php
-
-		-
-			message: '#^Parameter \#3 \$icon of method App\\Presenters\\BasePresenter\:\:addBreadCrumbLink\(\) expects null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../FrontModule/Presenters/SearchPresenter.php
-
-		-
-			message: '#^Default value of the parameter \#3 \$data \(array\) of method App\\Model\\Database\\Articles\:\:insertRelationFile\(\) is incompatible with type Nette\\Utils\\ArrayHash\.$#'
-			identifier: parameter.defaultValue
-			count: 1
-			path: ../Model/Database/Articles.php
-
-		-
-			message: '#^Method App\\Model\\Database\\Articles\:\:deleteRelationFile\(\) should return int but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: ../Model/Database/Articles.php
-
-		-
-			message: '#^Method App\\Model\\Database\\Articles\:\:insertRelationFile\(\) should return int but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: ../Model/Database/Articles.php
+			message: '#^PHPDoc tag @param has invalid value \(\\Nette\\Utils\\ArrayHash\)\: Unexpected token "\\n\\t ", expected variable at offset 48 on line 3$#'
+			identifier: phpDoc.parseError
+			count: 2
+			path: ../Model/CommentManager.php
 
 		-
 			message: '#^Call to function is_null\(\) with int will always evaluate to false\.$#'
@@ -265,34 +217,28 @@ parameters:
 			path: ../Model/Database/BaseSubMetas.php
 
 		-
-			message: '#^Default value of the parameter \#3 \$data \(array\) of method App\\Model\\Database\\Categories\:\:insertRelationFile\(\) is incompatible with type Nette\\Utils\\ArrayHash\.$#'
-			identifier: parameter.defaultValue
+			message: '#^Method App\\Model\\UrlManager\:\:existUrlByTypeAndKey\(\) should return Nette\\Database\\Table\\ActiveRow\|false but returns true\.$#'
+			identifier: return.type
 			count: 1
-			path: ../Model/Database/Categories.php
+			path: ../Model/UrlManager.php
 
 		-
-			message: '#^Method App\\Model\\Database\\Categories\:\:insertRelationFile\(\) should return int but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: ../Model/Database/Categories.php
-
-		-
-			message: '#^Method App\\Model\\Database\\Categories\:\:updateTranslation\(\) should return int but return statement is missing\.$#'
-			identifier: return.missing
-			count: 2
-			path: ../Model/Database/Categories.php
-
-		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$id$#'
+			message: '#^PHPDoc tag @param references unknown parameter\: \$categoryId$#'
 			identifier: parameter.notFound
 			count: 1
-			path: ../Model/Database/Categories.php
+			path: ../Model/UrlManager.php
 
 		-
-			message: '#^Property App\\Model\\Database\\Metas\:\:\$languages is never read, only written\.$#'
-			identifier: property.onlyWritten
+			message: '#^PHPDoc tag @param references unknown parameter\: \$languageId$#'
+			identifier: parameter.notFound
 			count: 1
-			path: ../Model/Database/Metas.php
+			path: ../Model/UrlManager.php
+
+		-
+			message: '#^Property App\\Model\\UrlManager\:\:\$urlTypeAndKey is unused\.$#'
+			identifier: property.unused
+			count: 1
+			path: ../Model/UrlManager.php
 
 		-
 			message: '#^Negated boolean expression is always false\.$#'
@@ -307,108 +253,6 @@ parameters:
 			path: ../Model/UserManager.php
 
 		-
-			message: '#^Access to private property \$parent of parent class Nette\\ComponentModel\\Component\.$#'
-			identifier: property.private
-			count: 1
-			path: ../Modules/CommentsModule/AdminModule/CommentsPresenter.php
-
-		-
-			message: '#^Call to an undefined method App\\Modules\\CommentsModule\\Comment\:\:getRevisionsCount\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../Modules/CommentsModule/AdminModule/CommentsPresenter.php
-
-		-
-			message: '#^Call to an undefined method App\\Modules\\CommentsModule\\Comment\:\:makeBackup\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: ../Modules/CommentsModule/AdminModule/CommentsPresenter.php
-
-		-
-			message: '#^Call to an undefined method App\\Modules\\CommentsModule\\Model\\Comments\:\:statusPublish\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../Modules/CommentsModule/AdminModule/CommentsPresenter.php
-
-		-
-			message: '#^Default value of the parameter \#2 \$status \(int\) of method App\\Modules\\CommentsModule\\AdminModule\\CommentsPresenter\:\:handleActivate\(\) is incompatible with type bool\.$#'
-			identifier: parameter.defaultValue
-			count: 1
-			path: ../Modules/CommentsModule/AdminModule/CommentsPresenter.php
-
-		-
-			message: '#^Cannot access property \$childs on array\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: ../Modules/CommentsModule/Comment.php
-
-		-
-			message: '#^Cannot access property \$id on array\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: ../Modules/CommentsModule/Comment.php
-
-		-
-			message: '#^Cannot access property \$left on array\.$#'
-			identifier: property.nonObject
-			count: 2
-			path: ../Modules/CommentsModule/Comment.php
-
-		-
-			message: '#^Cannot access property \$right on array\.$#'
-			identifier: property.nonObject
-			count: 2
-			path: ../Modules/CommentsModule/Comment.php
-
-		-
-			message: '#^PHPDoc tag @param has invalid value \(\\Nette\\Utils\\ArrayHash\)\: Unexpected token "\\n\\t ", expected variable at offset 48 on line 3$#'
-			identifier: phpDoc.parseError
-			count: 2
-			path: ../Modules/CommentsModule/Comment.php
-
-		-
-			message: '#^Property App\\Modules\\CommentsModule\\Components\\Comments\\Comments\:\:\$comments is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../Modules/CommentsModule/Components/Comments/Comments.php
-
-		-
-			message: '#^Variable \$columnId might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../Modules/CommentsModule/Components/Comments/Comments.php
-
-		-
-			message: '#^Variable \$form might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
-			path: ../Modules/CommentsModule/Components/Comments/Comments.php
-
-		-
-			message: '#^Method App\\Modules\\UrlModule\\UrlManager\:\:existUrlByTypeAndKey\(\) should return Nette\\Database\\Table\\ActiveRow\|false but returns true\.$#'
-			identifier: return.type
-			count: 1
-			path: ../Modules/UrlModule/UrlManager.php
-
-		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$categoryId$#'
-			identifier: parameter.notFound
-			count: 1
-			path: ../Modules/UrlModule/UrlManager.php
-
-		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$languageId$#'
-			identifier: parameter.notFound
-			count: 1
-			path: ../Modules/UrlModule/UrlManager.php
-
-		-
-			message: '#^Property App\\Modules\\UrlModule\\UrlManager\:\:\$urlTypeAndKey is unused\.$#'
-			identifier: property.unused
-			count: 1
-			path: ../Modules/UrlModule/UrlManager.php
-
-		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
@@ -419,51 +263,3 @@ parameters:
 			identifier: deadCode.unreachable
 			count: 1
 			path: ../Plugins/Statistics/Statistics.php
-
-		-
-			message: '#^Left side of && is always true\.$#'
-			identifier: booleanAnd.leftAlwaysTrue
-			count: 1
-			path: ../Presenters/BasePresenter.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$link with type Nette\\Application\\UI\\Link is incompatible with native type string\|null\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: ../Presenters/BasePresenter.php
-
-		-
-			message: '#^PHPDoc tag @param has invalid value \(bool\)\: Unexpected token "\\n\\t \* ", expected variable at offset 166 on line 5$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: ../Presenters/BasePresenter.php
-
-		-
-			message: '#^PHPDoc tag @param has invalid value \(string\)\: Unexpected token "\\n\\t \* ", expected variable at offset 149 on line 4$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: ../Presenters/BasePresenter.php
-
-		-
-			message: '#^Parameter \#1 \$token of method League\\OAuth2\\Client\\Provider\\Facebook\:\:getResourceOwner\(\) expects League\\OAuth2\\Client\\Token\\AccessToken, League\\OAuth2\\Client\\Token\\AccessTokenInterface given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Security/FacebookLogin.php
-
-		-
-			message: '#^Access to an undefined property Nette\\Security\\IIdentity\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: ../Security/Role.php
-
-		-
-			message: '#^Call to an undefined method App\\Model\\Database\\Categories\:\:getAllInLanguage\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../Service/Category.php
-
-		-
-			message: '#^Method App\\Service\\Meta\:\:getModelByType\(\) should return App\\Model\\Database\\BaseSubMetas but returns App\\Model\\Database\\Files\.$#'
-			identifier: return.type
-			count: 1
-			path: ../Service/Meta.php

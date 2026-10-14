@@ -1,9 +1,8 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\CommentsModule\AdminModule;
+namespace App\AdminModule\Presenters;
 
-use App\AdminModule\Presenters\BasePresenter;
 use App\Attributes\Privilege;
 use App\Attributes\Resource;
 use App\Attributes\Secured;
@@ -16,7 +15,7 @@ use Nette;
 use Nette\Application\Attributes\Persistent;
 
 /**
- * Comment Presenter
+ * CommentManager Presenter
  */
 class CommentsPresenter extends BasePresenter
 {
@@ -39,7 +38,7 @@ class CommentsPresenter extends BasePresenter
 	public ?string $show;
 
 	/**
-	 * Comment parent
+	 * CommentManager parent
 	 */
 	//private int $parent;
 
@@ -52,10 +51,10 @@ class CommentsPresenter extends BasePresenter
 	public CommentFormFactory $commentFactory;
 
 	/** @inject */
-	public CommentsModule\Model\Comments $commentsModel;
+	public Model\Database\Comments $commentsModel;
 
 	/** @inject */
-	public CommentsModule\Comment $commentService;
+	public Model\CommentManager $commentService;
 
 	/** @inject */
 	public Model\Database\Categories $categoriesModel;

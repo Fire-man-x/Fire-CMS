@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\CommentsModule\Model;
+namespace App\Model\Database;
 
 /**
  * Interface for relation comments table

@@ -18,13 +18,9 @@ use Nette\Localization\Translator;
 class SearchControl extends Control
 {
 
-	/** articles */
-	private array $articles = array();
 
 	/** Query */
 	private string $query = "";
-
-	private string $language;
 
 	private string $templateFile;
 
@@ -83,17 +79,6 @@ class SearchControl extends Control
 		$this->template->setFile($this->templateFile);
 		$this->template->setTranslator($this->translator);
 		$this->template->render();
-	}
-
-
-	/**
-	 * Language setter
-	 */
-	public function setLanguage(string $language): self
-	{
-		$this->language = $language;
-
-		return $this;
 	}
 
 

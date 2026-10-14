@@ -1,16 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\UrlModule;
+namespace App\Model\Database;
 
 
-use App\Model\Database\BaseModel;
 use Nette\Database\Explorer;
 
 /**
  * Urls Model
  */
-class Model extends BaseModel
+class Urls extends BaseModel
 {
 
 	public function __construct(Explorer $database)

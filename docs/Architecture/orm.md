@@ -122,7 +122,7 @@ kategorie (`Categories`, bez sloupce `type`) se zásuvnými „subtypy" přes `a
 Pages, úvodní stránka je `Front:Homepage`), správce souborů
 (`Files`/`FileFolders`), menu (`Menus`), štítky (`Tags`), SEO meta (`Metas`), uživatelé/role
 (`Users`/`Roles`), vícejazyčnost (`LiveTranslator` + `Languages`/`LanguageService`), hezká URL a
-přesměrování (`UrlModule`), komentáře (`CommentsModule`), nastavení webu (`Settings` - jeden řádek
+přesměrování (`Urls`/`Redirections` + `App\Model\UrlManager`), komentáře (`CommentsModule`), nastavení webu (`Settings` - jeden řádek
 `firecms_settings` s globálními hodnotami `imageResolution`/`themePath`/`contactPhone`/`mapLatitude`/
 `mapLongitude` + texty po jazycích ve `firecms_settingDescriptions`, včetně `contactAddress`).
 

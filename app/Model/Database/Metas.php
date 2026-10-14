@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Model\Database;
 
-use App\Service\LanguageService;
+use Nette\Database\Explorer;
 use Nette\Utils\ArrayHash;
 
 /**
@@ -11,19 +11,9 @@ use Nette\Utils\ArrayHash;
  */
 class Metas extends BaseModel
 {
-
-	private LanguageService $languages;
-
-
-	/**
-	 * Constructor
-	 * @param \Nette\Database\Explorer $database
-	 * @param LanguageService $languages
-	 */
-	public function __construct(\Nette\Database\Explorer $database, LanguageService $languages)
+	public function __construct(Explorer $database)
 	{
 		parent::__construct($database);
-		$this->languages = $languages;
 
 		$this->setTableName('firecms_metas');
 		$this->setForeignKeyColumn('metaId');

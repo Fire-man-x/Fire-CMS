@@ -6,10 +6,9 @@ namespace App\FrontModule\Components\DynamicForms;
 use App\Forms\BaseFormFactory;
 use App\Model\Database\DynamicForms;
 use App\Model\Database\Settings;
-use App\Modules\CommentsModule\Comment;
 use Nette\Application\UI\Form;
 use Nette\Forms\Container;
-use Nette\Mail\IMailer;
+use Nette\Mail\Mailer;
 use Nette\Mail\Message;
 use Nette\NotImplementedException;
 
@@ -18,28 +17,18 @@ use Nette\NotImplementedException;
 
 class ContactFormFactory extends BaseFormFactory
 {
-
-	private DynamicForms $model;
-
-	private Settings $modelOptions;
-
-	private Comment $commentService;
-
-	private IMailer $mailer;
-
 	private string $language;
 
 
 	/**
 	 * ContactFormFactory constructor.
 	 */
-	public function __construct(DynamicForms $model, Settings $modelOptions, Comment $commentService, IMailer $mailer)
+	public function __construct(
+		private DynamicForms $model,
+		private Settings $modelOptions,
+		private Mailer $mailer)
 	{
 		parent::__construct();
-		$this->model = $model;
-		$this->modelOptions = $modelOptions;
-		$this->mailer = $mailer;
-		$this->commentService = $commentService;
 	}
 
 
@@ -65,7 +54,7 @@ class ContactFormFactory extends BaseFormFactory
 			//try change form name from submited from
 			if(!$formName && $form->isSubmitted())
 			{
-				$formName = $form->getHttpData($form::DATA_TEXT, 'formName');
+				$formName = $form->getHttpData($form::DataText, 'formName');
 			}
 
 			//dynamic form

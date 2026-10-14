@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Tests\Modules\UrlModule;
+namespace Tests\Model;
 
 use App\Model\Database\Languages;
-use App\Modules\UrlModule\Model;
-use App\Modules\UrlModule\RedirectionsModel;
-use App\Modules\UrlModule\UrlManager;
+use App\Model\Database\Urls;
+use App\Model\Database\Redirections;
+use App\Model\UrlManager;
 use App\Service\LanguageService;
 use Nette\Database\Explorer;
 use Tester\Assert;
 use Tester\TestCase;
 use Tests\Helpers\SqliteDatabase;
 
-require_once __DIR__ . '/../../bootstrap.php';
+require_once __DIR__ . '/../bootstrap.php';
 
 /**
  * Integrační test nad in-memory SQLite: ověřuje, že UrlManager::validateUrl()
@@ -47,8 +47,8 @@ final class UrlManagerValidateUrlTest extends TestCase
 		]);
 
 		$this->urlManager = new UrlManager(
-			new Model($this->db),
-			new RedirectionsModel($this->db),
+			new Urls($this->db),
+			new Redirections($this->db),
 			new LanguageService(new Languages($this->db)),
 			$this->db,
 		);

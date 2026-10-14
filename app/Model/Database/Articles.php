@@ -5,10 +5,10 @@ namespace App\Model\Database;
 
 use App\Components\IViewCounter;
 use App\Model\TranslatedTitleTrait\TranslatedTitleTrait;
-use App\Modules\CommentsModule\Model\ISubComments;
 use App\Service\LanguageService;
 use Nette\Database\SqlLiteral;
 use Nette\Database\Table\ActiveRow;
+use Nette\Database\Table\Selection;
 use Nette\Utils\ArrayHash;
 
 /**
@@ -225,13 +225,12 @@ class Articles extends BaseModel implements Translatable, IViewCounter, ISubTags
 
 	/**
 	 * Inserts relation with file
-	 * @param int $articleId
-	 * @param int $fileId
-	 * @param ArrayHash $data
-	 * @return int Row id
 	 */
-	public function insertRelationFile($articleId, $fileId, $data = array())
+	public function insertRelationFile(int $articleId, int $fileId, ArrayHash $data = null): void
 	{
+		if(!$data){
+			$data = new ArrayHash();
+		}
 		$data["articleId"] = $articleId;
 		$data["fileId"] = $fileId;
 		if(!isset($data["isMain"])){
@@ -253,11 +252,8 @@ class Articles extends BaseModel implements Translatable, IViewCounter, ISubTags
 
 	/**
 	 * Delete relation with file
-	 * @param int $articleId
-	 * @param int $fileId
-	 * @return int Row id
 	 */
-	public function deleteRelationFile($articleId, $fileId)
+	public function deleteRelationFile(int $articleId, int $fileId): void
 	{
 		$this->database->table(self::RELATION_FILE_TABLE_NAME)
 			->where("articleId", $articleId)
@@ -268,10 +264,9 @@ class Articles extends BaseModel implements Translatable, IViewCounter, ISubTags
 
 	/**
 	 * Relation categories
-	 * @param int $articleId
-	 * @return \Nette\Database\Table\Selection All categories relation
+	 * @return Selection All categories relation
 	 */
-	public function getRelationCategory($articleId)
+	public function getRelationCategory(int $articleId): Selection
 	{
 		return $this->database->table(Categories::RELATION_ARTICLE_TABLE_NAME)
 			->select(Categories::RELATION_ARTICLE_TABLE_NAME.".*")
@@ -285,7 +280,7 @@ class Articles extends BaseModel implements Translatable, IViewCounter, ISubTags
 	/**
 	 * Relation tags table
 	 */
-	public function getRelationTagsTable(): \Nette\Database\Table\Selection
+	public function getRelationTagsTable(): Selection
 	{
 		return $this->database->table(self::RELATION_TAG_TABLE_NAME);
 	}

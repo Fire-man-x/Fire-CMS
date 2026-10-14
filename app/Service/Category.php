@@ -278,7 +278,7 @@ class Category
 	public function getAllCommentsWithChilds($language, string $type, int $columnId, \Nette\Utils\Paginator $paginator): array
 	{
 
-		$comments = $this->categoriesModel->getAllInLanguage($language);
+		$comments = $this->categoriesModel->getAllWithTranslation($language);
 
 		$commentsChilds = clone $comments;
 
@@ -304,9 +304,9 @@ class Category
 	/**
 	 * Create tree from list
 	 */
-	protected function createTree(array $parent, array $childList)
+	protected function createTree(array $parent, array $childList): ArrayHash
 	{
-		$parentComment = \Nette\Utils\ArrayHash::from($parent);
+		$parentComment = ArrayHash::from($parent);
 		$parentCommentId = $parentComment->id;
 		if (in_array($parentCommentId, array_keys($childList))) {
 			$parentComment->childs = $childList[$parentCommentId];

@@ -9,10 +9,11 @@ use App\Attributes\Privilege;
 use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Model\Database\DynamicForms;
-use App\Modules\UrlModule\UrlManager;
+use App\Model\UrlManager;
 use Contributte\Datagrid\Datagrid;
-use Nette;
 use Nette\Application\Attributes\Persistent;
+use Nette\Application\ForbiddenRequestException;
+use Nette\Application\UI\Form;
 
 /**
  * DynamicForm Presenter
@@ -120,7 +121,7 @@ class DynamicFormsPresenter extends BasePresenter
 		//edit own
 		$dynamicFormInfo = $this->dynamicFormsModel->getById($this->id);
 		if(!$this->user->isAllowed(new \App\Security\Resource("DynamicForms", $dynamicFormInfo ? $dynamicFormInfo->createdBy : $this->getUser()->getId()),"edit")){
-			throw new \Nette\Application\ForbiddenRequestException("You have not access to 'DynamicForms' with priviledge 'edit'.");
+			throw new ForbiddenRequestException("You have not access to 'DynamicForms' with priviledge 'edit'.");
 		}
 
 
@@ -149,7 +150,6 @@ class DynamicFormsPresenter extends BasePresenter
 	/**
 	 * DynamicForms grid
 	 * @throws \LiveTranslator\TranslatorException
-	 * @throws \Ublaboo\DataGrid\Exception\DataGridException
 	 */
 	protected function createComponentDynamicFormsGrid(string $name): Datagrid
 	{
@@ -273,10 +273,8 @@ class DynamicFormsPresenter extends BasePresenter
 	/**
 	 * DynamicFormItems grid
 	 * @throws \LiveTranslator\TranslatorException
-	 * @throws \Ublaboo\DataGrid\Exception\DataGridColumnStatusException
-	 * @throws \Ublaboo\DataGrid\Exception\DataGridException
 	 */
-	protected function createComponentDynamicFormItemsGrid(string $name): DataGrid
+	protected function createComponentDynamicFormItemsGrid(string $name): Datagrid
 	{
 		$source = $this->dynamicFormsModel->getItems($this->id);
 		if($source == null)
@@ -323,15 +321,14 @@ class DynamicFormsPresenter extends BasePresenter
 
 	/**
 	 * DynamicForm form factory.
-	 * @throws Nette\Application\UI\InvalidLinkException
 	 */
-	protected function createComponentDynamicFormForm(): Nette\Application\UI\Form
+	protected function createComponentDynamicFormForm(): Form
 	{
 		$this->dynamicFormFormFactory->asModal();
 		$form = $this->dynamicFormFormFactory->create();
 		$form->setTranslator($this->translator);
 
-		$form->onSuccess[] = function ($form) {
+		$form->onSuccess[] = function () {
 			$this->redirect('this');
 		};
 
@@ -342,7 +339,7 @@ class DynamicFormsPresenter extends BasePresenter
 	/**
 	 * DynamicFormItem form factory.
 	 */
-	protected function createComponentDynamicFormItemForm(): Nette\Application\UI\Form
+	protected function createComponentDynamicFormItemForm(): Form
 	{
 		if($this->getParameter("name")){
 			$this->dynamicFormItemFormFactory->setEditId($this->getParameter("name"));
@@ -365,7 +362,6 @@ class DynamicFormsPresenter extends BasePresenter
 
 	/**
 	 * Delete handler
-	 * @throws Nette\Application\AbortException
 	 */
 	#[Secured]
 	#[Resource('DynamicForms')]
@@ -388,7 +384,9 @@ class DynamicFormsPresenter extends BasePresenter
 	public function handleEdit(int $dynamicFormId): void
 	{
 		$this->dynamicFormFormFactory->setEditId($dynamicFormId);
-		$this->dynamicFormFormFactory->setDefaultValues($this["dynamicFormForm"], $dynamicFormId);
+		/** @var Form $form */
+		$form = $this["dynamicFormForm"];
+		$this->dynamicFormFormFactory->setDefaultValues($form, $dynamicFormId);
 
 		$this->redrawControl("dynamicFormForm");
 	}
@@ -402,7 +400,7 @@ class DynamicFormsPresenter extends BasePresenter
 	#[Privilege('add')]
 	public function handleAddDynamicFormItem($DynamicFormItem_id): void
 	{
-		$this->categoriesModel->insertRelationDynamicForm($DynamicFormItem_id, $this->id);
+		//$this->dynamicFormItemFormFactory->insertRelationDynamicForm($DynamicFormItem_id, $this->id);
 
 		$this->redrawControl("dynamicFormItemsGrid");
 	}
@@ -417,7 +415,9 @@ class DynamicFormsPresenter extends BasePresenter
 	public function handleEditItem(string $name): void
 	{
 		$this->dynamicFormItemFormFactory->setEditId($name);
-		$this->dynamicFormItemFormFactory->setDefaultValues($this["dynamicFormItemForm"], $name);
+		/** @var Form $form */
+		$form = $this["dynamicFormForm"];
+		$this->dynamicFormItemFormFactory->setDefaultValues($form, $name);
 
 		$this->redrawControl("dynamicFormItemForm");
 	}

@@ -6,7 +6,7 @@ namespace App\AdminModule\Forms;
 use App\Components\TagsInput\DataSourceDescriptor;
 use App\Components\TagsInput\TagInput;
 use App\Model;
-use App\Modules\UrlModule\UrlManager;
+use App\Model\UrlManager;
 use App\Service\Article;
 use App\Service\Tag;
 use Nette\InvalidArgumentException;

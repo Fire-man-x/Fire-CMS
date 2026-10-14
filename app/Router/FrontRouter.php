@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Router;
 
-use App\Modules\UrlModule\UrlManager;
+use App\Model\UrlManager;
 use App\Service\DomainService;
 use App\Service\LanguageService;
 use Nette\Application\Routers\RouteList;

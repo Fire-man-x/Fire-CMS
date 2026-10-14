@@ -5,7 +5,7 @@ namespace App\AdminModule\Forms\CategorySubtype;
 
 use App\AdminModule\Forms\AdminForm;
 use App\AdminModule\Forms\AdminFormValues;
-use App\Modules\UrlModule\UrlManager;
+use App\Model\UrlManager;
 
 class DefaultFormPart implements ICategoryFormType
 {

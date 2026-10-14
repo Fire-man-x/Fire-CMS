@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\FrontModule\Components\DynamicForms;
 
+use App\AdminModule\Presenters\BasePresenter;
 use App\DI\IPluginComponentFactory;
 use Nette\Application\UI\Presenter;
 use Nette\ComponentModel\IComponent;
@@ -20,7 +21,9 @@ class ContactFormComponentFactory implements IPluginComponentFactory
 
 	public function createComponent(Presenter $presenter): IComponent
 	{
-		$this->control->setLanguage($presenter->editLocale);
+		if($presenter instanceof BasePresenter) {
+			$this->control->setLanguage($presenter->editLocale);
+		}
 
 		return $this->control;
 	}

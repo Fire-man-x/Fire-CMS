@@ -14,8 +14,8 @@ class Role implements \Nette\Security\Role
 	const member = 'member';
 	const admin = 'admin';
 
-	public $id = null;
-	public $role = null;
+	public int|string $id;
+	public string $role;
 
 
 	public function __construct()
@@ -24,8 +24,8 @@ class Role implements \Nette\Security\Role
 		// instance of User or Identity
 		if (func_num_args() == 1) {
 			if ($args[0] instanceof User) {
-				$this->role = $args[0]->getIdentity()->getRoles();
-				$this->id = $args[0]->getIdentity()->id;
+				$this->role = current($args[0]->getIdentity()->getRoles());
+				$this->id = $args[0]->getIdentity()->getId();
 			} elseif ($args[0] instanceof SimpleIdentity) {
 				$this->role = $args[0]->role;
 				$this->id = $args[0]->id;

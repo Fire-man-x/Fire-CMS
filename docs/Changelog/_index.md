@@ -4,6 +4,10 @@ Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na det
 
 ## 2026-10-14
 
+- **URL a přesměrování bez `UrlModule`.** `App\Model\UrlManager`, modely `App\Model\Database\Urls`/`Redirections`,
+  presenter a formuláře v `app/AdminModule`. `PresenterFactory` už neprohledává `app/Modules`.
+  Viz [2026-10-14-urls-from-module.md](2026-10-14-urls-from-module.md).
+
 - **VisualPaginator 4.0.2 pro PHP 8.3, Nette 3.3 a Latte 3.** `libs/VisualPaginator-4.0.2` bez zastaralých API
   (session, `@persistent`, `{php}`), typovaná šablona `VisualPaginatorTemplate`. Opraveno: hodnota v session při
   vypnutém výběru počtu položek už nevyhodí výjimku a změna počtu položek přes AJAX platí hned. Nové

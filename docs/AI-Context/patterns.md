@@ -52,8 +52,7 @@ Pole nejsou přímo na formuláři, ale v kontejnerech:
 
 Handlery mají typy `(AdminForm $form, AdminFormValues $values): void`. `AdminForm::setDefaults()` rozdělí plochý
 řádek (`$row->toArray()`) do `data`, překlady předávejte pod klíčem `locales` (`['locales' => [$language => [...]]]`).
-Vzor je `DomainFormFactory`. Všechny formuláře v `app/AdminModule/Forms/` už jsou v tomto formátu. Přímo
-z `App\Forms\BaseFormFactory` (pole na formuláři) dědí jen formuláře `UrlModule`.
+Vzor je `DomainFormFactory`. Všechny formuláře v `app/AdminModule/Forms/` už jsou v tomto formátu.
 
 ```php
 declare(strict_types=1);

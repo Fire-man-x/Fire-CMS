@@ -1,9 +1,8 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\CommentsModule\Model;
+namespace App\Model\Database;
 
-use App\Model\Database\BaseModel;
 use App\Service\LanguageService;
 use Nette\Database\Explorer;
 use Nette\Database\Table\Selection;

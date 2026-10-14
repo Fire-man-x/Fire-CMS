@@ -12,7 +12,7 @@ use App\Attributes\Secured;
 use App\Components\CategoriesMenu\CategoriesMenu;
 use App\Model\Database\Categories;
 use App\Model\Database\Files;
-use App\Modules\UrlModule\UrlManager;
+use App\Model\UrlManager;
 use App\Service\Category;
 use App\Service\Meta;
 use App\Service\Tag;

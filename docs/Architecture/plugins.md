@@ -3,8 +3,8 @@
 Tři mechanismy rozšíření jádra:
 
 - **`app/Modules/<Name>Module/`** — funkční oblasti dodávané jako součást jádra samotného. Aktuálně:
-  `CommentsModule`, `UrlModule` (obě mají obsah), `CoreModule` (prázdný adresář, zatím bez obsahu — rezerva
-  do budoucna, ne fungující modul). Modul obvykle má vlastní `Model/`, `Forms/`, `Components/` a podstrom
+  žádný — URL i komentáře jsou ve standardní struktuře `app/Model`, `app/AdminModule`, `app/FrontModule`
+  a adresář `app/Modules` v jádře není. Modul obvykle má vlastní `Model/`, `Forms/`, `Components/` a podstrom
   `AdminModule/` (občas i `FrontModule/`) s presentery/šablonami. Modul se nedá "vypnout" — je to napořád
   součást jádra.
 - **`app/Plugins/<Name>/`** — SYSTÉMOVÝ plugin: volitelná funkcionalita, ale obecná/znovupoužitelná napříč
@@ -76,10 +76,9 @@ verze migrace se píše podle stejných pravidel převodu jako u jádra (`Archit
 
 Výchozí Nette mapování je `App\*Module\Presenters\*Presenter`. `application.presenterFactory` je v
 `config.neon` přepsané na `App\Application\PresenterFactory` — když výchozí mapování třídu nenajde, jako
-fallback prohledá `app/Plugins`, `app/Modules` a `theme/Plugins` na soubory `*Presenter.php` (čtením
-obsahu souboru, ne přes RobotLoader index). Díky tomu můžou presentery ležet pod vlastním namespace, např.
-`App\Plugins\<Name>\AdminModule\Presenters\<Name>Presenter` nebo
-`App\Modules\CommentsModule\AdminModule\CommentsPresenter`. Při nejednoznačnosti krátkého jména napříč
+fallback prohledá `app/Plugins` a `theme/Plugins` na soubory `*Presenter.php` (čtením
+obsahu souboru, ne přes RobotLoader index; seznam adresářů je `setScanDirs()` v `config.neon`). Díky tomu můžou
+presentery ležet pod vlastním namespace, např. `App\Plugins\<Name>\AdminModule\Presenters\<Name>Presenter`. Při nejednoznačnosti krátkého jména napříč
 více plugin/modulovými stromy se rozlišuje porovnáním prostředního segmentu jména presenteru s názvem
 složky pluginu/modulu — detaily viz doc komentář `App\Application\PresenterFactory`.
 

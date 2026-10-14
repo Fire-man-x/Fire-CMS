@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\AdminModule\Forms;
 
 use App\Model\Database\Sections;
-use App\Modules\UrlModule\UrlManager;
+use App\Model\UrlManager;
 use Nette\InvalidArgumentException;
 
 /**

@@ -9,7 +9,7 @@ use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Model\Database\Files;
 use App\Model\Database\Pages;
-use App\Modules\UrlModule\UrlManager;
+use App\Model\UrlManager;
 use Contributte\Datagrid\Datagrid;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Form;

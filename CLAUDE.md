@@ -56,7 +56,7 @@ composer stan-generate-baseline  # znovu vygeneruje app/config/phpstan-baseline.
 composer stan-report             # tabulkový report zapsaný do log/phpstan-report.txt
 composer stan-report-json        # JSON report zapsaný do log/phpstan-report.json
 composer test                    # Nette Tester nad tests/; lze zadat i konkrétní cestu:
-composer test -- tests/Modules/UrlModule
+composer test -- tests/Model
 ```
 
 - Spuštění `composer stan` nad celým stromem `app/` může odhalit i chyby nesouvisející s vaší konkrétní
@@ -125,23 +125,24 @@ V `app/Router/` jsou tři poskytovatelé routerů, automaticky registrovaní př
 `router.priorities` v `config.neon`:
 - `AdminRouter` — `/administrace/<presenter>/<action>[/<id>]`, modul `Admin`.
 - `FrontRouter` — deleguje na `CustomRouter`, který zjišťuje hezká URL proti databázově podloženému
-  `UrlModule\UrlManager` (nejde o statickou route masku); jako záložní variantu používá
+  `App\Model\UrlManager` (nejde o statickou route masku); jako záložní variantu používá
   `[<locale>/]<presenter>/<action>[/<id>]`, modul `Front`.
 - `FileRouter` — nižší priorita, pro URL souborů/assetů.
 
 Výchozí hledání třídy presenteru je `App\*Module\Presenters\*Presenter`, ale `application.presenterFactory`
 je v `config.neon` přepsaná na `App\Application\PresenterFactory` (`app/Application/PresenterFactory.php`),
-která — pokud výchozí mapování třídu nenajde — jako záložní variantu prohledá `app/Plugins`, `app/Modules` a
-`theme/Plugins` na soubory `*Presenter.php`. Díky tomu můžou presentery ležet uvnitř stromů pluginů/modulů
-pod vlastním namespace, např. `App\Plugins\<Name>\AdminModule\Presenters\<Name>Presenter` nebo
-`App\Modules\CommentsModule\AdminModule\CommentsPresenter`. Pokud je krátký název presenteru nejednoznačný
+která — pokud výchozí mapování třídu nenajde — jako záložní variantu prohledá `app/Plugins` a
+`theme/Plugins` na soubory `*Presenter.php`. Díky tomu můžou presentery ležet uvnitř stromů pluginů
+pod vlastním namespace, např. `App\Plugins\<Name>\AdminModule\Presenters\<Name>Presenter`. Pokud je krátký název presenteru nejednoznačný
 napříč více pluginy/moduly, rozlišuje se porovnáním prostředního segmentu názvu presenteru s názvem složky
 pluginu/modulu — než budete tuto logiku měnit, přečtěte si podrobnosti v doc komentáři třídy.
 
 ### Dva mechanismy rozšíření — Modules vs. Plugins
-- `app/Modules/<Name>Module/` — funkční oblasti dodávané jako součást samotného jádra (např. `UrlModule`,
-  `CommentsModule`). Každá obvykle má vlastní `Model/`, `Forms/`, `Components/` a podstrom `AdminModule/`
-  (občas i `FrontModule/`) s presentery/šablonami.
+- `app/Modules/<Name>Module/` — funkční oblasti dodávané jako součást samotného jádra. Aktuálně žádný modul
+  není: URL (`Urls`, `Redirections`, `UrlManager`) i komentáře jsou ve standardní struktuře `app/Model`,
+  `app/AdminModule`, `app/FrontModule`, a `PresenterFactory` adresář `app/Modules` neprohledává. Nový modul
+  by měl vlastní `Model/`, `Forms/`, `Components/` a podstrom `AdminModule/` (občas i `FrontModule/`) a do
+  `setScanDirs()` v `config.neon` by se musel přidat.
 - `app/Plugins/<Name>/` — schválený způsob, jak přidat volitelnou/klientsky specifickou funkcionalitu bez
   úpravy souborů jádra (viz Konvence níže); zapojuje se přes vlastní `config.plugin.neon`, který je
   includován z `theme/config/plugins.neon`.
@@ -178,8 +179,8 @@ soubory ukládá `FlysystemStorage` na lokální disk nebo S3 podle `fileStorage
 povolené v `fileStorage: <název>: thumbnails:`; úložišť může být víc, každé s vlastním schématem názvů
 (`NamingScheme`) - viz `docs/Architecture/file-storage.md`), Menus (menu), Tags (štítky), Metas
 (SEO meta na úrovni článku/kategorie), Users/Roles (uživatelé/role), Languages (vícejazyčnost přes
-`LiveTranslator` plus vlastní model `Languages`/`LanguageService`), `UrlModule` (vlastní hezká URL +
-přesměrování, se kterými pracuje `CustomRouter`), `CommentsModule` (komentáře).
+`LiveTranslator` plus vlastní model `Languages`/`LanguageService`), Urls/Redirections (vlastní hezká URL +
+přesměrování, `App\Model\UrlManager`, administrace `:Admin:Settings:Urls`, pracuje s nimi `CustomRouter`), `CommentsModule` (komentáře).
 
 ## Konvence (`doc/conventions.md`)
 - Plugin/balíček vždy staví na Fire CMS a **nikdy** nesmí přímo upravovat zdrojové soubory jádra (např.

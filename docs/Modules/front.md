@@ -14,7 +14,7 @@ namespace odlišný od administrace (viz `Architecture/presenters.md`).
 
 ## Routing na frontend
 
-Řeší `CustomRouter`/`FrontRouter`, viz `Architecture/routing.md` — hezká URL z DB (`UrlModule`), fallback
+Řeší `CustomRouter`/`FrontRouter`, viz `Architecture/routing.md` — hezká URL z DB (`App\Model\UrlManager`), fallback
 `[<locale>/]<presenter>/<action>[/<id>]`.
 
 ## Homepage a obsah

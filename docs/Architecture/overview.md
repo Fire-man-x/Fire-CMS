@@ -60,7 +60,7 @@ composer stan-report-json        # JSON report do log/phpstan-report.json
 
 `composer test` spouští Nette Tester nad `tests/` (viz `AI-Context/gotchas.md` sekce "Testování přes Nette
 Tester"). Většinou jde o integrační testy nad in-memory SQLite Explorerem sestaveným ručně (bez DI
-kontejneru) — vhodné pro `Model`/business-logic třídy nezávislé na presenterech. Pokryté jsou vybrané části
+kontejneru) — vhodné pro `Urls`/business-logic třídy nezávislé na presenterech. Pokryté jsou vybrané části
 (`UrlManager`, `CustomRouter`, menu, stránky, jazyky, překlady, správce souborů), ne celé `app/`. Chybí jakékoliv JS/CSS build nástroje —
 frontendové assety pod `www/` se servírují tak, jak jsou. Aplikace běží na Apache + mod_rewrite
 (`www/.htaccess`); v repozitáři není příkaz pro PHP built-in server ani CLI runtime mimo Composer skripty
