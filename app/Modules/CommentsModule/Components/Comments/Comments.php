@@ -3,11 +3,12 @@ declare(strict_types=1);
 
 namespace App\Modules\CommentsModule\Components\Comments;
 
-use AlesWita\Components\VisualPaginator;
+use AlesWita\VisualPaginator\VisualPaginator;
+use AlesWita\VisualPaginator\VisualPaginatorFactory;
 use App\Forms\CommentFormFactory;
-use App\Model\UserManager;
 use App\Modules\CommentsModule;
 use Nette\Application\UI\Control;
+use Nette\Localization\Translator;
 
 /**
  * Class Comments
@@ -28,12 +29,6 @@ class Comments extends Control
 
 	private string $templateFile;
 
-	private \Nette\Localization\Translator $translator;
-
-	private CommentFormFactory $commentFormFactory;
-
-	private CommentsModule\Comment $commentsService;
-
 	private string $language;
 
 	private string $type;
@@ -42,11 +37,12 @@ class Comments extends Control
 	/**
 	 * Comments Component
 	 */
-	public function __construct(\Nette\Localization\Translator $translator, CommentFormFactory $commentFormFactory, CommentsModule\Comment $commentsService)
-	{
-		$this->translator = $translator;
-		$this->commentFormFactory = $commentFormFactory;
-		$this->commentsService = $commentsService;
+	public function __construct(
+		private readonly Translator $translator,
+		private readonly CommentFormFactory $commentFormFactory,
+		private readonly CommentsModule\Comment $commentsService,
+		private readonly VisualPaginatorFactory $visualPaginatorFactory,
+	) {
 	}
 
 
@@ -138,7 +134,6 @@ class Comments extends Control
 
 	/**
 	 * Load subcomments
-	 * @return VisualPaginator
 	 */
 	protected function loadSubComments($fromCommentId)
 	{
@@ -147,18 +142,12 @@ class Comments extends Control
 
 
 	/**
-	 * Paginator factory.
-	 * @return VisualPaginator
+	 * Paginator factory - pevně 10 komentářů na stránku, bez výběru počtu
 	 */
-	protected function createComponentPaginator()
+	protected function createComponentPaginator(): VisualPaginator
 	{
-		$vp = new VisualPaginator();
-		//$vp->setCanSetItemsPerPage(true);
-		//$vp->setItemsPerPageList(array(1,2,3,10=>10))
-		$vp->setItemsPerPage(10);
-		$vp->setTranslator($this->translator);
-
-		return $vp;
+		return $this->visualPaginatorFactory->create()
+			->setDefaultItemsPerPage(10);
 	}
 
 

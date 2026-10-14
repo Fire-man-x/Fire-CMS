@@ -3,32 +3,29 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Forms;
 
-use App\Forms\BaseFormFactory;
 use App\Model;
 use App\Service\LanguageService;
 use App\Service\ProjectFolders;
 use Nette\Application\UI\Form;
 use Nette\Localization\Translator;
+use Nette\Utils\ArrayHash;
 use Nette\Utils\Finder;
 use Nette\Utils\Html;
 
 
-class SettingFormFactory extends BaseFormFactory
+class SettingFormFactory extends AdminFormFactory
 {
-	/** Kontejner globálních (nepřekládaných) hodnot - klíče z Settings::GLOBAL_COLUMN_MAP */
-	private const GlobalContainer = 'global';
-
 	public function __construct(
-		private Model\Database\Settings $model,
-		private LanguageService         $languages,
-		private Translator              $translator,
-		private ProjectFolders          $projectFolders,
+		private readonly Model\Database\Settings $model,
+		private readonly LanguageService $languages,
+		private readonly Translator $translator,
+		private readonly ProjectFolders $projectFolders,
 	) {
 		parent::__construct();
 	}
 
 
-	public function create(int|string $editId = null): Form
+	public function create(int|string|null $editId = null): AdminForm
 	{
 		$form = parent::create($editId);
 
@@ -44,10 +41,10 @@ class SettingFormFactory extends BaseFormFactory
 			$templatesItems[$dirName] = $dirName;
 		}
 
-		// globální (nepřekládané) hodnoty jednou ve vlastním kontejneru - dřív se opakovaly v každém jazyce
-		// a při uložení vyhrála hodnota z posledního jazykového kontejneru
+		// globální (nepřekládané) hodnoty jednou v kontejneru `data` (klíče z Settings::GLOBAL_COLUMN_MAP) - dřív se
+		// opakovaly v každém jazyce a při uložení vyhrála hodnota z posledního jazykového kontejneru
 		$form->addGroup('Global settings');
-		$global = $form->addContainer(self::GlobalContainer);
+		$global = $form->data;
 		$global->addText('image_resolution', 'Resize image after upload to')
 			->setNullable()
 			->setTranslator(null)
@@ -76,8 +73,10 @@ class SettingFormFactory extends BaseFormFactory
 
 		foreach ($this->languages->getLanguages() as $languageId => $language) {
 			// Html = renderer popisek skupiny už znovu nepřekládá (jinak by "Jazyk: CS" skončil v nepřeložených)
-			$form->addGroup(Html::el()->setText($this->translator->translate('Language') . ': ' . $language));
-			$container = $form->addContainer($languageId);
+			$group = $form->addGroup(Html::el()->setText($this->translator->translate('Language') . ': ' . $language));
+			// kontejner jazyka přebírá skupinu z `locales` (ten vznikl u prvního jazyka) - skupinu nastavíme sami
+			$container = $form->locales->addContainer((string) $languageId);
+			$container->setCurrentGroup($group);
 
 			$container->addText('main_title', 'Web title')
 				->setNullable();
@@ -99,12 +98,12 @@ class SettingFormFactory extends BaseFormFactory
 		}
 
 		$form->setCurrentGroup();
-		$form->addSubmit('send', 'Save');
+		$form->buttons->addSubmit('send', 'Save');
 
 		//default values, global values + one language per container
-		$defaults = [self::GlobalContainer => $this->model->getAllForLanguage($this->languages->getDefaultLanguage())];
+		$defaults = ['data' => $this->model->getAllForLanguage($this->languages->getDefaultLanguage()), 'locales' => []];
 		foreach ($this->languages->getLanguages() as $languageId => $language) {
-			$defaults[$languageId] = $this->model->getAllForLanguage($languageId);
+			$defaults['locales'][$languageId] = $this->model->getAllForLanguage((string) $languageId);
 		}
 		$form->setDefaults($defaults);
 
@@ -113,15 +112,12 @@ class SettingFormFactory extends BaseFormFactory
 	}
 
 
-	public function formSucceeded($form, $values)
+	public function formSucceeded(AdminForm $form, AdminFormValues $values): void
 	{
-		unset($values->editId);
-
 		$settingId = $this->model->getMainSettingId();
-		$this->model->saveGlobal($settingId, $values->{self::GlobalContainer});
-		unset($values->{self::GlobalContainer});
-		foreach ($values as $languageId => $languageValues) {
-			$this->model->saveForLanguage($settingId, $languageId, $languageValues);
+		$this->model->saveGlobal($settingId, $values->data);
+		foreach ($values->locales as $languageId => $languageValues) {
+			$this->model->saveForLanguage($settingId, (string) $languageId, ArrayHash::from($languageValues));
 		}
 	}
 }

@@ -134,6 +134,31 @@ implementace v repozitáři. Řešení: buď žádný nativní typ (a `@return a
 v docblocku implementace, starší styl — viz `Model\Modules`/`Model\Roles`), nebo nativní `: array|Selection`
 (nový styl, preferovaný kvůli "Tvrdá pravidla" v `CLAUDE.md`). NEDĚLAT `: array` samotné.
 
+## `AdminForm`: pole v kontejnerech `data` / `locales` / `buttons`
+
+Formuláře z `AdminFormFactory` (`app/AdminModule/Forms/`) mají pole v kontejnerech, takže HTML jméno je
+`data[active]`, `locales[cs][title]`, `buttons[send]`. Ručně vykreslená šablona proto musí psát
+`{input data-active:}`, `{input buttons-send}`, `$form['data']['status']` a `$form['locales'][$actualLanguage]['title']`.
+Staré `{input active:}` nebo `$form['translation'][...]` spadne na neexistující komponentě. Totéž platí v PHP
+(`$form->data['parentId']`, ne `$form['parentId']`).
+
+`AdminFormValues::$locales` má nativní typ `array`, a proto Nette vrací překlady jako **pole**
+(`$values->locales['cs']['title']`), ne `ArrayHash` jako u `$values->data`. Modely, které chtějí `ArrayHash`
+(`Articles::updateTranslation()`, `Category::insert()`), dostanou `ArrayHash::from($values->locales[$language])`.
+
+Extension metody (`addTagInput()`) volané na `$form->data` PHPStan nezná (`Nette\Forms\Container`). Ovládací prvek
+vytvořte přímo a přidejte ho přes `$form->data->addComponent(new TagInput(...), 'tags')`, viz `ArticleFormFactory`.
+
+Výjimka je upload `addFileUpload()` (jquery-fileupload): knihovna hledá soubor i token podle plochého HTML jména
+(`$files[$control->getHtmlName()]`, POST `<jméno>-token`), takže v `data[files]` by upload nefungoval. Prvek zůstává
+přímo na formuláři se `setOmitted()` (`AdminFormValues` nemá vlastnost `files`) a hodnota se čte z prvku, viz
+`FilesManagerUploadFormFactory`.
+
+Skupiny (`$form->addGroup()`) a kontejnery jazyků: `Container::addContainer()` převezme aktuální skupinu rodiče.
+`locales` vzniká líně při prvním přístupu, takže všechny kontejnery jazyků by skončily ve skupině prvního jazyka.
+Každému kontejneru jazyka nastavte skupinu ručně (`$form->locales->addContainer($lang)->setCurrentGroup($group)`),
+viz `SettingFormFactory`.
+
 ## `Vodacek\Forms\Controls\DateInput::addOwnDate()` vs. nativní `addDate()`
 
 `DateInput::register()` (volané např. v `MenusPresenter::startup()`) registruje extension metodu
@@ -480,7 +505,7 @@ Pasti, na které narazíte u staré vendorované knihovny:
 
 ## Antispam (`addAntiSpam()`) padá při vykreslení formuláře
 
-`Zet\AntiSpam\AntiSpamControl::__construct()` (`app/Components/jzechy/nette-antispam`) volá `monitor(Presenter::class)`
+`Zet\AntiSpam\AntiSpamControl::__construct()` (`../../libs/jzechy/nette-antispam`) volá `monitor(Presenter::class)`
 bez callbacku. Současná `nette/component-model` to odmítne výjimkou „At least one handler is required.“, takže každý
 formulář s antispamem (kontaktní formulář DynamicForms) spadne už při vytvoření. Oprava: předat callback
 (`$this->monitor(Presenter::class, fn(Presenter $p) => $this->validator->setSession($p->getSession()))`) místo

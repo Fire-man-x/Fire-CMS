@@ -13,7 +13,10 @@ final class AdminFormValues
 
 	public ArrayHash $buttons;
 
-	/** @var array<string,ArrayHash> language => values */
+	/**
+	 * Vlastnost má typ `array`, proto Nette vrací i vnořené kontejnery jazyků jako pole (ne ArrayHash)
+	 * @var array<string, array<string, mixed>> language => values
+	 */
 	public array $locales;
 
 	public static function create(): static

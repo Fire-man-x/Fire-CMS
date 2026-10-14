@@ -3,37 +3,38 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Forms;
 
-use App\Forms\BaseFormFactory;
 use App\Model;
 use App\Service\LanguageService;
 use Nette\Application\UI\Form;
+use Nette\Forms\Controls\TextInput;
 use Nette\Utils\ArrayHash;
 
 
-class TagFormFactory extends BaseFormFactory
+class TagFormFactory extends AdminFormFactory
 {
 	public function __construct(
-		private Model\Database\Tags $model,
-		private LanguageService $languages)
-	{
+		private readonly Model\Database\Tags $model,
+		private readonly LanguageService $languages,
+	) {
 		parent::__construct();
 	}
 
 
-	public function create(int|string $editId = null): Form
+	public function create(int|string|null $editId = null): AdminForm
 	{
 		$form = parent::create($editId);
 
 		$form->setTranslator(null);
 
+		// název štítku po jazycích (firecms_tagDescriptions, kontejner locales[languageId][name])
 		foreach ($this->languages->getLanguages() as $languageId => $language) {
-			$container = $form->addContainer($languageId);
-			$container->addText("name", $language)
+			$form->locales->addContainer((string) $languageId)
+				->addText("name", $language)
 				->setNullable()
 				->setTranslator(null);
 		}
 
-		$form->addSubmit('send', 'Save');
+		$form->buttons->addSubmit('send', 'Save');
 
 		$form->onSuccess[] = array($this, 'formSucceeded');
 		$form->onValidate[] = array($this, 'formValidate');
@@ -41,52 +42,52 @@ class TagFormFactory extends BaseFormFactory
 	}
 
 
-	public function formValidate(Form $form, $values)
+	public function formValidate(AdminForm $form, AdminFormValues $values): void
 	{
-		unset($values->editId);
-		
-		foreach ($values as $languageId => $value) {
+		foreach ($values->locales as $languageId => $value) {
 			$query = $this->model->getTranslationTable()
 				->where("languageId", $languageId)
-				->where("name", $value->name);
+				->where("name", $value['name']);
 
 			if($this->isEditMode()){
 				$query->where($this->model->getForeignKeyColumn()." != ?", $this->getEditId());
 			}
 			$name = $query->fetch();
 			if($name){
-				$form[$languageId]['name']->addError("Name '%value' already exist.");
-				$form->getPresenter()->flashMessage(sprintf($form->getTranslator()->translate("Tag in language '%s' already exist."), $languageId), FLASH_FAILED, false);
+				$nameControl = $form->getComponent('locales-' . $languageId . '-name', false);
+				if ($nameControl instanceof TextInput) {
+					$nameControl->addError("Name '%value' already exist.");
+				}
+				// LiveTranslator dosazuje parametry do %s sám (bez parametru by dosadil 0)
+				$message = (string) $form->getTranslator()?->translate("Tag in language '%s' already exist.", $languageId);
+				$form->getPresenter()->flashMessage($message, FLASH_FAILED);
 			}
 		}
 	}
 
-	public function formSucceeded(Form $form, $values)
+
+	public function formSucceeded(AdminForm $form, AdminFormValues $values): void
 	{
 		unset($values->editId);
 
-		$allFilled = true;
 		$allEmpty = true;
-		foreach ($values as $value){
-			if($value["name"] == null){
-				$allFilled = false;
-			}
+		foreach ($values->locales as $value){
 			if($value["name"] != null){
 				$allEmpty = false;
 			}
 		}
 
 		if ($this->isEditMode()) {
-			foreach ($this->languages->getLanguages() as $languageId => $language) {
-				if($values[$languageId]["name"]){
-					$this->model->updateTranslation((int) $this->getEditId(), $languageId, $values[$languageId]);
+			foreach ($values->locales as $languageId => $value) {
+				if($value["name"]){
+					$this->model->updateTranslation((int) $this->getEditId(), (string) $languageId, ArrayHash::from($value));
 				}
 			}
 		} elseif(!$allEmpty) {
 			$id = $this->model->insert(ArrayHash::from([]));
-			foreach ($this->languages->getLanguages() as $languageId => $language) {
-				if($values[$languageId]["name"]){
-					$this->model->insertTranslation($id, $languageId, $values[$languageId]);
+			foreach ($values->locales as $languageId => $value) {
+				if($value["name"]){
+					$this->model->insertTranslation($id, (string) $languageId, ArrayHash::from($value));
 				}
 			}
 		}
@@ -96,13 +97,13 @@ class TagFormFactory extends BaseFormFactory
 	/**
 	 * Set default values to modal form
 	 */
-	public function setDefaultValues(Form $form, int $editId)
+	public function setDefaultValues(Form $form, int $editId): void
 	{
 		$defaults = $this->model->getTranslationTable()
 			->where($this->model->getForeignKeyColumn(), $editId)
 			->fetchAssoc("languageId");
 
-		$form->setDefaults($defaults);
+		$form->setDefaults(['locales' => $defaults]);
 	}
 
 }

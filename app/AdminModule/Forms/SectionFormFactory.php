@@ -5,7 +5,6 @@ namespace App\AdminModule\Forms;
 
 use App\Model\Database\Sections;
 use App\Modules\UrlModule\UrlManager;
-use Nette\Application\UI\Form;
 use Nette\InvalidArgumentException;
 
 /**
@@ -30,10 +29,10 @@ class SectionFormFactory extends AdminFormFactory
 
 		$form = parent::create($editId);
 
-		$form->addCheckbox('active', 'Active')
+		$form->data->addCheckbox('active', 'Active')
 			->setDefaultValue(true);
 
-		$translation = $form->addContainer('translation');
+		$translation = $form->locales->addContainer($language);
 		$translation->addText('title', 'Title')
 			->setRequired(VALIDATE_REQUIRED)
 			->setMaxLength(255)
@@ -46,10 +45,10 @@ class SectionFormFactory extends AdminFormFactory
 		$translation->addText('seoDescription', 'SEO description');
 		$translation->addText('seoKeywords', 'SEO keywords');
 
-		$form->addSubmit('send', 'Save');
+		$form->buttons->addSubmit('send', 'Save');
 
-		$form->onSuccess[] = function (Form $form) use ($language): void {
-			$this->formSucceeded($form, $language);
+		$form->onSuccess[] = function (AdminForm $form, AdminFormValues $values) use ($language): void {
+			$this->formSucceeded($form, $values, $language);
 		};
 
 		if ($this->isEditMode()) {
@@ -64,28 +63,28 @@ class SectionFormFactory extends AdminFormFactory
 			} catch (InvalidArgumentException) {
 				// sekce v tomto jazyce zatím URL nemá
 			}
-			$form->setDefaults($section->toArray() + ['translation' => $translationValues]);
+			$form->setDefaults($section->toArray() + ['locales' => [$language => $translationValues]]);
 		}
 
 		return $form;
 	}
 
 
-	private function formSucceeded(Form $form, string $language): void
+	private function formSucceeded(AdminForm $form, AdminFormValues $values, string $language): void
 	{
-		/** @var array{active: bool, translation: array{title: string, url: string, content: string, seoTitle: string, seoDescription: string, seoKeywords: string}} $values */
-		$values = $form->getValues('array');
-		$translation = $values['translation'];
-		unset($values['translation']);
+		/** @var array{active: bool} $data */
+		$data = (array) $values->data;
+		/** @var array{title: string, url: string, content: string, seoTitle: string, seoDescription: string, seoKeywords: string} $translation */
+		$translation = $values->locales[$language];
 
 		$url = trim($translation['url']) !== '' ? $translation['url'] : $translation['title'];
 		unset($translation['url']);
 
 		if ($this->isEditMode()) {
 			$sectionId = (int) $this->getEditId();
-			$this->model->update($sectionId, $values);
+			$this->model->update($sectionId, $data);
 		} else {
-			$sectionId = $this->model->insertSection($values);
+			$sectionId = $this->model->insertSection($data);
 		}
 
 		$this->model->saveTranslation($sectionId, $language, $translation);

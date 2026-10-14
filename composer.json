@@ -40,7 +40,9 @@
             "App\\": "app",
             "Theme\\": "theme",
 			"Nextras\\Datagrid\\": "./libs/nextras/datagrid/src",
-			"Contributte\\FileUpload\\": "./libs/jzechy/jquery-fileupload/src"
+			"Contributte\\FileUpload\\": "./libs/jzechy/jquery-fileupload/src",
+			"Zet\\AntiSpam\\": "./libs/jzechy/nette-antispam/src",
+			"AlesWita\\VisualPaginator\\": "./libs/VisualPaginator-4.0.2/src"
 		},
         "classmap": [
         ],

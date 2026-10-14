@@ -33,7 +33,7 @@ kořenovém `CLAUDE.md` — ten je závazný, tohle je jen shrnutí pro rychlou 
 ## Typický CRUD presenter
 
 Grid (`Contributte\Datagrid\Datagrid`, zdroj `IDatagridSource::getDatagridSource()`) + modální formulář
-(`BaseFormFactory` potomek, `asModal()`, `setEditId()`/`resetEditMode()`). Plný vzor v
+(`AdminFormFactory` potomek s poli v `$form->data`, `asModal()`, `setEditId()`/`resetEditMode()`). Plný vzor v
 `Architecture/presenters.md` a `AI-Context/patterns.md`.
 
 ## Než začnete upravovat

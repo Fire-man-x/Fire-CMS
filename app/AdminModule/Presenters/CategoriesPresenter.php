@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Presenters;
 
+use App\AdminModule\Forms\CategoryFormFactory;
+use App\AdminModule\Forms\MetaValueFormFactory;
 use App\AdminModule\Presenters\SectionAwareTrait\SectionAwareTrait;
 use App\Attributes\Privilege;
 use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Components\CategoriesMenu\CategoriesMenu;
-use App\Forms\CategoryFormFactory;
-use App\Forms\MetaValueFormFactory;
 use App\Model\Database\Categories;
 use App\Model\Database\Files;
 use App\Modules\UrlModule\UrlManager;

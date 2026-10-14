@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace App\FrontModule\Components\Categories;
 
-use AlesWita\Components\VisualPaginator;
+use AlesWita\VisualPaginator\VisualPaginator;
+use AlesWita\VisualPaginator\VisualPaginatorFactory;
 use App\Model;
 use Nette\Application\UI\Control;
+use Nette\Localization\Translator;
 
 /**
  * Class Categories
@@ -26,20 +28,17 @@ class Categories extends Control
 
 	private string $templateFile;
 
-	private \Nette\Localization\Translator $translator;
-
-	private Model\Database\Categories $categoriesModel;
-
 	private string $language;
 
 
 	/**
 	 * Categories Component
 	 */
-	public function __construct(\Nette\Localization\Translator $translator, Model\Database\Categories $categoriesModel)
-	{
-		$this->translator = $translator;
-		$this->categoriesModel = $categoriesModel;
+	public function __construct(
+		private readonly Translator $translator,
+		private readonly Model\Database\Categories $categoriesModel,
+		private readonly VisualPaginatorFactory $visualPaginatorFactory,
+	) {
 	}
 
 
@@ -122,18 +121,12 @@ class Categories extends Control
 
 
 	/**
-	 * Paginator factory.
-	 * @return VisualPaginator
+	 * Paginator factory - pevně 10 kategorií na stránku, bez výběru počtu
 	 */
-	protected function createComponentPaginator()
+	protected function createComponentPaginator(): VisualPaginator
 	{
-		$vp = new VisualPaginator();
-		//$vp->setCanSetItemsPerPage(true);
-		//$vp->setItemsPerPageList(array(1,2,3,10=>10));
-		$vp->setItemsPerPage(10);
-		$vp->setTranslator($this->translator);
-
-		return $vp;
+		return $this->visualPaginatorFactory->create()
+			->setDefaultItemsPerPage(10);
 	}
 
 }

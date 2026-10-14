@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace App\FrontModule\Components\Articles;
 
-use AlesWita\Components\VisualPaginator;
+use AlesWita\VisualPaginator\VisualPaginator;
+use AlesWita\VisualPaginator\VisualPaginatorFactory;
 use App\FileStorage\FileManager;
 use App\Model;
 use Nette\Application\UI\Control;
+use Nette\Localization\Translator;
 
 /**
  * Class Articles
@@ -17,7 +19,7 @@ class Articles extends Control
 {
 
 	/** articles */
-	private array $articles = array();
+	//private array $articles = array();
 
 	/** Query */
 	private string $query = "";
@@ -27,32 +29,21 @@ class Articles extends Control
 
 	private string $templateFile;
 
-	private \Nette\Localization\Translator $translator;
-
-	private Model\Database\Articles $articlesModel;
-
-	private Model\Database\Files $filesModel;
-
 	private string $language;
-
-	private FileManager $fileManager;
-
-	private Model\Database\Users $usersModel;
-
-	private Model\UserManager $userManager;
 
 
 	/**
 	 * Articles Component
 	 */
-	public function __construct(\Nette\Localization\Translator $translator, Model\Database\Articles $articlesModel, Model\Database\Files $filesModel, FileManager $fileManager, Model\Database\Users $usersModel, Model\UserManager $userManager)
+	public function __construct(
+		private readonly Translator $translator,
+		private readonly Model\Database\Articles $articlesModel,
+		private readonly Model\Database\Files $filesModel,
+		private readonly FileManager $fileManager,
+		private readonly Model\Database\Users $usersModel,
+		private readonly Model\UserManager $userManager,
+		private readonly VisualPaginatorFactory $visualPaginatorFactory)
 	{
-		$this->translator = $translator;
-		$this->articlesModel = $articlesModel;
-		$this->filesModel = $filesModel;
-		$this->fileManager = $fileManager;
-		$this->usersModel = $usersModel;
-		$this->userManager = $userManager;
 	}
 
 
@@ -124,8 +115,10 @@ class Articles extends Control
 			$articles->where("article:" . Model\Database\Articles::RELATION_TAG_TABLE_NAME . ".tagId", $this->tagId);
 		}
 		$itemsCount = $articles->count();
-		$this["paginator"]->setItemCount($itemsCount);
-		$articles->limit($this["paginator"]->getItemsPerPage(), $this["paginator"]->getOffset());
+		/** @var VisualPaginator $paginator */
+		$paginator = $this["paginator"];
+		$paginator->setItemCount($itemsCount);
+		$articles->limit($paginator->getItemsPerPage(), $paginator->getOffset());
 
 		$articlesArray = $articles->fetchAll();
 		foreach ($articlesArray as &$article){
@@ -143,25 +136,19 @@ class Articles extends Control
 		}
 
 		$this->template->articles = $articlesArray;
-		$this->template->showPaginator = $itemsCount > $this["paginator"]->getItemsPerPage();
+		$this->template->showPaginator = $itemsCount > $paginator->getItemsPerPage();
 		$this->template->__imagestore = $this->fileManager;
 		$this->template->render();
 	}
 
 
 	/**
-	 * Paginator factory.
-	 * @return VisualPaginator
+	 * Paginator factory - pevně 10 článků na stránku, bez výběru počtu
 	 */
-	protected function createComponentPaginator()
+	protected function createComponentPaginator(): VisualPaginator
 	{
-		$vp = new VisualPaginator();
-		//$vp->setCanSetItemsPerPage(true);
-		//$vp->setItemsPerPageList(array(1,2,3,10=>10));
-		$vp->setItemsPerPage(10);
-		$vp->setTranslator($this->translator);
-
-		return $vp;
+		return $this->visualPaginatorFactory->create()
+			->setDefaultItemsPerPage(10);
 	}
 
 }

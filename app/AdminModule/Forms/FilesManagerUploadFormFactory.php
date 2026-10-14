@@ -3,22 +3,22 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Forms;
 
+use App\AdminModule\Presenters\FilesManagerPresenter;
 use App\FileStorage\Files\HashFile;
 use App\FileStorage\Files\HashImageEntity;
-use App\Forms\BaseFormFactory;
 use App\Model;
-use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
+use Contributte\FileUpload\FileUploadControl;
 
-class FilesManagerUploadFormFactory extends BaseFormFactory
+class FilesManagerUploadFormFactory extends AdminFormFactory
 {
-	public function __construct(private Model\Database\Files $filesModel)
+	public function __construct(private readonly Model\Database\Files $filesModel)
 	{
 		parent::__construct();
 	}
 
 
-	public function create(int|string $editId = null): Form
+	public function create(int|string|null $editId = null): AdminForm
 	{
 		$form = parent::create($editId);
 
@@ -26,11 +26,15 @@ class FilesManagerUploadFormFactory extends BaseFormFactory
 		 /* ->setRequired(false)
 		  ->addRule(Form::IMAGE);
 		 */
-		$form->addFileUpload('files');
+		// upload zůstává přímo na formuláři, ne v `data`: knihovna jquery-fileupload hledá soubor i token podle
+		// plochého HTML jména (`$files[$control->getHtmlName()]`, POST `<jméno>-token`), `data[files]` by nenašla.
+		// Z hodnot je vynechaný (AdminFormValues vlastnost `files` nemá), hodnota se čte přímo z prvku.
+		$form->addFileUpload('files')
+			->setOmitted();
 		/* ->setRequired(true)
 		  ->addRule(Form::IMAGE); */
 
-		$form->addSubmit('send', 'Save');
+		$form->buttons->addSubmit('send', 'Save');
 
 		$form->onSuccess[] = array($this, 'formSucceeded');
 
@@ -43,19 +47,23 @@ class FilesManagerUploadFormFactory extends BaseFormFactory
 	}
 
 
-	public function formSucceeded(Form $form, ArrayHash $values): void
+	public function formSucceeded(AdminForm $form, AdminFormValues $values): void
 	{
-		if ($values->files) {
+		$filesControl = $form['files'];
+		$files = $filesControl instanceof FileUploadControl ? $filesControl->getValue() : null;
+		$presenter = $form->getPresenter();
+
+		if (is_array($files) && $presenter instanceof FilesManagerPresenter) {
 			\Tracy\Debugger::timer("p");
 			/** @var HashFile $file */
-			foreach ($values->files as $file) {
+			foreach ($files as $file) {
 				/*if($file->isOk()) {
 					$file = $this->multiFileUploadModel->save($file, array());
 				}*/
 
 				$this->filesModel->insert(ArrayHash::from(array(
 					"originalName" => $file->getName(),
-					"fileFolderId" => $form->getPresenter()->id,
+					"fileFolderId" => $presenter->id,
 					"diskName" => $file->getHash(),
 					"extension" => $file->getExtension(),
 					"mimeType" => $file->getMimeType(),
@@ -65,7 +73,7 @@ class FilesManagerUploadFormFactory extends BaseFormFactory
 			}
 			\Tracy\Debugger::log("cas:".\Tracy\Debugger::timer("p"));
 		}
-		$form->getPresenter()->redirect('this');
+		$presenter->redirect('this');
 	}
 
 }

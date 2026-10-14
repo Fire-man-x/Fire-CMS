@@ -19,15 +19,15 @@
 				<br>
 			{/if}
 
-			{$form->getRenderer()->renderPair($form['translation']['title']) |noescape}
-			{$form->getRenderer()->renderPair($form['translation']['url']) |noescape}
-			{$form->getRenderer()->renderPair($form['translation']['content']) |noescape}
+			{$form->getRenderer()->renderPair($form['locales'][$actualLanguage]['title']) |noescape}
+			{$form->getRenderer()->renderPair($form['locales'][$actualLanguage]['url']) |noescape}
+			{$form->getRenderer()->renderPair($form['locales'][$actualLanguage]['content']) |noescape}
 
 			<fieldset>
 				<legend>{_"SEO"}</legend>
-				{$form->getRenderer()->renderPair($form['translation']['seoTitle']) |noescape}
-				{$form->getRenderer()->renderPair($form['translation']['seoDescription']) |noescape}
-				{$form->getRenderer()->renderPair($form['translation']['seoKeywords']) |noescape}
+				{$form->getRenderer()->renderPair($form['locales'][$actualLanguage]['seoTitle']) |noescape}
+				{$form->getRenderer()->renderPair($form['locales'][$actualLanguage]['seoDescription']) |noescape}
+				{$form->getRenderer()->renderPair($form['locales'][$actualLanguage]['seoKeywords']) |noescape}
 			</fieldset>
 		</div>
 
@@ -35,12 +35,12 @@
 			<fieldset>
 				<legend>{_'Actions'}</legend>
 				<div class="row mb-3">
-					<div class="col-sm-3 col-lg-12x col-form-label">{label active: /}</div>
-					<div class="col-sm-9 col-lg-12x"><div class="form-check">{input active:}</div></div>
+					<div class="col-sm-3 col-lg-12x col-form-label">{label data-active: /}</div>
+					<div class="col-sm-9 col-lg-12x"><div class="form-check">{input data-active:}</div></div>
 				</div>
 				<div class="row mb-3">
 					<div class="col-sm-12">
-						{input send class=>'btn btn-primary button'}
+						{input buttons-send class=>'btn btn-primary button'}
 						<a n:if="$sectionId && $hasUrl" n:href=":Front:Sections:detail id=>$sectionId, locale=>$actualLanguage" class="btn btn-secondary" title="{_'Show on web'}" target="blank"><i class="fa fa-eye"></i></a>
 					</div>
 				</div>

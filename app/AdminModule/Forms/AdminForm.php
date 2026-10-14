@@ -28,10 +28,11 @@ use Nette\Forms\Rendering\TwitterBootstrapRenderer;
  * anything this app has.
  *
  * @property-read Container $data Data Container
- * @property-read Generator<string,Container> $locales All language containers
+ * @property-read Container $locales Language containers (languageId => Container)
  * @property-read Container $buttons Buttons container
  * @property array<callable(static, AdminFormValues): void> $onSuccess
  * @property array<callable(static, AdminFormValues): void> $onValidate
+ * @function addFileUpload(string $name, int $maxFiles = null, int $maxFileSize = null)
  */
 class AdminForm extends Form
 {

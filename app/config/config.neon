@@ -80,7 +80,6 @@ extensions:
 	#Input
 	tagInput: Achse\TagInput\Extension
 	dateInput: Vodacek\Forms\Controls\Extension
-	visualpaginator: AlesWita\Components\VisualPaginatorExtension
 	antispam: Zet\AntiSpam\AntiSpamExtension
 
 	#replicator
@@ -152,15 +151,6 @@ fileStorage:
 				- 945x      # plugin Sliders
 			crop: []
 
-visualpaginator:
-	session: @Nette\Http\Session
-	translator: @Nette\Localization\Translator
-	template: AlesWita\Components\VisualPaginator::TEMPLATE_BOOTSTRAP_V4 # without '@' !!!
-	#itemsPerPageList: [1: 1, 2: 2, 3: 3]
-	messages:
-		"send": "paginator.send"
-		"itemsPerPage": "paginator.itemsPerPage"
-
 sentry:
     # Enabled only on production
     enable: %productionMode%
@@ -214,11 +204,13 @@ services:
 	- App\Modules\UrlModule\Model
 	- App\Modules\UrlModule\RedirectionsModel
 	urlManager: App\Modules\UrlModule\UrlManager
+	visualPaginatorFactory: AlesWita\VisualPaginator\VisualPaginatorFactory
+
 
 	- App\Model\Database\Categories
 	- App\Service\Category
-	- App\Forms\CategoryFormFactory
-	- App\Forms\CategorySubtype\DefaultFormPart
+	- App\AdminModule\Forms\CategoryFormFactory
+	- App\AdminModule\Forms\CategorySubtype\DefaultFormPart
 	- App\Modules\UrlModule\Forms\UrlFormFactory
 	- App\Modules\UrlModule\Forms\RedirectionFormFactory
 
@@ -227,8 +219,8 @@ services:
 	- App\Model\Database\Pages
 	- App\Model\Database\Sections
 	- App\Service\Article
-	- App\Forms\ArticleFormFactory
-	- App\Forms\PageFormFactory
+	- App\AdminModule\Forms\ArticleFormFactory
+	- App\AdminModule\Forms\PageFormFactory
 	- App\AdminModule\Forms\SectionFormFactory
 
 	- App\Modules\CommentsModule\Model\Comments
@@ -243,8 +235,8 @@ services:
 	- App\Model\MultiFileUploadModel
 
 	- App\Components\Menu\Model\Menus
-	- App\Forms\MenuFormFactory
-	- App\Forms\MenuItemFormFactory
+	- App\AdminModule\Forms\MenuFormFactory
+	- App\AdminModule\Forms\MenuItemFormFactory
 	- App\Components\Menu\Model\MenuItemTitles
 
 	#Admin\Settings
@@ -265,16 +257,13 @@ services:
 	- App\Model\Database\Metas
 	- App\Model\Database\ArticleMetas
 	- App\Model\Database\CategoryMetas
-	- App\Forms\MetaFormFactory
-	- App\Forms\MetaValueFormFactory
+	- App\AdminModule\Forms\MetaFormFactory
+	- App\AdminModule\Forms\MetaValueFormFactory
 
 
 	#Admin Menu
 	- App\Components\CategoriesMenu\CategoriesMenu
 	- App\Components\FilesManagerMenu\FilesManagerMenu
-
-	#- ondrs\UploadManager\Managers\FileManager
-	- Zet\FileUpload\Model\BaseUploadModel
 
 	#Frontend
 	- App\Components\Menu\Menu

@@ -1,70 +1,22 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Property App\\AdminModule\\Forms\\DomainFormFactory\:\:\$translator is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../AdminModule/Forms/DomainFormFactory.php
-
-		-
-			message: '#^Access to an undefined property Nette\\Forms\\Control\:\:\$value\.$#'
-			identifier: property.notFound
-			count: 1
-			path: ../AdminModule/Forms/DynamicFormFormFactory.php
-
-		-
 			message: '#^Access to an undefined property Nette\\Application\\UI\\Form\:\:\$data\.$#'
 			identifier: property.notFound
 			count: 1
 			path: ../AdminModule/Forms/FilesManagerFileNameFormFactory.php
 
 		-
-			message: '#^Access to an undefined property Nette\\Application\\UI\\Presenter\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: ../AdminModule/Forms/FilesManagerUploadFormFactory.php
-
-		-
-			message: '#^Call to an undefined method Nette\\Application\\UI\\Form\:\:addFileUpload\(\)\.$#'
+			message: '#^Call to an undefined method App\\AdminModule\\Forms\\AdminForm\:\:addFileUpload\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: ../AdminModule/Forms/FilesManagerUploadFormFactory.php
-
-		-
-			message: '#^Call to an undefined method Nette\\ComponentModel\\IComponent\:\:addError\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: ../AdminModule/Forms/LanguageFormFactory.php
-
-		-
-			message: '#^Call to an undefined method Nette\\ComponentModel\\IComponent\:\:setDefaultValue\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../AdminModule/Forms/LanguageFormFactory.php
-
-		-
-			message: '#^Access to an undefined property Nette\\Application\\UI\\Form\:\:\$data\.$#'
-			identifier: property.notFound
-			count: 1
-			path: ../AdminModule/Forms/RoleFormFactory.php
-
-		-
-			message: '#^Call to an undefined method Nette\\ComponentModel\\IComponent\:\:addError\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../AdminModule/Forms/RoleFormFactory.php
 
 		-
 			message: '#^PHPDoc tag @var with type SplFileInfo is not subtype of native type Nette\\Utils\\FileInfo\.$#'
 			identifier: varTag.nativeType
 			count: 1
 			path: ../AdminModule/Forms/SettingFormFactory.php
-
-		-
-			message: '#^Method Nette\\Application\\UI\\Control\:\:flashMessage\(\) invoked with 3 parameters, 1\-2 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: ../AdminModule/Forms/TagFormFactory.php
 
 		-
 			message: '#^Access to an undefined property App\\AdminModule\\Forms\\UserFormFactory\:\:\$sender\.$#'
@@ -93,12 +45,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method App\\AdminModule\\Forms\\UserFormFactory\:\:link\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: ../AdminModule/Forms/UserFormFactory.php
-
-		-
-			message: '#^Class App\\AdminModule\\Forms\\AdminForm constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
 			count: 1
 			path: ../AdminModule/Forms/UserFormFactory.php
 
@@ -217,216 +163,6 @@ parameters:
 			path: ../Components/ViewCounter.php
 
 		-
-			message: '#^Call to an undefined static method Nette\\Utils\\Callback\:\:invoke\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
-
-		-
-			message: '#^PHPDoc tag @param has invalid value \(Nette\\Http\\Session\)\: Unexpected token "\\n\\t \* ", expected variable at offset 33 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
-
-		-
-			message: '#^PHPDoc tag @param has invalid value \(Nette\\Localization\\Translator\)\: Unexpected token "\\n\\t ", expected variable at offset 44 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
-
-		-
-			message: '#^PHPDoc tag @param has invalid value \(array\)\: Unexpected token "\\n\\t ", expected variable at offset 20 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
-
-		-
-			message: '#^PHPDoc tag @param has invalid value \(array\)\: Unexpected token "\\n\\t \* ", expected variable at offset 36 on line 3$#'
-			identifier: phpDoc.parseError
-			count: 2
-			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
-
-		-
-			message: '#^PHPDoc tag @param has invalid value \(bool\)\: Unexpected token "\\n\\t ", expected variable at offset 19 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 2
-			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
-
-		-
-			message: '#^PHPDoc tag @param has invalid value \(int\)\: Unexpected token "\\n\\t \* ", expected variable at offset 18 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 2
-			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
-
-		-
-			message: '#^PHPDoc tag @param has invalid value \(self\)\: Unexpected token "\\n\\t ", expected variable at offset 34 on line 3$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
-
-		-
-			message: '#^PHPDoc tag @param has invalid value \(string\)\: Unexpected token "\\n\\t ", expected variable at offset 37 on line 3$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
-
-		-
-			message: '#^PHPDoc tag @param has invalid value \(string\)\: Unexpected token "\\n\\t ", expected variable at offset 74 on line 4$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
-
-		-
-			message: '#^PHPDoc tag @param has invalid value \(string\|null\)\: Unexpected token "\\n\\t \* ", expected variable at offset 56 on line 3$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
-
-		-
-			message: '#^Strict comparison using \!\=\= between array and null will always evaluate to true\.$#'
-			identifier: notIdentical.alwaysTrue
-			count: 1
-			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
-
-		-
-			message: '#^Strict comparison using \!\=\= between string and null will always evaluate to true\.$#'
-			identifier: notIdentical.alwaysTrue
-			count: 1
-			path: ../Components/VisualPaginator-3.0/src/VisualPaginator.php
-
-		-
-			message: '#^PHPDoc tag @param has invalid value \(Nette\\PhpGenerator\\ClassType\)\: Unexpected token "\\n\\t \* ", expected variable at offset 43 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: ../Components/VisualPaginator-3.0/src/VisualPaginatorExtension.php
-
-		-
-			message: '#^Method AlesWita\\Components\\VisualPaginator\\Tests\\App\\Router\:\:createRouter\(\) has invalid return type Nette\\Application\\IRouter\.$#'
-			identifier: class.notFound
-			count: 1
-			path: ../Components/VisualPaginator-3.0/tests/app/Router.php
-
-		-
-			message: '#^Method AlesWita\\Components\\VisualPaginator\\Tests\\App\\Router\:\:createRouter\(\) should return Nette\\Application\\IRouter but returns Nette\\Application\\Routers\\RouteList\.$#'
-			identifier: return.type
-			count: 1
-			path: ../Components/VisualPaginator-3.0/tests/app/Router.php
-
-		-
-			message: '#^Call to an undefined method AlesWita\\Components\\VisualPaginator\:\:setCanSetItemsPerPage\(\)\.$#'
-			identifier: method.notFound
-			count: 6
-			path: ../Components/VisualPaginator-3.0/tests/app/TestPresenter.php
-
-		-
-			message: '#^Instanceof between string and Zet\\FileUpload\\Model\\IUploadModel will always evaluate to false\.$#'
-			identifier: instanceof.alwaysFalse
-			count: 1
-			path: ../Components/jzechy/jquery-fileupload/src/FileUploadControl.php
-
-		-
-			message: '#^Parameter \#2 \$callback of static method Nette\\Forms\\Container\:\:extensionMethod\(\) expects callable\(Nette\\Forms\\Container\)\: mixed, Closure\(Nette\\Forms\\Container, mixed, mixed\=, mixed\=\)\: Zet\\FileUpload\\FileUploadControl given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Components/jzechy/jquery-fileupload/src/FileUploadControl.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between string and null will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 1
-			path: ../Components/jzechy/jquery-fileupload/src/FileUploadControl.php
-
-		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
-			count: 1
-			path: ../Components/jzechy/jquery-fileupload/src/FileUploadExtension.php
-
-		-
-			message: '#^Strict comparison using \!\=\= between int\|null and false will always evaluate to true\.$#'
-			identifier: notIdentical.alwaysTrue
-			count: 1
-			path: ../Components/jzechy/jquery-fileupload/src/Filter/BaseFilter.php
-
-		-
-			message: '#^Instanceof between Zet\\FileUpload\\Template\\Renderer\\BaseRenderer and Zet\\FileUpload\\Template\\Renderer\\BaseRenderer will always evaluate to true\.$#'
-			identifier: instanceof.alwaysTrue
-			count: 1
-			path: ../Components/jzechy/jquery-fileupload/src/Model/UploadController.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between Zet\\FileUpload\\Filter\\IMimeTypeFilter and null will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 1
-			path: ../Components/jzechy/jquery-fileupload/src/Model/UploadController.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between Zet\\FileUpload\\Template\\Renderer\\BaseRenderer and null will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 1
-			path: ../Components/jzechy/jquery-fileupload/src/Model/UploadController.php
-
-		-
-			message: '#^Property Zet\\FileUpload\\Template\\JavascriptBuilder\:\:\$cache is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../Components/jzechy/jquery-fileupload/src/Template/JavascriptBuilder.php
-
-		-
-			message: '#^Property Zet\\FileUpload\\Template\\JavascriptBuilder\:\:\$renameLink is unused\.$#'
-			identifier: property.unused
-			count: 1
-			path: ../Components/jzechy/jquery-fileupload/src/Template/JavascriptBuilder.php
-
-		-
-			message: '#^Property Zet\\FileUpload\\Template\\JavascriptBuilder\:\:\$uploadUrl is unused\.$#'
-			identifier: property.unused
-			count: 1
-			path: ../Components/jzechy/jquery-fileupload/src/Template/JavascriptBuilder.php
-
-		-
-			message: '#^Call to an undefined static method Nette\\Forms\\Controls\\BaseControl\:\:attached\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: ../Components/jzechy/nette-antispam/src/AntiSpamControl.php
-
-		-
-			message: '#^Constructor of class Zet\\AntiSpam\\AntiSpamControl has an unused parameter \$session\.$#'
-			identifier: constructor.unusedParameter
-			count: 1
-			path: ../Components/jzechy/nette-antispam/src/AntiSpamControl.php
-
-		-
-			message: '#^Method Zet\\AntiSpam\\AntiSpamControl\:\:getError\(\) should return string\|null but returns int\.$#'
-			identifier: return.type
-			count: 1
-			path: ../Components/jzechy/nette-antispam/src/AntiSpamControl.php
-
-		-
-			message: '#^Parameter \#2 \$callback of static method Nette\\Forms\\Container\:\:extensionMethod\(\) expects callable\(Nette\\Forms\\Container\)\: mixed, Closure\(Nette\\Forms\\Container, mixed, mixed\=, mixed\=\)\: Zet\\AntiSpam\\AntiSpamControl given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Components/jzechy/nette-antispam/src/AntiSpamControl.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between string and null will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 1
-			path: ../Components/jzechy/nette-antispam/src/HiddenFields.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between Nette\\Localization\\Translator and null will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 2
-			path: ../Components/jzechy/nette-antispam/src/QuestionGenerator.php
-
-		-
-			message: '#^Negated boolean expression is always false\.$#'
-			identifier: booleanNot.alwaysFalse
-			count: 1
-			path: ../Components/jzechy/nette-antispam/src/Validator.php
-
-		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 1
@@ -449,12 +185,6 @@ parameters:
 			identifier: new.static
 			count: 1
 			path: ../FileStorage/Macro/Nodes/SrcNode.php
-
-		-
-			message: '#^Call to an undefined method Nette\\Application\\UI\\Form\:\:addTagInput\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../Forms/ArticleFormFactory.php
 
 		-
 			message: '#^Instanceof between string and DateTime will always evaluate to false\.$#'
@@ -503,18 +233,6 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: ../Forms/BaseFormPartFactory.php
-
-		-
-			message: '#^Call to an undefined method Nette\\Application\\UI\\Form\:\:addTagInput\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../Forms/CategoryFormFactory.php
-
-		-
-			message: '#^Property App\\FrontModule\\Components\\Articles\\Articles\:\:\$articles is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../FrontModule/Components/Articles/Articles.php
 
 		-
 			message: '#^Property App\\FrontModule\\Components\\Categories\\Categories\:\:\$categories is never read, only written\.$#'
@@ -731,12 +449,6 @@ parameters:
 			identifier: phpDoc.parseError
 			count: 2
 			path: ../Modules/CommentsModule/Comment.php
-
-		-
-			message: '#^Method App\\Modules\\CommentsModule\\Components\\Comments\\Comments\:\:loadSubComments\(\) should return AlesWita\\Components\\VisualPaginator but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: ../Modules/CommentsModule/Components/Comments/Comments.php
 
 		-
 			message: '#^Property App\\Modules\\CommentsModule\\Components\\Comments\\Comments\:\:\$comments is never read, only written\.$#'

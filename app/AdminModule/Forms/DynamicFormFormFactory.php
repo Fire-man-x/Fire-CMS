@@ -3,25 +3,21 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Forms;
 
-use App\Forms\BaseFormFactory;
 use App\Model\Database\DynamicForms;
 use App\Service\LanguageService;
 use Nette\Application\UI\Form;
+use Nette\Forms\Control;
 use Nette\Localization\Translator;
+use Nette\Utils\ArrayHash;
 
 
-class DynamicFormFormFactory extends BaseFormFactory
+class DynamicFormFormFactory extends AdminFormFactory
 {
 	public static string $allLanguages = "All languages";
 
-	private Translator $translator;
-
-	private DynamicForms $model;
-
-	private LanguageService $languages;
-
 	/**
 	 * Types
+	 * @var array<string, string>
 	 */
 	public static array $types = array(
 		'article' => 'Article',
@@ -30,30 +26,31 @@ class DynamicFormFormFactory extends BaseFormFactory
 	);
 
 
-	public function __construct(Translator $translator, LanguageService $languages, DynamicForms $model)
-	{
+	public function __construct(
+		private readonly Translator $translator,
+		private readonly LanguageService $languages,
+		private readonly DynamicForms $model,
+	) {
 		parent::__construct();
-		$this->translator = $translator;
-		$this->languages = $languages;
-		$this->model = $model;
 	}
 
 
-	public function create(int|string $editId = null): Form
+	public function create(int|string|null $editId = null): AdminForm
 	{
 		$form = parent::create($editId);
 
-		$templateNameControl = $form->addText('templateName', 'Name in template')
+		$templateNameControl = $form->data->addText('templateName', 'Name in template')
 			->setRequired(VALIDATE_REQUIRED);
 		$templateNameControl->addRule(Form::Pattern, '\'%label\' can contains only this chars "a-z" or "_".', '[a-z_]+');
-		$templateNameControl->addRule(function ($item) use ($form)
+		$templateNameControl->addRule(function (Control $item) use ($form): bool
 		{
-			if($form->isSubmitted() && !empty($form->getUntrustedValues()->editId))
+			$editId = $form->isSubmitted() ? $form->getUntrustedValues(AdminFormValues::class)->editId ?? null : null;
+			if(!empty($editId))
 			{
-				$this->setEditId($form->getUntrustedValues()->editId);
+				$this->setEditId($editId);
 			}
 
-			$exist = $this->model->findByTemplateName($item->value, $this->isEditMode() ? $this->getEditId() : null)->fetch();
+			$exist = $this->model->findByTemplateName($item->getValue(), $this->isEditMode() ? $this->getEditId() : null)->fetch();
 			if ($exist) {
 				return false;
 			}
@@ -62,12 +59,11 @@ class DynamicFormFormFactory extends BaseFormFactory
 			}
 		}, VALIDATE_EXIST);
 
-		//translation
-		$translationContainer = $form->addContainer('translation');
+		//translation - locales[languageId]
 		$moreLanguages = count($this->languages->getActiveLanguages())>1;
 		foreach($this->languages->getActiveLanguages() as $activeLanguage)
 		{
-			$languageContainer = $translationContainer->addContainer($activeLanguage['languageId']);
+			$languageContainer = $form->locales->addContainer($activeLanguage['languageId']);
 			//title
 			$label = 'Title';
 			if($moreLanguages)
@@ -95,27 +91,28 @@ class DynamicFormFormFactory extends BaseFormFactory
 		}
 
 		//whereToSend
-		$controlWhereToSend = $form->addSelect('whereToSend', 'Where to send', array('email' => 'Email'))
+		$controlWhereToSend = $form->data->addSelect('whereToSend', 'Where to send', array('email' => 'Email'))
 			->setPrompt(PROMPT_VALUE);
 		//afterSendInformations
-		$controlAfterSendInformation = $form->addText('afterSendInformationsEmail', 'Email')
+		$controlAfterSendInformation = $form->data->addText('afterSendInformationsEmail', 'Email')
 			->setHtmlType('email');
 		$controlAfterSendInformation->addConditionOn($controlWhereToSend, Form::Equal, 'email')
 				->addRule(Form::Filled, VALIDATE_REQUIRED)
 				->addRule(Form::Email, VALIDATE_FORMAT);
-		$controlAfterSendInformation->getLabelPrototype()->addAttributes(array('id' => $controlAfterSendInformation->getHtmlId().'-label'));
+		$afterSendInformationId = (string) $controlAfterSendInformation->getHtmlId();
+		$controlAfterSendInformation->getLabelPrototype()->addAttributes(array('id' => $afterSendInformationId.'-label'));
 
 		//add toggle
 		$controlWhereToSend->addCondition(Form::Equal, 'email')
-			->toggle($controlAfterSendInformation->getHtmlId())
-			->toggle($controlAfterSendInformation->getHtmlId().'-label');
+			->toggle($afterSendInformationId)
+			->toggle($afterSendInformationId.'-label');
 
 		//submit
-		$form->addSubmit('send', 'Save');
+		$form->buttons->addSubmit('send', 'Save');
 
 		$form->onValidate[] = array($this, 'formValidate');
 		$form->onSuccess[] = array($this, 'formSucceeded');
-		$form->onError[] = function($form){
+		$form->onError[] = function(AdminForm $form): void {
 			foreach($form->getErrors() as $error)
 			{
 				$form->getPresenter()->flashMessage($error, FLASH_FAILED);
@@ -125,45 +122,42 @@ class DynamicFormFormFactory extends BaseFormFactory
 	}
 
 
-	public function formValidate(Form $form, array $values): void
+	public function formValidate(AdminForm $form, AdminFormValues $values): void
 	{
 		//condition is used on control
 		/*$exist = $this->model->findByTemplateName($values->templateName, $this->isEditMode() ? $this->getEditId() : null)->fetch();
 
 		if ($exist) {
-			$form['templateName']->addError($form->getTranslator()->translate(VALIDATE_EXIST), false);
+			$form->data['templateName']->addError($form->getTranslator()->translate(VALIDATE_EXIST), false);
 
 			$form->getPresenter()->flashMessage(FAIL_SAVE, FLASH_FAILED);
 		}*/
 	}
 
 
-	public function formSucceeded($form, $values): void
+	public function formSucceeded(AdminForm $form, AdminFormValues $values): void
 	{
-		unset($values->editId);
+		$data = $values->data;
 
-		$translations = $values->translation;
-		unset($values->translation);
-
-		$values->afterSendInformations = serialize(array(
-			"send_to" => $values->afterSendInformationsEmail
+		$data->afterSendInformations = serialize(array(
+			"send_to" => $data->afterSendInformationsEmail
 		));
-		unset($values->afterSendInformationsEmail);
+		unset($data->afterSendInformationsEmail);
 
 		if ($this->isEditMode()) {
-			$this->model->update($this->getEditId(), (array) $values);
-			foreach($translations as $language => $translation)
+			$this->model->update((int) $this->getEditId(), (array) $data);
+			foreach($values->locales as $language => $translation)
 			{
-				$this->model->updateTranslation((int) $this->getEditId(), $language, $translation);
+				$this->model->updateTranslation((int) $this->getEditId(), (string) $language, ArrayHash::from($translation));
 			}
 		} else {
 			//autor formuláře - DynamicFormsPresenter podle něj hlídá oprávnění "edit" u vlastních záznamů
-			$values->createdBy = $form->getPresenter()->getUser()->getId();
-			$insertId = $this->model->insert($values);
+			$data->createdBy = $form->getPresenter()->getUser()->getId();
+			$insertId = $this->model->insert($data);
 
-			foreach($translations as $language => $translation)
+			foreach($values->locales as $language => $translation)
 			{
-				$this->model->insertTranslation($insertId, $language, $translation);
+				$this->model->insertTranslation($insertId, (string) $language, ArrayHash::from($translation));
 			}
 		}
 	}
@@ -179,14 +173,16 @@ class DynamicFormFormFactory extends BaseFormFactory
 		$defaults = $this->model->getById($editId);
 		$translations = $this->model->getAllWithTranslation()->where($this->model->getForeignKeyColumn(), $editId);
 
-		if($defaults)
+		if(!$defaults)
 		{
-			$defaults = $defaults->toArray();
-			//todo: sjednotit na jedno misto
-			$afterSendInformations = @unserialize($defaults['afterSendInformations']);
-			$defaults['afterSendInformationsEmail'] = isset($afterSendInformations['send_to']) ? $afterSendInformations['send_to'] : null;
-			$defaults['translation'] = $translations->fetchAssoc('languageId');
+			throw new \InvalidArgumentException("Can not edit item with id '" . $editId . "'");
 		}
+
+		$defaults = $defaults->toArray();
+		//todo: sjednotit na jedno misto
+		$afterSendInformations = is_string($defaults['afterSendInformations']) ? @unserialize($defaults['afterSendInformations'], ['allowed_classes' => false]) : false;
+		$defaults['afterSendInformationsEmail'] = is_array($afterSendInformations) ? ($afterSendInformations['send_to'] ?? null) : null;
+		$defaults['locales'] = $translations->fetchAssoc('languageId');
 
 		$form->setDefaults($defaults);
 	}

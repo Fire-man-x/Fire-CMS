@@ -3,57 +3,58 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Forms;
 
-use App\Forms\BaseFormFactory;
 use App\Model\Database\Sliders;
 use Nette\Application\UI\Form;
+use Nette\Utils\Strings;
 
-class SliderFormFactory extends BaseFormFactory
+class SliderFormFactory extends AdminFormFactory
 {
-	public function __construct(private Sliders $model)
+	public function __construct(private readonly Sliders $model)
 	{
 		parent::__construct();
 	}
 
 
-	public function create(int|string $editId = null): Form
+	public function create(int|string|null $editId = null): AdminForm
 	{
 		$form = parent::create($editId);
 
-		$form->addText('name', 'Title')
+		$form->data->addText('name', 'Title')
 			->setRequired(VALIDATE_REQUIRED);
 
-		$form->addText('location', 'Template location')
+		$form->data->addText('location', 'Template location')
 			->setRequired(VALIDATE_REQUIRED);
 
-		$form->addText('duration', 'Display duration')
+		$form->data->addText('duration', 'Display duration')
 			->setRequired(VALIDATE_REQUIRED)
-			->addRule(Form::INTEGER, VALIDATE_FORMAT);
+			->addRule(Form::Integer, VALIDATE_FORMAT);
 
-		$form->addText('speed', 'Animation speed')
+		$form->data->addText('speed', 'Animation speed')
 			->setRequired(VALIDATE_REQUIRED)
-			->addRule(Form::INTEGER, VALIDATE_FORMAT);
+			->addRule(Form::Integer, VALIDATE_FORMAT);
 
-		$form->addCheckbox('navigation', 'Show navigation');
+		$form->data->addCheckbox('navigation', 'Show navigation');
 
-		$form->addCheckbox('manual', 'Manual');
+		$form->data->addCheckbox('manual', 'Manual');
 
-		$form->addSubmit('send', 'Save');
+		$form->buttons->addSubmit('send', 'Save');
 
 		$form->onSuccess[] = array($this, 'formSucceeded');
 		return $form;
 	}
 
 
-	public function formSucceeded($form, $values): void
+	public function formSucceeded(AdminForm $form, AdminFormValues $values): void
 	{
 		unset($values->editId);
 
-		$values->location = str_replace("-", "_", \Nette\Utils\Strings::webalize($values->location));
+		$location = $values->data['location'];
+		$values->data['location'] = str_replace("-", "_", Strings::webalize(is_string($location) ? $location : ''));
 
 		if ($this->isEditMode()) {
-			$this->model->update($this->getEditId(), (array) $values);
+			$this->model->update((int) $this->getEditId(), (array) $values->data);
 		} else {
-			$this->model->insert($values);
+			$this->model->insert($values->data);
 		}
 	}
 
@@ -63,7 +64,12 @@ class SliderFormFactory extends BaseFormFactory
 	 */
 	public function setDefaultValues(Form $form, int $editId): void
 	{
+		parent::setDefaultValues($form, $editId);
+
 		$defaults = $this->model->getById($editId);
+		if (!$defaults) {
+			throw new \InvalidArgumentException("Can not edit item with id '" . $editId . "'");
+		}
 
 		$form->setDefaults($defaults);
 	}

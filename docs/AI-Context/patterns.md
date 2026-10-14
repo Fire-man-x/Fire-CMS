@@ -37,62 +37,71 @@ Registrace v `app/config/config.neon`, sekce `services:` (anonymní, autowired p
 ```neon
 services:
     - App\Model\Database\X
-    - App\Forms\XFormFactory
+    - App\AdminModule\Forms\XFormFactory
 ```
 
 ## Form factory
 
+Formuláře administrace leží v `app/AdminModule/Forms/` a dědí z `AdminFormFactory`, který vrací `AdminForm`.
+Pole nejsou přímo na formuláři, ale v kontejnerech:
+
+- `$form->data` - hodnoty řádku (`$values->data` je `ArrayHash`),
+- `$form->locales->addContainer($language)` - překlad (řádek `*Descriptions`) pro jazyk (`$values->locales[$language]`
+  je **pole**, ne `ArrayHash`),
+- `$form->buttons` - tlačítka.
+
+Handlery mají typy `(AdminForm $form, AdminFormValues $values): void`. `AdminForm::setDefaults()` rozdělí plochý
+řádek (`$row->toArray()`) do `data`, překlady předávejte pod klíčem `locales` (`['locales' => [$language => [...]]]`).
+Vzor je `DomainFormFactory`. Všechny formuláře v `app/AdminModule/Forms/` už jsou v tomto formátu. Přímo
+z `App\Forms\BaseFormFactory` (pole na formuláři) dědí jen formuláře `UrlModule`.
+
 ```php
 declare(strict_types=1);
-namespace App\Forms;
+namespace App\AdminModule\Forms;
 
 use App\Model\Database\X;
 use Nette\Application\UI\Form;
-use Nette\Utils\ArrayHash;
 
-class XFormFactory extends BaseFormFactory
+class XFormFactory extends AdminFormFactory
 {
     public function __construct(
-        FormFactory $factory,
         private readonly X $model,
     ) {
-        parent::__construct($factory);
+        parent::__construct();
     }
 
-    public function create(int|string|null $editId = null): Form
+    public function create(int|string|null $editId = null): AdminForm
     {
         $form = parent::create($editId);
-        $form->addText('name', 'Name')->setRequired(VALIDATE_REQUIRED);
-        $form->addSubmit('send', 'Save');
+        $form->data->addText('name', 'Name')->setRequired(VALIDATE_REQUIRED);
+        $form->buttons->addSubmit('send', 'Save');
         $form->onSuccess[] = [$this, 'formSucceeded'];
         return $form;
     }
 
-    public function formSucceeded(Form $form, ArrayHash $values): void
+    public function formSucceeded(AdminForm $form, AdminFormValues $values): void
     {
-        unset($values->editId);
         if ($this->isEditMode()) {
-            $this->model->update($this->getEditId(), (array) $values);
+            $this->model->update((int) $this->getEditId(), (array) $values->data);
         } else {
-            $this->model->insert($values);
+            $this->model->insert($values->data);
         }
     }
 
     public function setDefaultValues(Form $form, int $editId): void
     {
         parent::setDefaultValues($form, $editId);
-        $defaults = [];
-        if ($editId) {
-            $defaults = $this->model->findById($editId)->fetch();
-            $this->setEditId($editId);
-            if (!$defaults) {
-                throw new \InvalidArgumentException("Can not edit item with id '" . $editId . "'");
-            }
+        $defaults = $this->model->getById($editId);
+        if (!$defaults) {
+            throw new \InvalidArgumentException("Can not edit item with id '" . $editId . "'");
         }
         $form->setDefaults($defaults);
     }
 }
 ```
+
+Ručně vykreslená šablona odkazuje na pole přes kontejner: `{input data-active:}`, `{label data-active: /}`,
+`{input buttons-send}`, `$form['data']['status']`, `$form['locales'][$actualLanguage]['title']`.
 
 **Pozor:** pokud `setDefaultValues()` nemá `if ($editId)` guard (rovnou `findById($editId)->fetch()` bez
 podmínky), NEVOLEJTE ji z `handleAdd()` — spadla by na neexistujícím id. V tom případě `handleAdd()` jen

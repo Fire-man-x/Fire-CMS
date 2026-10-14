@@ -3,13 +3,14 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Presenters;
 
+use App\AdminModule\Forms\AdminForm;
+use App\AdminModule\Forms\MenuFormFactory;
+use App\AdminModule\Forms\MenuItemFormFactory;
 use App\Attributes\Privilege;
 use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Components\Menu as MenuComponent;
 use App\Components\Menu\Model\Menus;
-use App\Forms\MenuFormFactory;
-use App\Forms\MenuItemFormFactory;
 use App\Model;
 use Contributte\Datagrid\Datagrid;
 use Contributte\Datagrid\Exception\DatagridColumnStatusException;
@@ -256,7 +257,7 @@ class MenusPresenter extends BasePresenter
 	/**
 	 * Formulář položky menu (modal)
 	 */
-	protected function createComponentMenuItemForm(): Nette\Application\UI\Form
+	protected function createComponentMenuItemForm(): AdminForm
 	{
 		$this->menuItemFactory->asModal();
 		$form = $this->menuItemFactory->create(null, (int) $this->id, (string) $this->editLocale);

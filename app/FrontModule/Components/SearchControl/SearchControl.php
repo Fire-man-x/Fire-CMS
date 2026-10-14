@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace App\FrontModule\Components\SearchControl;
 
-use AlesWita\Components\VisualPaginator;
+use AlesWita\VisualPaginator\VisualPaginator;
+use AlesWita\VisualPaginator\VisualPaginatorFactory;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
+use Nette\Localization\Translator;
 
 /**
  * Class SearchControl
@@ -26,18 +28,15 @@ class SearchControl extends Control
 
 	private string $templateFile;
 
-	private \Nette\Localization\Translator $translator;
-
-	private SearchFormFactory $searchFormFactory;
-
 
 	/**
 	 * SearchControl Component
 	 */
-	public function __construct(\Nette\Localization\Translator $translator, SearchFormFactory $searchFactory)
-	{
-		$this->translator = $translator;
-		$this->searchFormFactory = $searchFactory;
+	public function __construct(
+		private readonly Translator $translator,
+		private readonly SearchFormFactory $searchFormFactory,
+		private readonly VisualPaginatorFactory $visualPaginatorFactory,
+	) {
 	}
 
 
@@ -103,13 +102,8 @@ class SearchControl extends Control
 	 */
 	protected function createComponentPaginator(): VisualPaginator
 	{
-		$vp = new VisualPaginator();
-		//$vp->setCanSetItemsPerPage(true);
-		//$vp->setItemsPerPageList(array(1,2,3,10=>10));
-		$vp->setItemsPerPage(10);
-		$vp->setTranslator($this->translator);
-
-		return $vp;
+		return $this->visualPaginatorFactory->create()
+			->setDefaultItemsPerPage(10);
 	}
 
 

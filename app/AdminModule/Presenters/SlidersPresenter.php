@@ -73,7 +73,9 @@ class SlidersPresenter extends BasePresenter
 
 		foreach ($this->template->items as &$languageItem){
 			foreach ($languageItem as &$item){
-				$item["file"] = $this->filesModel->toFileEntity($item);
+				// fetchAssoc() vrací pole, toFileEntity() potřebuje řádek souboru
+				$file = $this->filesModel->getById((int) $item["fileId"]);
+				$item["file"] = $file ? $this->filesModel->toFileEntity($file) : null;
 			}
 		}
 	}
@@ -299,8 +301,9 @@ class SlidersPresenter extends BasePresenter
 	#[Secured]
 	#[Resource('Sliders')]
 	#[Privilege('edit')]
-	public function handleSortItems(string $language, array $items): void
+	public function handleSortItems(string $language = '', array $items = []): void
 	{
+		// parametry posílá JS až v AJAX požadavku, {link sortItems!} v šabloně je generuje bez nich
 		if(!$language){
 			throw new InvalidArgumentException("Language cannot be empty.");
 		}

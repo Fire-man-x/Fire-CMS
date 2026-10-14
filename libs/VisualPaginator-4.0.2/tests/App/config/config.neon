@@ -1,0 +1,10 @@
+application:
+	mapping:
+		*: App\*Presenter
+
+services:
+	- AlesWita\VisualPaginator\VisualPaginatorFactory
+	- App\RouterFactory::createRouter
+
+	test.presenter:
+		class: App\TestPresenter

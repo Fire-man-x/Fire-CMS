@@ -37,10 +37,9 @@ class UserFormFactory extends AdminFormFactory
 	}
 
 
-	public function create(int|string $editId = null): AdminForm
+	public function create(int|string|null $editId = null): AdminForm
 	{
-		/** @var AdminForm $form */
-		$form = new AdminForm($editId);
+		$form = parent::create($editId);
 
 
 		/*$group = $form->addGroup('Informations', true);
@@ -70,7 +69,7 @@ class UserFormFactory extends AdminFormFactory
 		$form->buttons->addSubmit('save', 'Save');
 
 		if($this->isEditMode()){
-			$values = $this->users->getById($this->getEditId());
+			$values = $this->users->getById((int) $this->getEditId());
 			if($values) {
 				$form->setDefaults($values);
 			}
@@ -86,7 +85,7 @@ class UserFormFactory extends AdminFormFactory
 
 		if($this->isEditMode()){
 			try{
-				$this->userManager->update($this->getEditId(), (array) $values->data);
+				$this->userManager->update((int) $this->getEditId(), (array) $values->data);
 			}catch(DuplicateEmailException|DuplicateNameException $e){
 				$form->addError($e->getMessage());
 			}
@@ -226,7 +225,7 @@ class UserFormFactory extends AdminFormFactory
 	/**
 	 * Set default values to modal form
 	 */
-	public function setDefaultValues(Form $form, int $editId)
+	public function setDefaultValues(Form $form, int $editId): void
 	{
 		throw new \InvalidArgumentException("Is not implemented yet.");
 	}

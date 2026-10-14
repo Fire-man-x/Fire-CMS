@@ -46,6 +46,7 @@ class LanguageService
 
 	/**
 	 * Languages
+	 * @return array<string,string>
 	 */
 	public function getLanguages(): array
 	{
@@ -127,6 +128,7 @@ class LanguageService
 
 	/**
 	 * Admin languages
+	 * @return array<int,string>
 	 */
 	public function getAdminLanguages(): array
 	{

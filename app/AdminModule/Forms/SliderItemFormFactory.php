@@ -3,18 +3,17 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Forms;
 
-use App\Forms\BaseFormFactory;
 use App\Model\Database\SliderItems;
 use Nette\Application\UI\Form;
 
-class SliderItemFormFactory extends BaseFormFactory
+class SliderItemFormFactory extends AdminFormFactory
 {
 	private int $sliderId;
 
 	private string $language;
 
 
-	public function __construct(private SliderItems $model)
+	public function __construct(private readonly SliderItems $model)
 	{
 		parent::__construct();
 	}
@@ -64,38 +63,38 @@ class SliderItemFormFactory extends BaseFormFactory
 	}
 
 
-	public function create(int|string $editId = null): Form
+	public function create(int|string|null $editId = null): AdminForm
 	{
 		$form = parent::create($editId);
 
-		$form->addText('url', 'URL')
+		$form->data->addText('url', 'URL')
 			->setHtmlType("url");
 
-		$form->addText('text', 'Text');
+		$form->data->addText('text', 'Text');
 
-		$form->addHidden("languageId");
+		$form->data->addHidden("languageId");
 
-		$form->addSubmit('send', 'Save');
+		$form->buttons->addSubmit('send', 'Save');
 
 		$form->onSuccess[] = array($this, 'formSucceeded');
 		return $form;
 	}
 
 
-	public function formSucceeded($form, $values): void
+	public function formSucceeded(AdminForm $form, AdminFormValues $values): void
 	{
 		unset($values->editId);
 
 
 		if ($this->isEditMode()) {
 			$this->model->findById($this->getSliderId())
-				->where("languageId", $values->languageId)
+				->where("languageId", $values->data['languageId'])
 				->where("position", $this->getEditId())
-				->update($values);
+				->update((array) $values->data);
 		} else {
-			$values->sliderId = $this->getSliderId();
+			$values->data['sliderId'] = $this->getSliderId();
 
-			$this->model->insert($values);
+			$this->model->insert($values->data);
 		}
 	}
 
@@ -105,6 +104,8 @@ class SliderItemFormFactory extends BaseFormFactory
 	 */
 	public function setDefaultValues(Form $form, int $editId): void
 	{
+		parent::setDefaultValues($form, $editId);
+
 		$defaults = $this->model
 			->findById($this->getSliderId())
 			->where("languageId", $this->getLanguage())

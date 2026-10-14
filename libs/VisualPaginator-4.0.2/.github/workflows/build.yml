@@ -1,0 +1,39 @@
+name: "build"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  build:
+    name: "PHPStan + tests (PHP ${{ matrix.php-version }})"
+    runs-on: "ubuntu-latest"
+
+    strategy:
+      matrix:
+        php-version: [ "8.3", "8.4" ]
+      fail-fast: false
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          php-version: "${{ matrix.php-version }}"
+          tools: "composer:v2"
+
+      - name: "Validate Composer"
+        run: "composer validate"
+
+      - name: "Install dependencies"
+        run: "composer update --no-interaction --no-progress --prefer-dist --prefer-stable"
+
+      - name: "PHPStan"
+        run: "vendor/bin/phpstan analyse -c phpstan.neon"
+
+      - name: "Tests"
+        run: "vendor/bin/tester -s -p php --colors 1 -C tests"

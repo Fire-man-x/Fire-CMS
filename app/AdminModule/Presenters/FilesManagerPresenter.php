@@ -3,14 +3,15 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Presenters;
 
-use AlesWita\Components\VisualPaginator;
+use AlesWita\VisualPaginator\VisualPaginator;
+use AlesWita\VisualPaginator\VisualPaginatorFactory;
+use App\AdminModule\Forms\CategoryFormFactory;
 use App\AdminModule\Forms\FilesManagerFileNameFormFactory;
 use App\AdminModule\Forms\FilesManagerUploadFormFactory;
 use App\FileStorage\Files\HashFileEntity;
 use App\FileStorage\Files\HashImageEntity;
 use App\FileStorage\Images\ExifOrientation;
 use App\FileStorage\Storages\FlysystemStorage;
-use App\Forms\CategoryFormFactory;
 use App\Model\Database\FileFolders;
 use App\Model\Database\Files;
 use Nette;
@@ -83,6 +84,9 @@ class FilesManagerPresenter extends BasePresenter
 	/** @inject */
 	public \App\Components\FilesManagerMenu\FilesManagerMenu $filesManagerMenu;
 
+	/** @inject */
+	public VisualPaginatorFactory $visualPaginatorFactory;
+
 
 	protected function startup(): void
 	{
@@ -126,9 +130,11 @@ class FilesManagerPresenter extends BasePresenter
 				break;
 		}
 		$itemsCount = $source->count();
-		$this["paginator"]->setItemCount($itemsCount);
-		$source->limit($this["paginator"]->getItemsPerPage(), $this["paginator"]->getOffset());
-		$this->template->showPaginator = $itemsCount > $this["paginator"]->getItemsPerPage();
+		/** @var VisualPaginator $paginator */
+		$paginator = $this["paginator"];
+		$paginator->setItemCount($itemsCount);
+		$source->limit($paginator->getItemsPerPage(), $paginator->getOffset());
+		$this->template->showPaginator = $itemsCount > $paginator->getItemsPerPage();
 
 		$this->template->files = array();
 		foreach ($source->fetchAll() as $file){
@@ -177,12 +183,12 @@ class FilesManagerPresenter extends BasePresenter
 	 * Files paginator factory.
 	 * @return VisualPaginator
 	 */
-	protected function createComponentPaginator()
+	protected function createComponentPaginator(): VisualPaginator
 	{
 
-		$vp = new VisualPaginator();
+		$vp = $this->visualPaginatorFactory->create();
+		$vp->canSetItemsPerPage = true;
 		$vp->setItemsPerPage(20);
-		$vp->setTranslator($this->translator);
 
 		return $vp;
 	}

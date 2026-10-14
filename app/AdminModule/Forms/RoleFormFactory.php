@@ -6,16 +6,19 @@ namespace App\AdminModule\Forms;
 use App\Model;
 use App\Security\Acl;
 use Nette\Application\UI\Form;
+use Nette\Forms\Controls\TextInput;
 
 class RoleFormFactory extends AdminFormFactory
 {
-	public function __construct(private Model\Database\Roles $model, private Model\Database\Modules $modelModules)
-	{
+	public function __construct(
+		private readonly Model\Database\Roles $model,
+		private readonly Model\Database\Modules $modelModules,
+	) {
 		parent::__construct();
 	}
 
 
-	public function create(int|string $editId = null): AdminForm
+	public function create(int|string|null $editId = null): AdminForm
 	{
 		$form = parent::create($editId);
 
@@ -33,7 +36,7 @@ class RoleFormFactory extends AdminFormFactory
 	}
 
 
-	public function formValidate(AdminForm $form, AdminFormValues $values)
+	public function formValidate(AdminForm $form, AdminFormValues $values): void
 	{
 		$values->data->name = str_replace("-", "_", \Nette\Utils\Strings::webalize($values->data->name));
 
@@ -43,13 +46,16 @@ class RoleFormFactory extends AdminFormFactory
 		}
 		$name = $query->fetch();
 		if ($name) {
-			$form['name']->addError("Name '%value' already exist.");
+			$nameControl = $form->data['name'];
+			if ($nameControl instanceof TextInput) {
+				$nameControl->addError("Name '%value' already exist.");
+			}
 			$form->getPresenter()->flashMessage("Name already exist.", FLASH_FAILED);
 		}
 	}
 
 
-	public function formSucceeded(AdminForm $form, AdminFormValues $values)
+	public function formSucceeded(AdminForm $form, AdminFormValues $values): void
 	{
 		unset($values->editId);
 
@@ -64,7 +70,7 @@ class RoleFormFactory extends AdminFormFactory
 				unset($values->data->name);
 			}
 
-			$this->model->update($this->getEditId(), (array) $values->data);
+			$this->model->update((int) $this->getEditId(), (array) $values->data);
 		} else {
 			$this->model->insert($values->data);
 		}
@@ -74,18 +80,25 @@ class RoleFormFactory extends AdminFormFactory
 	/**
 	 * Set default values to modal form
 	 */
-	public function setDefaultValues(Form $form, int $editId)
+	public function setDefaultValues(Form $form, int $editId): void
 	{
+		parent::setDefaultValues($form, $editId);
+
 		$defaults = $this->model->getById($editId);
-		if ($defaults?->default) {
-			$form->data['name']->getControlPrototype()->readonly(true);
+		if (!$defaults) {
+			throw new \InvalidArgumentException("Can not edit item with id '" . $editId . "'");
+		}
+
+		$nameControl = $form->getComponent('data-name', false);
+		if ($defaults->default && $nameControl instanceof TextInput) {
+			$nameControl->getControlPrototype()->readonly(true);
 		}
 
 		$form->setDefaults($defaults);
 	}
 
 
-	public function createModuleForm(int $editId = null): AdminForm
+	public function createModuleForm(?int $editId = null): AdminForm
 	{
 		$form = parent::create($editId);
 

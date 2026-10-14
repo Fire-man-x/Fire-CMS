@@ -130,7 +130,8 @@ class Settings extends BaseModel implements Translatable
 
 	/**
 	 * Uloží globální (nepřekládané) hodnoty - klíče z GLOBAL_COLUMN_MAP, ostatní ignoruje. Formulář
-	 * Nastavení je má ve vlastním kontejneru `global`, aby se nepřepisovaly hodnotou z jiného jazyka.
+	 * Nastavení je má ve vlastním kontejneru `data` (jazyky jsou v `locales`), aby se nepřepisovaly hodnotou
+	 * z jiného jazyka.
 	 */
 	public function saveGlobal(int $settingId, ArrayHash $data): void
 	{

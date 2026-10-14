@@ -2,6 +2,20 @@
 
 Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na detailní záznam v `Changelog/`.
 
+## 2026-10-14
+
+- **VisualPaginator 4.0.2 pro PHP 8.3, Nette 3.3 a Latte 3.** `libs/VisualPaginator-4.0.2` bez zastaralých API
+  (session, `@persistent`, `{php}`), typovaná šablona `VisualPaginatorTemplate`. Opraveno: hodnota v session při
+  vypnutém výběru počtu položek už nevyhodí výjimku a změna počtu položek přes AJAX platí hned. Nové
+  `setDefaultItemsPerPage()` (pevný počet bez výběru), komponenty Articles, Categories, SearchControl a Comments převedené z 3.0.
+  Viz [2026-10-14-visualpaginator-4-php83.md](2026-10-14-visualpaginator-4-php83.md).
+
+- **Formuláře administrace na `AdminFormFactory`.** Všechny formuláře v `app/AdminModule/Forms/` (článek, kategorie,
+  stránka, sekce, menu, mety, štítky, slidery, nastavení, dynamické formuláře, upload souborů) mají formát
+  `DomainFormFactory`: pole v `data`, překlad v `locales[jazyk]`, tlačítka v `buttons`, typy `AdminForm`/`AdminFormValues`.
+  Šablony odkazují na `{input data-active:}` apod.
+  Viz [2026-10-14-admin-forms-adminformfactory.md](2026-10-14-admin-forms-adminformfactory.md).
+
 ## 2026-10-09
 
 - **Šablony komponent z tématu (`TemplateLookupTrait`), zatím u Menu.** Šablona komponenty se hledá v

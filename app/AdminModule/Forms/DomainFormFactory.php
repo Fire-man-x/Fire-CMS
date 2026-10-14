@@ -3,51 +3,43 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Forms;
 
-use App\Forms\BaseFormFactory;
 use App\Model;
 use App\Service\LanguageService;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\TextInput;
-use Nette\Localization\Translator;
-use Nette\Utils\ArrayHash;
 use Nette\Utils\Strings;
 
 
-class DomainFormFactory extends BaseFormFactory
+class DomainFormFactory extends AdminFormFactory
 {
-
-	private TextInput $domainControl;
-
-
 	public function __construct(
-		private readonly Translator             $translator,
-		private readonly LanguageService        $languages,
+		private readonly LanguageService $languages,
 		private readonly Model\Database\Domains $model,
 	) {
 		parent::__construct();
 	}
 
 
-	public function create(int|string $editId = null): Form
+	public function create(int|string $editId = null): AdminForm
 	{
 		$form = parent::create($editId);
 
-		$form->addCheckbox('active', 'Active');
+		$form->data->addCheckbox('active', 'Active');
 
-		$form->addCheckbox('default', 'Default')
+		$form->data->addCheckbox('default', 'Default')
 			->setOption('description', 'Used for generated links if a language has more than one domain.');
 
-		$form->addSelect('languageId', 'Language', $this->languages->getLanguages())
+		$form->data->addSelect('languageId', 'Language', $this->languages->getLanguages())
 			->setTranslator(null)
 			->setRequired(VALIDATE_REQUIRED);
 
-		$this->domainControl = $form->addText('domain', 'Domain')
+		$domainControl = $form->data->addText('domain', 'Domain')
 			->setRequired(VALIDATE_REQUIRED)
 			->setOption('description', 'Hostname only, e.g. "example.com", without scheme or path.')
 			->addRule(Form::Pattern, '\'%label\' can contain only a hostname, e.g. "example.com".', '[a-z0-9]([a-z0-9.-]*[a-z0-9])?');
-		$this->domainControl->getControlPrototype()->maxlength(255);
+		$domainControl->getControlPrototype()->maxlength(255);
 
-		$form->addSubmit('send', 'Save');
+		$form->buttons->addSubmit('send', 'Save');
 
 		$form->onValidate[] = array($this, 'formValidate');
 		$form->onSuccess[] = array($this, 'formSucceeded');
@@ -55,12 +47,9 @@ class DomainFormFactory extends BaseFormFactory
 	}
 
 
-	/**
-	 * @param array<string,mixed> $values
-	 */
-	public function formValidate(Form $form, array $values): void
+	public function formValidate(AdminForm $form, AdminFormValues $values): void
 	{
-		$domain = Strings::lower($values['domain'] ?? '');
+		$domain = Strings::lower($values->data['domain'] ?? '');
 
 		$query = $this->model->findAll()->where('domain', $domain);
 		if ($this->isEditMode()) {
@@ -68,24 +57,24 @@ class DomainFormFactory extends BaseFormFactory
 		}
 
 		if ($query->fetch()) {
-			$this->domainControl->addError('This domain is already used.');
+			$domainControl = $form->data['domain'];
+			if($domainControl instanceof TextInput){
+				$domainControl->addError('This domain is already used.');
+			}
 			$form->getPresenter()->flashMessage('This domain is already used.', FLASH_FAILED);
 		}
 	}
 
 
-	/**
-	 * @param array<string,mixed> $values
-	 */
-	public function formSucceeded(Form $form, array $values): void
+	public function formSucceeded(AdminForm $form, AdminFormValues $values): void
 	{
-		unset($values['editId']);
-		$values['domain'] = Strings::lower($values['domain']);
+		unset($values->editId);
+		$values->data['domain'] = Strings::lower($values->data['domain']);
 
 		if ($this->isEditMode()) {
-			$this->model->update((int) $this->getEditId(), $values);
+			$this->model->update((int) $this->getEditId(), (array) $values->data);
 		} else {
-			$this->model->insert(ArrayHash::from($values));
+			$this->model->insert($values->data);
 		}
 	}
 

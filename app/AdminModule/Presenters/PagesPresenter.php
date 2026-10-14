@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Presenters;
 
+use App\AdminModule\Forms\PageFormFactory;
 use App\Attributes\Privilege;
 use App\Attributes\Resource;
 use App\Attributes\Secured;
-use App\Forms\PageFormFactory;
 use App\Model\Database\Files;
 use App\Model\Database\Pages;
 use App\Modules\UrlModule\UrlManager;

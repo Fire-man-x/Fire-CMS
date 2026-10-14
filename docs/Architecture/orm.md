@@ -117,7 +117,7 @@ private function findActive(): Selection
 Články (`Articles`), stránky (`Pages` - `firecms_pages` + `firecms_pageDescriptions` + obrázky `firecms_pageFiles`, vnořování
 přes `parentId`/`position`, bez revizí/štítků, URL typu `page` - plochý slug i u podstránek, volitelná šablona
 `template` z `Pages::Templates`, např. `contact`), sekce (`Sections` - `firecms_sections` + `firecms_sectionDescriptions`, kategorie i články mají `sectionId`),
-kategorie (`Categories`, bez sloupce `type`) se zásuvnými „subtypy" přes `app/Forms/CategorySubtype/*FormPart`
+kategorie (`Categories`, bez sloupce `type`) se zásuvnými „subtypy" přes `app/AdminModule/Forms/CategorySubtype/*FormPart`
 (jen `DefaultFormPart`; kategorie nemají typy - odkazy řeší položky menu, galerie a obsahové stránky jsou
 Pages, úvodní stránka je `Front:Homepage`), správce souborů
 (`Files`/`FileFolders`), menu (`Menus`), štítky (`Tags`), SEO meta (`Metas`), uživatelé/role

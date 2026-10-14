@@ -1,4 +1,12 @@
 {varType string $currentSectionTitle}
+{varType array $languages}
+{varType string $actualLanguage}
+{varType int $revisionCount}
+{varType array|null $revisionsList}
+{varType int|null $id}
+{varType array|null $files}
+{varType bool $isWindowMode}
+{varType App\Modules\UrlModule\UrlManager $urlManager}
 {block h1}
 {_"Categories"} <small class="text-muted">{$currentSectionTitle}</small>
 {/block}
@@ -35,20 +43,20 @@
 						<br>
 					{/if}
 
-					{$form->getRenderer()->renderPair($form['translation']['title']) |noescape}
+					{$form->getRenderer()->renderPair($form['locales'][$actualLanguage]['title']) |noescape}
 
-					{$form->getRenderer()->renderPair($form['translation']['url']) |noescape}
+					{$form->getRenderer()->renderPair($form['locales'][$actualLanguage]['url']) |noescape}
 
 					<div>
-						{$form->getRenderer()->renderPair($form['translation']['excerpt']) |noescape}
+						{$form->getRenderer()->renderPair($form['locales'][$actualLanguage]['excerpt']) |noescape}
 
-						{$form->getRenderer()->renderPair($form['translation']['content']) |noescape}
+						{$form->getRenderer()->renderPair($form['locales'][$actualLanguage]['content']) |noescape}
 
 						<fieldset>
 							<legend>{_"SEO"}</legend>
-							{$form->getRenderer()->renderPair($form['translation']['seoTitle']) |noescape}
-							{$form->getRenderer()->renderPair($form['translation']['seoDescription']) |noescape}
-							{$form->getRenderer()->renderPair($form['translation']['seoKeywords']) |noescape}
+							{$form->getRenderer()->renderPair($form['locales'][$actualLanguage]['seoTitle']) |noescape}
+							{$form->getRenderer()->renderPair($form['locales'][$actualLanguage]['seoDescription']) |noescape}
+							{$form->getRenderer()->renderPair($form['locales'][$actualLanguage]['seoKeywords']) |noescape}
 						</fieldset>
 					</div>
 				</div>
@@ -58,15 +66,15 @@
 						<legend>{_'Actions'}</legend>
 						<div class="row mb-3">
 							<div class="col-sm-3 col-lg-12x col-form-label">
-								{label active: /}
+								{label data-active: /}
 							</div>
 
 							<div class="col-sm-9 col-lg-12x">
-								<div class="form-check">{input active:}</div>
+								<div class="form-check">{input data-active:}</div>
 							</div>
 						</div>
 
-						{$form->getRenderer()->renderPair($form['status']) |noescape}
+						{$form->getRenderer()->renderPair($form['data']['status']) |noescape}
 
 						<div n:if="$revisionCount" class="row mb-3">
 							<div class="col-sm-3 col-lg-12x col-form-label">
@@ -90,27 +98,27 @@
 							</div>
 						</div>
 
-						{$form->getRenderer()->renderPair($form['publishingDate']) |noescape}
+						{$form->getRenderer()->renderPair($form['data']['publishingDate']) |noescape}
 
-						{$form->getRenderer()->renderPair($form['expiringDate']) |noescape}
+						{$form->getRenderer()->renderPair($form['data']['expiringDate']) |noescape}
 
 						<div class="row mb-3">
 							<div class="col-sm-3 col-lg-12x col-form-label">
-								{label showInMenu: /}
+								{label data-showInMenu: /}
 							</div>
 
 							<div class="col-sm-9 col-lg-12x">
-								<div class="form-check">{input showInMenu:}</div>
+								<div class="form-check">{input data-showInMenu:}</div>
 							</div>
 						</div>
 
 						<div class="row mb-3">
 							<div class="col-sm-3 col-lg-12x col-form-label">
-								{label public: /}
+								{label data-public: /}
 							</div>
 
 							<div class="col-sm-9 col-lg-12x">
-								<div class="form-check">{input public:}</div>
+								<div class="form-check">{input data-public:}</div>
 							</div>
 						</div>
 
@@ -124,7 +132,7 @@
 							<div class="col-sm-12 col-form-label"></div>
 
 							<div class="col-sm-12">
-								{input send class=>'btn btn-primary button'}
+								{input buttons-send class=>'btn btn-primary button'}
 								{if $id && $urlManager->existUrlByTypeAndKey('category', $id, $actualLanguage)}
 									<a n:href=":Front:Categories:detail id=>$id, locale=>$actualLanguage" class="btn btn-secondary" title="{_'Show on web'}" target="blank"><i class="fa fa-eye"></i></a>
 								{/if}
@@ -134,12 +142,12 @@
 
 					<fieldset>
 						<legend>{_'Tags'}</legend>
-						{input tags class=>'form-control text'}
+						{input data-tags class=>'form-control text'}
 					</fieldset>
 
 					<fieldset class="images-sortable">
 						<legend>{_'Images'} <a href="#" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#modal" data-src="{link :Admin:FilesManager:default isWindowMode=>true}" title="{_'Add'}" ><i class="fa fa-plus"></i></a></legend>
-						{input images}
+						{input data-images}
 						{$filesContainer}
 						{*<img src="/images/thumb.svg" alt="Thumbnail" class="img-thumbnail active" style="width: 6rem;">*}
 					</fieldset>

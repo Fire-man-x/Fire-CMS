@@ -74,7 +74,7 @@ composer test -- tests/Modules/UrlModule
   `app/`) — nový test kód proto ověřte ručně přes `composer stan -- tests`. Podrobnosti a další pasti viz
   `docs/AI-Context/gotchas.md` sekce "Testování přes Nette Tester".
 - Vendorované komponenty třetích stran mají vlastní testy nezávislé na tomhle (např.
-  `app/Components/VisualPaginator-3.0/tests`, `app/Components/mail-panel-master/tests`) — testují tyto
+  `libs/VisualPaginator-3.0`, `app/Components/mail-panel-master/tests`) — testují tyto
   knihovny, ne aplikaci, a `composer test` je nespouští.
 - Chybí jakékoliv JS/CSS build nástroje (žádný `package.json`) — frontendové assety pod `www/` se servírují
   tak, jak jsou.

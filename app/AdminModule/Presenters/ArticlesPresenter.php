@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Presenters;
 
+use App\AdminModule\Forms\ArticleFormFactory;
+use App\AdminModule\Forms\MetaValueFormFactory;
 use App\AdminModule\Presenters\SectionAwareTrait\SectionAwareTrait;
 use App\Attributes\Privilege;
 use App\Attributes\Resource;
 use App\Attributes\Secured;
-use App\Forms\ArticleFormFactory;
-use App\Forms\MetaValueFormFactory;
 use App\Model\Database\Articles;
 use App\Model\Database\Categories;
 use App\Model\Database\Files;

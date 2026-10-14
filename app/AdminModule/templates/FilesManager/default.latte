@@ -1,3 +1,9 @@
+{varType Nette\Database\Table\ActiveRow $folderInfo}
+{varType bool $showPaginator}
+{varType array $files}
+{varType Nette\Database\Table\ActiveRow|null $fileInfo}
+{varType bool $isWindowMode}
+
 {block h1}
 {_"Files manager"}
 {/block}
@@ -20,7 +26,7 @@
 	{capture $modalContent}
 		{form uploadForm}
 			{input files}
-			{$form->getRenderer()->renderPair($form['send']) |noescape}
+			{$form->getRenderer()->renderPair($form['buttons']['send']) |noescape}
 		{/form}
 	{/capture}
 	{include \APP_DIR.'Presenters/templates/Components/modalForm.latte' id=>'modal', label=>$control->translator->translate('Upload'), modalContent=>$modalContent} {*, size=>'modal-sm'*}
