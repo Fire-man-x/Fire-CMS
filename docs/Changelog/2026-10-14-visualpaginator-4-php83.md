@@ -23,6 +23,10 @@ bez zastaralých API. Opravené jsou dvě chyby v práci s počtem položek na s
   (`app/Modules/CommentsModule/Components/`) převedené z `AlesWita\Components\VisualPaginator` (3.0, smazaný) na 4.0.2:
   `VisualPaginatorFactory` v konstruktoru (promoted `readonly`), `->setDefaultItemsPerPage(10)` jako dřív bez výběru
   počtu. Z baseline odstraněné záznamy pro neexistující třídu 3.0.
+- `src/templates/bootstrap5.latte` (nová) — stránkování a výběr počtu položek pro Bootstrap 5 (`form-select`,
+  `input-group` bez `-prepend/-append`). Konstanty `VisualPaginator::TEMPLATE_NORMAL|BOOTSTRAP4|BOOTSTRAP5` a parametr
+  `templateFile` u `VisualPaginatorFactory`. V `app/config/config.neon` je globálně `TEMPLATE_BOOTSTRAP5` (jako dřív
+  `TEMPLATE_BOOTSTRAP_V4` přes extension verze 3.0) — bez něj by se použila holá šablona `normal.latte`.
 - `src/VisualPaginatorTemplate.php` (dřív `Template.php`) — dědí z `Nette\Bridges\ApplicationLatte\Template`,
   Nette ji pro komponentu najde samo podle jména. Vlastní šablona: `{templateType AlesWita\VisualPaginator\VisualPaginatorTemplate}`.
 - `src/VisualPaginatorFactory.php` — `readonly` třída, překlad zpráv přetypovaný na `string`

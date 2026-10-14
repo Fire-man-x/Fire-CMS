@@ -11,6 +11,8 @@ final readonly class VisualPaginatorFactory
 	public function __construct(
 		private Session $session,
 		private ?Translator $translator = null,
+		/** šablona pro všechny paginatory (např. VisualPaginator::TEMPLATE_BOOTSTRAP5), null = výchozí */
+		private ?string $templateFile = null,
 	)
 	{
 	}
@@ -18,6 +20,10 @@ final readonly class VisualPaginatorFactory
 	public function create(): VisualPaginator
 	{
 		$paginator = new VisualPaginator($this->session);
+
+		if ($this->templateFile !== null) {
+			$paginator->templateFile = $this->templateFile;
+		}
 
 		$translator = $this->translator;
 		if ($translator !== null) {

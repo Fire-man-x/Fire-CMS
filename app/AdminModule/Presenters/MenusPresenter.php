@@ -458,10 +458,11 @@ class MenusPresenter extends BasePresenter
 	#[Privilege('delete')]
 	public function handleDelete(int $menuId): void
 	{
-		$this->menusModel->delete($menuId);
-		$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
-
-		$this->flashMessage(FAIL_DELETE, FLASH_FAILED);
+		if ($this->menusModel->delete($menuId)) {
+			$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
+		} else {
+			$this->flashMessage(FAIL_DELETE, FLASH_FAILED);
+		}
 
 		$this->redirect('this');
 	}

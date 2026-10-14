@@ -492,10 +492,12 @@ class ArticlesPresenter extends BasePresenter
 	#[Privilege('delete')]
 	public function handleDelete(int $articleId): void
 	{
-		$this->articlesModel->delete($articleId);
-		$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
-
-		$this->flashMessage(FAIL_DELETE, FLASH_FAILED);
+		if ($this->articlesModel->getById($articleId)) {
+			$this->articlesModel->delete($articleId);
+			$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);
+		} else {
+			$this->flashMessage(FAIL_DELETE, FLASH_FAILED);
+		}
 
 		$this->redirect('this');
 	}

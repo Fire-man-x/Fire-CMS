@@ -3,6 +3,7 @@
 namespace Tests;
 
 use AlesWita\VisualPaginator\VisualPaginator;
+use AlesWita\VisualPaginator\VisualPaginatorFactory;
 use App\TestPresenter;
 use Nette\Application\IPresenterFactory;
 use Nette\Application\Request;
@@ -162,6 +163,21 @@ final class PresenterTest extends TestCase
 		Assert::exception(static function () use ($paginator): void {
 			$paginator->setDefaultItemsPerPage(0);
 		}, InvalidArgumentException::class, 'AlesWita\VisualPaginator\VisualPaginator::setDefaultItemsPerPage(): items per page must be positive, 0 given.');
+	}
+
+	/**
+	 * Šablona nastavená ve factory (config.neon) platí pro všechny paginatory, bez ní zůstává TEMPLATE_NORMAL
+	 */
+	public function test07(): void
+	{
+		$session = $this->container->getByType(Session::class);
+
+		Assert::same(VisualPaginator::TEMPLATE_NORMAL, (new VisualPaginatorFactory($session))->create()->templateFile);
+		Assert::same(
+			VisualPaginator::TEMPLATE_BOOTSTRAP5,
+			(new VisualPaginatorFactory($session, templateFile: VisualPaginator::TEMPLATE_BOOTSTRAP5))->create()->templateFile,
+		);
+		Assert::true(is_file(VisualPaginator::TEMPLATE_BOOTSTRAP5));
 	}
 
 	private function createPresenter(): TestPresenter

@@ -188,7 +188,8 @@ class FilesManagerPresenter extends BasePresenter
 
 		$vp = $this->visualPaginatorFactory->create();
 		$vp->canSetItemsPerPage = true;
-		$vp->setItemsPerPage(20);
+		// výchozí počet bez zápisu do session - setItemsPerPage() by při každém požadavku přepsal volbu uživatele
+		$vp->setDefaultItemsPerPage(20);
 
 		return $vp;
 	}

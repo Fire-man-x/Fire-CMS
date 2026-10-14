@@ -19,6 +19,9 @@ $ composer require aleswita/visualpaginator
 ```yaml
 services:
 	- AlesWita\VisualPaginator\VisualPaginatorFactory
+
+	# or with a template for all paginators (TEMPLATE_NORMAL, TEMPLATE_BOOTSTRAP4, TEMPLATE_BOOTSTRAP5)
+	- AlesWita\VisualPaginator\VisualPaginatorFactory(templateFile: AlesWita\VisualPaginator\VisualPaginator::TEMPLATE_BOOTSTRAP5)
 ```
 
 #### Presenter

@@ -7,7 +7,8 @@ Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na det
 - **VisualPaginator 4.0.2 pro PHP 8.3, Nette 3.3 a Latte 3.** `libs/VisualPaginator-4.0.2` bez zastaralých API
   (session, `@persistent`, `{php}`), typovaná šablona `VisualPaginatorTemplate`. Opraveno: hodnota v session při
   vypnutém výběru počtu položek už nevyhodí výjimku a změna počtu položek přes AJAX platí hned. Nové
-  `setDefaultItemsPerPage()` (pevný počet bez výběru), komponenty Articles, Categories, SearchControl a Comments převedené z 3.0.
+  `setDefaultItemsPerPage()` (pevný počet bez výběru), komponenty Articles, Categories, SearchControl a Comments převedené z 3.0. Nová
+  šablona `bootstrap5.latte`, v `config.neon` nastavená pro všechny paginatory.
   Viz [2026-10-14-visualpaginator-4-php83.md](2026-10-14-visualpaginator-4-php83.md).
 
 - **Formuláře administrace na `AdminFormFactory`.** Všechny formuláře v `app/AdminModule/Forms/` (článek, kategorie,

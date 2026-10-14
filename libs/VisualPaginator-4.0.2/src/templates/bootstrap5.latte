@@ -1,0 +1,38 @@
+{templateType AlesWita\VisualPaginator\VisualPaginatorTemplate}
+
+{var $linkClass = $ajax ? 'page-link ajax' : 'page-link'}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+  <nav>
+    <ul class="pagination mb-0">
+      <li n:class="'page-item', $paginator->isFirst() ? 'disabled'">
+        <a n:href="paginate!, page => $paginator->getPage() - 1" class="{$linkClass}" aria-label="&laquo;">&laquo;</a>
+      </li>
+
+      {foreach $steps as $step}
+        <li n:class="'page-item', $step === $paginator->getPage() ? 'active'">
+          <a n:href="paginate!, page => $step" class="{$linkClass}" n:attr="aria-current: $step === $paginator->getPage() ? 'page'">{$step}</a>
+        </li>
+        {if $iterator->getNextValue() > $step + 1}
+          <li class="page-item disabled">
+            <span class="page-link">&hellip;</span>
+          </li>
+        {/if}
+      {/foreach}
+
+      <li n:class="'page-item', $paginator->isLast() ? 'disabled'">
+        <a n:href="paginate!, page => $paginator->getPage() + 1" class="{$linkClass}" aria-label="&raquo;">&raquo;</a>
+      </li>
+    </ul>
+  </nav>
+
+  {if $itemsPerPage}
+    {form itemsPerPage, class => $ajax ? 'ajax' : null}
+      <div class="input-group">
+        {label itemsPerPage, class => 'input-group-text' /}
+        {input itemsPerPage, class => 'form-select'}
+        {input send, class => 'btn btn-outline-secondary'}
+      </div>
+    {/form}
+  {/if}
+</div>

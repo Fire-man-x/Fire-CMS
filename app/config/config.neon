@@ -204,7 +204,8 @@ services:
 	- App\Modules\UrlModule\Model
 	- App\Modules\UrlModule\RedirectionsModel
 	urlManager: App\Modules\UrlModule\UrlManager
-	visualPaginatorFactory: AlesWita\VisualPaginator\VisualPaginatorFactory
+	# šablona paginatoru pro administraci (Bootstrap 5) i web; jednotlivě lze přepsat přes $paginator->templateFile
+	visualPaginatorFactory: AlesWita\VisualPaginator\VisualPaginatorFactory(templateFile: AlesWita\VisualPaginator\VisualPaginator::TEMPLATE_BOOTSTRAP5)
 
 
 	- App\Model\Database\Categories

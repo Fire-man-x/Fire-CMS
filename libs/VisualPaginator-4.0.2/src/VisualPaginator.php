@@ -20,6 +20,12 @@ final class VisualPaginator extends Control
 
 	public const string SESSION_SECTION = 'visual-paginator';
 
+	public const string TEMPLATE_NORMAL = __DIR__ . '/templates/normal.latte';
+
+	public const string TEMPLATE_BOOTSTRAP4 = __DIR__ . '/templates/bootstrap4.latte';
+
+	public const string TEMPLATE_BOOTSTRAP5 = __DIR__ . '/templates/bootstrap5.latte';
+
 	#[Persistent]
 	public ?int $page = null;
 
@@ -45,7 +51,7 @@ final class VisualPaginator extends Control
 		'itemsPerPage' => 'Items per page',
 	];
 
-	public string $templateFile = __DIR__ . '/templates/normal.latte';
+	public string $templateFile = self::TEMPLATE_NORMAL;
 
 	/** @var array<callable(): void> */
 	public array $onPaginate = [];
