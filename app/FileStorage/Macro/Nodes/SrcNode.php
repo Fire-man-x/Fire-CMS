@@ -13,7 +13,7 @@ use Latte\Compiler\Tag;
  * n:src="$image [, width [, height]]"
  * Renders the image URL into the `src` attribute.
  */
-class SrcNode extends StatementNode
+final class SrcNode extends StatementNode
 {
 	public ExpressionNode $image;
 	public ArrayNode $args;

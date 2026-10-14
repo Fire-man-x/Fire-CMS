@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Presenters;
 
+use App\AdminModule\Forms\AdminForm;
 use App\Attributes\Privilege;
 use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Forms\CommentFormFactory;
 use App\Model;
-use App\Modules\CommentsModule;
 use App\Service\Tag;
 use Contributte\Datagrid\Datagrid;
 use Nette;
@@ -121,10 +121,10 @@ class CommentsPresenter extends BasePresenter
 	 * @SecuredInside
 	 * @Resource (Comments)
 	 * @Privilege (edit)
-	 */
-	public function actionDetail($parent = null)
+	 * /
+	public function actionDetail()//$parent = null)
 	{
-		$this->parent = $parent;
+		//$this->parent = $parent;
 
 		if ($this->language !== null && $this->languages->existLanguage($this->language)) {
 			$this->actualLanguage = $this->language == null ? $this->languages->getDefaultLanguage() : $this->language;
@@ -142,7 +142,7 @@ class CommentsPresenter extends BasePresenter
 
 		//revisionCount
 		$this->template->revisionCount = $this->commentService->getRevisionsCount($this->id);
-	}
+	}*/
 
 
 	/**
@@ -268,28 +268,6 @@ class CommentsPresenter extends BasePresenter
 
 
 	/**
-	 * Activate
-	 * @param int $commentId
-	 * @param boolean $status
-	 * @SecuredInside
-	 * @Resource(Comments)
-	 * @Privilege(edit)
-	 */
-	public function handleActivate(int $commentId, $status = 0)
-	{
-		//edit own
-		$createdBy = $this->commentsModel->getById($commentId)?->createdBy;
-		if(!$this->user->isAllowed(new \App\Security\Resource("Comments", $createdBy),"edit")){
-			throw new \Nette\Application\ForbiddenRequestException("You have not access to 'Comments' with priviledge 'edit'.");
-		}
-		$this->commentService->makeBackup($commentId);
-		$this->commentsModel->update($commentId, array("active" => (boolean) $status));
-		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
-		$this->redirect('this');
-	}
-
-
-	/**
 	 * Approve
 	 * @param int $commentId
 	 */
@@ -298,8 +276,7 @@ class CommentsPresenter extends BasePresenter
 	#[Privilege('approve_comment')]
 	public function handleApprove(int $commentId)
 	{
-		$this->commentService->makeBackup($commentId);
-		$this->commentsModel->statusPublish($commentId);
+		//$this->commentsModel->statusPublish($commentId);
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 		$this->redirect('this');
 	}
@@ -317,7 +294,9 @@ class CommentsPresenter extends BasePresenter
 		$this->template->commentInfo = $this->commentsModel->getById($commentId);;
 
 		//$this->commentFactory->setEditId($commentId);
-		$this->commentFactory->setDefaultValuesReply($this["commentReplyForm"], $commentId);
+		/** @var AdminForm $form */
+		$form = $this["commentReplyForm"];
+		$this->commentFactory->setDefaultValuesReply($form, $commentId);
 		$this->redrawControl("commentReplyForm");
 	}
 
@@ -332,7 +311,9 @@ class CommentsPresenter extends BasePresenter
 	public function handleEdit(int $commentId)
 	{
 		$this->commentFactory->setEditId($commentId);
-		$this->commentFactory->setDefaultValues($this["commentForm"], $commentId);
+		/** @var AdminForm $form */
+		$form = $this["commentForm"];
+		$this->commentFactory->setDefaultValues($form, $commentId);
 		$this->redrawControl("commentForm");
 	}
 

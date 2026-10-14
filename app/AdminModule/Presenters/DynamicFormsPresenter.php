@@ -35,28 +35,11 @@ class DynamicFormsPresenter extends BasePresenter
 	public int $id;
 
 	/**
-	 * Language
-	 */
-	//#[Persistent]
-	//public string $language;
-
-	/**
 	 * Show filter
 	 * @persistentInDefault
 	 */
 	public ?string $show;
 
-	/**
-	 * DynamicForm parent
-	 */
-	private ?int $parent;
-
-	private ?string $language = null;
-
-	/**
-	 * Actual language
-	 */
-	public string $actualLanguage;
 
 	/** @inject */
 	public DynamicFormFormFactory $dynamicFormFormFactory;
@@ -79,11 +62,6 @@ class DynamicFormsPresenter extends BasePresenter
 		parent::startup();
 
 		$this->addBreadCrumbLink("Dynamic forms", $this->link(":Admin:DynamicForms:default", array("id" => null)) );
-
-		//default language
-		if($this->language == $this->languages->getDefaultLanguage()) {
-			$this->redirect("this", array("language" => null));
-		}
 	}
 
 
@@ -106,16 +84,8 @@ class DynamicFormsPresenter extends BasePresenter
 	 * @Resource (DynamicForms)
 	 * @Privilege (edit)
 	 */
-	public function actionDetail(int $parent = null): void
+	public function actionDetail(): void
 	{
-		$this->parent = $parent;
-
-		if ($this->language !== null && $this->languages->existLanguage($this->language)) {
-			$this->actualLanguage = $this->language == null ? $this->languages->getDefaultLanguage() : $this->language;
-		} else {
-			$this->actualLanguage = $this->languages->getDefaultLanguage();
-		}
-
 		$this->template->dynamicForms = $this->dynamicFormsModel;
 
 		//edit own
@@ -143,7 +113,6 @@ class DynamicFormsPresenter extends BasePresenter
 	public function renderDetail(): void
 	{
 		$this->template->languages = $this->languages->getLanguages();
-		$this->template->actualLanguage = $this->actualLanguage;
 	}
 
 

@@ -56,9 +56,9 @@ class Shortcodes
 	 */
 	public function add(string $tag, callable $function)
 	{
-		if (!is_callable($function)) {
+		/*if (!is_callable($function)) {
 			throw new BadFunctionCallException("Function in shortcode '$tag' is not callable");
-		}
+		}*/
 		$this->shortcodes[$tag] = $function;
 	}
 

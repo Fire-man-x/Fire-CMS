@@ -18,7 +18,7 @@ kořenovém `CLAUDE.md` — ten je závazný, tohle je jen shrnutí pro rychlou 
 | ACL? | `#[Secured] #[Resource('X')] #[Privilege('y')]` atributy z `app/Attributes/`. Vynucuje `AdminModule\Presenters\BasePresenter::checkRequirements()`. |
 | Routing admin? | `/administrace/<presenter>/<action>[/<id>]`, presenter jméno v URL malými písmeny/pomlčkami (`pages`, `dynamic-forms`), NE PascalCase. |
 | Testy? | `composer test` (Nette Tester nad `tests/`) — hlavně integrační testy nad in-memory SQLite (`UrlManager`, `CustomRouter`, menu, stránky, jazyky) + unit testy (`App\Security\Role`, správce souborů, překlady). Zdaleka nepokrývá celé `app/`. Viz `AI-Context/gotchas.md`. |
-| PHPStan gate? | Level 5 (`composer stan`) je fakticky vynucovaná brána (s ~900řádkovou baseline dluhu). `composer stan9`/`stan10` pro přísnější kontrolu nového kódu — spouštějte cíleně na měněné soubory, ne na celý strom. |
+| PHPStan gate? | Level 5 (`composer stan`) je vynucovaná brána, celé `app/` prochází s prázdnou baseline. `composer stan9`/`stan10` pro přísnější kontrolu nového kódu — spouštějte cíleně na měněné soubory, ne na celý strom. |
 
 ## Konvence nového kódu (viz CLAUDE.md "Tvrdá pravidla")
 
@@ -42,8 +42,8 @@ Grid (`Contributte\Datagrid\Datagrid`, zdroj `IDatagridSource::getDatagridSource
    Týká se to i `App\Model\Plugin\*` proti `App\DI\*`, jde skrz strom napříč — grep, ne odhad.
 2. **Jádro vs. plugin** — pokud editujete něco mimo `app/Plugins/**`, uvědomte si, že to ovlivní všechny
    klientské projekty forknuté z tohoto jádra (viz `Architecture/overview.md`).
-3. **PHPStan noise** — repo má rozsáhlou baseline existujícího dluhu. Spouštějte `composer stan --
-   <soubor/adresář>`, ne nad celým `app/`, jinak si spletete cizí šum se svou chybou.
+3. **PHPStan** — level 5 nad celým `app/` prochází s prázdnou baseline, nová chyba se opravuje, ne
+   přidává do baseline. Během práce stačí `composer stan -- <soubor/adresář>`, před commitem celé `app/`.
 4. **Přečtěte si `AI-Context/gotchas.md`** — sbírka konkrétních pastí, na které narazil někdo před vámi
    (case sensitivity v routingu, kompilace kontejneru při vypnutém pluginu, `addDate` vs. `addOwnDate`,
    ...). Šetří to hodiny opakovaného objevování stejné věci.

@@ -84,7 +84,7 @@ abstract class BaseSubMetas extends BaseModel
 	 * @param int $columnId Id of row in "Column" column
 	 * @param array $data Data to update
 	 */
-	public function useMetas(int $columnId, array $data): void
+	public function useMetas(int|string|null $columnId, array $data): void
 	{
 		if(is_null($columnId)){
 			throw new \InvalidArgumentException("Reference column ('".$this->getReferenceColumn()."') cannot be null");

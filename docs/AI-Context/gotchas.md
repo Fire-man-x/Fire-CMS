@@ -187,15 +187,6 @@ parametr má být `int`, a nahlásí chybu při přímém volání `new ImageReq
 volejte přes `ImageRequest::fromMacro($file, ['200x150'])` (statická tovární metoda, stejná jako používají
 latte makra interně) — PHPStan si na args-array nestěžuje.
 
-## `addFileUpload()` / `IFile::getHash()` — PHPStan false positive (akceptovaný)
-
-`addFileUpload()` je runtime-registrovaná extension metoda (`Contributte\FileUpload`), `File` interface
-nedeklaruje `getHash()` (mají ho jen konkrétní implementace jako `HashImageEntity`). Oboje PHPStan hlásí
-jako "undefined method" — je to ale STEJNÝ, už dřív akceptovaný vzor jako v `app/AdminModule/Forms/
-FilesManagerUploadFormFactory.php` (viz `app/config/phpstan-baseline.neon`). Nový kód se stejným vzorem
-tenhle warning taky dostane a nemusíte to řešit — jen ověřte, že jde opravdu o STEJNÝ vzor (upload file
-entity, ne skutečná chyba v typu).
-
 ## Úložiště souborů (`FlysystemStorage`) — na co si dát pozor
 
 Podrobně viz `Architecture/file-storage.md`.

@@ -4,18 +4,15 @@ declare(strict_types=1);
 namespace App\AdminModule\Forms;
 
 use App\AdminModule\SettingsModule\Presenters\UsersPresenter;
+use App\Components\TwitterBootstrapRenderer\TwitterBootstrapRenderer;
 use App\Model;
 use App\Model\Exceptions\DuplicateEmailException;
 use App\Model\Exceptions\DuplicateNameException;
-use Latte\Engine;
+use Nette\Application\LinkGenerator;
 use Nette\Application\UI\Form;
 use Nette\Database\SqlLiteral;
-use App\Components\TwitterBootstrapRenderer\TwitterBootstrapRenderer;
 use Nette\Http\Request;
 use Nette\Localization\Translator;
-use Nette\Mail\Message;
-use Nette\Mail\SendmailMailer;
-use Nette\Mail\SmtpMailer;
 use Nette\Security\AuthenticationException;
 use Nette\Utils\Random;
 
@@ -30,7 +27,8 @@ class UserFormFactory extends AdminFormFactory
 		private Model\UserManager    $userManager,
 		private Translator           $translator,
 		private Model\Database\Roles $roles,
-		private Request              $httpRequest
+		private Request              $httpRequest,
+		private LinkGenerator $linkGenerator
 	)
 	{
 		parent::__construct();
@@ -158,7 +156,7 @@ class UserFormFactory extends AdminFormFactory
 	}
 
 
-	public function formRecoveryPasswordSucceeded(Form $form, $values)
+	/*public function formRecoveryPasswordSucceeded(Form $form, $values)
 	{
 		$findedUser = $this->users->findByName($values->username)->fetch();
 
@@ -207,13 +205,13 @@ class UserFormFactory extends AdminFormFactory
 			$form->addError($e->getMessage());
 		}
 		 */
-	}
+	//}
 
 
 	protected function generateResetUrl(int $userId): string {
 		$baseUrl = $this->httpRequest->getUrl()->getHostUrl();
 		$token = Random::generate(24);
-		$signal = $this->link("this", array('token' => $token));
+		$signal = $this->linkGenerator->link("this", array('token' => $token));
 		$this->users->update($userId, array(
 			'recoveryPasswordTime' => new SqlLiteral("NOW()"),
 			'recoveryPasswordToken' => $token

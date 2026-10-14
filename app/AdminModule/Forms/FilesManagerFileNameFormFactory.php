@@ -5,6 +5,7 @@ namespace App\AdminModule\Forms;
 
 use App\Model;
 use Nette\Application\UI\Form;
+use Nette\Forms\Controls\BaseControl;
 
 
 class FilesManagerFileNameFormFactory extends AdminFormFactory
@@ -69,7 +70,12 @@ class FilesManagerFileNameFormFactory extends AdminFormFactory
 			/*if(!$defaults["newName"]){
 				$defaults["newName"] = $defaults["originalName"];
 			}*/
-			$form->data["newName"]->getControlPrototype()->placeholder($defaults["originalName"]);
+			if($form instanceof AdminForm) {
+				$control = $form->data["newName"];
+				if($control instanceof BaseControl) {
+					$control->getControlPrototype()->placeholder($defaults["originalName"]);
+				}
+			}
 
 			$form->setDefaults($defaults);
 		}

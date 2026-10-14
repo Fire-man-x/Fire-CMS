@@ -14,7 +14,7 @@ use Latte\Compiler\Tag;
  * n:crop="$image [, width [, height]]"
  * Renders the cropped image URL, either as plain output or as a `src` attribute.
  */
-class CropNode extends StatementNode
+final class CropNode extends StatementNode
 {
 	public ExpressionNode $image;
 	public ArrayNode $args;

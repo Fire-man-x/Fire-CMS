@@ -61,7 +61,7 @@ class TwitterBootstrapRenderer extends DefaultFormRenderer
 	 */
 	public function renderErrors(Control $control = null, bool $own = true): string
 	{
-		$translator = $this->form ? $this->form->getTranslator() : null;
+		$translator = $this->form->getTranslator();
 
 		$errors = $control
 			? $control->getErrors()
@@ -77,7 +77,7 @@ class TwitterBootstrapRenderer extends DefaultFormRenderer
 			if ($error instanceof HtmlStringable) {
 				$item->addHtml($error);
 			} else {
-				$item->setText($translator ? $translator->translate($error) : $error);
+				$item->setText($translator->translate($error));
 			}
 			$container->addHtml($item);
 		}

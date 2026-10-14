@@ -26,12 +26,6 @@ class UrlManager
 	private array $url;
 
 	/**
-	 * List of url
-	 */
-	private array $urlTypeAndKey;
-
-
-	/**
 	 * UrlManager constructor.
 	 */
 	public function __construct(
@@ -97,10 +91,8 @@ class UrlManager
 
 	/**
 	 * Exist url?
-	 * @return false|\Nette\Database\Table\ActiveRow
-	 * @throws InvalidArgumentException
 	 */
-	public function existUrlByTypeAndKey(string $type, int $key, ?string $languageId = null)
+	public function existUrlByTypeAndKey(string $type, int $key, ?string $languageId = null): bool
 	{
 		try
 		{
@@ -152,41 +144,40 @@ class UrlManager
 
 	/**
 	 * Save URL
-	 * @param string $languageId
 	 */
-	public function saveUrl(string $type, int $key, $language, string $url)
+	public function saveUrl(string $type, int $key, string $languageId, string $url)
 	{
 		$webalizedUrl = $this->validateUrl($url, $type, $key, $key);
 
 		try
 		{
-			$urlInfo = $this->getUrlInfoByTypeAndKey($type, $key, $language);
+			$urlInfo = $this->getUrlInfoByTypeAndKey($type, $key, $languageId);
 			$oldUrl = $urlInfo['url'];
 
 			//redirection
 			if($oldUrl != $webalizedUrl) {
 				//update old redirection if exist
 				$this->redirectionsModel->findAll()
-					->where("languageId", $language)
+					->where("languageId", $languageId)
 					->where("oldUrl", $oldUrl)
 					->update(array("newUrl" => $webalizedUrl));
 
 				//update all old to new
 				$this->redirectionsModel->findAll()
-					->where("languageId", $language)
+					->where("languageId", $languageId)
 					->where("newUrl", $oldUrl)
 					->update(array("newUrl" => $webalizedUrl));
 
 				//insert
 				$this->redirectionsModel->insert(ArrayHash::from([
-					"languageId" => $language,
+					"languageId" => $languageId,
 					"oldUrl" => $oldUrl,
 					"newUrl" => $webalizedUrl
 				]));
 
 				//remove recursive
 				$this->redirectionsModel->findAll()
-					->where("languageId", $language)
+					->where("languageId", $languageId)
 					->where("oldUrl", $webalizedUrl)
 					->delete();
 
@@ -200,7 +191,7 @@ class UrlManager
 			$this->model->insert(ArrayHash::from(array(
 				"type" => $type,
 				"key" => $key,
-				"languageId" => $language,
+				"languageId" => $languageId,
 				"url" => $webalizedUrl
 			)));
 		}
@@ -208,9 +199,8 @@ class UrlManager
 
 	/**
 	 * Validate URL handler
-	 * @param int $categoryId
 	 */
-	public function validateUrl(string $url, $type, $key, $notInKey = null): string
+	public function validateUrl(string $url, string $type, int $key, int $notInKey = null): string
 	{
 		$exist = true;
 		$index = 0;

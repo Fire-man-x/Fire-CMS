@@ -13,7 +13,7 @@ use Latte\Compiler\Tag;
  * n:bg="$image [, width [, height]]"
  * Renders the cropped image URL into a `style="background-image: url(...)"` attribute.
  */
-class BgNode extends StatementNode
+final class BgNode extends StatementNode
 {
 	public ExpressionNode $image;
 	public ArrayNode $args;

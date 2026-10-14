@@ -33,7 +33,7 @@ class Statistics
 		//todo: opet povolit na produkci
 		return;
 
-		$agent = $this->request->getHeader('User-Agent');
+		/*$agent = $this->request->getHeader('User-Agent');
 		if($agent)
 		{
 			$this->model->insert(ArrayHash::from(array(
@@ -41,7 +41,7 @@ class Statistics
 				"ip" => $this->request->getRemoteAddress(),
 				"agent" => $agent
 			)));
-		}
+		}*/
 	}
 
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace App\Model\Database;
 
 
+use Nette\Database\Table\ActiveRow;
+
 /**
  * Users Model
  */
@@ -33,22 +35,23 @@ class Users extends BaseModel
 	}
 
 
-	public function findByName(string $username): \Nette\Database\Table\Selection
+	public function getByName(string $username): ?ActiveRow
 	{
-		return $this->findAll()->where(self::COLUMN_NAME, $username);
+		return $this->findAll()->where(self::COLUMN_NAME, $username)->fetch();
 	}
 
 
-	public function findByEmail(string $email): \Nette\Database\Table\Selection
+	public function getByEmail(string $email): ?ActiveRow
 	{
-		return $this->findAll()->where(self::COLUMN_EMAIL, $email);
+		return $this->findAll()->where(self::COLUMN_EMAIL, $email)->fetch();
 	}
 
 
-	public function findByOAuthId(string $oauthService, string $oauthId): \Nette\Database\Table\Selection
+	public function getByOAuthId(string $oauthService, string $oauthId): ?ActiveRow
 	{
 		return $this->findAll()
 			->where(self::COLUMN_OAUTH_SERVICE, $oauthService)
-			->where(self::COLUMN_OAUTH_ID, $oauthId);
+			->where(self::COLUMN_OAUTH_ID, $oauthId)
+			->fetch();
 	}
 }

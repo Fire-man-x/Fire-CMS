@@ -6,6 +6,7 @@ namespace App\Components\CategoriesMenu;
 use App\Attributes\Privilege;
 use App\Attributes\Resource;
 use App\Attributes\Secured;
+use App\FrontModule\Presenters\CategoriesPresenter;
 use App\Model;
 use App\Service\Category;
 use Nette\Application\ForbiddenRequestException;
@@ -182,7 +183,7 @@ class CategoriesMenu extends Control
 
 		//redirect
 		$redirectToId = null;
-		if($this->getPresenter()->id == $categoryId){
+		if($this->getPresenter() instanceof CategoriesPresenter && $this->getPresenter()->id == $categoryId){
 			$redirectToId = $redirectToCategoryId;
 		}
 

@@ -90,7 +90,7 @@ class MetaValueFormFactory extends AdminFormFactory
 
 		$model = $this->metasService->getModelByType($this->type);
 
-		$model->useMetas((int) $this->getEditId(), (array) $values->data);
+		$model->useMetas($this->getEditId(), (array) $values->data);
 
 		/*
 		if ($this->isEditMode()) {

@@ -44,34 +44,34 @@ class UserManager implements Authenticator
 			if ($password != "admin") {
 				throw new Nette\Security\AuthenticationException('The password is incorrect.', self::INVALID_CREDENTIAL);
 			}
-			/*$row = $this->getAll()->where(self::COLUMN_ID, 1)->fetch()->toArray();
-			unset($row[self::COLUMN_PASSWORD_HASH]);
-			return new Nette\Security\Identity(1, array("admin"), $row);* /
+			/*$user = $this->getAll()->where(self::COLUMN_ID, 1)->fetch()->toArray();
+			unset($user[self::COLUMN_PASSWORD_HASH]);
+			return new Nette\Security\Identity(1, array("admin"), $user);* /
 			return new Nette\Security\Identity(1, array("admin"), array("username"=>"Administrátor"));
 		}*/
 
-		$row = $this->usersModel->findByName($username)->fetch();
+		$user = $this->usersModel->getByName($username);
 
-		if (!$row) {
+		if (!$user) {
 			throw new AuthenticationException('The username is incorrect.', self::IdentityNotFound);
 
-		} elseif (!$this->passwords->verify($password, $row[Users::COLUMN_PASSWORD_HASH])) {
+		} elseif (!$this->passwords->verify($password, $user[Users::COLUMN_PASSWORD_HASH])) {
 			throw new AuthenticationException('The password is incorrect.', self::InvalidCredential);
 
-		} elseif ($this->passwords->needsRehash($row[Users::COLUMN_PASSWORD_HASH])) {
-			$row->update([
+		} elseif ($this->passwords->needsRehash($user[Users::COLUMN_PASSWORD_HASH])) {
+			$user->update([
 				Users::COLUMN_PASSWORD_HASH => $this->passwords->hash($password),
 			]);
 		}
 
-		$arr = $row->toArray();
+		$arr = $user->toArray();
 		$arr["makedName"] = $this->makeName($arr);
 		unset($arr[Users::COLUMN_PASSWORD_HASH]);
-		$role = $this->rolesModel->getById($row[Users::COLUMN_ROLE]);
+		$role = $this->rolesModel->getById($user[Users::COLUMN_ROLE]);
 		if(!$role){
 			throw new RecordNotFoundException();
 		}
-		return new SimpleIdentity($arr[Users::COLUMN_ID], array(new Role($role["name"], $arr[Users::COLUMN_ID])), $arr);
+		return new SimpleIdentity($arr[Users::COLUMN_ID], $role["name"], $arr);
 	}
 
 
@@ -81,13 +81,11 @@ class UserManager implements Authenticator
 	 */
 	public function authenticateByOauth(string $oauthService, string $oauthId, string $oauthEmail): SimpleIdentity
 	{
-		$user = $this->usersModel->findByOAuthId($oauthService, $oauthId);
+		$user = $this->usersModel->getByOAuthId($oauthService, $oauthId);
 		if(!$user) {
 			// found existing user with the same email, error and force them to login using password
-			$user = $this->usersModel->findByEmail($oauthEmail);
+			$user = $this->usersModel->getByEmail($oauthEmail);
 		}
-
-		$user = $user->fetch();
 
 		if(!$user) {
 			throw new AuthenticationException('Authentication by OAuth is incorrect.', self::IdentityNotFound);
@@ -100,7 +98,7 @@ class UserManager implements Authenticator
 		if(!$role){
 			throw new RecordNotFoundException();
 		}
-		return new SimpleIdentity($arr[Users::COLUMN_ID], array(new Role($role["name"], $arr[Users::COLUMN_ID])), $arr);
+		return new SimpleIdentity($arr[Users::COLUMN_ID], $role["name"], $arr);
 	}
 
 

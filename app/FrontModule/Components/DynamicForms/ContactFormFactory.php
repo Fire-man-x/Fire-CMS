@@ -11,6 +11,7 @@ use Nette\Forms\Container;
 use Nette\Mail\Mailer;
 use Nette\Mail\Message;
 use Nette\NotImplementedException;
+use Nette\Utils\ArrayHash;
 
 //use ContactsModel;
 
@@ -111,6 +112,7 @@ class ContactFormFactory extends BaseFormFactory
 		};
 
 		//antispam
+		/** @phpstan-ignore-next-line */
 		$form->addAntiSpam("spamControl", 5, 60)
 			->setOmitted(); //lockTime, resendTime
 
@@ -119,7 +121,7 @@ class ContactFormFactory extends BaseFormFactory
 	}
 
 
-	public function formSucceeded(Form $form, array $values): void
+	public function formSucceeded(Form $form, ArrayHash $values): void
 	{
 		unset($values->editId);
 
@@ -179,11 +181,11 @@ class ContactFormFactory extends BaseFormFactory
 	{
 		throw new NotImplementedException();
 
-		parent::setDefaultValues($form, $editId);
+		/*parent::setDefaultValues($form, $editId);
 
 		$defaults = $this->model->getById($editId)->fetch();
 
-		$form->setDefaults($defaults);
+		$form->setDefaults($defaults);*/
 	}
 
 }

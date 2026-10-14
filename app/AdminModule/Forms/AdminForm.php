@@ -32,7 +32,7 @@ use App\Components\TwitterBootstrapRenderer\TwitterBootstrapRenderer;
  * @property-read Container $buttons Buttons container
  * @property array<callable(static, AdminFormValues): void> $onSuccess
  * @property array<callable(static, AdminFormValues): void> $onValidate
- * @function addFileUpload(string $name, int $maxFiles = null, int $maxFileSize = null)
+ * @method addFileUpload(string $name, int $maxFiles = null, int $maxFileSize = null)
  */
 class AdminForm extends Form
 {

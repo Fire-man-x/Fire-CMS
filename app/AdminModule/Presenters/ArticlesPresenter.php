@@ -447,13 +447,11 @@ class ArticlesPresenter extends BasePresenter
 
 	/**
 	 * Activate
-	 * @param int $articleId
-	 * @param boolean $status
 	 * @SecuredInside
 	 * @Resource(Articles)
 	 * @Privilege(edit)
 	 */
-	public function handleActivate(int $articleId, $status = 0): void
+	public function handleActivate(int $articleId, bool $status = false): void
 	{
 		//edit own
 		$createdBy = $this->articlesModel->getById($articleId)?->createdBy;
@@ -461,7 +459,7 @@ class ArticlesPresenter extends BasePresenter
 			throw new ForbiddenRequestException("You have not access to 'Articles' with priviledge 'edit'.");
 		}
 		$this->articleService->makeBackup($articleId);
-		$this->articlesModel->update($articleId, array("active" => (boolean) $status));
+		$this->articlesModel->update($articleId, array("active" => $status));
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
 		$this->redirect('this');
 	}

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Presenters;
 
-use Alnux\NetteBreadCrumb\BreadCrumb;
+use App\Components\Breadcrumb\BreadCrumb;
 use App\FileStorage\TPresenter;
 use LiveTranslator\TranslatorException;
 use Nette\Application\Helpers;

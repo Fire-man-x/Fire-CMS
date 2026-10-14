@@ -70,9 +70,8 @@ class CommentManager
 
 	/**
 	 * Insert
-	 * @param \Nette\Utils\ArrayHash
 	 */
-	public function insert($type, $relationColumnId, $data): int
+	public function insert($type, $relationColumnId, ArrayHash $data): int
 	{
 		$model = $this->getModelByType($type);
 
@@ -107,9 +106,8 @@ class CommentManager
 
 	/**
 	 * Insert
-	 * @param \Nette\Utils\ArrayHash
 	 */
-	public function insertReply($replyToId, $data): int
+	public function insertReply(int $replyToId, ArrayHash $data): int
 	{
 		$type = $this->getTypeByStoredItem($replyToId);
 		$model = $this->getModelByType($type);

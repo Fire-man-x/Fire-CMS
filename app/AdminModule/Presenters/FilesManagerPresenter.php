@@ -55,7 +55,7 @@ class FilesManagerPresenter extends BasePresenter
 	/**
 	 * Category parent
 	 */
-	private ?int $parent = null;
+	//private ?int $parent = null;
 
 	/**
 	 * Files model
@@ -201,7 +201,7 @@ class FilesManagerPresenter extends BasePresenter
 	protected function createComponentFilesManagerMenu(): \Nette\Application\UI\Control
 	{
 		$control =  $this->filesManagerMenu;
-		$control->setActiveCategory($this->parent ? $this->parent : $this->id);
+		$control->setActiveCategory(/*$this->parent ? $this->parent : */$this->id);
 
 		return $control;
 	}

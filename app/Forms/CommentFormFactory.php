@@ -5,6 +5,7 @@ namespace App\Forms;
 
 use Nette\Application\UI\Form;
 use Nette\Security\User;
+use Nette\Utils\ArrayHash;
 
 class CommentFormFactory extends BaseFormFactory
 {
@@ -74,7 +75,7 @@ class CommentFormFactory extends BaseFormFactory
 	}
 
 
-	public function formSucceeded(Form $form, $values)
+	public function formSucceeded(Form $form, ArrayHash $values): void
 	{
 		unset($values->editId);
 
@@ -103,7 +104,7 @@ class CommentFormFactory extends BaseFormFactory
 	/**
 	 * Set default values to modal form
 	 */
-	public function setDefaultValues(Form $form, int $editId)
+	public function setDefaultValues(Form $form, int $editId): void
 	{
 		$this->setType($this->service->getTypeByStoredItem($editId));
 
@@ -116,7 +117,7 @@ class CommentFormFactory extends BaseFormFactory
 	/**
 	 * Reply form
 	 */
-	public function createReply($replyTo = null, $languageId = null): Form
+	public function createReply(int $replyTo = null, string $languageId = null): Form
 	{
 		//setter
 		$this->languageId = $languageId;
@@ -147,7 +148,7 @@ class CommentFormFactory extends BaseFormFactory
 	}
 
 
-	public function formSucceededReply(Form $form, $values)
+	public function formSucceededReply(Form $form, ArrayHash $values): void
 	{
 		unset($values->editId);
 

@@ -32,9 +32,9 @@ Komentáře, dokumentace, vysvětlení → **česky**.
 ## Tvrdá pravidla
 - `declare(strict_types=1);` v každém PHP souboru
 - PHP 8.3 features (constructor promotion, readonly, enums, match)
-- PHPStan: **level 5 přes `app/config/phpstan.neon` je aktuálně vynucovaná brána** (viz Příkazy níže) —
-  baseline (`app/config/phpstan-baseline.neon`) má ale přes 900 řádků nasbíraného dluhu, takže level 5
-  fakticky neznamená "bez chyb", jen "bez NOVÝCH chyb nad rámec baseline". `composer stan9` / `composer
+- PHPStan: **level 5 přes `app/config/phpstan.neon` je aktuálně vynucovaná brána** (viz Příkazy níže) a
+  celé `app/` jím prochází bez chyb s prázdnou baseline (`app/config/phpstan-baseline.neon`). Novou chybu
+  opravte, nepřidávejte ji do baseline. `composer stan9` / `composer
   stan10` existují jako přísnější kontrola nad konkrétním souborem/adresářem, kterou spouštějte na nový kód
   (viz Příkazy) — nejde o vynucenou CI bránu, level 10 je dlouhodobý cíl, ne aktuální stav repozitáře.
 - Explicitní typy, žádný `mixed` bez důvodu — nový kód piš tak, aby procházel `composer stan9`/`stan10`
@@ -59,9 +59,9 @@ composer test                    # Nette Tester nad tests/; lze zadat i konkrét
 composer test -- tests/Model
 ```
 
-- Spuštění `composer stan` nad celým stromem `app/` může odhalit i chyby nesouvisející s vaší konkrétní
-  změnou (baseline nemusí sedět s rozpracovaným kódem v pracovním stromu). Analýzu proto směřujte jen na soubory/adresáře,
-  kterých se vaše změna skutečně týká, a neberte šum z celého repozitáře jako chybu, kterou jste způsobili vy.
+- `composer stan` nad celým stromem `app/` může v rozpracovaném pracovním stromu hlásit i chyby z cizích,
+  ještě nedokončených změn. Při vlastní práci proto kontrolujte hlavně soubory/adresáře, kterých se změna týká;
+  před commitem ale musí projít celé `app/` (stejně jako v CI).
 - `tests/` (Nette Tester, spouští se přes `composer test`) — hlavně integrační testy nad
   in-memory SQLite `Nette\Database\Explorer` sestaveným ručně bez DI kontejneru
   (`tests/Helpers/SqliteDatabase.php`), bez závislosti na `config.local.neon`. Pokryté jsou vybrané části

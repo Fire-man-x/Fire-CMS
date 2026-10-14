@@ -1,7 +1,8 @@
 <?php
 declare(strict_types=1);
 
-namespace Alnux\NetteBreadCrumb;
+//namespace Alnux\NetteBreadCrumb;
+namespace App\Components\Breadcrumb;
 
 /**
  * Class BreadCrumbControl
@@ -55,12 +56,9 @@ class BreadCrumb extends Control
 
 	/**
 	 * Remove link
-	 *
-	 * @param $key
-	 *
 	 * @throws Exception
 	 */
-	public function removeLink($key)
+	public function removeLink(string $key)
 	{
 		$key = md5($key);
 		if(array_key_exists($key, $this->links))
@@ -75,11 +73,8 @@ class BreadCrumb extends Control
 
 	/**
 	 * Edit link
-	 * @author Leonardo Allende <alnux@ya.ru>
-	 * @param $title
-	 * @param null $icon
 	 */
-	public function editLink($title, ?\Nette\Application\UI\Link $link = null, $icon = null): void
+	public function editLink(string $title, ?string $link = null, ?string $icon = null): void
 	{
 		if(array_key_exists(md5($title), $this->links))
 		{

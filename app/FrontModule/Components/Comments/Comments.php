@@ -19,9 +19,6 @@ use Nette\Localization\Translator;
 class Comments extends Control
 {
 
-	/** comments */
-	private array $comments = array();
-
 	/** Article id */
 	private ?int $articleId = null;
 
@@ -118,17 +115,20 @@ class Comments extends Control
 		$this->template->setFile($this->templateFile);
 		$this->template->setTranslator($this->translator);
 
+		$columnId = 0;
 		if($this->articleId){
 			$columnId = $this->articleId;
 		}
 		if($this->categoryId){
 			$columnId = $this->categoryId;
 		}
-		$this->template->comments = $this->commentsService->getAllCommentsWithChilds($this->language, $this->type, $columnId, $this["paginator"]->getPaginator());
+		/** @var VisualPaginator $paginator */
+		$paginator = $this["paginator"];
+		$this->template->comments = $this->commentsService->getAllCommentsWithChilds($this->language, $this->type, $columnId, $paginator->getPaginator());
 
 		//$this->commentsService->recalculateTree($this->language, $this->type, $columnId);
 
-		$this->template->showPaginator = $this["paginator"]->getPaginator()->getItemCount() > $this["paginator"]->getItemsPerPage();
+		$this->template->showPaginator = $paginator->getPaginator()->getItemCount() > $paginator->getItemsPerPage();
 		$this->template->render();
 	}
 

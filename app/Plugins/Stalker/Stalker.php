@@ -33,14 +33,14 @@ class Stalker
 	public function traceUrl(User $user): void
 	{
 		return;
-		if($user->getId()){
+		/*if($user->getId()){
 			$this->model->insert(ArrayHash::from(array(
 				"createdBy" => $user->getId(),
 				"ip" => $this->request->getRemoteAddress(),
 				"url" => $this->request->getUrl()->getRelativeUrl(),
 				"data"=> $this->request->isMethod('POST') ? serialize($this->request->getPost()) : null
 			)));
-		}
+		}*/
 	}
 
 }

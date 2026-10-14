@@ -4,6 +4,10 @@ Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na det
 
 ## 2026-10-14
 
+- **PHPStan level 5 bez baseline.** Celé `app/` prochází s prázdnou `phpstan-baseline.neon`, uzly maker obrázků
+  (`app/FileStorage/Macro/Nodes/*`) jsou `final`. Nová chyba se opravuje, ne přidává do baseline.
+  Viz [2026-10-14-phpstan-empty-baseline.md](2026-10-14-phpstan-empty-baseline.md).
+
 - **URL a přesměrování bez `UrlModule`.** `App\Model\UrlManager`, modely `App\Model\Database\Urls`/`Redirections`,
   presenter a formuláře v `app/AdminModule`. `PresenterFactory` už neprohledává `app/Modules`.
   Viz [2026-10-14-urls-from-module.md](2026-10-14-urls-from-module.md).

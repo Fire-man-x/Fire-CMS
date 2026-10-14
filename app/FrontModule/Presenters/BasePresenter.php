@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\FrontModule\Presenters;
 
-use Alnux\NetteBreadCrumb\BreadCrumb;
+use App\Components\Breadcrumb\BreadCrumb;
 use App\Components\Menu;
 use App\Components\Shortcodes;
 use App\FrontModule\Components;

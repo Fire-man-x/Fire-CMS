@@ -32,7 +32,7 @@ class SettingFormFactory extends AdminFormFactory
 		$templatesItems = array('default' => $this->translator->translate('Default'));
 		$dirs = Finder::findDirectories()->in($this->projectFolders->getWwwThemeDir());
 		foreach ($dirs as $dir) {
-			/** @var \SplFileInfo $dir */
+			/* * @var \SplFileInfo $dir */
 			$dirName = $dir->getFilename();
 			if ($dirName == 'default') {
 				continue;

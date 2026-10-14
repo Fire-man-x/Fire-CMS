@@ -16,10 +16,6 @@ use Nette\Localization\Translator;
  */
 class Categories extends Control
 {
-
-	/** categories */
-	private array $categories = array();
-
 	/** Query @var string */
 	private $query = "";
 

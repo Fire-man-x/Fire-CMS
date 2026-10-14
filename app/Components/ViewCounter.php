@@ -49,7 +49,7 @@ class ViewCounter
 	 * Model getter
 	 * @throws InvalidArgumentException
 	 */
-	private function getModelByType(string $type): Model\Database\Articles|Model\Database\Files|Model\Database\Categories
+	private function getModelByType(string $type): IViewCounter
 	{
 		switch ($type) {
 			case self::TYPE_ARTICLE:
@@ -71,10 +71,7 @@ class ViewCounter
 	public function itemViewed(string $type, int $itemId, string $language): void
 	{
 		$model = $this->getModelByType($type);
-
-		if($model instanceof IViewCounter){
-			$model->addViewCount($itemId, $language);
-		}
+		$model->addViewCount($itemId, $language);
 	}
 
 }

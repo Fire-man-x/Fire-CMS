@@ -14,7 +14,7 @@ use Latte\Compiler\Tag;
  * n:image="$image [, width [, height]]"
  * Renders the image URL, either as plain output or as a `href` attribute.
  */
-class ImageNode extends StatementNode
+final class ImageNode extends StatementNode
 {
 	public ExpressionNode $image;
 	public ArrayNode $args;
