@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Achse\TagInput;
+namespace App\Components\TagsInput;
 
 use Nette;
 
@@ -16,7 +16,7 @@ class Extension extends Nette\DI\CompilerExtension
 	{
 		parent::afterCompile($class);
 		$init = $class->getMethod('initialize');
-		$init->addBody('\Achse\TagInput\TagInput::register();');
+		$init->addBody('\App\Components\TagsInput\TagInput::register();');
 	}
 
 }

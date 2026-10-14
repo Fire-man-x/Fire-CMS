@@ -60,7 +60,7 @@ class MenusPresenter extends BasePresenter
 
 		$this->addBreadCrumbLink("Menus", $this->link(":Admin:Menus:default", array("id" => null)) );
 
-		\Vodacek\Forms\Controls\DateInput::register();
+		\App\Components\DateInput\DateInput::register();
 
 		$this->template->__imagestore = $this->fileManager;
 	}

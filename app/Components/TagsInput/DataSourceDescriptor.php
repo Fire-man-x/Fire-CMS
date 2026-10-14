@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Achse\TagInput;
+namespace App\Components\TagsInput;
 
 use JsonSerializable;
 use Nette\SmartObject;
@@ -13,10 +13,7 @@ class DataSourceDescriptor implements JsonSerializable
 	const DEFAULT_LABEL_PROPERTY = 'label';
 	const DEFAULT_VALUE_PROPERTY = 'value';
 
-	/**
-	 * @var
-	 */
-	private $url;
+	private string $url;
 
 	private string $valuePropertyName = self::DEFAULT_VALUE_PROPERTY;
 
@@ -25,10 +22,7 @@ class DataSourceDescriptor implements JsonSerializable
 	private ?int $maxTags = null;
 
 
-	/**
-	 * @param string $url
-	 */
-	public function __construct($url)
+	public function __construct(string $url)
 	{
 		$this->url = $url;
 	}

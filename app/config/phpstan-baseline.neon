@@ -55,12 +55,6 @@ parameters:
 			path: ../AdminModule/Presenters/ArticlesPresenter.php
 
 		-
-			message: '#^Call to an undefined method Nette\\Security\\UserStorage\:\:setNamespace\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../AdminModule/Presenters/BasePresenter.php
-
-		-
 			message: '#^Parameter \#3 \$icon of method App\\Presenters\\BasePresenter\:\:addBreadCrumbLink\(\) expects null, string given\.$#'
 			identifier: argument.type
 			count: 1
@@ -121,34 +115,10 @@ parameters:
 			path: ../Components/CategoriesMenu/CategoriesMenu.php
 
 		-
-			message: '#^Parameter \#1 \$operation of method Vodacek\\Forms\\Controls\\DateInput\:\:addRule\(\) expects \(callable\(Nette\\Forms\\Control, mixed\)\: bool\)\|string, Closure\(Vodacek\\Forms\\Controls\\DateInput\)\: bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Components/DateInput/DateInput.php
-
-		-
-			message: '#^Parameter \#2 \$callback of static method Nette\\Forms\\Container\:\:extensionMethod\(\) expects callable\(Nette\\Forms\\Container\)\: mixed, Closure\(Nette\\Forms\\Container, string, string\|null\=, string\=\)\: Vodacek\\Forms\\Controls\\DateInput given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Components/DateInput/DateInput.php
-
-		-
 			message: '#^Call to function is_callable\(\) with callable\(\)\: mixed will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
 			path: ../Components/Shortcodes.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(\)\: Unexpected token "\\n\\t ", expected type at offset 12 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: ../Components/TagsInput/DataSourceDescriptor.php
-
-		-
-			message: '#^Parameter \#2 \$callback of static method Nette\\Forms\\Container\:\:extensionMethod\(\) expects callable\(Nette\\Forms\\Container\)\: mixed, Closure\(Nette\\Forms\\Container, mixed, mixed\=, Achse\\TagInput\\DataSourceDescriptor\|null\=, mixed\=\)\: Achse\\TagInput\\TagInput given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../Components/TagsInput/TagInput.php
 
 		-
 			message: '#^Ternary operator condition is always true\.$#'
@@ -185,54 +155,6 @@ parameters:
 			identifier: new.static
 			count: 1
 			path: ../FileStorage/Macro/Nodes/SrcNode.php
-
-		-
-			message: '#^Instanceof between string and DateTime will always evaluate to false\.$#'
-			identifier: instanceof.alwaysFalse
-			count: 1
-			path: ../Forms/BaseFormFactory.php
-
-		-
-			message: '#^Instanceof between string and DateTimeImmutable will always evaluate to false\.$#'
-			identifier: instanceof.alwaysFalse
-			count: 1
-			path: ../Forms/BaseFormFactory.php
-
-		-
-			message: '#^Instanceof between string and Nette\\Utils\\DateTime will always evaluate to false\.$#'
-			identifier: instanceof.alwaysFalse
-			count: 1
-			path: ../Forms/BaseFormFactory.php
-
-		-
-			message: '#^Result of \|\| is always false\.$#'
-			identifier: booleanOr.alwaysFalse
-			count: 2
-			path: ../Forms/BaseFormFactory.php
-
-		-
-			message: '#^Call to an undefined method App\\Forms\\BaseFormPartFactory\:\:getEditId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../Forms/BaseFormPartFactory.php
-
-		-
-			message: '#^Call to an undefined method App\\Forms\\BaseFormPartFactory\:\:isModal\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: ../Forms/BaseFormPartFactory.php
-
-		-
-			message: '#^Call to an undefined method App\\Forms\\BaseFormPartFactory\:\:setEditId\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: ../Forms/BaseFormPartFactory.php
-
-		-
-			message: '#^Property App\\Forms\\BaseFormPartFactory\:\:\$form is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../Forms/BaseFormPartFactory.php
 
 		-
 			message: '#^Property App\\FrontModule\\Components\\Categories\\Categories\:\:\$categories is never read, only written\.$#'
@@ -299,12 +221,6 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: ../FrontModule/Presenters/ArticlesPresenter.php
-
-		-
-			message: '#^Call to an undefined method Nette\\Security\\UserStorage\:\:setNamespace\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../FrontModule/Presenters/BasePresenter.php
 
 		-
 			message: '#^Parameter \#3 \$icon of method App\\Presenters\\BasePresenter\:\:addBreadCrumbLink\(\) expects null, string given\.$#'

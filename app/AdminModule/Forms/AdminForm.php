@@ -7,7 +7,7 @@ use Generator;
 use Nette\Application\UI\Form;
 use Nette\Database\Table\ActiveRow;
 use Nette\Forms\Container;
-use Nette\Forms\Rendering\TwitterBootstrapRenderer;
+use App\Components\TwitterBootstrapRenderer\TwitterBootstrapRenderer;
 
 /**
  * Admin form that renders its groups as collapsible Bootstrap accordion sections instead of one

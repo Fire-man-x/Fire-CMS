@@ -1,14 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Nette\Forms\Rendering;
+namespace App\Components\TwitterBootstrapRenderer;
 
 use Nette\Forms\Control;
 use Nette\Forms\Controls;
 use Nette\Forms\Form;
+use Nette\Forms\Rendering\DefaultFormRenderer;
 use Nette\HtmlStringable;
 use Nette\Utils\Html;
-use Vodacek\Forms\Controls\DateInput;
+use App\Components\DateInput\DateInput;
 
 /**
  * Renderer for Twitter Bootstrap v5

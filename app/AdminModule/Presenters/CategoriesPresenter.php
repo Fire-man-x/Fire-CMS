@@ -264,8 +264,8 @@ class CategoriesPresenter extends BasePresenter
 		$items = $this->tagService->findByName($this->editLocale, $query);
 		foreach ($items as &$item){
 			$item = array(
-				\Achse\TagInput\DataSourceDescriptor::DEFAULT_VALUE_PROPERTY => null,
-				\Achse\TagInput\DataSourceDescriptor::DEFAULT_LABEL_PROPERTY => $item["label"]
+				\App\Components\TagsInput\DataSourceDescriptor::DEFAULT_VALUE_PROPERTY => null,
+				\App\Components\TagsInput\DataSourceDescriptor::DEFAULT_LABEL_PROPERTY => $item["label"]
 			);
 		}
 		$this->sendJson($items);

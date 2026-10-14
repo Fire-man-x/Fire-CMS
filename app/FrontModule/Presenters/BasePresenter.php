@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace App\FrontModule\Presenters;
 
 use Alnux\NetteBreadCrumb\BreadCrumb;
-use App\Components\LanguageChanger;
 use App\Components\Menu;
 use App\Components\Shortcodes;
 use App\FrontModule\Components;
@@ -16,6 +15,7 @@ use App\Service\ProjectFolders;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\BadRequestException;
 use Nette\Application\Helpers;
+use Nette\Bridges\SecurityHttp\SessionStorage;
 use Nette\DI\MissingServiceException;
 
 
@@ -165,7 +165,11 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 		$this->translator->setNamespace("front");
 
 		//user
-		$this->getUser()->getStorage()->setNamespace("front");
+		// setNamespace() má jen session úložiště, rozhraní UserStorage ho nedeklaruje
+		$userStorage = $this->getUser()->getStorage();
+		if ($userStorage instanceof SessionStorage) {
+			$userStorage->setNamespace("front");
+		}
 
 		//base breadcrumb
 		$this->addBreadCrumbLink('Home', '/'/*$this->link('//:Front:Homepage:', array("id"=>null))*/, 'fa fa-home');

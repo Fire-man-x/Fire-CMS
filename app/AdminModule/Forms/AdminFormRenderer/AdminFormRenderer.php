@@ -12,7 +12,7 @@ use Nette\Forms\Controls\MultiSelectBox;
 use Nette\Forms\Controls\SelectBox;
 use Nette\Forms\Form;
 use Nette\Forms\FormRenderer;
-use Nette\Forms\Rendering\TwitterBootstrapRenderer;
+use App\Components\TwitterBootstrapRenderer\TwitterBootstrapRenderer;
 
 /**
  * Renders an AdminForm's visual groups as a Bootstrap 5 accordion, one accordion-item per group,

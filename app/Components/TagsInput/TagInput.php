@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Achse\TagInput;
+namespace App\Components\TagsInput;
 
 use Nette;
 use Nette\Forms\Controls\TextInput;
@@ -24,8 +24,13 @@ class TagInput extends TextInput
 	 */
 	public static function register(string $control_name = 'addTagInput')
 	{
+		// Nette typuje callback jako callable(Container): mixed - další parametry proto musí být volitelné,
+		// povinné se kontrolují až za běhu
 		\Nette\Forms\Container::extensionMethod(
-			'Nette\Forms\Container::' . $control_name, function (Nette\Forms\Container $form, $name, $label = null, DataSourceDescriptor $dataSourceDescriptor = null, $maxLength = null) {
+			'Nette\Forms\Container::' . $control_name, function (Nette\Forms\Container $form, ?string $name = null, $label = null, ?DataSourceDescriptor $dataSourceDescriptor = null, $maxLength = null) {
+			if ($name === null || $dataSourceDescriptor === null) {
+				throw new Nette\InvalidArgumentException('addTagInput(): name and DataSourceDescriptor are required.');
+			}
 			$control = new self($dataSourceDescriptor, $label, $maxLength);
 
 			return $form[$name] = $control;

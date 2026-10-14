@@ -10,7 +10,7 @@ use App\Model\Exceptions\DuplicateNameException;
 use Latte\Engine;
 use Nette\Application\UI\Form;
 use Nette\Database\SqlLiteral;
-use Nette\Forms\Rendering\TwitterBootstrapRenderer;
+use App\Components\TwitterBootstrapRenderer\TwitterBootstrapRenderer;
 use Nette\Http\Request;
 use Nette\Localization\Translator;
 use Nette\Mail\Message;

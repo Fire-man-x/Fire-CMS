@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Forms;
 
-use Achse\TagInput\DataSourceDescriptor;
-use Achse\TagInput\TagInput;
+use App\Components\TagsInput\DataSourceDescriptor;
+use App\Components\TagsInput\TagInput;
 use App\AdminModule\Forms\CategorySubtype\DefaultFormPart;
 use App\AdminModule\Forms\CategorySubtype\ICategoryFormType;
 use App\Model;
@@ -74,7 +74,7 @@ class CategoryFormFactory extends AdminFormFactory
 
 		$form = parent::createBaseForm();*/
 
-		/* @var $dtm \Vodacek\Forms\Controls\DateInput */
+		/* @var $dtm \App\Components\DateInput\DateInput */
 		/*$dtm = $form->addDate("datum", "datum");
 		$dtm->setRequired();*/
 

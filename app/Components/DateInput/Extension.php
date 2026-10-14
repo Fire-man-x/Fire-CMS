@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Vodacek\Forms\Controls;
+namespace App\Components\DateInput;
 
 use Nette;
 
@@ -16,7 +16,7 @@ class Extension extends Nette\DI\CompilerExtension
 		parent::afterCompile($class);
 		$init = $class->getMethod('initialize');
 		/** @see DateInput::register() */
-		$init->addBody('Vodacek\Forms\Controls\DateInput::register();');
+		$init->addBody('App\Components\DateInput\DateInput::register();');
 	}
 
 }

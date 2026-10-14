@@ -5,7 +5,7 @@ namespace App\Forms;
 
 use Nette;
 use Nette\Application\UI\Form;
-use Nette\Forms\Rendering\TwitterBootstrapRenderer;
+use App\Components\TwitterBootstrapRenderer\TwitterBootstrapRenderer;
 
 
 class FormFactory

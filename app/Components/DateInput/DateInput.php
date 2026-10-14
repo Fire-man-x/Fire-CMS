@@ -27,7 +27,7 @@ declare(strict_types=1);
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Vodacek\Forms\Controls;
+namespace App\Components\DateInput;
 
 use DateTimeInterface;
 use Nette\Forms\Container;
@@ -71,18 +71,24 @@ class DateInput extends BaseControl  {
 	];
 
 	public static function register($immutable = true): void {
+		// Nette typuje callback jako callable(Container): mixed - další parametry proto musí být volitelné,
+		// povinné jméno prvku se kontroluje až za běhu
 		Container::extensionMethod('addOwnDate', static function (
 			Container $form,
-			string $name,
-			string $label = null,
+			?string $name = null,
+			?string $label = null,
 			string $type = self::TYPE_DATETIME_LOCAL
-		) use ($immutable) {
+		) use ($immutable): self {
+			if ($name === null) {
+				throw new \InvalidArgumentException('addOwnDate(): name of the control is required.');
+			}
 			$component = new self($label, $type, $immutable);
 			$form->addComponent($component, $name);
 			$component->setRequired(false);
-			$component->addRule(static function(self $control) {
-				return self::validateValid($control);
-			}, self::$defaultValidMessage);
+			$component->addRule(
+				static fn(Control $control): bool => self::validateValid($control),
+				self::$defaultValidMessage,
+			);
 			return $component;
 		});
 		Validator::$messages[__CLASS__.'::validateDateInputRange'] = Validator::$messages[Form::RANGE];

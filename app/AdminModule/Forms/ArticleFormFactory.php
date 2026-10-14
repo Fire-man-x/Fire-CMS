@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Forms;
 
-use Achse\TagInput\DataSourceDescriptor;
-use Achse\TagInput\TagInput;
+use App\Components\TagsInput\DataSourceDescriptor;
+use App\Components\TagsInput\TagInput;
 use App\Model;
 use App\Modules\UrlModule\UrlManager;
 use App\Service\Article;

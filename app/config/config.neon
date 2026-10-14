@@ -78,8 +78,8 @@ extensions:
 	fileStorage: App\FileStorage\DI\Extension
 
 	#Input
-	tagInput: Achse\TagInput\Extension
-	dateInput: Vodacek\Forms\Controls\Extension
+	tagInput: App\Components\TagsInput\Extension
+	dateInput: App\Components\DateInput\Extension
 	antispam: Zet\AntiSpam\AntiSpamExtension
 
 	#replicator

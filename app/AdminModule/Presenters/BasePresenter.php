@@ -11,6 +11,7 @@ use App\Service\LanguageService;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\BadRequestException;
 use Nette\Application\ForbiddenRequestException;
+use Nette\Bridges\SecurityHttp\SessionStorage;
 
 
 /**
@@ -77,7 +78,10 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	public function checkRequirements($element): void
 	{
 		//different login in backend and frontend
-		$this->getUser()->getStorage()->setNamespace('admin');
+		$userStorage = $this->getUser()->getStorage();
+		if ($userStorage instanceof SessionStorage) {
+			$userStorage->setNamespace('admin');
+		}
 
 		//setup translator
 		//different translations in backend and frontend

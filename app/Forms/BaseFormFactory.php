@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace App\Forms;
 
 use Nette\Application\UI\Form;
-use Nette\Forms\Rendering\TwitterBootstrapRenderer;
+use App\Components\TwitterBootstrapRenderer\TwitterBootstrapRenderer;
 use Nette\SmartObject;
 use Nette\Utils\DateTime;
-use Vodacek\Forms\Controls\DateInput;
+use App\Components\DateInput\DateInput;
 
 /**
  * Abstract Base Form factory
@@ -27,8 +27,6 @@ abstract class BaseFormFactory
 	 * Is form for modal?
 	 */
 	private bool $isModal = false;
-
-	private array $formParts = array();
 
 
 	/**
@@ -96,15 +94,6 @@ abstract class BaseFormFactory
 	}
 
 
-	/**
-	 * Add form part to form
-	 */
-	public function addFormPart(BaseFormPartFactory $formPart)
-	{
-		$this->formParts[] = $formPart;
-	}
-
-
 	protected function create(int|string|null $editId = null): Form
 	{
 		if ($this->isModal() && !is_null($editId)) {
@@ -127,11 +116,6 @@ abstract class BaseFormFactory
 				}
 				unset($values->editId);
 			};
-		}
-
-		foreach ($this->formParts as $formPart){
-			/* @var $formPart BaseFormPartFactory */
-			$formPart->createPart();
 		}
 
 		return $form;
@@ -180,9 +164,7 @@ abstract class BaseFormFactory
 	 */
 	protected function checkDateTimeFormat(string $string): ?\Nette\Utils\DateTime
 	{
-		if ($string instanceof DateTime || $string instanceof \DateTime || $string instanceof \DateTimeImmutable) {
-			return $string;
-		} elseif (preg_match("#^" . DATETIME_REGEXP . "$#", $string)) {
+		if (preg_match("#^" . DATETIME_REGEXP . "$#", $string)) {
 			return new \Nette\Utils\DateTime($string);
 		} else {
 			return null;
