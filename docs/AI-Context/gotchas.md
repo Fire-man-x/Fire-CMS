@@ -532,6 +532,6 @@ Chování zdokumentované testy:
   `languageId`. Vyřazení vlastní URL (`$notInKey`) ale porovnává jen `key`, ne `type`: při editaci článku 2 se
   nepočítá ani URL stránky nebo kategorie s ID 2. Neopraveno.
 - `CustomRouter::match()`: segment tvaru `xx/...` se vždy zkusí jako jazykový prefix (viz `Architecture/routing.md`).
-- `App\Security\Role`: jednoargumentová varianta konstruktoru (`Nette\Security\User`/`App\Security\Identity`) je
-  mrtvý kód — odkazuje na neexistující `App\Security\Identity` a `App\Security\Exception` a spadla by na fatální
-  chybu. V repu se volá jen dvouargumentová `new Role($roleName, $userId)`, test pokrývá jen ji. Neopraveno.
+- `App\Security\Role`: role ACL s ID uživatele (`new Role($roleName, $userId)`), vytváří ji
+  `App\Security\User::isAllowed()` z názvu role v identitě (identita nese jen řetězec). Bez ní by pravidlo
+  „autor smí se svým záznamem cokoliv“ v `AuthorizatorFactory` nikdy neplatilo.

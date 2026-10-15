@@ -4,6 +4,11 @@ Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na det
 
 ## 2026-10-15
 
+- **Detail článku: kategorie, pole URL, přepínač aktivity.** Obrázky a grid kategorií za formulářem článku (datagrid
+  by vnořil formulář), „Přidat“ v okně kategorií už neotevírá okno obrázků, přidání obrázku nemaže pole URL,
+  přepínač aktivity jen u článků s právem `edit` a bez chybové stránky.
+  Viz [2026-10-15-articles-detail-fixes.md](2026-10-15-articles-detail-fixes.md).
+
 - **Společný návrh URL z názvu.** Rozhraní `UrlValidation` + `UrlValidationTrait` místo čtyř kopií `handleValidateUrl()`
   (články, kategorie, stránky, sekce). U editovaného článku a kategorie se už nenavrhuje `…-1` místo vlastní URL.
   Viz [2026-10-15-url-validation.md](2026-10-15-url-validation.md).

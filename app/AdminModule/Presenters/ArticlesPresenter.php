@@ -16,7 +16,6 @@ use App\Service\Meta;
 use App\Service\Tag;
 use Contributte\Datagrid\Datagrid;
 use Nette\Application\Attributes\Parameter;
-use Nette\Application\ForbiddenRequestException;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 
@@ -210,6 +209,9 @@ class ArticlesPresenter extends BasePresenter implements UrlValidation
 		->setClass('btn-success')
 			->setIcon('check-circle')
 			->setTitle('Set as unactive');
+		$active_column->setRenderCondition(function($item) {
+			return $this->user->isAllowed(new \App\Security\Resource("Articles", $item["createdBy"]), "edit");
+		});
 		$active_column->onChange[] = function($id, $value) {
 			$this->handleActivate((int) $id, (bool) $value);
 		};
@@ -296,16 +298,14 @@ class ArticlesPresenter extends BasePresenter implements UrlValidation
 
 
 	/**
-	 * Categories grid
-	 * @param string $name
-	 * @return Datagrid
+	 * Kategorie článku (vykresluje se za formulářem článku, datagrid má vlastní <form>)
 	 * @throws \LiveTranslator\TranslatorException
 	 * @throws \Contributte\Datagrid\Exception\DatagridColumnStatusException
 	 * @throws \Contributte\Datagrid\Exception\DatagridException
 	 */
-	protected function createComponentCategoriesGrid($name)
+	protected function createComponentCategoriesGrid(string $name): Datagrid
 	{
-		$source = $this->articlesModel->getRelationCategory($this->id);
+		$source = $this->articlesModel->getRelationCategory((int) $this->id);
 		$this->categoriesModel->selectTitle($source, Categories::RELATION_ARTICLE_TABLE_NAME . ".categoryId", $this->editLocale)
 			->order("title");
 		$primaryKey = "categoryId";
@@ -334,9 +334,7 @@ class ArticlesPresenter extends BasePresenter implements UrlValidation
 
 		//Actions
 		$grid->addAction('delete', 'Delete', 'removeCategory!', array($primaryKey => $primaryKey))
-			->setClass(function($item) {
-				return 'btn btn-danger btn-sm ajax float-right'.($item->default ? ' disabled' : '');
-			})
+			->setClass('btn btn-danger btn-sm ajax float-right')
 			->setIcon(ICON_DELETE)
 			->setTitle('Delete')
 			->addAttributes(array(
@@ -379,8 +377,8 @@ class ArticlesPresenter extends BasePresenter implements UrlValidation
 			->setIcon('plus')
 			->setTitle('Add')
 			->addAttributes(array(
-				"data-bs-toggle" => "modal",
-				"data-bs-target" => "#modal"
+				// zavře okno výběru (dřív data-bs-target="#modal" otevíralo okno obrázků)
+				"data-bs-dismiss" => "modal",
 			));
 
 		return $grid;
@@ -433,7 +431,9 @@ class ArticlesPresenter extends BasePresenter implements UrlValidation
 		//edit own - i při přímém volání z gridu (onChange), kde se atribut nevyhodnotí
 		$createdBy = $this->articlesModel->getById($articleId)?->createdBy;
 		if(!$this->user->isAllowed(new \App\Security\Resource("Articles", $createdBy),"edit")){
-			throw new ForbiddenRequestException("You have not access to 'Articles' with priviledge 'edit'.");
+			// stejně jako BasePresenter::checkRequirements() - výjimka z gridu by skončila chybovou stránkou
+			$this->flashMessage((string) $this->translator->translate("You have not access to resouce '%s' with privilege '%s'.", $this->translator->translate("Articles"), $this->translator->translate("edit")), FLASH_FAILED, false);
+			$this->redirect('this');
 		}
 		$this->articleService->makeBackup($articleId);
 		$this->articlesModel->update($articleId, array("active" => $status));

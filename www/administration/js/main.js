@@ -97,10 +97,11 @@ $(function () {
 		$(this).find(".buttons").removeClass("show");
 	});
 
-	//hide alerts
-	/*window.setTimeout(function() {
-		$(".alert").alert('close');
-	}, 2500);*/
+	//hide flash messages - odpočet je CSS animace .flash-timer (style.css), najetí myší ji pozastaví;
+	//delegováno na document, platí i pro zprávy ze snippetu překresleného AJAXem
+	$(document).on('animationend', '.message .flash-timer', function() {
+		bootstrap.Alert.getOrCreateInstance($(this).closest('.flash')[0]).close();
+	});
 
 	//url
 	var ajaxTimeout;
@@ -236,10 +237,9 @@ $(function () {
 							return item["file_id"];
 						}),
 						"language": toLanguage
-					},
-					success: function (payload) {
-						$(".validate-url-output").val(payload.url);
 					}
+					// bez success: snippety (obrázky) překreslí nette.ajax, dřív se tu přepisovalo pole URL
+					// hodnotou payload.url, kterou handlery obrázků neposílají - pole se vymazalo
 				});
 			} else if (selectedFilesCallback !== null) {
 				items.forEach(function (item) {

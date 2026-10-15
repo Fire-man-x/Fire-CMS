@@ -103,31 +103,36 @@
 				{input data-tags class=>'form-control text'}
 			</fieldset>
 
-			<fieldset class="images-sortable">
-				<legend>{_'Images'} <a href="#" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#modal" data-src="{link :Admin:FilesManager:default isWindowMode=>true}" title="{_'Add'}" ><i class="fa fa-plus"></i></a></legend>
-				{input data-images}
-				{snippet files}
-					{ifset $files}
-						<div n:foreach="$files as $file" class="img-thumbnail d-inline-block" data-file-id="{$file->getId()}">
-							<a n:tag-if="!$isWindowMode" nx:href="fileInfo! hash=>$file->getHash()" data-bs-toggle="popover" titlex="{_'Actions'}" data-content="<a href='{link removeImage! fileId=>$file->getId()}' class='ajax'><i class='fa fa-times'></i></a>" data-bs-placement="bottom" titlex="{$file->getName()}">
-								<img n:src="$file, '100x100'" alt="{$file->getName()}" class="">
-								<small class="d-block text-xs-center">{$file->getName()}</small>
-							</a>
-						</div>
-					{/ifset}
-				{/snippet}
-			</fieldset>
-
-			<fieldset>
-				<legend>{_'Categories'} <a href="#" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#categoriesSelectionModal" title="{_'Add'}" ><i class="fa fa-plus"></i></a></legend>
-				{snippet categories}
-					{*control categoriesGrid*}
-				{/snippet}
-			</fieldset>
+			{input data-images}
 		</div>
 	{/form}
 
 	<div class="clearfix"></div>
+
+	{* obrázky a kategorie pod celým článkem - datagrid kategorií má vlastní <form>, uvnitř formuláře článku by byl
+	   vnořený formulář; jen u uloženého článku (handlery potřebují jeho ID) *}
+	<div n:ifset="$id" id="article-relations" class="mt-3">
+		<fieldset class="images-sortable">
+			<legend>{_'Images'} <a href="#" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#modal" data-src="{link :Admin:FilesManager:default isWindowMode=>true}" title="{_'Add'}" ><i class="fa fa-plus"></i></a></legend>
+			{snippet files}
+				{ifset $files}
+					<div n:foreach="$files as $file" class="img-thumbnail d-inline-block" data-file-id="{$file->getId()}">
+						<a n:tag-if="!$isWindowMode" nx:href="fileInfo! hash=>$file->getHash()" data-bs-toggle="popover" titlex="{_'Actions'}" data-content="<a href='{link removeImage! fileId=>$file->getId()}' class='ajax'><i class='fa fa-times'></i></a>" data-bs-placement="bottom" titlex="{$file->getName()}">
+							<img n:src="$file, '100x100'" alt="{$file->getName()}" class="">
+							<small class="d-block text-xs-center">{$file->getName()}</small>
+						</a>
+					</div>
+				{/ifset}
+			{/snippet}
+		</fieldset>
+
+		<fieldset>
+			<legend>{_'Categories'} <a href="#" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#categoriesSelectionModal" title="{_'Add'}" ><i class="fa fa-plus"></i></a></legend>
+			{snippet categories}
+				{control categoriesGrid}
+			{/snippet}
+		</fieldset>
+	</div>
 
 	{*<div class="" role="navigation">
 		<fieldset>
@@ -144,7 +149,7 @@
 		var selectedFilesFromIframeUrl = {link addImage!};
 
 		//sortable menu
-		$('#sidebar-inside .images-sortable').sortable({
+		$('.images-sortable').sortable({
 			forcePlaceholderSize: true,
 			helper:	'clone',
 			opacity: .6,
