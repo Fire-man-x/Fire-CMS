@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace App\AdminModule\SettingsModule\Presenters;
 
 use App\AdminModule\Forms\DomainFormFactory;
-use App\Attributes\Privilege;
-use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Model\Database\Domains;
 use App\Model\Database\Languages;
@@ -18,9 +16,7 @@ use Nette;
  * Správa domén přiřazených jazykovým mutacím - viz App\Service\DomainService a
  * App\Router\CustomRouter, které podle nich rozhodují o routování.
  */
-#[Secured]
-#[Resource('Domains')]
-#[Privilege('view')]
+#[Secured('Domains', 'view')]
 class DomainsPresenter extends BasePresenter
 {
 

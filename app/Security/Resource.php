@@ -5,15 +5,8 @@ namespace App\Security;
 
 class Resource implements \Nette\Security\Resource
 {
-
-	public $id = null;
-	public $name = null;
-
-
-	function __construct($name, $createdById = null)
+	function __construct(private string $name, public ?int $createdById = null)
 	{
-		$this->name = $name;
-		$this->id = $createdById;
 	}
 
 

@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace App\AdminModule\Presenters;
 
 use App\AdminModule\Forms\AdminForm;
-use App\Attributes\Privilege;
-use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Forms\CommentFormFactory;
 use App\Model;
@@ -85,10 +83,8 @@ class CommentsPresenter extends BasePresenter
 	}
 
 
-	#[Secured]
-	#[Resource('Comments')]
-	#[Privilege('view')]
-	public function actionDefault(string $show = null)
+	#[Secured('Comments', 'view')]
+	public function actionDefault(string $show = null): void
 	{
 		$this->show = $show;
 		if (!is_null($this->show) && !in_array($this->show, array("trash","pending"))) {
@@ -122,7 +118,7 @@ class CommentsPresenter extends BasePresenter
 	 * @Resource (Comments)
 	 * @Privilege (edit)
 	 * /
-	public function actionDetail()//$parent = null)
+	public function actionDetail()//$parent = null): void
 	{
 		//$this->parent = $parent;
 
@@ -253,9 +249,8 @@ class CommentsPresenter extends BasePresenter
 
 	/**
 	 * Sign-up form factory.
-	 * @return Nette\Application\UI\Form
 	 */
-	protected function createComponentCommentReplyForm()
+	protected function createComponentCommentReplyForm(): Nette\Application\UI\Form
 	{
 		$form = $this->commentFactory->createReply(
 			$this->id,
@@ -269,12 +264,9 @@ class CommentsPresenter extends BasePresenter
 
 	/**
 	 * Approve
-	 * @param int $commentId
 	 */
-	#[Secured]
-	#[Resource('Comments')]
-	#[Privilege('approve_comment')]
-	public function handleApprove(int $commentId)
+	#[Secured('Comments', 'approve_comment')]
+	public function handleApprove(int $commentId): void
 	{
 		//$this->commentsModel->statusPublish($commentId);
 		$this->flashMessage(SUCCESS_SAVE, FLASH_SUCCESS);
@@ -284,12 +276,9 @@ class CommentsPresenter extends BasePresenter
 
 	/**
 	 * Add handler
-	 * @param int $commentId
 	 */
-	#[Secured]
-	#[Resource('Comments')]
-	#[Privilege('edit')]
-	public function handleReply(int $commentId)
+	#[Secured('Comments', 'edit')]
+	public function handleReply(int $commentId): void
 	{
 		$this->template->commentInfo = $this->commentsModel->getById($commentId);;
 
@@ -303,12 +292,9 @@ class CommentsPresenter extends BasePresenter
 
 	/**
 	 * Edit handler
-	 * @param int $commentId
 	 */
-	#[Secured]
-	#[Resource('Comments')]
-	#[Privilege('edit')]
-	public function handleEdit(int $commentId)
+	#[Secured('Comments', 'edit')]
+	public function handleEdit(int $commentId): void
 	{
 		$this->commentFactory->setEditId($commentId);
 		/** @var AdminForm $form */
@@ -320,12 +306,9 @@ class CommentsPresenter extends BasePresenter
 
 	/**
 	 * Delete handler
-	 * @param int $commentId
 	 */
-	#[Secured]
-	#[Resource('Comments')]
-	#[Privilege('delete')]
-	public function handleDelete(int $commentId)
+	#[Secured('Comments', 'delete')]
+	public function handleDelete(int $commentId): void
 	{
 		$this->commentService->delete($commentId);
 		$this->flashMessage(SUCCESS_DELETE, FLASH_SUCCESS);

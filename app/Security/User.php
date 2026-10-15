@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Security;
 
+use Nette\InvalidArgumentException;
 use Nette\Security\Authorizator;
 
 /**
@@ -45,7 +46,22 @@ class User extends \Nette\Security\User
 	public function isAllowed(mixed $resource = Authorizator::All, mixed $privilege = Authorizator::All, ?int $createdByUserId = null): bool
 	{
 		//bdump(func_get_args(), 'isAllowed');
-		$isAllowed = parent::isAllowed($resource, $privilege);
+		//$isAllowed = parent::isAllowed($resource, $privilege);
+
+		if($this->isLoggedIn() && !is_int($this->getId())){
+			throw new InvalidArgumentException("User ID is not integer.");
+		}
+
+		$isAllowed = true;
+		foreach ($this->getRoles() as $role) {
+			// id přihlášeného uživatele -> pravidlo "vlastní obsah" v AuthorizatorFactory
+			$queriedRole = $this->isLoggedIn() ? new Role($role, $this->getId()) : $role;
+			//this goes to AuthorizatorFactory::create()
+			if ($this->getAuthorizator()->isAllowed($queriedRole, $resource, $privilege)) {
+				return true;
+			}
+			$isAllowed = false;
+		}
 
 		if ($resource instanceof UserAccessibleResourceEntity && $isAllowed === false) {
 			return $resource->checkAccess($this->id, $privilege, $createdByUserId);

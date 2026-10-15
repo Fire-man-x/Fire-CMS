@@ -5,8 +5,6 @@ namespace App\AdminModule\Presenters;
 
 use App\AdminModule\Forms\SliderFormFactory;
 use App\AdminModule\Forms\SliderItemFormFactory;
-use App\Attributes\Privilege;
-use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Model\Database\Files;
 use App\Model\Database\SliderItems;
@@ -19,9 +17,7 @@ use Nette\InvalidArgumentException;
 /**
  * Sliders presenter.
  */
-#[Secured]
-#[Resource('Sliders')]
-#[Privilege('view')]
+#[Secured('Sliders', 'view')]
 class SlidersPresenter extends BasePresenter
 {
 
@@ -178,9 +174,7 @@ class SlidersPresenter extends BasePresenter
 	/**
 	 * Add handler
 	 */
-	#[Secured]
-	#[Resource('Sliders')]
-	#[Privilege('add')]
+	#[Secured('Sliders', 'add')]
 	public function handleAdd(): void
 	{
 		$this->factorySlider->resetEditMode();
@@ -191,9 +185,7 @@ class SlidersPresenter extends BasePresenter
 	/**
 	 * Edit handler
 	 */
-	#[Secured]
-	#[Resource('Sliders')]
-	#[Privilege('edit')]
+	#[Secured('Sliders', 'edit')]
 	public function handleEdit(int $sliderId): void
 	{
 		$this->factorySlider->setEditId($sliderId);
@@ -205,9 +197,7 @@ class SlidersPresenter extends BasePresenter
 	/**
 	 * Delete handler
 	 */
-	#[Secured]
-	#[Resource('Sliders')]
-	#[Privilege('delete')]
+	#[Secured('Sliders', 'delete')]
 	public function handleDelete(int $sliderId): void
 	{
 		//tabulka nemá sloupec `default` (dřívější kontrola `->default` vždy spadla) - slider lze smazat vždy
@@ -220,9 +210,7 @@ class SlidersPresenter extends BasePresenter
 	/**
 	 * Add item handler
 	 */
-	#[Secured]
-	#[Resource('Sliders')]
-	#[Privilege('edit')]
+	#[Secured('Sliders', 'edit')]
 	public function handleAddItem(string $language): void
 	{
 		//$this->factorySliderItem->setLanguage($language);
@@ -234,9 +222,7 @@ class SlidersPresenter extends BasePresenter
 	/**
 	 * Edit item handler
 	 */
-	#[Secured]
-	#[Resource('Sliders')]
-	#[Privilege('edit')]
+	#[Secured('Sliders', 'edit')]
 	public function handleEditItem(string $language, int $position): void
 	{
 		$this->factorySliderItem->setEditId($position);
@@ -249,9 +235,7 @@ class SlidersPresenter extends BasePresenter
 	/**
 	 * Remove item handler
 	 */
-	#[Secured]
-	#[Resource('Sliders')]
-	#[Privilege('edit')]
+	#[Secured('Sliders', 'edit')]
 	public function handleRemoveItem(string $language, int $position): void
 	{
 		$this->modelSliderItems->delete(array(
@@ -270,9 +254,7 @@ class SlidersPresenter extends BasePresenter
 	/**
 	 * Add item image handler
 	 */
-	#[Secured]
-	#[Resource('Sliders')]
-	#[Privilege('edit')]
+	#[Secured('Sliders', 'edit')]
 	public function handleAddItemImage(array $files, ?string $language = null): void
 	{
 		if(empty($files)){
@@ -298,9 +280,7 @@ class SlidersPresenter extends BasePresenter
 	/**
 	 * Add item image handler
 	 */
-	#[Secured]
-	#[Resource('Sliders')]
-	#[Privilege('edit')]
+	#[Secured('Sliders', 'edit')]
 	public function handleSortItems(string $language = '', array $items = []): void
 	{
 		// parametry posílá JS až v AJAX požadavku, {link sortItems!} v šabloně je generuje bez nich

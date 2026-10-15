@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace App\AdminModule\Presenters;
 
 use App\AdminModule\Forms\TagFormFactory;
-use App\Attributes\Privilege;
-use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Model\Database\Tags;
 use Contributte\Datagrid\Column\ColumnText;
@@ -16,9 +14,7 @@ use Nette\Application\Attributes\Persistent;
 /**
  * Tags presenter.
  */
-#[Secured]
-#[Resource('Tags')]
-#[Privilege('view')]
+#[Secured('Tags', 'view')]
 class TagsPresenter extends BasePresenter
 {
 
@@ -47,9 +43,7 @@ class TagsPresenter extends BasePresenter
 	}
 
 
-	#[Secured]
-	#[Resource('Tags')]
-	#[Privilege('view')]
+	#[Secured('Tags', 'view')]
 	public function actionDefault(): void
 	{
 		$this->template->onlyLocale = $this->onlyLocale;

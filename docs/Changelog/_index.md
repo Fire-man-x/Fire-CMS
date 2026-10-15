@@ -2,7 +2,24 @@
 
 Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na detailní záznam v `Changelog/`.
 
+## 2026-10-15
+
+- **Společný návrh URL z názvu.** Rozhraní `UrlValidation` + `UrlValidationTrait` místo čtyř kopií `handleValidateUrl()`
+  (články, kategorie, stránky, sekce). U editovaného článku a kategorie se už nenavrhuje `…-1` místo vlastní URL.
+  Viz [2026-10-15-url-validation.md](2026-10-15-url-validation.md).
+
+- **`#[Secured('Zdroj', 'právo')]` místo `#[Secured]` + `#[Resource]` + `#[Privilege]`.** Opakovatelný atribut s povinnými
+  parametry, `recordIdParameter:` pustí autora záznamu ke všemu (zatím `ArticlesPresenter::actionDetail()`). Bez zpětné kompatibility,
+  pluginy projektů je potřeba převést. Viz [2026-10-15-secured-attribute.md](2026-10-15-secured-attribute.md).
+
 ## 2026-10-14
+
+- **Mapa autorů záznamů pro ACL.** Služba `App\Security\ResourceOwners` (`resourceOwners` v `config.neon`) vrátí
+  podle zdroje ACL a ID záznamu jeho autora (`createdBy`), pluginy přidají zdroj přes `setup: - add()`. Zatím ji nic nevolá.
+  Viz [2026-10-14-resource-owners.md](2026-10-14-resource-owners.md).
+
+- **Flash zprávy administrace vpravo dole.** Zásobník v pravém dolním rohu, zprávy se zavřou po 5 s, najetí myší
+  odpočet pozastaví. Viz [2026-10-14-admin-flash-toasts.md](2026-10-14-admin-flash-toasts.md).
 
 - **PHPStan level 5 bez baseline.** Celé `app/` prochází s prázdnou `phpstan-baseline.neon`, uzly maker obrázků
   (`app/FileStorage/Macro/Nodes/*`) jsou `final`. Nová chyba se opravuje, ne přidává do baseline.

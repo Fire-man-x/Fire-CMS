@@ -169,11 +169,32 @@ public function handleActivate(int $id, bool $status): void
 ```
 
 **Pozor na oprávnění:** `onChange` běží v signálu datagridu (`handleChangeStatus` komponenty), ne presenteru.
-Atributy `#[Resource]`/`#[Privilege]` na metodě presenteru vyhodnocuje jen
+Atribut `#[Secured]` na metodě presenteru vyhodnocuje jen
 `AdminModule\Presenters\BasePresenter::checkRequirements()`, a to při volání signálu presenteru. Při přímém volání
 z `onChange` se nevyhodnotí a platí jen oprávnění z třídy presenteru (typicky `view`). V novém kódu proto oprávnění
 ověřte v obsluze ručně (`$this->getUser()->isAllowed('X', 'edit')`). Existující `handleActivate()` v jádru (Pages,
 Sections, Languages) to zatím nedělají.
+
+## Návrh URL z názvu (`UrlValidation`)
+
+Pole formuláře s třídou `validate-url` posílá text AJAXem na signál `validateUrl` (`www/administration/js/main.js`),
+odpověď `payload.url` se vloží do pole s třídou `validate-url-output`. Presenter s takovým formulářem implementuje
+`App\AdminModule\Presenters\UrlValidation` a použije trait s implementací, sám dodá jen typ URL:
+
+```php
+class PagesPresenter extends BasePresenter implements UrlValidation
+{
+    use UrlValidationTrait;     // App\AdminModule\Presenters\UrlValidationTrait\UrlValidationTrait
+
+    public function getUrlType(): string
+    {
+        return Pages::URL_TYPE;
+    }
+}
+```
+
+Trait potřebuje vlastnost `?int $id` s ID editovaného záznamu. Jeho vlastní URL se při návrhu nepočítá jako
+obsazená. Prázdný text vrátí prázdnou odpověď. Handler nemá vlastní `#[Secured]`, platí oprávnění třídy presenteru.
 
 ## Registrace pluginu (`config.plugin.neon`)
 

@@ -66,4 +66,4 @@ Každý jazyk (`firecms_languages`) může mít 0-N domén v `firecms_domains` (
   jako předtím — funkce je čistě přídavná/opt-in.
 
 Admin přístup k Doménám je gated stejně hrubě jako Languages/Users/Roles/Tags/Urls — jen přes resource
-`Settings` v menu (`@layout.latte`), žádný vlastní `#[Secured]`/`#[Resource]` atribut na presenteru.
+`Settings` v menu (`@layout.latte`), žádný vlastní `#[Secured]` atribut na presenteru.

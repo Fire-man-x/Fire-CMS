@@ -19,12 +19,12 @@ class AuthorizatorFactory
 	/**
 	 * Acl constructor
 	 */
-	public static function create(Modules $modelModules, Roles $modelRoles): Permission
+	public static function create(Modules $modelModules, Roles $modelRoles): Acl
 	{
 		self::$modelModules = $modelModules;
 		self::$modelRoles = $modelRoles;
 
-		$acl = new Permission;
+		$acl = new Acl();
 
 		//roles
 		$roles = self::$modelRoles->getListWithName();
@@ -80,7 +80,7 @@ class AuthorizatorFactory
 			}*/
 
 			if($acl->getQueriedRole() instanceof Role && $acl->getQueriedResource() instanceof Resource){
-				return $acl->getQueriedRole()->id != $acl->getQueriedResource()->id;
+				return $acl->getQueriedRole()->actualUserId != $acl->getQueriedResource()->createdById;
 			}
 
 			return true;

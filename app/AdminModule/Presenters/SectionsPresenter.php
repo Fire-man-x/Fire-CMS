@@ -4,8 +4,7 @@ declare(strict_types=1);
 namespace App\AdminModule\Presenters;
 
 use App\AdminModule\Forms\SectionFormFactory;
-use App\Attributes\Privilege;
-use App\Attributes\Resource;
+use App\AdminModule\Presenters\UrlValidationTrait\UrlValidationTrait;
 use App\Attributes\Secured;
 use App\Model\Database\Sections;
 use App\Model\UrlManager;
@@ -17,11 +16,11 @@ use Nette\Application\UI\Form;
  * Sekce (App\Model\Sections) - seznam s řazením přetažením a detail s překlady po jazycích. Články a
  * kategorie sekce spravují :Admin:Articles / :Admin:Categories s parametrem `section`.
  */
-#[Secured]
-#[Resource('Sections')]
-#[Privilege('view')]
-class SectionsPresenter extends BasePresenter
+#[Secured('Sections', 'view')]
+class SectionsPresenter extends BasePresenter implements UrlValidation
 {
+	use UrlValidationTrait;
+
 	#[Persistent]
 	public ?int $id = null;
 
@@ -42,9 +41,7 @@ class SectionsPresenter extends BasePresenter
 	}
 
 
-	#[Secured]
-	#[Resource('Sections')]
-	#[Privilege('edit')]
+	#[Secured('Sections', 'edit')]
 	public function actionDetail(): void
 	{
 		if ($this->id !== null) {
@@ -137,9 +134,7 @@ class SectionsPresenter extends BasePresenter
 	}
 
 
-	#[Secured]
-	#[Resource('Sections')]
-	#[Privilege('edit')]
+	#[Secured('Sections', 'edit')]
 	public function handleActivate(int $sectionId, bool $status = false): void
 	{
 		$this->sectionsModel->update($sectionId, ['active' => $status]);
@@ -151,9 +146,7 @@ class SectionsPresenter extends BasePresenter
 	/**
 	 * Drag & drop v gridu sekcí
 	 */
-	#[Secured]
-	#[Resource('Sections')]
-	#[Privilege('edit')]
+	#[Secured('Sections', 'edit')]
 	public function handleSort(?int $item_id = null, ?int $prev_id = null, ?int $next_id = null): void
 	{
 		$ids = array_keys($this->sectionsModel->getList());
@@ -179,9 +172,7 @@ class SectionsPresenter extends BasePresenter
 	}
 
 
-	#[Secured]
-	#[Resource('Sections')]
-	#[Privilege('delete')]
+	#[Secured('Sections', 'delete')]
 	public function handleDelete(int $sectionId): void
 	{
 		try {
@@ -194,12 +185,11 @@ class SectionsPresenter extends BasePresenter
 	}
 
 
-	#[Secured]
-	#[Resource('Sections')]
-	#[Privilege('edit')]
-	public function handleValidateUrl(string $text): void
+	/**
+	 * Typ URL pro návrh URL z názvu (UrlValidation)
+	 */
+	public function getUrlType(): string
 	{
-		$this->payload->url = $this->urlManager->validateUrl($text, Sections::URL_TYPE, $this->id, $this->id);
-		$this->sendPayload();
+		return Sections::URL_TYPE;
 	}
 }

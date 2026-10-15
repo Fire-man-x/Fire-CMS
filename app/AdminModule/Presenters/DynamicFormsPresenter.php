@@ -5,8 +5,6 @@ namespace App\AdminModule\Presenters;
 
 use App\AdminModule\Forms\DynamicFormFormFactory;
 use App\AdminModule\Forms\DynamicFormItemFormFactory;
-use App\Attributes\Privilege;
-use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Model\Database\DynamicForms;
 use App\Model\UrlManager;
@@ -18,9 +16,7 @@ use Nette\Application\UI\Form;
 /**
  * DynamicForm Presenter
  */
-#[Secured]
-#[Resource('DynamicForms')]
-#[Privilege('view')]
+#[Secured('DynamicForms', 'view')]
 class DynamicFormsPresenter extends BasePresenter
 {
 	/**
@@ -65,9 +61,7 @@ class DynamicFormsPresenter extends BasePresenter
 	}
 
 
-	#[Secured]
-	#[Resource('DynamicForms')]
-	#[Privilege('view')]
+	#[Secured('DynamicForms', 'view')]
 	public function actionDefault(string $show = null): void
 	{
 		$this->show = $show;
@@ -332,9 +326,7 @@ class DynamicFormsPresenter extends BasePresenter
 	/**
 	 * Delete handler
 	 */
-	#[Secured]
-	#[Resource('DynamicForms')]
-	#[Privilege('delete')]
+	#[Secured('DynamicForms', 'delete')]
 	public function handleDelete(int $dynamicFormId): void
 	{
 		$this->dynamicFormsModel->delete($dynamicFormId);
@@ -347,9 +339,7 @@ class DynamicFormsPresenter extends BasePresenter
 	/**
 	 * Edit DynamicForm handler
 	 */
-	#[Secured]
-	#[Resource('DynamicForms')]
-	#[Privilege('edit')]
+	#[Secured('DynamicForms', 'edit')]
 	public function handleEdit(int $dynamicFormId): void
 	{
 		$this->dynamicFormFormFactory->setEditId($dynamicFormId);
@@ -364,9 +354,7 @@ class DynamicFormsPresenter extends BasePresenter
 	/**
 	 * Add DynamicFormItem handler
 	 */
-	#[Secured]
-	#[Resource('DynamicForms')]
-	#[Privilege('add')]
+	#[Secured('DynamicForms', 'add')]
 	public function handleAddDynamicFormItem($DynamicFormItem_id): void
 	{
 		//$this->dynamicFormItemFormFactory->insertRelationDynamicForm($DynamicFormItem_id, $this->id);
@@ -378,9 +366,7 @@ class DynamicFormsPresenter extends BasePresenter
 	/**
 	 * Edit DynamicFormItem handler
 	 */
-	#[Secured]
-	#[Resource('DynamicForms')]
-	#[Privilege('edit')]
+	#[Secured('DynamicForms', 'edit')]
 	public function handleEditItem(string $name): void
 	{
 		$this->dynamicFormItemFormFactory->setEditId($name);
@@ -395,9 +381,7 @@ class DynamicFormsPresenter extends BasePresenter
 	/**
 	 * Delete DynamicFormItem handler
 	 */
-	#[Secured]
-	#[Resource('DynamicForms')]
-	#[Privilege('delete')]
+	#[Secured('DynamicForms', 'delete')]
 	public function handleRemoveItem($name): void
 	{
 		$this->dynamicFormsModel->removeItem($this->id, $name);

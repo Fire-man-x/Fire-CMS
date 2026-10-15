@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace App\AdminModule\SettingsModule\Presenters;
 
 use App\AdminModule\Forms\LanguageFormFactory;
-use App\Attributes\Privilege;
-use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Model\Database\Languages;
 use Contributte\Datagrid\Column\ColumnLink;
@@ -15,9 +13,7 @@ use Nette;
 /**
  * Languages presenter.
  */
-#[Secured]
-#[Resource('Languages')]
-#[Privilege('view')]
+#[Secured('Languages', 'view')]
 class LanguagesPresenter extends BasePresenter
 {
 

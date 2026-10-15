@@ -305,6 +305,16 @@ services:
 
 	user: App\Security\User
 	authorizator: App\Security\AuthorizatorFactory::create(@modules, @roles)
+	# zdroj ACL => model se sloupcem createdBy (autor smí se svým záznamem cokoliv), plugin přidá
+	# vlastní zdroj přes "resourceOwners: setup: - add('Zdroj', @Model)" - viz App\Security\ResourceOwners
+	resourceOwners: App\Security\ResourceOwners([
+		Articles: @App\Model\Database\Articles
+		Categories: @App\Model\Database\Categories
+		Comments: @App\Model\Database\Comments
+		DynamicForms: @App\Model\Database\DynamicForms
+		Menus: @App\Components\Menu\Model\Menus
+		Pages: @App\Model\Database\Pages
+	])
 
 
 	#Front

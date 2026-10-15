@@ -37,7 +37,7 @@ www/index.php
     → Nette\Application\Application::run()
       → Router (viz routing.md)   — najde presenter + akci
         → PresenterFactory (viz plugins.md) — instancuje presenter
-          → BasePresenter::checkRequirements()  — ACL (#[Secured]/#[Resource]/#[Privilege])
+          → BasePresenter::checkRequirements()  — ACL (#[Secured('Zdroj', 'právo')])
             → action*/render*/handle* — typicky načte Model, sestaví Datagrid/Form komponentu
               → *.latte šablona
 ```

@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Presenters;
 
-use App\Attributes\Privilege;
-use App\Attributes\Resource;
 use App\Attributes\Secured;
+use App\Model\Exceptions\RecordNotFoundException;
+use App\Security\Resource;
+use App\Security\ResourceOwners;
 use App\Security\User;
 use App\Service\LanguageService;
 use Nette\Application\Attributes\Persistent;
@@ -44,6 +45,9 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	/** Sekce do menu administrace (články a kategorie po sekcích), viz beforeRender() */
 	protected \App\Model\Database\Sections $sectionsModel;
 
+	/** Autor záznamu pro #[Secured(recordIdParameter: ...)], viz checkSecured() */
+	private ResourceOwners $resourceOwners;
+
 
 	/**
 	 * Inject metoda (ne veřejná @inject vlastnost) - potomci si konstruktor nechávají pro vlastní závislosti
@@ -51,6 +55,12 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 	public function injectSections(\App\Model\Database\Sections $sectionsModel): void
 	{
 		$this->sectionsModel = $sectionsModel;
+	}
+
+
+	public function injectResourceOwners(ResourceOwners $resourceOwners): void
+	{
+		$this->resourceOwners = $resourceOwners;
 	}
 
 
@@ -69,13 +79,11 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 
 	/**
 	 * Check requirements to presenter
-	 * @param \Nette\Application\UI\MethodReflection|\Nette\Application\UI\ComponentReflection $element
-	 * @return void
 	 * @throws \LiveTranslator\TranslatorException
 	 * @throws \Nette\Application\AbortException
 	 * @throws \Nette\Application\UI\InvalidLinkException
 	 */
-	public function checkRequirements($element): void
+	public function checkRequirements(\ReflectionClass|\ReflectionMethod $element): void
 	{
 		//different login in backend and frontend
 		$userStorage = $this->getUser()->getStorage();
@@ -112,38 +120,50 @@ abstract class BasePresenter extends \App\Presenters\BasePresenter
 			$this->redirect(':Admin:Sign:in', array('id' => null, 'backlink' => $this->isLinkCurrent(":Admin:Default:default") ? null : $this->storeRequest()));
 		}
 
-		// $element is a ReflectionClass (presenter access) or a ReflectionMethod
-		// (action*/handle*/render* call). Both expose getAttributes().
-		$resource = $element;
-
-		try{
-			if ($resource->getAttributes(Secured::class)) {
-				$resourceAttrs = $resource->getAttributes(Resource::class);
-				$privilegeAttrs = $resource->getAttributes(Privilege::class);
-
-				if ($resourceAttrs && $privilegeAttrs) {
-					$resources = [];
-					foreach ($resourceAttrs as $attr) {
-						$resources = array_merge($resources, $attr->newInstance()->names);
-					}
-
-					$privileges = [];
-					foreach ($privilegeAttrs as $attr) {
-						$privileges = array_merge($privileges, $attr->newInstance()->names);
-					}
-
-					foreach ($resources as $securedResource) {
-						foreach ($privileges as $securedPrivilege) {
-							if (!$this->user->isAllowed($securedResource, $securedPrivilege)) {
-								throw new ForbiddenRequestException($this->translator->translate("You have not access to resouce '%s' with privilege '%s'.", $securedResource, $securedPrivilege));
-							}
-						}
-					}
-				}
+		// $element je ReflectionClass (přístup k presenteru) nebo ReflectionMethod (volání action*/handle*/render*),
+		// každý #[Secured] (atribut lze opakovat) se ověřuje zvlášť
+		try {
+			foreach ($element->getAttributes(Secured::class) as $attribute) {
+				$this->checkSecured($attribute->newInstance());
 			}
-		} catch(ForbiddenRequestException $e) {
+		} catch (ForbiddenRequestException $e) {
 			$this->flashMessage($e->getMessage(), FLASH_FAILED, false);
 			$this->redirect(":Admin:Default:default");
+		}
+	}
+
+
+	/**
+	 * Ověří jeden #[Secured]. S parametrem owner se ptá na zdroj s ID autora záznamu - autor smí se svým
+	 * záznamem cokoliv (pravidlo v AuthorizatorFactory), bez ID záznamu v požadavku platí právo privilegeWithoutRecord.
+	 * @throws ForbiddenRequestException
+	 * @throws BadRequestException neplatné nebo neexistující ID záznamu
+	 */
+	private function checkSecured(Secured $secured): void
+	{
+		$resource = $secured->resource;
+		$privilege = $secured->privilege;
+
+		if ($secured->recordIdParameter !== null) {
+			$id = $this->getParameter($secured->recordIdParameter);
+			if ($id === null || $id === '') {
+				$privilege = $secured->privilegeWithoutRecord ?? $privilege;
+			} else {
+				$recordId = filter_var($id, FILTER_VALIDATE_INT);
+				if ($recordId === false) {
+					$this->error("Parameter '$secured->recordIdParameter' is not a valid ID.");
+				}
+
+				try {
+					$resource = new Resource($secured->resource, $this->resourceOwners->getOwnerId($secured->resource, $recordId));
+				} catch (RecordNotFoundException $e) {
+					$this->error($e->getMessage());
+				}
+			}
+		}
+
+		if (!$this->user->isAllowed($resource, $privilege)) {
+			throw new ForbiddenRequestException((string) $this->translator->translate("You have not access to resouce '%s' with privilege '%s'.", $this->translator->translate($secured->resource), $this->translator->translate($privilege)));
 		}
 	}
 

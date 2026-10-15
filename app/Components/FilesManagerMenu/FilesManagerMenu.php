@@ -5,8 +5,6 @@ namespace App\Components\FilesManagerMenu;
 
 use App\AdminModule\Forms\FilesManagerFolderFormFactory;
 use App\AdminModule\Presenters\FilesManagerPresenter;
-use App\Attributes\Privilege;
-use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Model\Database\FileFolders;
 use App\Model\Database\Files;
@@ -177,9 +175,7 @@ class FilesManagerMenu extends Control
 	/**
 	 * Add Folders handler
 	 */
-	#[Secured]
-	#[Resource('Files')]
-	#[Privilege('add')]
+	#[Secured('Files', 'add')]
 	public function handleAddFolder(int $parentFolder): void
 	{
 		$this->filesManagerFolderFormFactory->resetEditMode();
@@ -192,9 +188,7 @@ class FilesManagerMenu extends Control
 	/**
 	 * Add Folders handler
 	 */
-	#[Secured]
-	#[Resource('Files')]
-	#[Privilege('edit')]
+	#[Secured('Files', 'edit')]
 	public function handleEditFolder(int $folder_id): void
 	{
 		$this->filesManagerFolderFormFactory->setEditId($folder_id);
@@ -207,9 +201,7 @@ class FilesManagerMenu extends Control
 	/**
 	 * Delete folder handler
 	 */
-	#[Secured]
-	#[Resource('Files')]
-	#[Privilege('delete')]
+	#[Secured('Files', 'delete')]
 	public function handleRemoveFolder(int $folder_id): void
 	{
 		$folderInfo = $this->fileFoldersModel->getById($folder_id);

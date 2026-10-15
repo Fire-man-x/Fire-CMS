@@ -4,8 +4,7 @@ declare(strict_types=1);
 namespace App\AdminModule\Presenters;
 
 use App\AdminModule\Forms\PageFormFactory;
-use App\Attributes\Privilege;
-use App\Attributes\Resource;
+use App\AdminModule\Presenters\UrlValidationTrait\UrlValidationTrait;
 use App\Attributes\Secured;
 use App\Model\Database\Files;
 use App\Model\Database\Pages;
@@ -17,11 +16,11 @@ use Nette\Application\UI\Form;
 /**
  * Stránky (App\Model\Pages) - seznam a detail s překlady po jazycích (parametr `language`)
  */
-#[Secured]
-#[Resource('Pages')]
-#[Privilege('view')]
-class PagesPresenter extends BasePresenter
+#[Secured('Pages', 'view')]
+class PagesPresenter extends BasePresenter implements UrlValidation
 {
+	use UrlValidationTrait;
+
 	#[Persistent]
 	public ?int $id = null;
 
@@ -44,9 +43,7 @@ class PagesPresenter extends BasePresenter
 	}
 
 
-	#[Secured]
-	#[Resource('Pages')]
-	#[Privilege('edit')]
+	#[Secured('Pages', 'edit')]
 	public function actionDetail(): void
 	{
 		if ($this->id !== null) {
@@ -144,9 +141,7 @@ class PagesPresenter extends BasePresenter
 	}
 
 
-	#[Secured]
-	#[Resource('Pages')]
-	#[Privilege('edit')]
+	#[Secured('Pages', 'edit')]
 	public function handleActivate(int $pageId, bool $status = false): void
 	{
 		$this->pagesModel->update($pageId, ['active' => $status]);
@@ -158,9 +153,7 @@ class PagesPresenter extends BasePresenter
 	/**
 	 * Drag & drop v gridu stránek - jen mezi sourozenci, viz Pages::movePage()
 	 */
-	#[Secured]
-	#[Resource('Pages')]
-	#[Privilege('edit')]
+	#[Secured('Pages', 'edit')]
 	public function handleSort(?int $item_id = null, ?int $prev_id = null, ?int $next_id = null): void
 	{
 		if ($item_id === null) {
@@ -182,9 +175,7 @@ class PagesPresenter extends BasePresenter
 	 * Obrázky vybrané ve správci souborů (modal, administration/js/main.js - selectedFilesFromIframeUrl)
 	 * @param array<int|string> $files
 	 */
-	#[Secured]
-	#[Resource('Pages')]
-	#[Privilege('edit')]
+	#[Secured('Pages', 'edit')]
 	public function handleAddImages(array $files): void
 	{
 		$this->pagesModel->addFiles($this->getPageIdOrFail(), array_values(array_map('intval', $files)));
@@ -192,9 +183,7 @@ class PagesPresenter extends BasePresenter
 	}
 
 
-	#[Secured]
-	#[Resource('Pages')]
-	#[Privilege('edit')]
+	#[Secured('Pages', 'edit')]
 	public function handleRemoveImage(int $fileId): void
 	{
 		$this->pagesModel->removeFile($this->getPageIdOrFail(), $fileId);
@@ -210,9 +199,7 @@ class PagesPresenter extends BasePresenter
 	 * Nové pořadí obrázků po přetažení (první = hlavní obrázek)
 	 * @param array<int|string> $items
 	 */
-	#[Secured]
-	#[Resource('Pages')]
-	#[Privilege('edit')]
+	#[Secured('Pages', 'edit')]
 	public function handleSortImages(array $items): void
 	{
 		$this->pagesModel->sortFiles($this->getPageIdOrFail(), array_values(array_map('intval', $items)));
@@ -220,9 +207,7 @@ class PagesPresenter extends BasePresenter
 	}
 
 
-	#[Secured]
-	#[Resource('Pages')]
-	#[Privilege('delete')]
+	#[Secured('Pages', 'delete')]
 	public function handleDelete(int $pageId): void
 	{
 		$this->pagesModel->delete($pageId);
@@ -245,14 +230,10 @@ class PagesPresenter extends BasePresenter
 
 
 	/**
-	 * Návrh URL z názvu (administration/js/main.js, třída validate-url)
+	 * Typ URL pro návrh URL z názvu (UrlValidation)
 	 */
-	#[Secured]
-	#[Resource('Pages')]
-	#[Privilege('edit')]
-	public function handleValidateUrl(string $text): void
+	public function getUrlType(): string
 	{
-		$this->payload->url = $this->urlManager->validateUrl($text, Pages::URL_TYPE, $this->id, $this->id);
-		$this->sendPayload();
+		return Pages::URL_TYPE;
 	}
 }

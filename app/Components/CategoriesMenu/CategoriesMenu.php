@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace App\Components\CategoriesMenu;
 
-use App\Attributes\Privilege;
-use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\FrontModule\Presenters\CategoriesPresenter;
 use App\Model;
@@ -167,9 +165,7 @@ class CategoriesMenu extends Control
 	/**
 	 * Delete category handler
 	 */
-	#[Secured]
-	#[Resource('Categories')]
-	#[Privilege('delete')]
+	#[Secured('Categories', 'delete')]
 	public function handleRemoveCategory(int $categoryId): void
 	{
 		//delete

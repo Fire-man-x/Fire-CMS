@@ -6,18 +6,16 @@ namespace App\AdminModule\Presenters;
 use App\AdminModule\Forms\ArticleFormFactory;
 use App\AdminModule\Forms\MetaValueFormFactory;
 use App\AdminModule\Presenters\SectionAwareTrait\SectionAwareTrait;
-use App\Attributes\Privilege;
-use App\Attributes\Resource;
+use App\AdminModule\Presenters\UrlValidationTrait\UrlValidationTrait;
 use App\Attributes\Secured;
 use App\Model\Database\Articles;
 use App\Model\Database\Categories;
 use App\Model\Database\Files;
-use App\Model\UrlManager;
 use App\Service\Article;
 use App\Service\Meta;
 use App\Service\Tag;
 use Contributte\Datagrid\Datagrid;
-use Nette\Application\Attributes\Persistent;
+use Nette\Application\Attributes\Parameter;
 use Nette\Application\ForbiddenRequestException;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
@@ -25,12 +23,11 @@ use Nette\Utils\ArrayHash;
 /**
  * Article Presenter
  */
-#[Secured]
-#[Resource('Articles')]
-#[Privilege('view')]
-class ArticlesPresenter extends BasePresenter
+#[Secured('Articles', 'view')]
+class ArticlesPresenter extends BasePresenter implements UrlValidation
 {
 	use SectionAwareTrait;
+	use UrlValidationTrait;
 
 	/**
 	 * Not persistent revision parameter
@@ -40,14 +37,14 @@ class ArticlesPresenter extends BasePresenter
 	/**
 	 * Id
 	 */
-	#[Persistent]
+	#[Parameter]
 	public ?int $id = null;
 
 	/**
 	 * Show filter
-	 * @persistentInDefault
 	 */
-	public ?string $show;
+	#[Parameter]
+	public ?string $show = null;
 
 	/** @inject */
 	public ArticleFormFactory $articleFactory;
@@ -70,28 +67,23 @@ class ArticlesPresenter extends BasePresenter
 	/** @inject */
 	public Tag $tagService;
 
-	/** @inject */
-	public UrlManager $urlManager;
-
 
 	protected function startup(): void
 	{
 		parent::startup();
 
 		// sekce: editovaný článek má přednost před parametrem `section`
-		$article = $this->id ? $this->articlesModel->getById($this->id) : null;
+		$article = isset($this->id) ? $this->articlesModel->getById($this->id) : null;
 		$this->resolveSection($article ? (int) $article->sectionId : null);
 
 		$this->addBreadCrumbLink("Articles", $this->link(":Admin:Articles:default", array("id" => null)) );
 	}
 
 
-	#[Secured]
-	#[Resource('Articles')]
-	#[Privilege('view')]
+	#[Secured('Articles', 'view')]
 	public function actionDefault(string $show = null): void
 	{
-		$this->show = $show;
+		$this->show = $show; //is allready setted by Nette
 		if (!is_null($this->show) && !in_array($this->show, array("personal","pending","trash"))) {
 			throw  new \InvalidArgumentException("Parameter show '$this->show' is not permited");
 		}
@@ -123,24 +115,11 @@ class ArticlesPresenter extends BasePresenter
 	}
 
 
-	/**
-	 * @SecuredInside
-	 * @Resource (Articles)
-	 * @Privilege (edit)
-	 */
-	public function actionDetail(int $parent = null): void
+	#[Secured('Articles', 'edit', recordIdParameter: 'id', privilegeWithoutRecord: 'add')]
+	public function actionDetail(?int $id = null, int $parent = null): void
 	{
+		$this->id = $id; //is allready setted by Nette
 		$this->template->articles = $this->articlesModel;
-
-		//edit own
-		if($this->id) {
-			$articleInfo = $this->articlesModel->getById($this->id);
-			if(!$this->user->isAllowed(new \App\Security\Resource("Articles", $articleInfo ? $articleInfo->createdBy : $this->getUser()->getId()), "edit")) {
-				throw new ForbiddenRequestException("You have not access to 'Articles' with priviledge 'edit'.");
-			}
-		}
-
-
 
 		if($this->id)
 		{
@@ -302,7 +281,7 @@ class ArticlesPresenter extends BasePresenter
 
 		$grid->addAction('delete', 'Delete', 'delete!', array($paramKey => $primaryKey))
 			->setClass(function($item) {
-				return 'btn btn-danger btn-sm ajax'.(!$this->user->isAllowed(new \App\Security\Resource("Articles", $item["createdBy"]), "edit") ? ' disabled' : '');
+				return 'btn btn-danger btn-sm ajax'.(!$this->user->isAllowed(new \App\Security\Resource("Articles", $item["createdBy"]), "delete") ? ' disabled' : '');
 			})
 			->setIcon(ICON_DELETE)
 			->setTitle('Delete')
@@ -447,13 +426,11 @@ class ArticlesPresenter extends BasePresenter
 
 	/**
 	 * Activate
-	 * @SecuredInside
-	 * @Resource(Articles)
-	 * @Privilege(edit)
 	 */
+	#[Secured('Articles', 'edit', recordIdParameter: 'articleId')]
 	public function handleActivate(int $articleId, bool $status = false): void
 	{
-		//edit own
+		//edit own - i při přímém volání z gridu (onChange), kde se atribut nevyhodnotí
 		$createdBy = $this->articlesModel->getById($articleId)?->createdBy;
 		if(!$this->user->isAllowed(new \App\Security\Resource("Articles", $createdBy),"edit")){
 			throw new ForbiddenRequestException("You have not access to 'Articles' with priviledge 'edit'.");
@@ -467,11 +444,9 @@ class ArticlesPresenter extends BasePresenter
 
 	/**
 	 * Approve
-	 * @param int $articleId
+	 * Bez recordIdParameter - autor smí se svým záznamem vše, schválil by si tak vlastní článek.
 	 */
-	#[Secured]
-	#[Resource('Articles')]
-	#[Privilege('approve_article')]
+	#[Secured('Articles', 'approve_article')]
 	public function handleApprove(int $articleId): void
 	{
 		$this->articleService->makeBackup($articleId);
@@ -483,11 +458,8 @@ class ArticlesPresenter extends BasePresenter
 
 	/**
 	 * Delete handler
-	 * @param int $articleId
 	 */
-	#[Secured]
-	#[Resource('Articles')]
-	#[Privilege('delete')]
+	#[Secured('Articles', 'delete', recordIdParameter: 'articleId')]
 	public function handleDelete(int $articleId): void
 	{
 		if ($this->articlesModel->getById($articleId)) {
@@ -502,26 +474,23 @@ class ArticlesPresenter extends BasePresenter
 
 
 	/**
-	 * Validate URL handler
+	 * Typ URL pro návrh URL z názvu (UrlValidation)
 	 */
-	public function handleValidateUrl($text): void
+	public function getUrlType(): string
 	{
-		$this->payload->url = $this->urlManager->validateUrl($text, "article", $this->id);
-
-		$this->sendPayload();
+		return 'article';
 	}
 
 
 	/**
 	 * Add Images handler
+	 * @param array<int,string> $files
 	 */
-	#[Secured]
-	#[Resource('Articles')]
-	#[Privilege('add')]
+	#[Secured('Articles', 'edit', recordIdParameter: 'id')]
 	public function handleAddImage(array $files): void
 	{
 		foreach ($files as $fileId){
-			$this->articlesModel->insertRelationFile($this->id, $fileId);
+			$this->articlesModel->insertRelationFile($this->id, (int) $fileId);
 		}
 
 		$this->redrawControl("files");
@@ -531,9 +500,7 @@ class ArticlesPresenter extends BasePresenter
 	/**
 	 * Delete file handler
 	 */
-	#[Secured]
-	#[Resource('Articles')]
-	#[Privilege('delete')]
+	#[Secured('Articles', 'delete', recordIdParameter: 'id')]
 	public function handleRemoveImage(int $fileId): void
 	{
 		$this->articlesModel->deleteRelationFile($this->id, $fileId);
@@ -549,9 +516,7 @@ class ArticlesPresenter extends BasePresenter
 	/**
 	 * Add Category handler
 	 */
-	#[Secured]
-	#[Resource('Articles')]
-	#[Privilege('add')]
+	#[Secured('Articles', 'edit', recordIdParameter: 'id')]
 	public function handleAddCategory(int $categoryId): void
 	{
 		// kategorie článku musí být ze stejné sekce
@@ -567,9 +532,7 @@ class ArticlesPresenter extends BasePresenter
 	/**
 	 * Delete Category handler
 	 */
-	#[Secured]
-	#[Resource('Articles')]
-	#[Privilege('delete')]
+	#[Secured('Articles', 'delete', recordIdParameter: 'id')]
 	public function handleRemoveCategory(int $categoryId): void
 	{
 		$this->categoriesModel->deleteRelationArticle($categoryId, $this->id);
@@ -586,9 +549,7 @@ class ArticlesPresenter extends BasePresenter
 	 * SetCategoryAsMain
 	 * @param int $categoryId
 	 */
-	#[Secured]
-	#[Resource('Articles')]
-	#[Privilege('edit')]
+	#[Secured('Articles', 'edit', recordIdParameter: 'id')]
 	public function handleSetCategoryAsMain(int $categoryId): void
 	{
 		$this->categoriesModel->setRelationArticleAsMain($categoryId, $this->id);
@@ -604,12 +565,9 @@ class ArticlesPresenter extends BasePresenter
 
 	/**
 	 * Load tags handler
-	 * @param string $query
 	 */
-	#[Secured]
-	#[Resource('Articles')]
-	#[Privilege('edit')]
-	public function handleLoadTags($query): void
+	#[Secured('Articles', 'edit', recordIdParameter: 'id', privilegeWithoutRecord: 'add')]
+	public function handleLoadTags(string $query): void
 	{
 		$items = $this->tagService->findByName($this->editLocale, $query);
 		foreach ($items as &$item){

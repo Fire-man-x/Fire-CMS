@@ -9,41 +9,14 @@ use Nette\Security\User;
 
 class Role implements \Nette\Security\Role
 {
-
-	const guest = 'guest';
-	const member = 'member';
-	const admin = 'admin';
-
-	public int|string $id;
-	public string $role;
-
-
-	public function __construct()
+	public function __construct(private string $name, public int $actualUserId)
 	{
-		$args = func_get_args(); // get input args
-		// instance of User or Identity
-		if (func_num_args() == 1) {
-			if ($args[0] instanceof User) {
-				$this->role = current($args[0]->getIdentity()->getRoles());
-				$this->id = $args[0]->getIdentity()->getId();
-			} elseif ($args[0] instanceof SimpleIdentity) {
-				$this->role = $args[0]->role;
-				$this->id = $args[0]->id;
-			} else {
-				throw new Exception('Wrong input object.');
-			}
-		}
-		// role / id
-		if (func_num_args() >= 2) {
-			$this->role = $args[0];
-			$this->id = $args[1];
-		}
 	}
 
 
 	public function getRoleId(): string
 	{
-		return $this->role;
+		return $this->name;
 	}
 
 }

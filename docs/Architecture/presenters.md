@@ -47,33 +47,68 @@ class SignPresenter extends \App\FrontModule\Presenters\SignPresenter
   - `application: scanDirs: [%rootDir%/theme]` místo `search:` nefunguje: vlastní seznam nahradí výchozí
     `%appDir%` a zmizí všechny presentery z `app/`.
 
-## ACL — `#[Secured]`/`#[Resource]`/`#[Privilege]`
+## ACL — `#[Secured('Zdroj', 'právo')]`
 
-Definováno v `app/Attributes/`. Dá se dát na třídu presenteru (platí pro celý presenter) i na konkrétní
-`action*`/`render*`/`handle*` metodu (platí jen pro ni, obvykle jemnější privilege než `view` — `add`,
-`edit`, `delete`):
+Atribut `App\Attributes\Secured`. Dá se dát na třídu presenteru (platí pro celý presenter) i na konkrétní
+`action*`/`render*`/`handle*` metodu (platí jen pro ni, obvykle jemnější právo než `view` — `add`, `edit`,
+`delete`). Atribut lze opakovat, každá kombinace zdroj + právo se ověřuje zvlášť a musí projít všechny:
 
 ```php
-#[Secured]
-#[Resource('Pages')]
-#[Privilege('view')]
+#[Secured('Pages', 'view')]
 class PagesPresenter extends BasePresenter
 {
-    #[Secured]
-    #[Resource('Pages')]
-    #[Privilege('delete')]
+    #[Secured('Pages', 'delete')]
     public function handleDelete(int $id): void { ... }
 }
 ```
 
-Vynucuje se v `App\AdminModule\Presenters\BasePresenter::checkRequirements()` — přes reflexi přečte
-atributy na třídě NEBO na volané metodě a zavolá `$user->isAllowed($resource, $privilege)`. Při selhání buď
+Vynucuje se v `App\AdminModule\Presenters\BasePresenter::checkRequirements()` (`checkSecured()`) — přes reflexi
+přečte atributy na třídě NEBO na volané metodě a zavolá `$user->isAllowed($resource, $privilege)`. Při selhání buď
 přesměruje na `:Admin:Sign:in` (nenepřihlášený), nebo při `ForbiddenRequestException` ukáže flash a
-přesměruje. `$resource`/`$privilege` řetězce musí odpovídat záznamům v DB tabulce `firecms_modules` (viz
+přesměruje. Zdroj a právo musí odpovídat záznamům v DB tabulce `firecms_modules` (viz
 `App\Model\Database\Modules`/`Roles`) — v čerstvém checkoutu bez seed dat tam nic není, takže i správně napsaný
 `#[Secured]` bez odpovídajícího řádku v `firecms_modules` fakticky nikoho nepustí (nebo podle nastavení role
 naopak nikoho neblokuje — ověřte konkrétní chování v `Acl`/`AuthorizatorFactory`, než na to spoléháte v
 testu).
+
+Atributy u handlerů komponent (`Control`, např. `FilesManagerMenu`, `CategoriesMenu`) nikdo nevynucuje,
+`checkRequirements()` s nimi má jen presenter administrace.
+
+### Autor záznamu — `recordIdParameter`, `ResourceOwners`
+
+Autor smí se svým záznamem cokoliv, i bez práva `edit`/`delete` v roli. Zajišťuje to pravidlo `deny` s podmínkou
+v `AuthorizatorFactory`. Platí jen tehdy, když `isAllowed()` dostane zdroj jako `App\Security\Resource` s ID autora,
+např. `isAllowed(new Resource('Articles', $createdBy), 'edit')` (roli s ID uživatele doplní `App\Security\User`).
+
+V atributu to zařídí `recordIdParameter` s názvem parametru požadavku (URL), ve kterém je ID záznamu:
+
+```php
+#[Secured('Articles', 'edit', recordIdParameter: 'id', privilegeWithoutRecord: 'add')]
+public function actionDetail(?int $id = null): void
+```
+
+- ID v požadavku je: ověří se `edit` nad zdrojem s autorem záznamu. Neplatné ID nebo neexistující záznam = 404.
+- ID chybí (nový záznam): ověří se právo `privilegeWithoutRecord` (bez něj `privilege`) nad samotným názvem zdroje.
+
+Zatím to používá jen `ArticlesPresenter` (detail, mazání, aktivace, obrázky, kategorie, štítky).
+
+Právo z role platí pro všechny záznamy, pravidlo autora jen přidává. Handler, který mění existující záznam (připojí
+obrázek, kategorii), proto chce `edit`, ne `add`: s `add` by ho uživatel s právem přidávat spustil i nad cizím záznamem.
+Akci, kterou autor nad svým záznamem dělat nemá (schválení), `recordIdParameter` nedávejte. Kontrola na akci kryje i formulář na stránce (akce běží
+před signálem), ne ale handlery, které jdou zavolat i na jiné akci.
+
+Autora podle ID záznamu zjistí služba `App\Security\ResourceOwners` (`resourceOwners` v `config.neon`). Je to
+mapa zdroj ACL → model se sloupcem `createdBy`. V jádru je Articles, Categories, Comments, DynamicForms, Menus a
+Pages. `getOwnerId($resource, $id)` vrátí ID autora (`null` bez autora), u neexistujícího záznamu vyhodí
+`RecordNotFoundException`, u zdroje bez modelu `InvalidArgumentException`. Plugin přidá vlastní zdroj ve svém
+`config.plugin.neon`:
+
+```neon
+services:
+	resourceOwners:
+		setup:
+			- add('Calendar', @App\Plugins\Calendar\Model\Events)
+```
 
 Admin session běží v samostatném auth namespace (`'admin'`), nastaveném v téže `checkRequirements()` —
 přihlášení na frontendu a v administraci jsou nezávislá.
@@ -84,7 +119,7 @@ Naprostá většina administračních CRUD presenterů (Sliders, Menus, Pages, S
 kostru:
 
 ```php
-#[Secured] #[Resource('X')] #[Privilege('view')]
+#[Secured('X', 'view')]
 class XPresenter extends BasePresenter
 {
     #[Persistent]
@@ -123,14 +158,14 @@ class XPresenter extends BasePresenter
         return $form;
     }
 
-    #[Secured] #[Resource('X')] #[Privilege('add')]
+    #[Secured('X', 'add')]
     public function handleAdd(): void
     {
         $this->xFactory->resetEditMode();     // NE setEditId(null) — viz gotchas.md
         $this->redrawControl('xForm');
     }
 
-    #[Secured] #[Resource('X')] #[Privilege('edit')]
+    #[Secured('X', 'edit')]
     public function handleEdit(int $id): void
     {
         $this->xFactory->setEditId($id);
@@ -138,7 +173,7 @@ class XPresenter extends BasePresenter
         $this->redrawControl('xForm');
     }
 
-    #[Secured] #[Resource('X')] #[Privilege('delete')]
+    #[Secured('X', 'delete')]
     public function handleDelete(int $id): void
     {
         if ($this->xModel->delete($id)) {

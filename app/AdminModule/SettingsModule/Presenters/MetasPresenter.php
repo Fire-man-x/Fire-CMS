@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace App\AdminModule\SettingsModule\Presenters;
 
 use App\AdminModule\Forms\MetaFormFactory;
-use App\Attributes\Privilege;
-use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Model\Database\Metas;
 use Contributte\Datagrid\Column\ColumnText;
@@ -15,9 +13,7 @@ use Nette;
 /**
  * Metas presenter.
  */
-#[Secured]
-#[Resource('Metas')]
-#[Privilege('view')]
+#[Secured('Metas', 'view')]
 class MetasPresenter extends BasePresenter
 {
 

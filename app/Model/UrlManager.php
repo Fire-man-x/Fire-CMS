@@ -11,6 +11,7 @@ use Nette\Database\Explorer;
 use Nette\InvalidArgumentException;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
+use Nette\Utils\Strings;
 
 /**
  * Class UrlManager
@@ -29,7 +30,7 @@ class UrlManager
 	 * UrlManager constructor.
 	 */
 	public function __construct(
-		protected Urls $model,
+		protected Urls $urlModel,
 		protected Redirections $redirectionsModel,
 		protected LanguageService $languages,
 		protected Explorer $db)
@@ -43,7 +44,7 @@ class UrlManager
 	public function getUrl($urlId): array
 	{
 		if (!isset($this->url)) {
-			$this->url = $this->model->getById($urlId)?->toArray();
+			$this->url = $this->urlModel->getById($urlId)?->toArray();
 		}
 
 		return $this->url;
@@ -62,7 +63,7 @@ class UrlManager
 			$languageId = $this->languages->getDefaultLanguage();
 		}
 
-		$urlInfo = $this->model->findAll()
+		$urlInfo = $this->urlModel->findAll()
 			->where('languageId', $languageId)
 			->where('type', $type)
 			->where('key', $key)
@@ -82,7 +83,7 @@ class UrlManager
 	 */
 	public function deleteUrls(string $type, int $key): void
 	{
-		$this->model->findAll()
+		$this->urlModel->findAll()
 			->where('type', $type)
 			->where('key', $key)
 			->delete();
@@ -117,7 +118,7 @@ class UrlManager
 			$languageId = $this->languages->getDefaultLanguage();
 		}
 
-		$urlInfo = $this->model->findAll()
+		$urlInfo = $this->urlModel->findAll()
 			->where('languageId', $languageId)
 			->where('url', $url)
 			->fetch();
@@ -184,11 +185,11 @@ class UrlManager
 			}
 
 			//update url
-			$this->model->update($urlInfo["id"], array("url" => $webalizedUrl));
+			$this->urlModel->update($urlInfo["id"], array("url" => $webalizedUrl));
 
 		}catch(InvalidArgumentException $e) {
 			//insert url
-			$this->model->insert(ArrayHash::from(array(
+			$this->urlModel->insert(ArrayHash::from(array(
 				"type" => $type,
 				"key" => $key,
 				"languageId" => $languageId,
@@ -200,13 +201,13 @@ class UrlManager
 	/**
 	 * Validate URL handler
 	 */
-	public function validateUrl(string $url, string $type, int $key, int $notInKey = null): string
+	public function validateUrl(string $url, string $type, ?int $key, int $notInKey = null): string
 	{
 		$exist = true;
 		$index = 0;
 		while ($exist){
-			$webalizedUrl = \Nette\Utils\Strings::webalize($url . ($index == 0 ? "" : " " . $index));
-			$sql = $this->model->findAll()
+			$webalizedUrl = Strings::webalize($url . ($index == 0 ? "" : " " . $index));
+			$sql = $this->urlModel->findAll()
 				->where("url", $webalizedUrl);
 			if($notInKey){
 				$sql->where("key != ?", $notInKey);

@@ -15,7 +15,7 @@ kořenovém `CLAUDE.md` — ten je závazný, tohle je jen shrnutí pro rychlou 
 | Kolik je pluginů? | Proměnlivé, aktuálně 5 (`ls app/Plugins`). Nepředpokládejte fixní číslo. |
 | DB konvence? | Tabulky `firecms_<camelCase>` / `firecms_plugin_<camelCase>`, sloupce camelCase, PK `id`, FK `<entita>Id`, `createDate`/`updateDate`. Viz `Architecture/orm.md`. |
 | Datagrid knihovna? | `Contributte\Datagrid\Datagrid` (nový kód). Ne `Ublaboo\DataGrid\DataGrid` (staré, viz composer.json historie). |
-| ACL? | `#[Secured] #[Resource('X')] #[Privilege('y')]` atributy z `app/Attributes/`. Vynucuje `AdminModule\Presenters\BasePresenter::checkRequirements()`. |
+| ACL? | `#[Secured('X', 'y')]` (opakovatelný, `recordIdParameter:` = autor záznamu smí vše) z `app/Attributes/`. Vynucuje `AdminModule\Presenters\BasePresenter::checkRequirements()`. |
 | Routing admin? | `/administrace/<presenter>/<action>[/<id>]`, presenter jméno v URL malými písmeny/pomlčkami (`pages`, `dynamic-forms`), NE PascalCase. |
 | Testy? | `composer test` (Nette Tester nad `tests/`) — hlavně integrační testy nad in-memory SQLite (`UrlManager`, `CustomRouter`, menu, stránky, jazyky) + unit testy (`App\Security\Role`, správce souborů, překlady). Zdaleka nepokrývá celé `app/`. Viz `AI-Context/gotchas.md`. |
 | PHPStan gate? | Level 5 (`composer stan`) je vynucovaná brána, celé `app/` prochází s prázdnou baseline. `composer stan9`/`stan10` pro přísnější kontrolu nového kódu — spouštějte cíleně na měněné soubory, ne na celý strom. |

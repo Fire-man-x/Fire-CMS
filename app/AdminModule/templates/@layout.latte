@@ -202,13 +202,13 @@
 					<button type="button" class="btn btn-primary-outline btn-sm" data-bs-toggle="offcanvas"><i class="fa fa-chevron-left"></i> {_"Menu"}</button>
 				</p>*}
 
+				{* flash zprávy vpravo dole, zavřou se samy po doběhnutí .flash-timer (main.js), najetí myší odpočet zastaví *}
 				{snippet flashes}
-					<div n:ifset="$flashes" class="message" >
-						<div n:foreach="$flashes as $flash" n:class="alert-dismissible, fade, show, flash, $flash->type, alert, 'alert-'.$flash->type" role="alert" data-bs-dismiss="alert">
-							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{_"Close"}" title="{_"Close"}">
-								<span aria-hidden="true" class="visually-hidden">&times;</span>
-							</button>
+					<div n:ifset="$flashes" class="message">
+						<div n:foreach="$flashes as $flash" n:class="alert-dismissible, fade, show, flash, $flash->type, alert, 'alert-'.$flash->type" role="alert">
+							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{_"Close"}" title="{_"Close"}"></button>
 							{$flash->message}
+							<div class="flash-timer" aria-hidden="true"></div>
 						</div>
 					</div>
 				{/snippet}

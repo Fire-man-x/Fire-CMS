@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace App\AdminModule\SettingsModule\Presenters;
 
 use App\AdminModule\Forms\RoleFormFactory;
-use App\Attributes\Privilege;
-use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Model\Database\Roles;
 use Contributte\Datagrid\Datagrid;
@@ -14,9 +12,7 @@ use Nette;
 /**
  * Roles presenter.
  */
-#[Secured]
-#[Resource('Roles')]
-#[Privilege('view')]
+#[Secured('Roles', 'view')]
 class RolesPresenter extends BasePresenter
 {
 

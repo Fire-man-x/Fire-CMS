@@ -160,7 +160,7 @@ class Category
 			$translation = ArrayHash::from($allWithTranslation->toArray());
 			unset($translation->categoryId);
 			unset($translation->updateDate);
-			$this->categoriesModel->insertTranslation($newId, $allWithTranslation->language, $translation);
+			$this->categoriesModel->insertTranslation($newId, $allWithTranslation->language->languageId, $translation);
 		}
 
 		//category_file

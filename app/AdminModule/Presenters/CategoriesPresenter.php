@@ -6,8 +6,7 @@ namespace App\AdminModule\Presenters;
 use App\AdminModule\Forms\CategoryFormFactory;
 use App\AdminModule\Forms\MetaValueFormFactory;
 use App\AdminModule\Presenters\SectionAwareTrait\SectionAwareTrait;
-use App\Attributes\Privilege;
-use App\Attributes\Resource;
+use App\AdminModule\Presenters\UrlValidationTrait\UrlValidationTrait;
 use App\Attributes\Secured;
 use App\Components\CategoriesMenu\CategoriesMenu;
 use App\Model\Database\Categories;
@@ -25,12 +24,11 @@ use Nette\Utils\ArrayHash;
 /**
  * Category Presenter
  */
-#[Secured]
-#[Resource('Categories')]
-#[Privilege('view')]
-class CategoriesPresenter extends BasePresenter
+#[Secured('Categories', 'view')]
+class CategoriesPresenter extends BasePresenter implements UrlValidation
 {
 	use SectionAwareTrait;
+	use UrlValidationTrait;
 
 	/**
 	 * Not persistent revision parameter
@@ -90,9 +88,7 @@ class CategoriesPresenter extends BasePresenter
 	}
 
 
-	#[Secured]
-	#[Resource('Categories')]
-	#[Privilege('view')]
+	#[Secured('Categories', 'view')]
 	public function actionDefault(int $parent = null): void
 	{
 		// nadřazená kategorie jen ze stejné sekce
@@ -189,26 +185,18 @@ class CategoriesPresenter extends BasePresenter
 
 
 	/**
-	 * Validate URL handler
+	 * Typ URL pro návrh URL z názvu (UrlValidation)
 	 */
-	public function handleValidateUrl($text): void
+	public function getUrlType(): string
 	{
-		if(!$text)
-		{
-			$this->terminate();
-		}
-		$this->payload->url = $this->urlManager->validateUrl($text, 'category', $this->id);
-
-		$this->sendPayload();
+		return 'category';
 	}
 
 
 	/**
 	 * Add Images handler
 	 */
-	#[Secured]
-	#[Resource('Categories')]
-	#[Privilege('add')]
+	#[Secured('Categories', 'add')]
 	public function handleAddImage(array $files): void
 	{
 		foreach ($files as $fileId){
@@ -222,9 +210,7 @@ class CategoriesPresenter extends BasePresenter
 	/**
 	 * Delete file handler
 	 */
-	#[Secured]
-	#[Resource('Categories')]
-	#[Privilege('delete')]
+	#[Secured('Categories', 'delete')]
 	public function handleRemoveImage(int $fileId): void
 	{
 		$this->categoriesModel->deleteRelationFile($this->id, $fileId);
@@ -256,9 +242,7 @@ class CategoriesPresenter extends BasePresenter
 	/**
 	 * Load tags handler
 	 */
-	#[Secured]
-	#[Resource('Articles')]
-	#[Privilege('edit')]
+	#[Secured('Articles', 'edit')]
 	public function handleLoadTags(string $query): void
 	{
 		$items = $this->tagService->findByName($this->editLocale, $query);

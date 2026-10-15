@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace App\AdminModule\SettingsModule\Presenters;
 
 use App\AdminModule\Forms\UserFormFactory;
-use App\Attributes\Privilege;
-use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Model\Database\Users;
 use Contributte\Datagrid\Datagrid;
@@ -14,9 +12,7 @@ use Nette;
 /**
  * Users presenter.
  */
-#[Secured]
-#[Resource('Users')]
-#[Privilege('view')]
+#[Secured('Users', 'view')]
 class UsersPresenter extends BasePresenter
 {
 	/**
@@ -156,9 +152,7 @@ class UsersPresenter extends BasePresenter
 	}
 
 
-	#[Secured]
-	#[Resource('Users')]
-	#[Privilege('add')]
+	#[Secured('Users', 'add')]
 	public function handleAdd(): void
 	{
 		$this->formFactory->resetEditMode();
@@ -170,9 +164,7 @@ class UsersPresenter extends BasePresenter
 	 * Delete handle
 	 * @throws Nette\Application\AbortException
 	 */
-	#[Secured]
-	#[Resource('Users')]
-	#[Privilege('delete')]
+	#[Secured('Users', 'delete')]
 	public function handleDelete(int $id): void
 	{
 		$this->users->delete($id);
@@ -184,9 +176,7 @@ class UsersPresenter extends BasePresenter
 	/**
 	 * Activate user
 	 */
-	#[Secured]
-	#[Resource('Users')]
-	#[Privilege('edit')]
+	#[Secured('Users', 'edit')]
 	public function handleActivateUser(int $userId, bool $status=false): void
 	{
 		$this->users->update($userId, ["active"=>$status]);

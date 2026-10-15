@@ -232,7 +232,7 @@ deploy konfigurace), které si projekt může přidat.
 
 ## `firecms_modules` a ACL
 
-ACL (`#[Secured]`/`#[Resource]`/`#[Privilege]`) potřebuje odpovídající řádek v `firecms_modules` (viz
+ACL (`#[Secured('Zdroj', 'právo')]`) potřebuje odpovídající řádek v `firecms_modules` (viz
 `App\Model\Database\Modules`/`Roles`). Moduly jádra zakládá `basic-data`, pluginy své moduly ve vlastní migraci. Nový
 `#[Secured]` presenter bez odpovídajícího řádku se chová podle výchozího chování ACL (ověřte konkrétně v
 `Acl`/`AuthorizatorFactory`, nespoléhejte na to naslepo v testu/demu). Nový resource je potřeba přiřadit rolím
@@ -529,7 +529,8 @@ partial mock frameworku, což je křehké. `tests/Helpers/SqliteDatabase::create
 
 Chování zdokumentované testy:
 - `UrlManager::validateUrl()` hlídá unikátnost URL napříč CELOU tabulkou `firecms_urls`, ignoruje `type` i
-  `languageId`.
+  `languageId`. Vyřazení vlastní URL (`$notInKey`) ale porovnává jen `key`, ne `type`: při editaci článku 2 se
+  nepočítá ani URL stránky nebo kategorie s ID 2. Neopraveno.
 - `CustomRouter::match()`: segment tvaru `xx/...` se vždy zkusí jako jazykový prefix (viz `Architecture/routing.md`).
 - `App\Security\Role`: jednoargumentová varianta konstruktoru (`Nette\Security\User`/`App\Security\Identity`) je
   mrtvý kód — odkazuje na neexistující `App\Security\Identity` a `App\Security\Exception` a spadla by na fatální

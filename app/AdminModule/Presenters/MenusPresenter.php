@@ -6,8 +6,6 @@ namespace App\AdminModule\Presenters;
 use App\AdminModule\Forms\AdminForm;
 use App\AdminModule\Forms\MenuFormFactory;
 use App\AdminModule\Forms\MenuItemFormFactory;
-use App\Attributes\Privilege;
-use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Components\Menu as MenuComponent;
 use App\Components\Menu\Model\Menus;
@@ -22,9 +20,7 @@ use Nette\Application\Attributes\Persistent;
 /**
  * Menus Presenter
  */
-#[Secured]
-#[Resource('Menus')]
-#[Privilege('view')]
+#[Secured('Menus', 'view')]
 class MenusPresenter extends BasePresenter
 {
 
@@ -70,9 +66,7 @@ class MenusPresenter extends BasePresenter
 	 * @return void
 	 * @throws Nette\Application\UI\InvalidLinkException
 	 */
-	#[Secured]
-	#[Resource('Menus')]
-	#[Privilege('edit')]
+	#[Secured('Menus', 'edit')]
 	public function actionDetail(?int $parent = null): void
 	{
 		$this->template->menuInfo = $this->menusModel->getById($this->id);
@@ -296,9 +290,7 @@ class MenusPresenter extends BasePresenter
 	 * Sort handler (drag & drop v gridu položek) - jen mezi sourozenci, viz Menus::moveItem()
 	 * @throws Nette\Application\AbortException
 	 */
-	#[Secured]
-	#[Resource('Menus')]
-	#[Privilege('edit')]
+	#[Secured('Menus', 'edit')]
 	public function handleSort(?int $item_id, ?int $prev_id = null, ?int $next_id = null): void
 	{
 		if(!$item_id){
@@ -321,9 +313,7 @@ class MenusPresenter extends BasePresenter
 	/**
 	 * Nová položka - prázdný formulář v modalu
 	 */
-	#[Secured]
-	#[Resource('Menus')]
-	#[Privilege('add')]
+	#[Secured('Menus', 'add')]
 	public function handleAddItem(): void
 	{
 		$this->menuItemFactory->resetEditMode();
@@ -334,9 +324,7 @@ class MenusPresenter extends BasePresenter
 	/**
 	 * Úprava položky - formulář v modalu s hodnotami položky
 	 */
-	#[Secured]
-	#[Resource('Menus')]
-	#[Privilege('edit')]
+	#[Secured('Menus', 'edit')]
 	public function handleEditItem(int $itemId): void
 	{
 		$this->assertItemOfThisMenu($itemId);
@@ -349,9 +337,7 @@ class MenusPresenter extends BasePresenter
 	 * Smazání položky i s podpoložkami
 	 * @throws Nette\Application\AbortException
 	 */
-	#[Secured]
-	#[Resource('Menus')]
-	#[Privilege('delete')]
+	#[Secured('Menus', 'delete')]
 	public function handleDeleteItem(int $itemId): void
 	{
 		$this->assertItemOfThisMenu($itemId);
@@ -366,9 +352,7 @@ class MenusPresenter extends BasePresenter
 	 * Obrázky vybrané ve správci souborů pro položku (odkaz s data-selected-files-url, viz itemImages.latte)
 	 * @param array<int|string> $files
 	 */
-	#[Secured]
-	#[Resource('Menus')]
-	#[Privilege('edit')]
+	#[Secured('Menus', 'edit')]
 	public function handleAddItemImages(int $itemId, array $files = []): void
 	{
 		$this->assertItemOfThisMenu($itemId);
@@ -377,9 +361,7 @@ class MenusPresenter extends BasePresenter
 	}
 
 
-	#[Secured]
-	#[Resource('Menus')]
-	#[Privilege('edit')]
+	#[Secured('Menus', 'edit')]
 	public function handleRemoveItemImage(int $itemId, int $fileId): void
 	{
 		$this->assertItemOfThisMenu($itemId);
@@ -396,9 +378,7 @@ class MenusPresenter extends BasePresenter
 	 * Nové pořadí obrázků položky po přetažení (první = hlavní)
 	 * @param array<int|string> $items
 	 */
-	#[Secured]
-	#[Resource('Menus')]
-	#[Privilege('edit')]
+	#[Secured('Menus', 'edit')]
 	public function handleSortItemImages(int $itemId, array $items = []): void
 	{
 		$this->assertItemOfThisMenu($itemId);
@@ -424,9 +404,7 @@ class MenusPresenter extends BasePresenter
 	 * Activate
 	 * @throws Nette\Application\AbortException
 	 */
-	#[Secured]
-	#[Resource('Menus')]
-	#[Privilege('edit')]
+	#[Secured('Menus', 'edit')]
 	public function handleActivate(int $menuId, bool $status): void
 	{
 		$this->menusModel->update($menuId, array("active" => (boolean) $status));
@@ -438,9 +416,7 @@ class MenusPresenter extends BasePresenter
 	/**
 	 * Edit handler
 	 */
-	#[Secured]
-	#[Resource('Menus')]
-	#[Privilege('edit')]
+	#[Secured('Menus', 'edit')]
 	public function handleEdit(int $menuId): void
 	{
 		$this->menuFactory->setEditId($menuId);
@@ -453,9 +429,7 @@ class MenusPresenter extends BasePresenter
 	 * Delete handler
 	 * @throws Nette\Application\AbortException
 	 */
-	#[Secured]
-	#[Resource('Menus')]
-	#[Privilege('delete')]
+	#[Secured('Menus', 'delete')]
 	public function handleDelete(int $menuId): void
 	{
 		if ($this->menusModel->delete($menuId)) {

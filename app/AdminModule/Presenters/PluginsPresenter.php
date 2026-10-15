@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace App\AdminModule\Presenters;
 
-use App\Attributes\Privilege;
-use App\Attributes\Resource;
 use App\Attributes\Secured;
 use App\Model\Plugin\PluginMigrator;
 use App\Model\Plugin\PluginRepository;
@@ -15,9 +13,7 @@ use Contributte\Datagrid\Datagrid;
  * Plugins presenter - lists plugins found under app/Plugins and theme/Plugins
  * and lets an admin enable/disable them by rewriting theme/config/plugins.neon.
  */
-#[Secured]
-#[Resource('Plugins')]
-#[Privilege('view')]
+#[Secured('Plugins', 'view')]
 class PluginsPresenter extends BasePresenter
 {
 
@@ -85,9 +81,7 @@ class PluginsPresenter extends BasePresenter
 	/**
 	 * Enable/disable handler - rewrites theme/config/plugins.neon
 	 */
-	#[Secured]
-	#[Resource('Plugins')]
-	#[Privilege('edit')]
+	#[Secured('Plugins', 'edit')]
 	public function handleToggle(string $id, bool $active): void
 	{
 		if ($active) {

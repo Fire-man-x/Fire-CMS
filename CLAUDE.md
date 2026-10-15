@@ -156,10 +156,10 @@ jádra, aniž by presenter znal konkrétní třídu pluginu.
 ### Autorizace (ACL)
 `App\Security\User` / `AuthorizatorFactory` / `Acl` / `Role` (fyzicky v `app/Security/`) sestavují
 Nette ACL z modelů `Roles` a `Modules` (oprávnění řízená databází). Řízení přístupu na
-presenterech/akcích v administraci se deklaruje PHP atributy z `app/Attributes/`: `#[Secured]` +
-`#[Resource('...')]` + `#[Privilege('...')]`. Vynucují se v
+presenterech/akcích v administraci se deklaruje opakovatelným PHP atributem `#[Secured('Zdroj', 'právo')]`
+z `app/Attributes/` (s `recordIdParameter:` smí autor se svým záznamem cokoliv, viz `docs/Architecture/presenters.md`). Vynucuje se v
 `App\AdminModule\Presenters\BasePresenter::checkRequirements()`, která přes reflexi přečte atributy na
-třídě presenteru nebo na metodě action/render/handle a zavolá `$user->isAllowed($resource, $privilege)` —
+třídě presenteru nebo na metodě action/render/handle a pro každý zavolá `$user->isAllowed($resource, $privilege)` —
 buď přesměruje na `:Admin:Sign:in`, nebo při `ForbiddenRequestException` zobrazí flash zprávu a přesměruje.
 Administrace používá pro session samostatný auth namespace (`'admin'`), odlišný od frontendu, nastavený v
 téže `checkRequirements()`.
