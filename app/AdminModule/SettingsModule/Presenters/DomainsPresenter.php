@@ -46,7 +46,12 @@ class DomainsPresenter extends BasePresenter
 	 */
 	protected function createComponentDomainsGrid(): Datagrid
 	{
-		$source = $this->model->findAll()->order('languageId')->order('default DESC')->order('domain');
+		// ColumnStatus porovnává hodnotu striktně s volbami 0/1, PostgreSQL vrací `active` jako bool - proto jako int
+		// (select() vypíná výchozí `*`, sloupce tabulky je proto nutné vybrat výslovně)
+		$source = $this->model->findAll()
+			->select($this->model->getTableName() . '.*')
+			->select('CASE WHEN ' . $this->model->getTableName() . '.active THEN 1 ELSE 0 END AS active_status')
+			->order('languageId')->order('default DESC')->order('domain');
 		$primaryKey = $this->model->getColumnId();
 		$paramKey = $this->model->getForeignKeyColumn();
 
@@ -56,7 +61,7 @@ class DomainsPresenter extends BasePresenter
 		$grid->setTranslator($this->translator);
 
 		//active
-		$activeColumn = $grid->addColumnStatus('active', 'A.');
+		$activeColumn = $grid->addColumnStatus('active_status', 'A.');
 		$activeColumn->addOption(0, 'Unactive')
 			->setClass('btn-danger')
 			->setIcon('ban')

@@ -307,6 +307,11 @@ PostgreSQL neprojdou a camelCase bez uvozovek PostgreSQL převede na malá písm
   `getAllForMenu()`).
 - Příznaky jsou v PostgreSQL `boolean`: `where('default', false)`, ne `0`; do `isMain` apod. zapisujte `bool`
   (`count(...) === 0`), ne `IF(COUNT(...)=0, 1, 0)` - MariaDB `bool` uloží jako 1/0, PostgreSQL `0`/`1` odmítne.
+- Ze čtení vrací PostgreSQL příznaky jako `bool`, MariaDB jako `int`. `addColumnStatus()` datagridu porovnává hodnotu
+  s volbami `0`/`1` striktně (`===`), takže v PostgreSQL žádná volba nesedí a sloupec ukáže jen `1`. Nad `Selection`
+  přidejte `->select('CASE WHEN <tabulka>.active THEN 1 ELSE 0 END AS active_status')` a status sloupec postavte na
+  `active_status` (`UsersPresenter`, `ArticlesPresenter`, `MenusPresenter`, …), nad polem přetypujte na `(int)`
+  (`PagesPresenter`). Pozor, `select()` vypíná výchozí `*`, sloupce tabulky pak vyberte výslovně (`<tabulka>.*`).
 
 ## Nová migrace musí mít časové razítko za POSLEDNÍ provedenou migrací ze VŠECH skupin
 

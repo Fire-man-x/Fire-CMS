@@ -40,7 +40,12 @@ class LanguagesPresenter extends BasePresenter
 	 */
 	protected function createComponentLanguagesGrid(): Datagrid
 	{
-		$source = $this->model->findAll()->order("default DESC")->order($this->model->getColumnId());
+		// ColumnStatus porovnává hodnotu striktně s volbami 0/1, PostgreSQL vrací `active` jako bool - proto jako int
+		// (select() vypíná výchozí `*`, sloupce tabulky je proto nutné vybrat výslovně)
+		$source = $this->model->findAll()
+			->select($this->model->getTableName() . ".*")
+			->select("CASE WHEN " . $this->model->getTableName() . ".active THEN 1 ELSE 0 END AS active_status")
+			->order("default DESC")->order($this->model->getColumnId());
 		$primaryKey = $this->model->getColumnId();
 		$paramKey = $this->model->getForeignKeyColumn();
 
@@ -52,7 +57,7 @@ class LanguagesPresenter extends BasePresenter
 		//$grid->onSort[] = function($data, $item_id){};
 
 		//active
-		$activeColumn = $grid->addColumnStatus('active', 'A.');
+		$activeColumn = $grid->addColumnStatus('active_status', 'A.');
 		//$activeColumn->getElementPrototype("th")->setTitle($this->translator->translate("Active"));
 		$activeColumn->addOption(0, 'Unactive') // show if status == 0
 			->setClass('btn-danger')

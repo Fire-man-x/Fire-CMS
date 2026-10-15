@@ -162,6 +162,8 @@ class ArticlesPresenter extends BasePresenter implements UrlValidation
 	{
 		$source = $this->articlesModel->findAll()
 			->select($this->articlesModel->getTableName().".*")
+			// ColumnStatus porovnává hodnotu striktně s volbami 0/1, PostgreSQL vrací `active` jako bool - proto jako int
+			->select("CASE WHEN ".$this->articlesModel->getTableName().".active THEN 1 ELSE 0 END AS active_status")
 			->where($this->articlesModel->getTableName().".historyId", null)
 			->where($this->articlesModel->getTableName().".sectionId", $this->getSectionId())
 			->order($this->articlesModel->getTableName().".createDate DESC")
@@ -199,7 +201,7 @@ class ArticlesPresenter extends BasePresenter implements UrlValidation
 		$grid->setTranslator($this->translator);
 
 		//active
-		$active_column = $grid->addColumnStatus('active', 'A.');
+		$active_column = $grid->addColumnStatus('active_status', 'A.');
 		$active_column->getElementPrototype("th")->setTitle($this->translator->translate("Active"));
 		$active_column->addOption(0, 'Unactive') // show if status == 0
 		->setClass('btn-danger')
@@ -305,7 +307,9 @@ class ArticlesPresenter extends BasePresenter implements UrlValidation
 	 */
 	protected function createComponentCategoriesGrid(string $name): Datagrid
 	{
-		$source = $this->articlesModel->getRelationCategory((int) $this->id);
+		$source = $this->articlesModel->getRelationCategory((int) $this->id)
+			// ColumnStatus porovnává hodnotu striktně s volbami 0/1, PostgreSQL vrací `isMain` jako bool - proto jako int
+			->select("CASE WHEN " . Categories::RELATION_ARTICLE_TABLE_NAME . ".isMain THEN 1 ELSE 0 END AS is_main_status");
 		$this->categoriesModel->selectTitle($source, Categories::RELATION_ARTICLE_TABLE_NAME . ".categoryId", $this->editLocale)
 			->order("title");
 		$primaryKey = "categoryId";
@@ -316,7 +320,7 @@ class ArticlesPresenter extends BasePresenter implements UrlValidation
 		$grid->setTranslator($this->translator);
 
 		//isMain
-		$mainColumn = $grid->addColumnStatus('isMain', 'M.');
+		$mainColumn = $grid->addColumnStatus('is_main_status', 'M.');
 		$mainColumn->getElementPrototype("th")->setTitle($this->translator->translate("Main"));
 		$mainColumn->addOption(0, 'Not main') // show if status == 0
 			->setClass('btn-danger ajax')

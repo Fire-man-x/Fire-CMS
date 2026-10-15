@@ -96,7 +96,9 @@ class MenusPresenter extends BasePresenter
 		// název = nadpis ve výchozím jazyce (firecms_menuDescriptions), menu bez nadpisu se pozná podle location
 		// select() vypíná výchozí `*`, sloupce tabulky je proto nutné vybrat výslovně
 		$source = $this->menusModel->findAll()
-			->select($this->menusModel->delimite($this->menusModel->getTableName()) . ".*");
+			->select($this->menusModel->delimite($this->menusModel->getTableName()) . ".*")
+			// ColumnStatus porovnává hodnotu striktně s volbami 0/1, PostgreSQL vrací `active` jako bool - proto jako int
+			->select("CASE WHEN " . $this->menusModel->getTableName() . ".active THEN 1 ELSE 0 END AS active_status");
 		$this->menusModel->selectTitle($source, $this->menusModel->getTableName() . ".id");
 		$source->order("title")->order("location");
 		$primaryKey = $this->menusModel->getColumnId();
@@ -108,7 +110,7 @@ class MenusPresenter extends BasePresenter
 		$grid->setTranslator($this->translator);
 
 		//active
-		$activeColumn = $grid->addColumnStatus('active', 'A.');
+		$activeColumn = $grid->addColumnStatus('active_status', 'A.');
 		$activeColumn->getElementPrototype("th")->setTitle($this->translator->translate("Active"));
 		$activeColumn->addOption(0, 'Unactive') // show if status == 0
 		->setClass('btn-danger')

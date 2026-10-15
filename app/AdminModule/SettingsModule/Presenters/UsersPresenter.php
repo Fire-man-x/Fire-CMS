@@ -58,6 +58,8 @@ class UsersPresenter extends BasePresenter
 		$source = $this->users->findAll()
 			->select($this->users->getTableName().'.*')
 			->select('role.title AS role_title')
+			// ColumnStatus porovnává hodnotu striktně s volbami 0/1, PostgreSQL vrací `active` jako bool - proto jako int
+			->select('CASE WHEN '.$this->users->getTableName().'.active THEN 1 ELSE 0 END AS active_status')
 			->order($this->users->getColumnId());
 		$primaryKey = $this->users->getColumnId();
 
@@ -66,7 +68,7 @@ class UsersPresenter extends BasePresenter
 		$grid->setDataSource($source);
 		$grid->setTranslator($this->translator);
 
-		$active_column = $grid->addColumnStatus('active', 'A.');
+		$active_column = $grid->addColumnStatus('active_status', 'A.');
 		$active_column->getElementPrototype("th")->setTitle($this->translator->translate("Active"));
 		$active_column->addOption(0, 'Unactive') // show if status == 0
 		->setClass('btn-danger')

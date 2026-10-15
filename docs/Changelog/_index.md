@@ -4,6 +4,10 @@ Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na det
 
 ## 2026-10-15
 
+- **Přepínače aktivity v gridech na PostgreSQL.** Status sloupce gridů uživatelů, článků (i hlavní kategorie), menu,
+  jazyků a domén ukazovaly na PostgreSQL jen `1`; příznak se teď do gridu posílá jako `int` z SQL.
+  Viz [2026-10-15-datagrid-status-pgsql.md](2026-10-15-datagrid-status-pgsql.md).
+
 - **Detail článku: kategorie, pole URL, přepínač aktivity.** Obrázky a grid kategorií za formulářem článku (datagrid
   by vnořil formulář), „Přidat“ v okně kategorií už neotevírá okno obrázků, přidání obrázku nemaže pole URL,
   přepínač aktivity jen u článků s právem `edit` a bez chybové stránky.
