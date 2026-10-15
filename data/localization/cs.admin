@@ -365,3 +365,4 @@ a:2:{i:0;s:7:"Contact";i:1;s:7:"Kontakt";}
 a:2:{i:0;s:7:"Enabled";i:1;s:8:"Povoleno";}
 a:2:{i:0;s:8:"Disabled";i:1;s:10:"Zakázáno";}
 a:2:{i:0;s:8:"Location";i:1;s:11:"Umístění";}
+a:2:{i:0;s:49:"If empty, the value from global settings is used.";i:1;s:66:"Pokud je prázdné, použije se hodnota z globálního nastavení.";}

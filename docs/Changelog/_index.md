@@ -4,6 +4,10 @@ Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na det
 
 ## 2026-10-15
 
+- **E-mail a telefon webu v globálním nastavení i po jazycích.** `firecms_settings.mainEmail` a
+  `firecms_settingDescriptions.contactPhone` (migrace `structures/20261015120000.sql`), prázdná hodnota jazyka = globální.
+  Viz [2026-10-15-settings-email-phone.md](2026-10-15-settings-email-phone.md).
+
 - **Přepínače aktivity v gridech na PostgreSQL.** Status sloupce gridů uživatelů, článků (i hlavní kategorie), menu,
   jazyků a domén ukazovaly na PostgreSQL jen `1`; příznak se teď do gridu posílá jako `int` z SQL.
   Viz [2026-10-15-datagrid-status-pgsql.md](2026-10-15-datagrid-status-pgsql.md).

@@ -123,8 +123,8 @@ Pages, úvodní stránka je `Front:Homepage`), správce souborů
 (`Files`/`FileFolders`), menu (`Menus`), štítky (`Tags`), SEO meta (`Metas`), uživatelé/role
 (`Users`/`Roles`), vícejazyčnost (`LiveTranslator` + `Languages`/`LanguageService`), hezká URL a
 přesměrování (`Urls`/`Redirections` + `App\Model\UrlManager`), komentáře (`CommentsModule`), nastavení webu (`Settings` - jeden řádek
-`firecms_settings` s globálními hodnotami `imageResolution`/`themePath`/`contactPhone`/`mapLatitude`/
-`mapLongitude` + texty po jazycích ve `firecms_settingDescriptions`, včetně `contactAddress`).
+`firecms_settings` s globálními hodnotami `imageResolution`/`themePath`/`mainEmail`/`contactPhone`/`mapLatitude`/
+`mapLongitude` + texty po jazycích ve `firecms_settingDescriptions`, včetně `mainEmail`/`contactPhone`/`contactAddress`).
 
 Pravidla, která nejsou vidět ze schématu:
 - **Stránky** se mažou trvale (ne do koše), `delete()` uklidí URL i položky menu a podstránky přesune o úroveň
@@ -145,4 +145,7 @@ Pravidla, která nejsou vidět ze schématu:
   šablony (`$options['main_title']`), ne zapomenutý převod. Globální klíče má formulář Nastavení v jednom
   kontejneru `global` (`Settings::saveGlobal()`), ne v každém jazyce - jinak by vyhrála hodnota posledního jazyka.
   Vymazané pole se ukládá jako NULL (`property_exists`, ne `isset`).
+  `main_email` a `contact_phone` jsou v obou tabulkách (klíč v `GLOBAL_COLUMN_MAP` i `DESCRIPTION_COLUMN_MAP`):
+  `getAllForLanguage()`/`getByKey()` vrátí hodnotu jazyka, prázdnou nahradí globální. Formulář plní každou tabulku
+  zvlášť (`getGlobalValues()`, `getLanguageValues()`), aby se globální hodnota neuložila k jazyku.
 - **`UrlManager::validateUrl()`** hlídá unikátnost slugu napříč celou `firecms_urls` (všechny typy i jazyky).

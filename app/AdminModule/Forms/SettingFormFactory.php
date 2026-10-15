@@ -52,6 +52,11 @@ class SettingFormFactory extends AdminFormFactory
 			->getControlPrototype()->placeholder("1000x1000");
 		$global->addSelect('themePath', 'Templates', $templatesItems)
 			->setTranslator(null);
+		$global->addText('main_email', 'Email')
+			->setHtmlType('email')
+			->setNullable()
+			->setMaxLength(100)
+			->addRule(Form::Email, VALIDATE_FORMAT);
 		$global->addText('contact_phone', 'Phone')
 			->setHtmlType('tel')
 			->setNullable()
@@ -82,10 +87,19 @@ class SettingFormFactory extends AdminFormFactory
 				->setNullable();
 			$container->addText('main_description', 'Web description')
 				->setNullable();
+			// e-mail a telefon jsou i v globálním nastavení - prázdné pole jazyka = použije se globální hodnota
 			$container->addText('main_email', 'Email')
 				->setHtmlType('email')
 				->setNullable()
-				->addRule(Form::Email, VALIDATE_FORMAT);
+				->setMaxLength(100)
+				->setOption('description', 'If empty, the value from global settings is used.')
+				->addCondition(Form::Filled)
+					->addRule(Form::Email, VALIDATE_FORMAT);
+			$container->addText('contact_phone', 'Phone')
+				->setHtmlType('tel')
+				->setNullable()
+				->setMaxLength(50)
+				->setOption('description', 'If empty, the value from global settings is used.');
 			$container->addTextArea('contact_address', 'Address', null, 3)
 				->setNullable();
 
@@ -100,10 +114,11 @@ class SettingFormFactory extends AdminFormFactory
 		$form->setCurrentGroup();
 		$form->buttons->addSubmit('send', 'Save');
 
-		//default values, global values + one language per container
-		$defaults = ['data' => $this->model->getAllForLanguage($this->languages->getDefaultLanguage()), 'locales' => []];
+		//default values, global values + one language per container - každá tabulka zvlášť, bez doplnění globální
+		// hodnoty do jazyka (uložení by ji jinak zkopírovalo do jazyka a změna globální by se už neprojevila)
+		$defaults = ['data' => $this->model->getGlobalValues(), 'locales' => []];
 		foreach ($this->languages->getLanguages() as $languageId => $language) {
-			$defaults['locales'][$languageId] = $this->model->getAllForLanguage((string) $languageId);
+			$defaults['locales'][$languageId] = $this->model->getLanguageValues((string) $languageId);
 		}
 		$form->setDefaults($defaults);
 
