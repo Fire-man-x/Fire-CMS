@@ -29,7 +29,7 @@ class FilesManagerUploadFormFactory extends AdminFormFactory
 		// upload zůstává přímo na formuláři, ne v `data`: knihovna jquery-fileupload hledá soubor i token podle
 		// plochého HTML jména (`$files[$control->getHtmlName()]`, POST `<jméno>-token`), `data[files]` by nenašla.
 		// Z hodnot je vynechaný (AdminFormValues vlastnost `files` nemá), hodnota se čte přímo z prvku.
-		$form->addFileUpload('files')
+		$form->addFileUpload('files', 'Files')
 			->setOmitted();
 		/* ->setRequired(true)
 		  ->addRule(Form::IMAGE); */

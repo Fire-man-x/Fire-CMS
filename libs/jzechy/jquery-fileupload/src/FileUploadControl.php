@@ -161,11 +161,14 @@ class FileUploadControl extends UploadControl
 		}
 
 		$class = self::class;
+		// addFileUpload(název, popisek, max. počet souborů, max. velikost souboru) - pořadí jako u addUpload()/addText(),
+		// popisek je druhý parametr (null = bez popisku)
 		Nette\Forms\Container::extensionMethod('addFileUpload', function (
 			Nette\Forms\Container $container,
-			$name,
-			$maxFiles = null,
-			$maxFileSize = null
+			string $name,
+			string|\Stringable|null $label = null,
+			?int $maxFiles = null,
+			?string $maxFileSize = null
 		) use (
 			$class,
 			$systemContainer,
@@ -176,6 +179,8 @@ class FileUploadControl extends UploadControl
 
 			/** @var FileUploadControl $component */
 			$component = new $class($name, $maxFiles, $maxFileSize);
+			// konstruktor předává rodiči (UploadControl) jako popisek název prvku - nahradíme ho skutečným popiskem
+			$component->setCaption($label);
 			$component->setContainer($systemContainer);
 			$component->setUploadModel($configuration['uploadModel']);
 			$component->setFileFilter($configuration['fileFilter']);

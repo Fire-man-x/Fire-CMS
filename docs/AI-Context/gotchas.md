@@ -152,7 +152,8 @@ vytvořte přímo a přidejte ho přes `$form->data->addComponent(new TagInput(.
 Výjimka je upload `addFileUpload()` (jquery-fileupload): knihovna hledá soubor i token podle plochého HTML jména
 (`$files[$control->getHtmlName()]`, POST `<jméno>-token`), takže v `data[files]` by upload nefungoval. Prvek zůstává
 přímo na formuláři se `setOmitted()` (`AdminFormValues` nemá vlastnost `files`) a hodnota se čte z prvku, viz
-`FilesManagerUploadFormFactory`.
+`FilesManagerUploadFormFactory`. Signatura je `addFileUpload($name, $label, $maxFiles, $maxFileSize)` — popisek je
+druhý parametr (do 2026-10-16 tam byl `$maxFiles`).
 
 Skupiny (`$form->addGroup()`) a kontejnery jazyků: `Container::addContainer()` převezme aktuální skupinu rodiče.
 `locales` vzniká líně při prvním přístupu, takže všechny kontejnery jazyků by skončily ve skupině prvního jazyka.

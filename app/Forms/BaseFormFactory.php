@@ -12,7 +12,7 @@ use App\Components\DateInput\DateInput;
 /**
  * Abstract Base Form factory
  * @method self addOwnDate($label = null, $type = DateInput::TYPE_DATETIME_LOCAL)
- * @method self addFileUpload(string $name, int $maxFiles = NULL, int $maxFileSize = null)
+ * @method self addFileUpload(string $name, string|\Stringable|null $label = null, ?int $maxFiles = null, ?string $maxFileSize = null)
  */
 abstract class BaseFormFactory
 {

@@ -2,6 +2,12 @@
 
 Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na detailní záznam v `Changelog/`.
 
+## 2026-10-16
+
+- **`addFileUpload()` s popiskem.** Signatura `addFileUpload($name, $label, $maxFiles, $maxFileSize)` — popisek je
+  druhý parametr, dřív se jako popisek zobrazoval název prvku. Viz
+  [2026-10-16-fileupload-label.md](2026-10-16-fileupload-label.md).
+
 ## 2026-10-15
 
 - **E-mail a telefon webu v globálním nastavení i po jazycích.** `firecms_settings.mainEmail` a

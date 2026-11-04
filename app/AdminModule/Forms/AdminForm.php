@@ -32,7 +32,7 @@ use App\Components\TwitterBootstrapRenderer\TwitterBootstrapRenderer;
  * @property-read Container $buttons Buttons container
  * @property array<callable(static, AdminFormValues): void> $onSuccess
  * @property array<callable(static, AdminFormValues): void> $onValidate
- * @method addFileUpload(string $name, int $maxFiles = null, int $maxFileSize = null)
+ * @method \Contributte\FileUpload\FileUploadControl addFileUpload(string $name, string|\Stringable|null $label = null, ?int $maxFiles = null, ?string $maxFileSize = null) název, popisek, max. počet souborů, max. velikost souboru (např. '5M')
  */
 class AdminForm extends Form
 {
