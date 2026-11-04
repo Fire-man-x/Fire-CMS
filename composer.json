@@ -20,7 +20,8 @@
 		"dragonmantank/cron-expression": "^3.4",
 		"league/flysystem": "^3",
 		"league/flysystem-aws-s3-v3": "^3",
-		"contributte/sentry": "^0.5"
+		"contributte/sentry": "^0.5",
+		"mcp/sdk": "^0.9"
     },
 	"require-dev": {
 		"nette/tester": "*",
@@ -77,5 +78,10 @@
     },
 	"extra": {
 		"aws/aws-sdk-php": ["S3", "Sts"]
+	},
+	"config": {
+		"allow-plugins": {
+			"php-http/discovery": false
+		}
 	}
 }

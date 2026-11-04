@@ -160,6 +160,9 @@ vyřešeno přes `App\DI\IPluginServiceLocator` / `IPluginComponentLocator`. `pr
 (`App\DI\PluginMenuItem`) se sbírají v `App\DI\PluginServiceLocator::getList()` a vykreslují v admin
 `@layout.latte` dropdownu "Other" — dynamicky, podle toho, co je zrovna aktivní.
 
+Bez tagu, jen podle typu služby, sbírá jádro cron úlohy (`App\Cron\CronTask`, viz [cron.md](cron.md)) a nástroje
+MCP serveru (`App\Mcp\McpToolProvider`, viz [mcp.md](mcp.md)) - stačí službu zaregistrovat v `config.plugin.neon`.
+
 ## Překlady pluginu a tématu (`<plugin>/data/localization/`, `theme/data/localization/`)
 
 Plugin si nese vlastní překladové soubory ve stejném formátu jako `data/localization/` jádra

@@ -5,7 +5,7 @@ namespace App\Router\DI;
 use App\Router\RouterProvider;
 use Nette\Application\Routers\RouteList;
 use Nette\DI\CompilerExtension;
-use Nette\DI\Definitions\Definition;
+use Nette\DI\Definition;
 use Nette\DI\Definitions\ServiceDefinition;
 use Nette\DI\Definitions\Statement;
 use Nette\Schema\Expect;

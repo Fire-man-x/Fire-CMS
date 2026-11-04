@@ -12,6 +12,11 @@ parameters:
 		driver: mysql
 	# token pro cron endpoint /cron (App\Presenters\CronPresenter) - nastavte v config.local.neon, prázdný = vypnuto
 	cronToken: ''
+	# MCP server /mcp (App\Presenters\McpPresenter) - název a verze, které uvidí AI klient; přepište v neonu
+	# projektu/pluginu. Endpoint odpovídá, jen když nějaká služba implementuje App\Mcp\McpToolProvider.
+	mcp:
+		serverName: Fire CMS
+		serverVersion: '1.0.0'
 	# login with Facebook (App\Security\FacebookLogin) - clientId and clientSecret  setup in config.local.neon
 	facebook:
 		clientId: ''
@@ -98,6 +103,7 @@ router:
 	priorities:
 		App\Router\AdminRouter: 100
 		App\Router\CronRouter: 90
+		App\Router\McpRouter: 80
 		App\Router\FileRouter: -50
 		App\Router\FrontRouter: -100
 
@@ -195,6 +201,19 @@ services:
 	- App\Model\Database\CronTasks
 	- App\Cron\CronSettings(%cronToken%)
 	- App\Cron\CronRunner(tasks: typed(App\Cron\CronTask), tempDir: %tempDir%)
+
+	# MCP server - nástroje jsou všechny služby implementující App\Mcp\McpToolProvider (i z pluginů), viz App\Presenters\McpPresenter.
+	# Logger není autowirovaný, aby se nestal PSR-3 loggerem celé aplikace (propouští jen varování a chyby).
+	mcp.logger:
+		factory: App\Mcp\McpLogger
+		autowired: false
+	- App\Mcp\McpServer(
+		toolProviders: typed(App\Mcp\McpToolProvider)
+		serverName: %mcp.serverName%
+		serverVersion: %mcp.serverVersion%
+		sessionDir: %tempDir%/mcp-sessions
+		logger: @mcp.logger
+	)
 
 	- App\Model\UserManager
 	roles: App\Model\Database\Roles

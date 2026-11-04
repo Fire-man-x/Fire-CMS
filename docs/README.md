@@ -22,6 +22,7 @@ projektu si každý projekt popíše vlastním `.github/workflows/deploy.yml` po
 - [Routing](Architecture/routing.md) — tři routery, DB-podložená hezká URL, priority
 - [Konfigurace](Architecture/configuration.md) — NEON vrstvení, DI extensions
 - [Cron](Architecture/cron.md) — endpoint `/cron`, `App\Cron\CronTask`, kdy úloha poběží
+- [MCP server](Architecture/mcp.md) — endpoint `/mcp` pro AI asistenty, nástroje z pluginů přes `App\Mcp\McpToolProvider`
 - [Sessions](Architecture/sessions.md) — úložiště sessions (soubory, MySQL, PostgreSQL, Redis), `sessionHandler:` v theme.neon
 - [Úložiště souborů](Architecture/file-storage.md) — úložiště na lokálním disku nebo S3 (`fileStorage: <název>:`) se schématem názvů (`NamingScheme`) a povolenými náhledy obrázků (`thumbnails:` u úložiště)
 

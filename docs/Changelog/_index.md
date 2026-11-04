@@ -2,6 +2,12 @@
 
 Chronologický přehled (nejnovější nahoře). Každý řádek odkazuje na detailní záznam v `Changelog/`.
 
+## 2026-11-04
+
+- **MCP server `/mcp`.** AI asistenti volají nástroje webu přes MCP (oficiální SDK `mcp/sdk`). Nástroje přidává
+  plugin službou `App\Mcp\McpToolProvider` s metodami `#[McpTool]`, bez nástrojů endpoint vrací 404. Viz
+  [2026-11-04-mcp-server.md](2026-11-04-mcp-server.md) a [Architecture/mcp.md](../Architecture/mcp.md).
+
 ## 2026-10-16
 
 - **`addFileUpload()` s popiskem.** Signatura `addFileUpload($name, $label, $maxFiles, $maxFileSize)` — popisek je
